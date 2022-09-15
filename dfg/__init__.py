@@ -9,9 +9,16 @@ import cv2 as cv
 import numpy as np
 import layoutparser as lp
 
-model = lp.models.Detectron2LayoutModel('lp://PubLayNet/mask_rcnn_X_101_32x8d_FPN_3x/config',
-                             extra_config=["MODEL.ROI_HEADS.SCORE_THRESH_TEST", 0.8],
-                             label_map={0: "Text", 1: "Title", 2: "List", 3:"Table", 4:"Figure"})
+def list_pdfs():
+    files = os.listdir('pdfs')
+
+    for file in files:
+        if not f.endswith('.pdf'):
+            continue
+
+        yield file
+
+# true pdf image extraction
 
 def get_images(doc):
     result = []
@@ -34,32 +41,49 @@ def save_images(images, output):
         with open(os.path.join(output, f"{image['name']}.{image['ext']}"), 'wb') as image_file:
             image_file.write(image['image'])
 
-def render_to_image(pdf, output):
-    images = convert_from_path(pdf) #, output_folder=output, fmt='jpeg')
+# image rendering and layout parser extraction
+
+model = lp.models.Detectron2LayoutModel('lp://PubLayNet/mask_rcnn_X_101_32x8d_FPN_3x/config',
+                             extra_config=["MODEL.ROI_HEADS.SCORE_THRESH_TEST", 0.8],
+                             label_map={0: "Text", 1: "Title", 2: "List", 3:"Table", 4:"Figure"})
+
+def persist_page_images(images, output):
+    for idx, image in enumerate(images):
+        image = np.array(image)
+        path = os.path.join(output, f'page_{idx}.jpg')
+        cv.imwrite(image, path)
+        yield (idx, f'page_{idx}.jpg')
+
+def extract_image_from_page(db, pdf, output):
+    pdf_name = os.path.splitext(pdf['file'])[0]
+    images = convert_from_path(pdf['full_path_file'])
+    image_names = persist_page_images(images)
+    image_paths = map(lambda name: os.path.join(pdf_name, name), image_names)
+    pages = db.save_pages(db, pdf, image_paths)
 
     for idx, image in enumerate(images):
-        process_image(np.array(image), output, idx)
+        page = pages[idx]
+        page_images = process_image(page, np.array(image), output, idx)
+        page_images = map(lambda image: os.path.join(pdf_name, image), page_images)
+        db.save_images(db, page, page_images)
 
-def process_image(image, output, image_idx):
+def process_image(page, image, output, image_idx):
     layout = model.detect(image)
     figure_blocks = lp.Layout([b for b in layout if b.type=='Figure'])
-    print(len(figure_blocks))
     for idx, block in enumerate(figure_blocks):
         segment_image = block.pad(left=5, right=5, top=5, bottom=5).crop_image(image)
-        print(os.path.join(output, str(idx) + '_' + str(image_idx) + '.jpg'))
-        cv.imwrite(os.path.join(output, str(idx) + '_' + str(image_idx) + '.jpg'), segment_image)
+        image_path = str(idx) + '_' + str(image_idx) + '.jpg'
+        cv.imwrite(os.path.join(output, image_path), segment_image)
+        yield image_path
 
-def process_pdf_folder(folder, f):
-    files = os.listdir(folder)
-    files = filter(lambda f: f.endswith('.pdf'), files)
+def process_pdf_folder(db, folder, f):
+    pdfs = list_pdfs()
+    pdfs = db.save_publications(db, pdfs)
 
-    # pool = Pool()
-    for file in files:
-        output = os.path.join(folder, os.path.splitext(file)[0])
+    for pdf in pdfs:
+        output = os.path.join(os.getenv('PDF_ROOT'), os.path.splitext(pdf['file'])[0])
         if not os.path.exists(output):
             os.mkdir(output)
+        pdf['full_path_file'] = os.path.join(os.getenv('PDF_ROOT'), file)
 
-        f(os.path.join(folder, file), output)
-        # pool.apply_async(f, (os.path.join(folder, file), output))
-    # pool.close()
-    # pool.join()
+        f(db, pdf, output)
