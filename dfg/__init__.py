@@ -8,6 +8,26 @@ from pdf2image import convert_from_path, convert_from_bytes
 import cv2 as cv
 import numpy as np
 import layoutparser as lp
+from pyrsistent import PRecord, field, v
+
+# ids are optional due to instanciation
+
+class Publication(PRecord):
+    id = field(type=(int, type(None)))
+    file = field(type=str)
+    author = field(type=(str, type(None)))
+    title = field(type=(str, type(None)))
+    pages = field()
+
+class Page(PRecord):
+    id = field(type=(int, type(None)))
+    number = field(type=int)
+    image_file = field(type=str)
+    publicaton_id = field(type=(int, type(None)))
+
+class PageImage(PRecord):
+    id = field(type=(int, type(None)))
+
 
 def list_pdfs():
     files = os.listdir('pdfs')
@@ -59,12 +79,14 @@ def extract_image_from_page(db, pdf, output):
     images = convert_from_path(pdf['full_path_file'])
     image_names = persist_page_images(images)
     image_paths = map(lambda name: os.path.join(pdf_name, name), image_names)
-    pages = db.save_pages(db, pdf, image_paths)
 
-    for idx, image in enumerate(images):
-        page = pages[idx]
+    publication = Publication(file=pdf)
+    pages = v(Page(number=idx, image_file=image) for idx, image in enumerate(image_paths))
+
+    for idx, page in enumerate(pages):
         page_images = process_image(page, np.array(image), output, idx)
         page_images = map(lambda image: os.path.join(pdf_name, image), page_images)
+
         db.save_images(db, page, page_images)
 
 def process_image(page, image, output, image_idx):
