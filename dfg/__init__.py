@@ -8,7 +8,7 @@ from pdf2image import convert_from_path, convert_from_bytes
 import cv2 as cv
 import numpy as np
 import layoutparser as lp
-from pyrsistent import PRecord, field, v
+from pyrsistent import PRecord, field, pvector
 
 # ids are optional due to instanciation
 
@@ -22,12 +22,17 @@ class Publication(PRecord):
 class Page(PRecord):
     id = field(type=(int, type(None)))
     number = field(type=int)
-    image_file = field(type=str)
+    page_image = field()
     publicaton_id = field(type=(int, type(None)))
+    images = field()
 
 class PageImage(PRecord):
     id = field(type=(int, type(None)))
+    image = field()
 
+class Shape(PRecord):
+    id = field(type=(int, type(None)))
+    
 
 def list_pdfs():
     files = os.listdir('pdfs')
@@ -67,40 +72,33 @@ model = lp.models.Detectron2LayoutModel('lp://PubLayNet/mask_rcnn_X_101_32x8d_FP
                              extra_config=["MODEL.ROI_HEADS.SCORE_THRESH_TEST", 0.8],
                              label_map={0: "Text", 1: "Title", 2: "List", 3:"Table", 4:"Figure"})
 
-def persist_page_images(images, output):
-    for idx, image in enumerate(images):
-        image = np.array(image)
-        path = os.path.join(output, f'page_{idx}.jpg')
-        cv.imwrite(image, path)
-        yield (idx, f'page_{idx}.jpg')
+def extract_image_from_page(pdf, output):
+    pdf_name = os.path.splitext(os.path.basename(pdf))[0]
+    images = convert_from_path(pdf)
 
-def extract_image_from_page(db, pdf, output):
-    pdf_name = os.path.splitext(pdf['file'])[0]
-    images = convert_from_path(pdf['full_path_file'])
-    image_names = persist_page_images(images)
-    image_paths = map(lambda name: os.path.join(pdf_name, name), image_names)
+    pages = pvector(Page(number=idx, page_image=np.array(image)) for idx, image in enumerate(images))
 
-    publication = Publication(file=pdf)
-    pages = v(Page(number=idx, image_file=image) for idx, image in enumerate(image_paths))
+    e = pages.evolver()
+    for idx, page in enumerate(pages[:3]):
+        page_images = process_image(page, page.get('page_image'), output, idx)
 
-    for idx, page in enumerate(pages):
-        page_images = process_image(page, np.array(image), output, idx)
-        page_images = map(lambda image: os.path.join(pdf_name, image), page_images)
+        e[idx] = page.set('images', pvector(PageImage(image=image) for image in page_images))
 
-        db.save_images(db, page, page_images)
+    pages = e.persistent()
+
+    publication = Publication(file=pdf, pages=pages)
+    return publication
+
 
 def process_image(page, image, output, image_idx):
     layout = model.detect(image)
     figure_blocks = lp.Layout([b for b in layout if b.type=='Figure'])
     for idx, block in enumerate(figure_blocks):
         segment_image = block.pad(left=5, right=5, top=5, bottom=5).crop_image(image)
-        image_path = str(idx) + '_' + str(image_idx) + '.jpg'
-        cv.imwrite(os.path.join(output, image_path), segment_image)
-        yield image_path
+        yield segment_image
 
-def process_pdf_folder(db, folder, f):
+def process_pdf_folder(folder, f):
     pdfs = list_pdfs()
-    pdfs = db.save_publications(db, pdfs)
 
     for pdf in pdfs:
         output = os.path.join(os.getenv('PDF_ROOT'), os.path.splitext(pdf['file'])[0])
@@ -108,4 +106,4 @@ def process_pdf_folder(db, folder, f):
             os.mkdir(output)
         pdf['full_path_file'] = os.path.join(os.getenv('PDF_ROOT'), file)
 
-        f(db, pdf, output)
+        f(pdf, output)

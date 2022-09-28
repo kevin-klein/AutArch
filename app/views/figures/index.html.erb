@@ -1,0 +1,14 @@
+<p style="color: green"><%= notice %></p>
+
+<h1>Figures</h1>
+
+<div id="figures">
+  <% @figures.each do |figure| %>
+    <%= render figure %>
+    <p>
+      <%= link_to "Show this figure", figure %>
+    </p>
+  <% end %>
+</div>
+
+<%= link_to "New figure", new_figure_path %>

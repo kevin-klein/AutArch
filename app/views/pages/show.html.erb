@@ -1,0 +1,22 @@
+<p style="color: green"><%= notice %></p>
+
+<%= render @page %>
+
+<div>
+  <%= link_to "Edit this page", edit_page_path(@page) %> |
+  <%= link_to "Back to pages", pages_path %>
+
+  <%= button_to "Destroy this page", @page, method: :delete %>
+</div>
+
+<table>
+  <tbody>
+    <% @page.figures.each do |figure| %>
+      <tr>
+        <td>
+          <img src="data:image/jpeg;base64,<%= Base64.encode64 figure.image.data %>"/>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

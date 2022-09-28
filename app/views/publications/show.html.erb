@@ -1,0 +1,28 @@
+<p style="color: green"><%= notice %></p>
+
+<table class='table'>
+  <thead>
+    <tr>
+      <th>Page</th>
+      <th>Image</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @publication.pages.each do |page| %>
+      <tr>
+        <td><%= link_to page.number + 1, page %></td>
+        <td>
+          <img src="data:image/jpeg;base64,<%= Base64.encode64 page.image.data %>"/>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<div>
+  <%= link_to "Edit this publication", edit_publication_path(@publication) %> |
+  <%= link_to "Back to publications", publications_path %>
+
+  <%= button_to "Destroy this publication", @publication, method: :delete %>
+</div>

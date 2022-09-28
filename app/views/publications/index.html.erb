@@ -1,0 +1,32 @@
+<p style="color: green"><%= notice %></p>
+
+<h1>Publications</h1>
+
+<table class='table'>
+  <thead>
+    <tr>
+      <th>Title</th>
+      <th>Author</th>
+      <th></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @publications.each do |publication| %>
+      <tr>
+        <td>
+          <%= publication.title %>
+        </td>
+        <td>
+          <%= publication.author %>
+        </td>
+        <td>
+          <%= link_to "Show this publication", publication %>
+          <%= link_to "Analyze", analyze_publication_path(publication) %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<%= link_to "New publication", new_publication_path %>
