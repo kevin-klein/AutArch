@@ -1,0 +1,2 @@
+module PageImagesHelper
+end
