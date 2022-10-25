@@ -14,7 +14,8 @@ class PageImagesTest < ApplicationSystemTestCase
     visit page_images_url
     click_on "New page image"
 
-    fill_in "Np array bytes", with: @page_image.np_array_bytes
+    fill_in "Data", with: @page_image.data
+    fill_in "Page", with: @page_image.page_id
     click_on "Create Page image"
 
     assert_text "Page image was successfully created"
@@ -25,7 +26,8 @@ class PageImagesTest < ApplicationSystemTestCase
     visit page_image_url(@page_image)
     click_on "Edit this page image", match: :first
 
-    fill_in "Np array bytes", with: @page_image.np_array_bytes
+    fill_in "Data", with: @page_image.data
+    fill_in "Page", with: @page_image.page_id
     click_on "Update Page image"
 
     assert_text "Page image was successfully updated"

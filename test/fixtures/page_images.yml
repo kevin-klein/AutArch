@@ -1,7 +1,9 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  np_array_bytes: 
+  page: one
+  data: 
 
 two:
-  np_array_bytes: 
+  page: two
+  data: 

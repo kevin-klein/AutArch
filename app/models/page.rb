@@ -1,5 +1,5 @@
 class Page < ApplicationRecord
   belongs_to :publication
   belongs_to :image
-  has_many :figures
+  has_many :page_images
 end

@@ -1,0 +1,14 @@
+<p style="color: green"><%= notice %></p>
+
+<h1>Page images</h1>
+
+<div id="page_images">
+  <% @page_images.each do |page_image| %>
+    <%= render page_image %>
+    <p>
+      <%= link_to "Show this page image", page_image %>
+    </p>
+  <% end %>
+</div>
+
+<%= link_to "New page image", new_page_image_path %>
