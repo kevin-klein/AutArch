@@ -1,4 +1,3 @@
 class Figure < ApplicationRecord
-  belongs_to :page
-  belongs_to :image
+  belongs_to :page_image
 end

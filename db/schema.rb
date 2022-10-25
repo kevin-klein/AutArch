@@ -10,25 +10,32 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_09_28_144228) do
+ActiveRecord::Schema[7.0].define(version: 2022_09_30_171030) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
   create_table "figures", force: :cascade do |t|
-    t.bigint "page_id", null: false
-    t.bigint "image_id", null: false
-    t.jsonb "shape"
+    t.bigint "page_image_id", null: false
+    t.jsonb "shape", null: false
     t.string "tags", array: true
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["image_id"], name: "index_figures_on_image_id"
-    t.index ["page_id"], name: "index_figures_on_page_id"
+    t.index ["page_image_id"], name: "index_figures_on_page_image_id"
   end
 
   create_table "images", force: :cascade do |t|
     t.binary "data"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "page_images", force: :cascade do |t|
+    t.bigint "page_id", null: false
+    t.bigint "image_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["image_id"], name: "index_page_images_on_image_id"
+    t.index ["page_id"], name: "index_page_images_on_page_id"
   end
 
   create_table "pages", force: :cascade do |t|
@@ -49,8 +56,9 @@ ActiveRecord::Schema[7.0].define(version: 2022_09_28_144228) do
     t.datetime "updated_at", null: false
   end
 
-  add_foreign_key "figures", "images", on_delete: :cascade
-  add_foreign_key "figures", "pages", on_delete: :cascade
+  add_foreign_key "figures", "page_images", on_delete: :cascade
+  add_foreign_key "page_images", "images", on_delete: :cascade
+  add_foreign_key "page_images", "pages", on_delete: :cascade
   add_foreign_key "pages", "images", on_delete: :cascade
   add_foreign_key "pages", "publications", on_delete: :cascade
 end

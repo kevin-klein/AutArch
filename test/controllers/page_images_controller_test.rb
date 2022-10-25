@@ -17,7 +17,7 @@ class PageImagesControllerTest < ActionDispatch::IntegrationTest
 
   test "should create page_image" do
     assert_difference("PageImage.count") do
-      post page_images_url, params: { page_image: { np_array_bytes: @page_image.np_array_bytes } }
+      post page_images_url, params: { page_image: { data: @page_image.data, page_id: @page_image.page_id } }
     end
 
     assert_redirected_to page_image_url(PageImage.last)
@@ -34,7 +34,7 @@ class PageImagesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should update page_image" do
-    patch page_image_url(@page_image), params: { page_image: { np_array_bytes: @page_image.np_array_bytes } }
+    patch page_image_url(@page_image), params: { page_image: { data: @page_image.data, page_id: @page_image.page_id } }
     assert_redirected_to page_image_url(@page_image)
   end
 

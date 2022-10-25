@@ -65,6 +65,6 @@ class PageImagesController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def page_image_params
-      params.require(:page_image).permit(:np_array_bytes)
+      params.require(:page_image).permit(:page_id, :data)
     end
 end
