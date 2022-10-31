@@ -4,35 +4,7 @@ db/schema.rb linguist-generated
 # Mark any vendored files as having been vendored.
 vendor/* linguist-vendored
 dfg-0000.params filter=lfs diff=lfs merge=lfs -text
-*.gitignore filter=lfs diff=lfs merge=lfs -text
-*.ruby-version filter=lfs diff=lfs merge=lfs -text
-*.lock filter=lfs diff=lfs merge=lfs -text
-*.md filter=lfs diff=lfs merge=lfs -text
-*.js filter=lfs diff=lfs merge=lfs -text
-*.keep filter=lfs diff=lfs merge=lfs -text
-*.css filter=lfs diff=lfs merge=lfs -text
-*.rb filter=lfs diff=lfs merge=lfs -text
-*.erb filter=lfs diff=lfs merge=lfs -text
-*.jbuilder filter=lfs diff=lfs merge=lfs -text
-*.ru filter=lfs diff=lfs merge=lfs -text
-*.yml filter=lfs diff=lfs merge=lfs -text
-*.enc filter=lfs diff=lfs merge=lfs -text
 *.params filter=lfs diff=lfs merge=lfs -text
-*.json filter=lfs diff=lfs merge=lfs -text
-*.py filter=lfs diff=lfs merge=lfs -text
-*.PNG filter=lfs diff=lfs merge=lfs -text
-*.png filter=lfs diff=lfs merge=lfs -text
-*.jpg filter=lfs diff=lfs merge=lfs -text
-*.html filter=lfs diff=lfs merge=lfs -text
-*.ico filter=lfs diff=lfs merge=lfs -text
-*.txt filter=lfs diff=lfs merge=lfs -text
-*.pbtxt filter=lfs diff=lfs merge=lfs -text
-*.record filter=lfs diff=lfs merge=lfs -text
-*.bat filter=lfs diff=lfs merge=lfs -text
-*.log filter=lfs diff=lfs merge=lfs -text
-*.csv filter=lfs diff=lfs merge=lfs -text
-*.rb text !filter !merge !diff
-*.js text !filter !merge !diff
 *.csv text !filter !merge !diff
 *.txt text !filter !merge !diff
 *.py text !filter !merge !diff
