@@ -5740,7 +5740,7 @@
       "op": "null", 
       "name": "ssd0_expand_trans_conv0_weight", 
       "attrs": {
-        "__init__": "<mxnet.initializer.Xavier object at 0x00000112C27DA940>", 
+        "__init__": "<mxnet.initializer.Xavier object at 0x000001CED259AA30>", 
         "kernel": "(1, 1)", 
         "no_bias": "True", 
         "num_filter": "512"
@@ -5751,7 +5751,7 @@
       "op": "Convolution", 
       "name": "ssd0_expand_trans_conv0", 
       "attrs": {
-        "__init__": "<mxnet.initializer.Xavier object at 0x00000112C27DA940>", 
+        "__init__": "<mxnet.initializer.Xavier object at 0x000001CED259AA30>", 
         "kernel": "(1, 1)", 
         "no_bias": "True", 
         "num_filter": "512"
@@ -5795,7 +5795,7 @@
       "op": "null", 
       "name": "ssd0_expand_conv0_weight", 
       "attrs": {
-        "__init__": "<mxnet.initializer.Xavier object at 0x00000112C27DA940>", 
+        "__init__": "<mxnet.initializer.Xavier object at 0x000001CED259AA30>", 
         "kernel": "(3, 3)", 
         "no_bias": "True", 
         "num_filter": "512", 
@@ -5808,7 +5808,7 @@
       "op": "Convolution", 
       "name": "ssd0_expand_conv0", 
       "attrs": {
-        "__init__": "<mxnet.initializer.Xavier object at 0x00000112C27DA940>", 
+        "__init__": "<mxnet.initializer.Xavier object at 0x000001CED259AA30>", 
         "kernel": "(3, 3)", 
         "no_bias": "True", 
         "num_filter": "512", 
@@ -5906,7 +5906,7 @@
       "op": "null", 
       "name": "ssd0_expand_trans_conv1_weight", 
       "attrs": {
-        "__init__": "<mxnet.initializer.Xavier object at 0x00000112C27DA940>", 
+        "__init__": "<mxnet.initializer.Xavier object at 0x000001CED259AA30>", 
         "kernel": "(1, 1)", 
         "no_bias": "True", 
         "num_filter": "512"
@@ -5917,7 +5917,7 @@
       "op": "Convolution", 
       "name": "ssd0_expand_trans_conv1", 
       "attrs": {
-        "__init__": "<mxnet.initializer.Xavier object at 0x00000112C27DA940>", 
+        "__init__": "<mxnet.initializer.Xavier object at 0x000001CED259AA30>", 
         "kernel": "(1, 1)", 
         "no_bias": "True", 
         "num_filter": "512"
@@ -5961,7 +5961,7 @@
       "op": "null", 
       "name": "ssd0_expand_conv1_weight", 
       "attrs": {
-        "__init__": "<mxnet.initializer.Xavier object at 0x00000112C27DA940>", 
+        "__init__": "<mxnet.initializer.Xavier object at 0x000001CED259AA30>", 
         "kernel": "(3, 3)", 
         "no_bias": "True", 
         "num_filter": "512", 
@@ -5974,7 +5974,7 @@
       "op": "Convolution", 
       "name": "ssd0_expand_conv1", 
       "attrs": {
-        "__init__": "<mxnet.initializer.Xavier object at 0x00000112C27DA940>", 
+        "__init__": "<mxnet.initializer.Xavier object at 0x000001CED259AA30>", 
         "kernel": "(3, 3)", 
         "no_bias": "True", 
         "num_filter": "512", 
@@ -6072,7 +6072,7 @@
       "op": "null", 
       "name": "ssd0_expand_trans_conv2_weight", 
       "attrs": {
-        "__init__": "<mxnet.initializer.Xavier object at 0x00000112C27DA940>", 
+        "__init__": "<mxnet.initializer.Xavier object at 0x000001CED259AA30>", 
         "kernel": "(1, 1)", 
         "no_bias": "True", 
         "num_filter": "256"
@@ -6083,7 +6083,7 @@
       "op": "Convolution", 
       "name": "ssd0_expand_trans_conv2", 
       "attrs": {
-        "__init__": "<mxnet.initializer.Xavier object at 0x00000112C27DA940>", 
+        "__init__": "<mxnet.initializer.Xavier object at 0x000001CED259AA30>", 
         "kernel": "(1, 1)", 
         "no_bias": "True", 
         "num_filter": "256"
@@ -6127,7 +6127,7 @@
       "op": "null", 
       "name": "ssd0_expand_conv2_weight", 
       "attrs": {
-        "__init__": "<mxnet.initializer.Xavier object at 0x00000112C27DA940>", 
+        "__init__": "<mxnet.initializer.Xavier object at 0x000001CED259AA30>", 
         "kernel": "(3, 3)", 
         "no_bias": "True", 
         "num_filter": "256", 
@@ -6140,7 +6140,7 @@
       "op": "Convolution", 
       "name": "ssd0_expand_conv2", 
       "attrs": {
-        "__init__": "<mxnet.initializer.Xavier object at 0x00000112C27DA940>", 
+        "__init__": "<mxnet.initializer.Xavier object at 0x000001CED259AA30>", 
         "kernel": "(3, 3)", 
         "no_bias": "True", 
         "num_filter": "256", 
@@ -6238,7 +6238,7 @@
       "op": "null", 
       "name": "ssd0_expand_trans_conv3_weight", 
       "attrs": {
-        "__init__": "<mxnet.initializer.Xavier object at 0x00000112C27DA940>", 
+        "__init__": "<mxnet.initializer.Xavier object at 0x000001CED259AA30>", 
         "kernel": "(1, 1)", 
         "no_bias": "True", 
         "num_filter": "256"
@@ -6249,7 +6249,7 @@
       "op": "Convolution", 
       "name": "ssd0_expand_trans_conv3", 
       "attrs": {
-        "__init__": "<mxnet.initializer.Xavier object at 0x00000112C27DA940>", 
+        "__init__": "<mxnet.initializer.Xavier object at 0x000001CED259AA30>", 
         "kernel": "(1, 1)", 
         "no_bias": "True", 
         "num_filter": "256"
@@ -6293,7 +6293,7 @@
       "op": "null", 
       "name": "ssd0_expand_conv3_weight", 
       "attrs": {
-        "__init__": "<mxnet.initializer.Xavier object at 0x00000112C27DA940>", 
+        "__init__": "<mxnet.initializer.Xavier object at 0x000001CED259AA30>", 
         "kernel": "(3, 3)", 
         "no_bias": "True", 
         "num_filter": "256", 
@@ -6306,7 +6306,7 @@
       "op": "Convolution", 
       "name": "ssd0_expand_conv3", 
       "attrs": {
-        "__init__": "<mxnet.initializer.Xavier object at 0x00000112C27DA940>", 
+        "__init__": "<mxnet.initializer.Xavier object at 0x000001CED259AA30>", 
         "kernel": "(3, 3)", 
         "no_bias": "True", 
         "num_filter": "256", 
@@ -6854,7 +6854,7 @@
       "name": "ssd0_ssdanchorgenerator0_anchor_0", 
       "attrs": {
         "__dtype__": "0", 
-        "__init__": "Constant_ssd0_ssdanchorgenerator0_anchor_0_1180192125472", 
+        "__init__": "Constant_ssd0_ssdanchorgenerator0_anchor_0_1987928486672", 
         "__lr_mult__": "1.0", 
         "__shape__": "(1, 1, 128, 128, 16)", 
         "__storage_type__": "0", 
@@ -6897,7 +6897,7 @@
       "name": "ssd0_ssdanchorgenerator1_anchor_1", 
       "attrs": {
         "__dtype__": "0", 
-        "__init__": "Constant_ssd0_ssdanchorgenerator1_anchor_1_1180082775616", 
+        "__init__": "Constant_ssd0_ssdanchorgenerator1_anchor_1_1987802687280", 
         "__lr_mult__": "1.0", 
         "__shape__": "(1, 1, 64, 64, 24)", 
         "__storage_type__": "0", 
@@ -6940,7 +6940,7 @@
       "name": "ssd0_ssdanchorgenerator2_anchor_2", 
       "attrs": {
         "__dtype__": "0", 
-        "__init__": "Constant_ssd0_ssdanchorgenerator2_anchor_2_1180094052432", 
+        "__init__": "Constant_ssd0_ssdanchorgenerator2_anchor_2_1987813980432", 
         "__lr_mult__": "1.0", 
         "__shape__": "(1, 1, 32, 32, 24)", 
         "__storage_type__": "0", 
@@ -6983,7 +6983,7 @@
       "name": "ssd0_ssdanchorgenerator3_anchor_3", 
       "attrs": {
         "__dtype__": "0", 
-        "__init__": "Constant_ssd0_ssdanchorgenerator3_anchor_3_1180094009248", 
+        "__init__": "Constant_ssd0_ssdanchorgenerator3_anchor_3_1987813937888", 
         "__lr_mult__": "1.0", 
         "__shape__": "(1, 1, 16, 16, 24)", 
         "__storage_type__": "0", 
@@ -7026,7 +7026,7 @@
       "name": "ssd0_ssdanchorgenerator4_anchor_4", 
       "attrs": {
         "__dtype__": "0", 
-        "__init__": "Constant_ssd0_ssdanchorgenerator4_anchor_4_1180094006176", 
+        "__init__": "Constant_ssd0_ssdanchorgenerator4_anchor_4_1987813937840", 
         "__lr_mult__": "1.0", 
         "__shape__": "(1, 1, 16, 16, 16)", 
         "__storage_type__": "0", 
@@ -7069,7 +7069,7 @@
       "name": "ssd0_ssdanchorgenerator5_anchor_5", 
       "attrs": {
         "__dtype__": "0", 
-        "__init__": "Constant_ssd0_ssdanchorgenerator5_anchor_5_1180093971568", 
+        "__init__": "Constant_ssd0_ssdanchorgenerator5_anchor_5_1987813899328", 
         "__lr_mult__": "1.0", 
         "__shape__": "(1, 1, 16, 16, 16)", 
         "__storage_type__": "0", 
