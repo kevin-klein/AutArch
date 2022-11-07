@@ -1,0 +1,10 @@
+paths:
+  base_path: 'pdfs/VOC2018'
+  base_output: 'pdfs/output'
+
+network_config:
+  epochs: 240
+  batch_size: 32
+  label_loss: 1.0
+  bbox_loss: 1.0
+  

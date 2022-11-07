@@ -8,9 +8,13 @@ class CreatePageImages < ActiveRecord::Migration[7.0]
     end
 
     create_table :figures do |t|
-      t.references :page_image, null: false, foreign_key: { on_delete: :cascade }
-      t.jsonb :shape, null: false
-      t.string :tags, array: true
+      t.references :page, null: false, foreign_key: { on_delete: :cascade }
+      t.float :x1, null: false
+      t.float :x2, null: false
+      t.float :y1, null: false
+      t.float :y2, null: false
+      t.string :type, null: false
+      t.string :tags, array: true, null: false
 
       t.timestamps
     end
