@@ -17,6 +17,9 @@ from gluoncv.data.batchify import Tuple, Stack, Pad
 from gluoncv.data.transforms.presets.ssd import SSDDefaultTrainTransform
 from gluoncv.data.transforms.presets.ssd import SSDDefaultValTransform
 from gluoncv.data.transforms.presets.ssd import SSDDALIPipeline
+from gluoncv.data.transforms import bbox as tbbox
+from gluoncv.data.transforms import image as timage
+from gluoncv.data.transforms import experimental
 
 from gluoncv.utils.metrics.voc_detection import VOC07MApMetric
 from gluoncv.utils.metrics.coco_detection import COCODetectionMetric
@@ -40,7 +43,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description='Train SSD networks.')
     parser.add_argument('--network', type=str, default='vgg16_atrous',
                         help="Base network name which serves as feature extraction base.")
-    parser.add_argument('--data-shape', type=int, default=300,
+    parser.add_argument('--data-shape', type=int, default=512,
                         help="Input data shape, use 300, 512.")
     parser.add_argument('--batch-size', type=int, default=8,
                         help='Training mini-batch size')
@@ -98,6 +101,99 @@ def parse_args():
         assert hvd, "You are trying to use horovod support but it's not installed"
     return args
 
+class SSDCustomTrainTransform(SSDDefaultTrainTransform):
+    """Default SSD training transform which includes tons of image augmentations.
+
+    Parameters
+    ----------
+    width : int
+        Image width.
+    height : int
+        Image height.
+    anchors : mxnet.nd.NDArray, optional
+        Anchors generated from SSD networks, the shape must be ``(1, N, 4)``.
+        Since anchors are shared in the entire batch so it is ``1`` for the first dimension.
+        ``N`` is the number of anchors for each image.
+
+        .. hint::
+
+            If anchors is ``None``, the transformation will not generate training targets.
+            Otherwise it will generate training targets to accelerate the training phase
+            since we push some workload to CPU workers instead of GPUs.
+    iou_thresh : float
+        IOU overlap threshold for maximum matching, default is 0.5.
+    box_norm : array-like of size 4, default is (0.1, 0.1, 0.2, 0.2)
+        Std value to be divided from encoded values.
+
+    """
+    def __init__(self, width, height, anchors=None, iou_thresh=0.5, box_norm=(0.1, 0.1, 0.2, 0.2), **kwargs):
+        super().__init__(width, height, anchors=anchors, iou_thresh=iou_thresh, box_norm=box_norm)
+
+    def __call__(self, src, label):
+        """Apply transform to training image/label."""
+        # random color jittering
+        img = experimental.image.random_color_distort(src)
+        img, bbox = img, label
+
+        # random cropping
+        h, w, _ = img.shape
+        bbox, crop = experimental.bbox.random_crop_with_constraints(bbox, (w, h))
+        x0, y0, w, h = crop
+        img = mx.image.fixed_crop(img, x0, y0, w, h)
+
+        # resize with random interpolation
+        h, w, _ = img.shape
+        interp = np.random.randint(0, 5)
+        img = timage.imresize(img, self._width, self._height, interp=interp)
+        bbox = tbbox.resize(bbox, (w, h), (self._width, self._height))
+
+        # random horizontal flip
+        h, w, _ = img.shape
+        img, flips = timage.random_flip(img, px=0.5)
+        bbox = tbbox.flip(bbox, (w, h), flip_x=flips[0])
+
+        # to tensor
+        img = mx.nd.image.to_tensor(img)
+
+        if self._anchors is None:
+            return img, bbox.astype(img.dtype)
+
+        # generate training target so cpu workers can help reduce the workload on gpu
+        gt_bboxes = mx.nd.array(bbox[np.newaxis, :, :4])
+        gt_ids = mx.nd.array(bbox[np.newaxis, :, 4:5])
+        cls_targets, box_targets, _ = self._target_generator(
+            self._anchors, None, gt_bboxes, gt_ids)
+        return img, cls_targets[0], box_targets[0]
+
+class SSDCustomValTransform(object):
+    """Default SSD validation transform.
+
+    Parameters
+    ----------
+    width : int
+        Image width.
+    height : int
+        Image height.
+    mean : array-like of size 3
+        Mean pixel values to be subtracted from image tensor. Default is [0.485, 0.456, 0.406].
+    std : array-like of size 3
+        Standard deviation to be divided from image. Default is [0.229, 0.224, 0.225].
+
+    """
+    def __init__(self, width, height):
+        self._width = width
+        self._height = height
+
+    def __call__(self, src, label):
+        """Apply transform to validation image/label."""
+        # resize
+        h, w, _ = src.shape
+        img, _ = timage.resize_contain(src, (self._width, self._height))
+        bbox = tbbox.resize(label, in_size=(w, h), out_size=(self._width, self._height))
+
+        img = mx.nd.image.to_tensor(img)
+        return img, bbox.astype(img.dtype)
+
 class VOCLike(VOCDetection):
     CLASSES = [
         'grave',
@@ -121,27 +217,15 @@ class VOCLike(VOCDetection):
         'skull',
         'skull_photo'
     ]
-    def __init__(self, root='pdfs\\VOC2018', splits=[], transform=None, index_map=None, preload_label=True):
+    def __init__(self, root='pdfs/VOC2018', splits=[], transform=None, index_map=None, preload_label=True):
         super(VOCLike, self).__init__(root, splits, transform, index_map, preload_label)
 
 def get_dataset(dataset, args):
-    if dataset.lower() == 'voc':
-        train_dataset = VOCLike(
-            splits=[('', 'train')])
-        val_dataset = VOCLike(
-            splits=[('', 'test')])
-        val_metric = VOC07MApMetric(iou_thresh=0.5, class_names=val_dataset.classes)
-    elif dataset.lower() == 'coco':
-        train_dataset = gdata.COCODetection(root=args.dataset_root + "/coco", splits='instances_train2017')
-        val_dataset = gdata.COCODetection(root=args.dataset_root + "/coco", splits='instances_val2017', skip_empty=False)
-        val_metric = COCODetectionMetric(
-            val_dataset, args.save_prefix + '_eval', cleanup=True,
-            data_shape=(args.data_shape, args.data_shape))
-        # coco validation is slow, consider increase the validation interval
-        if args.val_interval == 1:
-            args.val_interval = 10
-    else:
-        raise NotImplementedError('Dataset: {} not implemented.'.format(dataset))
+    train_dataset = VOCLike(
+        splits=[('', 'train')])
+    val_dataset = VOCLike(
+        splits=[('', 'test')])
+    val_metric = VOC07MApMetric(iou_thresh=0.5, class_names=val_dataset.classes)
     return train_dataset, val_dataset, val_metric
 
 def get_dataloader(net, train_dataset, val_dataset, data_shape, batch_size, num_workers, ctx):
@@ -150,101 +234,17 @@ def get_dataloader(net, train_dataset, val_dataset, data_shape, batch_size, num_
     # use fake data to generate fixed anchors for target generation
     with autograd.train_mode():
         _, _, anchors = net(mx.nd.zeros((1, 3, height, width), ctx))
+
     anchors = anchors.as_in_context(mx.cpu())
     batchify_fn = Tuple(Stack(), Stack(), Stack())  # stack image, cls_targets, box_targets
     train_loader = gluon.data.DataLoader(
-        train_dataset.transform(SSDDefaultTrainTransform(width, height, anchors)),
+        train_dataset.transform(SSDCustomTrainTransform(width, height, anchors)),
         batch_size, True, batchify_fn=batchify_fn, last_batch='rollover', num_workers=num_workers)
     val_batchify_fn = Tuple(Stack(), Pad(pad_val=-1))
     val_loader = gluon.data.DataLoader(
-        val_dataset.transform(SSDDefaultValTransform(width, height)),
+        val_dataset.transform(SSDCustomValTransform(width, height)),
         batch_size, False, batchify_fn=val_batchify_fn, last_batch='keep', num_workers=num_workers)
     return train_loader, val_loader
-
-def get_dali_dataset(dataset_name, devices, args):
-    if dataset_name.lower() == "coco":
-        # training
-        expanded_file_root = os.path.expanduser(args.dataset_root)
-        coco_root = os.path.join(expanded_file_root,
-                                 'coco',
-                                 'train2017')
-        coco_annotations = os.path.join(expanded_file_root,
-                                        'coco',
-                                        'annotations',
-                                        'instances_train2017.json')
-        if args.horovod:
-            train_dataset = [gdata.COCODetectionDALI(num_shards=hvd.size(), shard_id=hvd.rank(), file_root=coco_root,
-                                                     annotations_file=coco_annotations, device_id=hvd.local_rank())]
-        else:
-            train_dataset = [gdata.COCODetectionDALI(num_shards= len(devices), shard_id=i, file_root=coco_root,
-                                                     annotations_file=coco_annotations, device_id=i) for i, _ in enumerate(devices)]
-
-        # validation
-        if (not args.horovod or hvd.rank() == 0):
-            val_dataset = gdata.COCODetection(root=os.path.join(args.dataset_root + '/coco'),
-                                              splits='instances_val2017',
-                                              skip_empty=False)
-            val_metric = COCODetectionMetric(
-                val_dataset, args.save_prefix + '_eval', cleanup=True,
-                data_shape=(args.data_shape, args.data_shape))
-        else:
-            val_dataset = None
-            val_metric = None
-    else:
-        raise NotImplementedError('Dataset: {} not implemented with DALI.'.format(dataset_name))
-
-    return train_dataset, val_dataset, val_metric
-
-def get_dali_dataloader(net, train_dataset, val_dataset, data_shape, global_batch_size, num_workers, devices, ctx, horovod, seed):
-    width, height = data_shape, data_shape
-    with autograd.train_mode():
-        _, _, anchors = net(mx.nd.zeros((1, 3, height, width), ctx=ctx))
-    anchors = anchors.as_in_context(mx.cpu())
-
-    if horovod:
-        batch_size = global_batch_size // hvd.size()
-        pipelines = [SSDDALIPipeline(device_id=hvd.local_rank(), batch_size=batch_size,
-                                     data_shape=data_shape, anchors=anchors,
-                                     num_workers=num_workers, dataset_reader = train_dataset[0],
-                                     seed=seed)]
-    else:
-        num_devices = len(devices)
-        batch_size = global_batch_size // num_devices
-        pipelines = [SSDDALIPipeline(device_id=device_id, batch_size=batch_size,
-                                     data_shape=data_shape, anchors=anchors,
-                                     num_workers=num_workers,
-                                     dataset_reader = train_dataset[i],
-                                     seed=seed) for i, device_id in enumerate(devices)]
-
-    epoch_size = train_dataset[0].size()
-    if horovod:
-        epoch_size //= hvd.size()
-    train_loader = DALIGenericIterator(pipelines, [('data', DALIGenericIterator.DATA_TAG),
-                                                    ('bboxes', DALIGenericIterator.LABEL_TAG),
-                                                    ('label', DALIGenericIterator.LABEL_TAG)],
-                                                    epoch_size, auto_reset=True)
-
-    # validation
-    if (not horovod or hvd.rank() == 0):
-        val_batchify_fn = Tuple(Stack(), Pad(pad_val=-1))
-        val_loader = gluon.data.DataLoader(
-            val_dataset.transform(SSDDefaultValTransform(width, height)),
-            global_batch_size, False, batchify_fn=val_batchify_fn, last_batch='keep', num_workers=num_workers)
-    else:
-        val_loader = None
-
-    return train_loader, val_loader
-
-
-def save_params(net, best_map, current_map, epoch, save_interval, prefix):
-    current_map = float(current_map)
-    if current_map > best_map[0]:
-        best_map[0] = current_map
-        net.save_params('{:s}_best.params'.format(prefix, epoch, current_map))
-        with open(prefix+'_best_map.log', 'a') as f:
-            f.write('{:04d}:\t{:.4f}\n'.format(epoch, current_map))
-    if save_interval and epoch % save_interval == 0:
-        net.save_params('{:s}_{:04d}_{:.4f}.params'.format(prefix, epoch, current_map))
 
 def validate(net, val_data, ctx, eval_metric):
     """Test on validation dataset."""
@@ -281,16 +281,10 @@ def train(net, train_data, val_data, eval_metric, ctx, args):
     """Training pipeline"""
     net.collect_params().reset_ctx(ctx)
 
-    if args.horovod:
-        hvd.broadcast_parameters(net.collect_params(), root_rank=0)
-        trainer = hvd.DistributedTrainer(
-                        net.collect_params(), 'sgd',
-                        {'learning_rate': args.lr, 'wd': args.wd, 'momentum': args.momentum})
-    else:
-        trainer = gluon.Trainer(
-                    net.collect_params(), 'sgd',
-                    {'learning_rate': args.lr, 'wd': args.wd, 'momentum': args.momentum},
-                    update_on_kvstore=(False if args.amp else None))
+    trainer = gluon.Trainer(
+                net.collect_params(), 'sgd',
+                {'learning_rate': args.lr, 'wd': args.wd, 'momentum': args.momentum},
+                update_on_kvstore=(False if args.amp else None))
 
     if args.amp:
         amp.init_trainer(trainer)
@@ -383,7 +377,6 @@ def train(net, train_data, val_data, eval_metric, ctx, args):
                 current_map = float(mean_ap[-1])
             else:
                 current_map = 0.
-            # save_params(net, best_map, current_map, epoch, args.save_interval, args.save_prefix)
         net.export('dfg')
 
 if __name__ == '__main__':
@@ -399,11 +392,9 @@ if __name__ == '__main__':
     gutils.random.seed(args.seed)
 
     # training contexts
-    if args.horovod:
-        ctx = [mx.gpu(hvd.local_rank())]
-    else:
-        ctx = [mx.gpu(int(i)) for i in args.gpus.split(',') if i.strip()]
-        ctx = ctx if ctx else [mx.cpu()]
+    # ctx = [mx.gpu(int(i)) for i in args.gpus.split(',') if i.strip()]
+    # ctx = ctx if ctx else [mx.cpu()]
+    ctx = [mx.cpu(0)]
 
     # network
     net_name = '_'.join(('ssd', str(args.data_shape), args.network, args.dataset))
@@ -426,20 +417,11 @@ if __name__ == '__main__':
             # needed for net to be first gpu when using AMP
             net.collect_params().reset_ctx(ctx[0])
 
-    # training data
-    if args.dali:
-        if not dali_found:
-            raise SystemExit("DALI not found, please check if you installed it correctly.")
-        devices = [int(i) for i in args.gpus.split(',') if i.strip()]
-        train_dataset, val_dataset, eval_metric = get_dali_dataset(args.dataset, devices, args)
-        train_data, val_data = get_dali_dataloader(
-            async_net, train_dataset, val_dataset, args.data_shape, args.batch_size, args.num_workers,
-            devices, ctx[0], args.horovod, args.seed)
-    else:
-        train_dataset, val_dataset, eval_metric = get_dataset(args.dataset, args)
-        batch_size = (args.batch_size // hvd.size()) if args.horovod else args.batch_size
-        train_data, val_data = get_dataloader(
-            async_net, train_dataset, val_dataset, args.data_shape, batch_size, args.num_workers, ctx[0])
+
+    train_dataset, val_dataset, eval_metric = get_dataset(args.dataset, args)
+    batch_size = (args.batch_size // hvd.size()) if args.horovod else args.batch_size
+    train_data, val_data = get_dataloader(
+        async_net, train_dataset, val_dataset, args.data_shape, batch_size, args.num_workers, ctx[0])
 
 
 

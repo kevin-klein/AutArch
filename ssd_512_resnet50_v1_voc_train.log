@@ -15352,3 +15352,119 @@ skeleton_photo_right_side=1.0000000000000002
 skull=0.57012987012987
 skull_photo=1.0000000000000002
 mAP=0.6660874698424106
+Namespace(network='resnet50_v1', data_shape=512, batch_size=4, dataset='voc', dataset_root='~/.mxnet/datasets/', num_workers=4, gpus='0', epochs=300, resume='', start_epoch=0, lr=0.001, lr_decay=0.1, lr_decay_epoch='160,200', momentum=0.9, wd=0.0005, log_interval=100, save_prefix='ssd_512_resnet50_v1_voc', save_interval=10, val_interval=1, seed=233, syncbn=False, dali=False, amp=False, horovod=False)
+Start training from [Epoch 0]
+Namespace(network='resnet50_v1', data_shape=512, batch_size=4, dataset='voc', dataset_root='~/.mxnet/datasets/', num_workers=4, gpus='0', epochs=300, resume='', start_epoch=0, lr=0.001, lr_decay=0.1, lr_decay_epoch='160,200', momentum=0.9, wd=0.0005, log_interval=100, save_prefix='ssd_512_resnet50_v1_voc', save_interval=10, val_interval=1, seed=233, syncbn=False, dali=False, amp=False, horovod=False)
+Start training from [Epoch 0]
+Namespace(network='resnet50_v1', data_shape=512, batch_size=4, dataset='voc', dataset_root='~/.mxnet/datasets/', num_workers=1, gpus='0', epochs=300, resume='', start_epoch=0, lr=0.001, lr_decay=0.1, lr_decay_epoch='160,200', momentum=0.9, wd=0.0005, log_interval=100, save_prefix='ssd_512_resnet50_v1_voc', save_interval=10, val_interval=1, seed=233, syncbn=False, dali=False, amp=False, horovod=False)
+Start training from [Epoch 0]
+Namespace(network='resnet50_v1', data_shape=512, batch_size=4, dataset='voc', dataset_root='~/.mxnet/datasets/', num_workers=0, gpus='0', epochs=300, resume='', start_epoch=0, lr=0.001, lr_decay=0.1, lr_decay_epoch='160,200', momentum=0.9, wd=0.0005, log_interval=100, save_prefix='ssd_512_resnet50_v1_voc', save_interval=10, val_interval=1, seed=233, syncbn=False, dali=False, amp=False, horovod=False)
+Start training from [Epoch 0]
+Namespace(network='resnet50_v1', data_shape=512, batch_size=4, dataset='voc', dataset_root='~/.mxnet/datasets/', num_workers=0, gpus='0', epochs=300, resume='', start_epoch=0, lr=0.001, lr_decay=0.1, lr_decay_epoch='160,200', momentum=0.9, wd=0.0005, log_interval=100, save_prefix='ssd_512_resnet50_v1_voc', save_interval=10, val_interval=1, seed=233, syncbn=False, dali=False, amp=False, horovod=False)
+Start training from [Epoch 0]
+[Epoch 0] Training cost: 115.253, CrossEntropy=10.975, SmoothL1=4.426
+Namespace(amp=False, batch_size=4, dali=False, data_shape=512, dataset='voc', dataset_root='~/.mxnet/datasets/', epochs=300, gpus='0', horovod=False, log_interval=100, lr=0.001, lr_decay=0.1, lr_decay_epoch='160,200', momentum=0.9, network='resnet50_v1', num_workers=0, resume='', save_interval=10, save_prefix='ssd_512_resnet50_v1_voc', seed=233, start_epoch=0, syncbn=False, val_interval=1, wd=0.0005)
+Start training from [Epoch 0]
+[Epoch 0] Training cost: 70.287, CrossEntropy=11.062, SmoothL1=4.396
+Namespace(amp=False, batch_size=4, dali=False, data_shape=512, dataset='voc', dataset_root='~/.mxnet/datasets/', epochs=300, gpus='0', horovod=False, log_interval=100, lr=0.001, lr_decay=0.1, lr_decay_epoch='160,200', momentum=0.9, network='resnet50_v1', num_workers=0, resume='', save_interval=10, save_prefix='ssd_512_resnet50_v1_voc', seed=233, start_epoch=0, syncbn=False, val_interval=1, wd=0.0005)
+Start training from [Epoch 0]
+[Epoch 0] Training cost: 67.474, CrossEntropy=11.095, SmoothL1=4.398
+[Epoch 0] Validation: 
+grave=0.03397683397683398
+grave_cross_section=0.0
+goods=0.0
+arrow_up=0.0
+arrow_left=0.0
+arrow_down=nan
+arrow_right=0.0
+scale=0.0
+grave_photo=0.0
+grave_photo_left_side=nan
+grave_photo_right_side=nan
+skeleton=nan
+skeleton_left_side=0.0
+skeleton_right_side=0.0
+map=0.0
+skeleton_photo=nan
+skeleton_photo_left_side=nan
+skeleton_photo_right_side=0.0
+skull=0.0
+skull_photo=0.0
+mAP=0.0024269167126309984
+Namespace(amp=False, batch_size=4, dali=False, data_shape=512, dataset='voc', dataset_root='~/.mxnet/datasets/', epochs=300, gpus='0', horovod=False, log_interval=100, lr=0.001, lr_decay=0.1, lr_decay_epoch='160,200', momentum=0.9, network='resnet50_v1', num_workers=4, resume='', save_interval=10, save_prefix='ssd_512_resnet50_v1_voc', seed=233, start_epoch=0, syncbn=False, val_interval=1, wd=0.0005)
+Start training from [Epoch 0]
+[Epoch 0] Training cost: 67.011, CrossEntropy=11.171, SmoothL1=4.455
+[Epoch 0] Validation: 
+grave=0.07702834799608993
+grave_cross_section=0.0
+goods=0.007177033492822966
+arrow_up=0.0
+arrow_left=0.0
+arrow_down=nan
+arrow_right=0.0
+scale=0.0
+grave_photo=0.0
+grave_photo_left_side=nan
+grave_photo_right_side=nan
+skeleton=nan
+skeleton_left_side=0.0
+skeleton_right_side=0.0
+map=0.0
+skeleton_photo=nan
+skeleton_photo_left_side=nan
+skeleton_photo_right_side=0.0
+skull=0.0
+skull_photo=0.0
+mAP=0.006014670106350921
+Namespace(amp=False, batch_size=32, dali=False, data_shape=512, dataset='voc', dataset_root='~/.mxnet/datasets/', epochs=300, gpus='0', horovod=False, log_interval=100, lr=0.001, lr_decay=0.1, lr_decay_epoch='160,200', momentum=0.9, network='resnet50_v1', num_workers=4, resume='', save_interval=10, save_prefix='ssd_512_resnet50_v1_voc', seed=233, start_epoch=0, syncbn=False, val_interval=1, wd=0.0005)
+Start training from [Epoch 0]
+[Epoch 0] Training cost: 65.011, CrossEntropy=20.162, SmoothL1=5.963
+[Epoch 0] Validation: 
+grave=0.0
+grave_cross_section=0.0
+goods=0.0
+arrow_up=0.0
+arrow_left=0.0
+arrow_down=nan
+arrow_right=0.0
+scale=0.0
+grave_photo=0.0
+grave_photo_left_side=nan
+grave_photo_right_side=nan
+skeleton=nan
+skeleton_left_side=0.0
+skeleton_right_side=0.0
+map=0.0
+skeleton_photo=nan
+skeleton_photo_left_side=nan
+skeleton_photo_right_side=0.0
+skull=0.0
+skull_photo=0.0
+mAP=0.0
+Namespace(amp=False, batch_size=16, dali=False, data_shape=512, dataset='voc', dataset_root='~/.mxnet/datasets/', epochs=300, gpus='0', horovod=False, log_interval=100, lr=0.001, lr_decay=0.1, lr_decay_epoch='160,200', momentum=0.9, network='resnet50_v1', num_workers=4, resume='', save_interval=10, save_prefix='ssd_512_resnet50_v1_voc', seed=233, start_epoch=0, syncbn=False, val_interval=8, wd=0.0005)
+Start training from [Epoch 0]
+[Epoch 0] Training cost: 71.028, CrossEntropy=17.396, SmoothL1=5.418
+[Epoch 0] Validation: 
+grave=0.0
+grave_cross_section=0.0
+goods=0.0
+arrow_up=0.0
+arrow_left=0.0
+arrow_down=nan
+arrow_right=0.0
+scale=0.0
+grave_photo=0.0
+grave_photo_left_side=nan
+grave_photo_right_side=nan
+skeleton=nan
+skeleton_left_side=0.0
+skeleton_right_side=0.0
+map=0.0
+skeleton_photo=nan
+skeleton_photo_left_side=nan
+skeleton_photo_right_side=0.0
+skull=0.0
+skull_photo=0.0
+mAP=0.0
+[Epoch 1] Training cost: 69.099, CrossEntropy=10.866, SmoothL1=4.470
+[Epoch 2] Training cost: 72.512, CrossEntropy=7.727, SmoothL1=3.895
