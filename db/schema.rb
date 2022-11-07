@@ -15,12 +15,16 @@ ActiveRecord::Schema[7.0].define(version: 2022_09_30_171030) do
   enable_extension "plpgsql"
 
   create_table "figures", force: :cascade do |t|
-    t.bigint "page_image_id", null: false
-    t.jsonb "shape", null: false
-    t.string "tags", array: true
+    t.bigint "page_id", null: false
+    t.float "x1", null: false
+    t.float "x2", null: false
+    t.float "y1", null: false
+    t.float "y2", null: false
+    t.string "type", null: false
+    t.string "tags", null: false, array: true
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["page_image_id"], name: "index_figures_on_page_image_id"
+    t.index ["page_id"], name: "index_figures_on_page_id"
   end
 
   create_table "images", force: :cascade do |t|
@@ -56,7 +60,7 @@ ActiveRecord::Schema[7.0].define(version: 2022_09_30_171030) do
     t.datetime "updated_at", null: false
   end
 
-  add_foreign_key "figures", "page_images", on_delete: :cascade
+  add_foreign_key "figures", "pages", on_delete: :cascade
   add_foreign_key "page_images", "images", on_delete: :cascade
   add_foreign_key "page_images", "pages", on_delete: :cascade
   add_foreign_key "pages", "images", on_delete: :cascade
