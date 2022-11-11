@@ -131,8 +131,6 @@ class SSDCustomTrainTransform(SSDDefaultTrainTransform):
 
     def __call__(self, src, label):
         """Apply transform to training image/label."""
-        # random color jittering
-        img = experimental.image.random_color_distort(src)
         img, bbox = img, label
 
         # random cropping
