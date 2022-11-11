@@ -56,7 +56,7 @@ gem 'bootsnap', require: false
 # gem 'image_processing', '~> 1.2'
 
 gem 'ruby-vips'
-gem 'torch-rb', git: 'https://github.com/ankane/torch.rb.git'
+gem 'torch-rb'
 gem 'torchvision'
 
 group :development, :test do
