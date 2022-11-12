@@ -13,7 +13,7 @@ class CreatePageImages < ActiveRecord::Migration[7.0]
       t.float :x2, null: false
       t.float :y1, null: false
       t.float :y2, null: false
-      t.string :type, null: false
+      t.string :type_name, null: false
       t.string :tags, array: true, null: false
 
       t.timestamps

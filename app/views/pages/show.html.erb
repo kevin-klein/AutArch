@@ -9,14 +9,11 @@
   <%= button_to "Destroy this page", @page, method: :delete %>
 </div>
 
-<table>
-  <tbody>
-    <% @page.figures.each do |figure| %>
-      <tr>
-        <td>
-          <img src="data:image/jpeg;base64,<%= Base64.encode64 figure.image.data %>"/>
-        </td>
-      </tr>
-    <% end %>
-  </tbody>
-</table>
+<svg width="512" height="724" xmlns="http://www.w3.org/2000/svg">
+  <image width="512" height="724" href="data:image/jpeg;base64,<%= Base64.encode64 @page.image.data %>" />
+  <% @page.figures.each do |figure| %>
+    <text x="<%= figure.x1 %>" y='<%= figure.y1 %>'><%= figure.type_name %></text>
+    <rect fill='none' stroke='black' x="<%= figure.x1 %>" y='<%= figure.y1 %>' width='<%= figure.width %>' height='<%= figure.height %>'>
+    </rect>
+  <% end %>
+</svg>
