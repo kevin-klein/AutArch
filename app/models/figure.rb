@@ -15,4 +15,12 @@
 #
 class Figure < ApplicationRecord
   belongs_to :page
+
+  def width
+    x2 - x1
+  end
+
+  def height
+    y2 - y1
+  end
 end
