@@ -15,6 +15,7 @@
 #
 class Figure < ApplicationRecord
   belongs_to :page
+  has_many :graves, class_name: 'Grave'
 
   def width
     x2 - x1
@@ -22,5 +23,31 @@ class Figure < ApplicationRecord
 
   def height
     y2 - y1
+  end
+
+  def center
+    {
+      x: (x1 + x2) / 2,
+      y: (y1 + y2) / 2
+    }
+  end
+
+  def collides?(figure)
+    (
+      x1 < figure.x1 + figure.width &&
+      x1 + width > figure.x1 &&
+      y1 < figure.y1 + figure.height &&
+      y1 + height > figure.y1
+    )
+  end
+
+  def distance_to(figure)
+    center1 = center
+    center2 = figure.center
+
+    item1 = (center1[:x] - center2[:x]) ** 2
+    item2 = (center1[:y] - center2[:y]) ** 2
+
+    Math.sqrt(item1 + item2)
   end
 end

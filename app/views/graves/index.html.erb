@@ -1,0 +1,7 @@
+<p style="color: green"><%= notice %></p>
+
+<h1>Graves Height/Width (possibly in meter)</h1>
+<%= scatter_chart Grave.includes(:figure).all.map { |grave| grave.width_height  }, xtitle: 'width', ytitle: 'height' %>
+
+<h1>Grave Goods distribution</h1>
+<%= scatter_chart Good.includes(:grave).all.map { |good| good.percentage_position  }, xtitle: 'x', ytitle: 'y', min: 0, max: 1, xmin: 0, xmax: 1 %>

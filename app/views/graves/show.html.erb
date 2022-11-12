@@ -1,0 +1,10 @@
+<p style="color: green"><%= notice %></p>
+
+<%= render @grafe %>
+
+<div>
+  <%= link_to "Edit this grave", edit_grafe_path(@grafe) %> |
+  <%= link_to "Back to graves", graves_path %>
+
+  <%= button_to "Destroy this grave", @grafe, method: :delete %>
+</div>

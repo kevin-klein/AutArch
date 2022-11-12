@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :graves
   resources :figures
   resources :pages
   resources :images

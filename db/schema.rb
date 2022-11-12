@@ -10,9 +10,29 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_09_30_171030) do
+ActiveRecord::Schema[7.0].define(version: 2022_11_12_162410) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "arrows", force: :cascade do |t|
+    t.bigint "grave_id", null: false
+    t.bigint "figure_id", null: false
+    t.float "angle"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["figure_id"], name: "index_arrows_on_figure_id"
+    t.index ["grave_id"], name: "index_arrows_on_grave_id"
+  end
+
+  create_table "corpses", force: :cascade do |t|
+    t.bigint "grave_id", null: false
+    t.bigint "figure_id", null: false
+    t.float "angle"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["figure_id"], name: "index_corpses_on_figure_id"
+    t.index ["grave_id"], name: "index_corpses_on_grave_id"
+  end
 
   create_table "figures", force: :cascade do |t|
     t.bigint "page_id", null: false
@@ -25,6 +45,24 @@ ActiveRecord::Schema[7.0].define(version: 2022_09_30_171030) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["page_id"], name: "index_figures_on_page_id"
+  end
+
+  create_table "goods", force: :cascade do |t|
+    t.bigint "grave_id", null: false
+    t.bigint "figure_id", null: false
+    t.integer "type"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["figure_id"], name: "index_goods_on_figure_id"
+    t.index ["grave_id"], name: "index_goods_on_grave_id"
+  end
+
+  create_table "graves", force: :cascade do |t|
+    t.string "location"
+    t.bigint "figure_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["figure_id"], name: "index_graves_on_figure_id"
   end
 
   create_table "images", force: :cascade do |t|
@@ -60,9 +98,39 @@ ActiveRecord::Schema[7.0].define(version: 2022_09_30_171030) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "scales", force: :cascade do |t|
+    t.bigint "figure_id", null: false
+    t.bigint "grave_id", null: false
+    t.float "meter_ratio"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["figure_id"], name: "index_scales_on_figure_id"
+    t.index ["grave_id"], name: "index_scales_on_grave_id"
+  end
+
+  create_table "skulls", force: :cascade do |t|
+    t.bigint "corpse_id", null: false
+    t.bigint "figure_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["corpse_id"], name: "index_skulls_on_corpse_id"
+    t.index ["figure_id"], name: "index_skulls_on_figure_id"
+  end
+
+  add_foreign_key "arrows", "figures"
+  add_foreign_key "arrows", "graves", column: "grave_id"
+  add_foreign_key "corpses", "figures"
+  add_foreign_key "corpses", "graves", column: "grave_id"
   add_foreign_key "figures", "pages", on_delete: :cascade
+  add_foreign_key "goods", "figures"
+  add_foreign_key "goods", "graves", column: "grave_id"
+  add_foreign_key "graves", "figures"
   add_foreign_key "page_images", "images", on_delete: :cascade
   add_foreign_key "page_images", "pages", on_delete: :cascade
   add_foreign_key "pages", "images", on_delete: :cascade
   add_foreign_key "pages", "publications", on_delete: :cascade
+  add_foreign_key "scales", "figures"
+  add_foreign_key "scales", "graves", column: "grave_id"
+  add_foreign_key "skulls", "corpses"
+  add_foreign_key "skulls", "figures"
 end
