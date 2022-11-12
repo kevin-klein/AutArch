@@ -1,12 +1,15 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { html } from 'htm/react';
+import htm from 'htm';
+const html = htm.bind(React.createElement);
 
-function Box({creating, x1, x2, y1, y2}) {
-  const color =
+function Box({figure: { creating, x1, y1, width, height, type_name}}) {
+  const color = null;
 
   return html`
-
+    <text x=${x1} y=${y1}>${type_name}</text>
+    <rect fill='none' stroke='black' x=${x1} y=${y1} width=${width} height=${height}>
+    </rect>
   `;
 }
 
@@ -21,8 +24,32 @@ function BoxEditor(props) {
   }
 
   return html`
-    <svg onclick=${onSvgClick}>
-      <img src="data:image/jpeg;base64, ${props.image}"/>
-    </svg>
+    <div class='row'>
+      <div class='col-md-12'>
+
+      </div>
+
+      <div class='col-md-12'>
+        <svg width="512" height="724" xmlns="http://www.w3.org/2000/svg" onClick=${onSvgClick}>
+          <image width="512" height="724" href=${props.image} />
+
+          ${boxes.map(figure => html`<${Box} figure=${figure} />`)}
+        </svg>
+      </div>
+    </div>
   `;
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+  const boxElement = document.getElementById('box-editor');
+
+  if(boxElement !== null) {
+    const figures = JSON.parse(boxElement.dataset.figures);
+    const image = boxElement.dataset.image;
+
+    ReactDOM.render(
+      React.createElement(BoxEditor, {boxes: figures, image: image}, null),
+      boxElement,
+    );
+  }
+})

@@ -17,6 +17,7 @@ gem 'onnxruntime'
 # gem 'pycall', require: ['pycall', 'pycall/import']
 # gem 'numpy'
 
+gem 'chartkick'
 gem 'mini_magick'
 
 # Use the Puma web server [https://github.com/puma/puma]

@@ -85,6 +85,7 @@ GEM
       rack-test (>= 0.6.3)
       regexp_parser (>= 1.5, < 3.0)
       xpath (~> 3.2)
+    chartkick (4.2.1)
     childprocess (4.1.0)
     concurrent-ruby (1.1.10)
     connection_pool (2.3.0)
@@ -144,8 +145,6 @@ GEM
       racc (~> 1.4)
     nokogiri (1.13.8-x86_64-linux)
       racc (~> 1.4)
-    numpy (0.4.0)
-      pycall (>= 1.2.0.beta1)
     onnxruntime (0.7.4-x86_64-darwin)
       ffi
     onnxruntime (0.7.4-x86_64-linux)
@@ -154,7 +153,6 @@ GEM
     public_suffix (5.0.0)
     puma (5.6.5)
       nio4r (~> 2.0)
-    pycall (1.4.1)
     racc (1.6.0)
     rack (2.2.4)
     rack-test (2.0.2)
@@ -247,17 +245,16 @@ DEPENDENCIES
   awesome_print
   bootsnap
   capybara
+  chartkick
   csv
   debug
   dotenv-rails (~> 2.8)
   importmap-rails
   jbuilder
   mini_magick
-  numpy
   onnxruntime
   pg
   puma (~> 5.0)
-  pycall
   rails (~> 7.0.2, >= 7.0.2.3)
   redis (~> 4.0)
   ruby-vips

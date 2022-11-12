@@ -1,19 +1,70 @@
-<p style="color: green"><%= notice %></p>
 
-<%= render @page %>
+<div class="row">
+  <div class="col-md-6">
 
-<div>
-  <%= link_to "Edit this page", edit_page_path(@page) %> |
-  <%= link_to "Back to pages", pages_path %>
+    <table class="table">
+      <tbody>
+        <tr>
+          <td>Publication</td>
+          <td><%= @page.publication.title %></td>
+        </tr>
 
-  <%= button_to "Destroy this page", @page, method: :delete %>
+        <tr>
+          <td>Page Number</td>
+          <td><%= @page.number %></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <table class="table">
+      <tbody>
+        <tr>
+          <td>Publication</td>
+          <td><%= @page.publication.title %></td>
+        </tr>
+
+        <tr>
+          <td>Page Number</td>
+          <td><%= @page.number %></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="col-md-6">
+    <div id="box-editor" data-image="data:image/jpeg;base64,<%= Base64.encode64 @page.image.data %>" data-figures="<%= @page.figures.to_json(methods: [:width, :height]) %>">
+    </div>
+  </div>
+
+  <div class="col-md-12">
+
+    <h2>Graves</h2>
+
+    <table class="table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Plan</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <% @page.graves.each do |grave|%>
+          <tr>
+            <td><%= grave.id %></td>
+            <td>
+              <svg width="512" height="724" xmlns="http://www.w3.org/2000/svg">
+                <image width="512" height="724" href="data:image/jpeg;base64,<%= Base64.encode64 @page.image.data %>" />
+                <% grave.figures.each do |figure| %>
+                  <text x="<%= figure.x1 %>" y='<%= figure.y1 %>'><%= figure.type_name %></text>
+                  <rect fill='none' stroke='black' x="<%= figure.x1 %>" y='<%= figure.y1 %>' width='<%= figure.width %>' height='<%= figure.height %>'>
+                  </rect>
+                <% end %>
+              </svg>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
 </div>
-
-<svg width="512" height="724" xmlns="http://www.w3.org/2000/svg">
-  <image width="512" height="724" href="data:image/jpeg;base64,<%= Base64.encode64 @page.image.data %>" />
-  <% @page.figures.each do |figure| %>
-    <text x="<%= figure.x1 %>" y='<%= figure.y1 %>'><%= figure.type_name %></text>
-    <rect fill='none' stroke='black' x="<%= figure.x1 %>" y='<%= figure.y1 %>' width='<%= figure.width %>' height='<%= figure.height %>'>
-    </rect>
-  <% end %>
-</svg>
