@@ -12,7 +12,7 @@ gem 'awesome_print'
 gem 'sprockets-rails'
 
 gem 'pg'
-gem 'onnxruntime'
+gem 'rails-erd', group: :development
 
 # gem 'pycall', require: ['pycall', 'pycall/import']
 # gem 'numpy'
@@ -88,3 +88,4 @@ end
 gem 'sidekiq', '~> 6.5'
 
 gem 'dotenv-rails', '~> 2.8'
+gem 'pkg-config'

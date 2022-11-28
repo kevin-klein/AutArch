@@ -87,6 +87,7 @@ GEM
       xpath (~> 3.2)
     chartkick (4.2.1)
     childprocess (4.1.0)
+    choice (0.2.0)
     concurrent-ruby (1.1.10)
     connection_pool (2.3.0)
     crass (1.0.6)
@@ -145,11 +146,8 @@ GEM
       racc (~> 1.4)
     nokogiri (1.13.8-x86_64-linux)
       racc (~> 1.4)
-    onnxruntime (0.7.4-x86_64-darwin)
-      ffi
-    onnxruntime (0.7.4-x86_64-linux)
-      ffi
     pg (1.4.3)
+    pkg-config (1.5.1)
     public_suffix (5.0.0)
     puma (5.6.5)
       nio4r (~> 2.0)
@@ -174,6 +172,11 @@ GEM
     rails-dom-testing (2.0.3)
       activesupport (>= 4.2.0)
       nokogiri (>= 1.6)
+    rails-erd (1.7.2)
+      activerecord (>= 4.2)
+      activesupport (>= 4.2)
+      choice (~> 0.2.0)
+      ruby-graphviz (~> 1.2)
     rails-html-sanitizer (1.4.3)
       loofah (~> 2.3)
     railties (7.0.4)
@@ -189,6 +192,8 @@ GEM
     reline (0.3.1)
       io-console (~> 0.5)
     rexml (3.2.5)
+    ruby-graphviz (1.2.5)
+      rexml
     ruby-vips (2.1.4)
       ffi (~> 1.12)
     rubyzip (2.3.2)
@@ -252,10 +257,11 @@ DEPENDENCIES
   importmap-rails
   jbuilder
   mini_magick
-  onnxruntime
   pg
+  pkg-config
   puma (~> 5.0)
   rails (~> 7.0.2, >= 7.0.2.3)
+  rails-erd
   redis (~> 4.0)
   ruby-vips
   selenium-webdriver

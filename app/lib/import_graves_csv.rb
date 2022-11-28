@@ -17,7 +17,7 @@ class ImportGravesCsv
 
         page = publication.pages.find_or_initialize_by(number: page)
 
-        image_data = File.read(Rails.root.join('pdfs', 'page_images', row['file']))
+        image_data = File.read(Rails.root.join('pdfs', 'scaled_images', row['file']))
 
         x1 = row['x1']
         x2 = row['x2']

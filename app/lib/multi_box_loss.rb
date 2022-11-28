@@ -1,5 +1,5 @@
-class MultiBoxLoss < Torch::NN::Module
-  include Torch::NN
+class MultiBoxLoss # < Torch::NN::Module
+  # include Torch::NN
 
   def initialize(priors_cxcy, threshold: 0.5, neg_pos_ratio: 3, alpha: 1.0)
     super()
