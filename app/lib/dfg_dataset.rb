@@ -1,5 +1,5 @@
-class DfgDataset < Torch::Utils::Data::Dataset
-  include TorchVision::Transforms
+class DfgDataset # < Torch::Utils::Data::Dataset
+  # include TorchVision::Transforms
 
   def initialize(folder, dataset: 'train.txt')
     @folder = folder

@@ -1,6 +1,6 @@
-class CreateCorpses < ActiveRecord::Migration[7.0]
+class CreateSkeletons < ActiveRecord::Migration[7.0]
   def change
-    create_table :corpses do |t|
+    create_table :skeletons do |t|
       t.references :grave, null: false, foreign_key: true
       t.references :figure, null: false, foreign_key: true
       t.float :angle

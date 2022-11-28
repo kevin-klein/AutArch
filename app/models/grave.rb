@@ -1,9 +1,11 @@
 class Grave < ApplicationRecord
   belongs_to :figure
+  belongs_to :site
   has_one :scale
   has_one :arrow
-  has_many :corpses
+  has_many :graves
   has_many :goods
+  has_many :skeletons
 
   def upwards?
     figure.width < figure.height
@@ -24,11 +26,11 @@ class Grave < ApplicationRecord
   end
 
   def figures
-    [
+    ([
       figure,
       scale&.figure,
       arrow&.figure,
 
-    ] + corpses.map(&:figure) + goods.map(&:figure)
+    ] + skeletons.map(&:figure) + goods.map(&:figure)).compact
   end
 end

@@ -1,5 +1,5 @@
-class PredictionConvolutions < Torch::NN::Module
-  include Torch::NN
+class PredictionConvolutions #< Torch::NN::Module
+  # include Torch::NN
 
   def initialize(n_classes)
     super()

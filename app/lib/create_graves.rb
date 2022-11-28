@@ -1,9 +1,14 @@
 class CreateGraves
 
+  def initialize
+
+  end
+
   def build
     Page.transaction do
       Page.includes(:figures).find_each do |page|
         figures = convert_figures(page.figures)
+        @site = Site.create!
 
         grave_figures = figures['grave']
         grave_figures&.each do |grave|
@@ -40,24 +45,25 @@ class CreateGraves
 
     grave = Grave.create!(
       figure: grave_figure,
+      site: @site
     )
 
-    find_closest_item(figures['scale']) do |closest_scale|
+    find_closest_item(grave_figure, figures['scale']) do |closest_scale|
       Scale.create!(
         grave: grave,
         figure: closest_scale
       )
     end
 
-    find_closest_item(figures['arrow']) do |closes_arrow|
+    find_closest_item(grave_figure, figures['arrow']) do |closest_arrow|
       Arrow.create!(
         grave: grave,
         figure: closest_arrow,
       )
     end
 
-    corpses = inside_grave.select { |figure| ['skeleton_left_side', 'skeleton_right_side'].include?(figure.type_name) }
-    corpses.each { |corpse| handle_corpse(corpse, grave, figures) }
+    skeletons = inside_grave.select { |figure| ['skeleton_left_side', 'skeleton_right_side'].include?(figure.type_name) }
+    skeletons.each { |skeleton| handle_skeleton(skeleton, grave, figures) }
 
     goods = inside_grave.select { |figure| figure.type_name == 'goods' }
     goods.each do |good|
@@ -67,12 +73,15 @@ class CreateGraves
       )
     end
 
-    find_closest_item('grave_cross_section') do |cross|
-
+    find_closest_item(grave_figure, figures['grave_cross_section']) do |cross|
+      GraveCrossSection.create!(
+        figure: cross,
+        grave: grave
+      )
     end
   end
 
-  def find_closest_item(figures)
+  def find_closest_item(grave_figure, figures)
     return if figures.nil?
 
     figure_index = figures.map { |figure| grave_figure.distance_to(figure) }.each_with_index.min[1]
@@ -80,10 +89,10 @@ class CreateGraves
     yield closest_figure
   end
 
-  def handle_corpse(corpse_figure, grave, figures)
-    corpse = Corpse.create!(
+  def handle_skeleton(skeleton_figure, grave, figures)
+    skeleton = Skeleton.create!(
       grave: grave,
-      figure: corpse_figure
+      figure: skeleton_figure
     )
 
     skulls = figures['skull']
@@ -91,7 +100,7 @@ class CreateGraves
       skull_index = skulls.map { |figure| grave.figure.distance_to(figure) }.each_with_index.min[1]
       closest_skull = skulls[skull_index]
       Skull.create!(
-        corpse: corpse,
+        skeleton: skeleton,
         figure: closest_skull,
       )
     end

@@ -1,10 +1,30 @@
 <p style="color: green"><%= notice %></p>
 
-<%= render @grafe %>
 
-<div>
-  <%= link_to "Edit this grave", edit_grafe_path(@grafe) %> |
-  <%= link_to "Back to graves", graves_path %>
+<div class="row">
+  <div class="col-md-6">
 
-  <%= button_to "Destroy this grave", @grafe, method: :delete %>
+    <div id="box-editor" data-arrow-angle='<%= @grave&.arrow&.angle %>' data-image="data:image/jpeg;base64,<%= Base64.encode64 @grave.figure.page.image.data %>" data-figures="<%= @grave.figures.to_json(methods: [:width, :height]) %>">
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <table class="table">
+      <thead>
+      </thead>
+
+      <tbody>
+        <tr>
+          <td>Arrow angle</td>
+          <td><%= @grave&.arrow&.angle %></td>
+        </tr>
+
+        <tr>
+          <td>Arc Length</td>
+          <td><%= @grave.arc_length %></td>
+        </tr>
+      </tbody>
+    </table>
+
+  </div>
 </div>

@@ -1,5 +1,5 @@
 class GravesController < ApplicationController
-  before_action :set_grafe, only: %i[ show edit update destroy ]
+  before_action :set_grave, only: %i[ show edit update destroy ]
 
   # GET /graves or /graves.json
   def index
@@ -12,7 +12,7 @@ class GravesController < ApplicationController
 
   # GET /graves/new
   def new
-    @grafe = Grave.new
+    @grave = Grave.new
   end
 
   # GET /graves/1/edit
@@ -21,10 +21,10 @@ class GravesController < ApplicationController
 
   # POST /graves or /graves.json
   def create
-    @grafe = Grave.new(grafe_params)
+    @grave = Grave.new(grafe_params)
 
     respond_to do |format|
-      if @grafe.save
+      if @grave.save
         format.html { redirect_to grafe_url(@grafe), notice: "Grave was successfully created." }
         format.json { render :show, status: :created, location: @grafe }
       else
@@ -37,12 +37,12 @@ class GravesController < ApplicationController
   # PATCH/PUT /graves/1 or /graves/1.json
   def update
     respond_to do |format|
-      if @grafe.update(grafe_params)
-        format.html { redirect_to grafe_url(@grafe), notice: "Grave was successfully updated." }
-        format.json { render :show, status: :ok, location: @grafe }
+      if @grave.update(grafe_params)
+        format.html { redirect_to grafe_url(@grave), notice: "Grave was successfully updated." }
+        format.json { render :show, status: :ok, location: @grave }
       else
         format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @grafe.errors, status: :unprocessable_entity }
+        format.json { render json: @grave.errors, status: :unprocessable_entity }
       end
     end
   end
@@ -59,12 +59,12 @@ class GravesController < ApplicationController
 
   private
     # Use callbacks to share common setup or constraints between actions.
-    def set_grafe
-      @grafe = Grave.find(params[:id])
+    def set_grave
+      @grave = Grave.find(params[:id])
     end
 
     # Only allow a list of trusted parameters through.
-    def grafe_params
-      params.require(:grafe).permit(:location, :figure_id)
+    def grave_params
+      params.require(:grave).permit(:location, :figure_id)
     end
 end

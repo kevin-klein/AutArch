@@ -1,4 +1,4 @@
 class Skull < ApplicationRecord
-  belongs_to :corpse
+  belongs_to :skeleton
   belongs_to :figure
 end

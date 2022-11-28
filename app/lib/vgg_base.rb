@@ -1,7 +1,7 @@
 #based on: https://github.com/sgrvinod/a-PyTorch-Tutorial-to-Object-Detection
 
-class VggBase < Torch::NN::Module
-  include Torch::NN
+class VggBase #< Torch::NN::Module
+  # include Torch::NN
 
   def initialize
     super

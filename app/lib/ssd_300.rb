@@ -1,6 +1,6 @@
 #based on: https://github.com/sgrvinod/a-PyTorch-Tutorial-to-Object-Detection
 
-class Ssd300 < Torch::NN::Module
+class Ssd300 # < Torch::NN::Module
   attr_accessor :priors_cxcy
 
   def initialize(n_classes)
