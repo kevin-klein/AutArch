@@ -11,22 +11,20 @@
     </div>
   <% end %>
 
-  <div>
-    <%= form.label :lat, style: "display: block" %>
-    <%= form.text_field :lat %>
+  <div class="mtb-3">
+    <%= form.label :name, class: 'form-label' %>
+    <%= form.text_field :name, class: 'form-control' %>
   </div>
 
-  <div>
-    <%= form.label :lon, style: "display: block" %>
-    <%= form.text_field :lon %>
+  <div class="mtb-3">
+    <%= form.label :lat, class: 'form-label' %>
+    <%= form.text_field :lat, class: 'form-control' %>
   </div>
 
-  <div>
-    <%= form.label :name, style: "display: block" %>
-    <%= form.text_field :name %>
+  <div class="mtb-3">
+    <%= form.label :lon, class: 'form-label' %>
+    <%= form.text_field :lon, class: 'form-control' %>
   </div>
 
-  <div>
-    <%= form.submit %>
-  </div>
+  <%= form.submit class: 'btn btn-primary' %>
 <% end %>

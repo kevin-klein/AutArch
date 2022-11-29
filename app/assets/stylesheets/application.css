@@ -13,3 +13,8 @@
  *= require_tree .
  *= require_self
  */
+
+circle.moveable-point:hover {
+  cursor: move;
+  fill: red;
+}
