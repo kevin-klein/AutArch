@@ -2,13 +2,20 @@
 
 <table class="table">
   <thead>
-
+    <tr>
+      <th>ID</th>
+      <th>Area</th>
+      <th>Arc</th>
+      <th></th>
+    </tr>
   </thead>
 
   <tbody>
     <% @graves.each do |grave| %>
       <tr>
         <td><%= grave.id %></td>
+        <td><%= grave.area %></td>
+        <td><%= grave.arc_length %></td>
         <td><%= link_to('Details', grave_path(grave)) %></td>
       </tr>
     <% end %>
