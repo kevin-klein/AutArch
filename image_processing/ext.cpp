@@ -2,7 +2,7 @@
 #include <cstdint>
 #include <opencv2/opencv.hpp>
 #include <ruby.h>
-#include <tesseract/baseapi.h>
+// #include <tesseract/baseapi.h>
 
 using namespace cv;
 using namespace std;
@@ -369,16 +369,16 @@ extern "C" VALUE getAngle(VALUE self, VALUE figure, VALUE image_value) {
   return 0;
 }
 
-tesseract::TessBaseAPI *api = new tesseract::TessBaseAPI();
-
-VALUE initTesseract(VALUE self) {
-  if (api->Init(NULL, "eng")) {
-    fprintf(stderr, "Could not initialize tesseract.\n");
-    exit(1);
-  }
-
-  return Qnil;
-}
+// tesseract::TessBaseAPI *api = new tesseract::TessBaseAPI();
+//
+// VALUE initTesseract(VALUE self) {
+//   if (api->Init(NULL, "eng")) {
+//     fprintf(stderr, "Could not initialize tesseract.\n");
+//     exit(1);
+//   }
+//
+//   return Qnil;
+// }
 
 extern "C" void Init_ext() {
   VALUE ImageProcessing = rb_define_module("ImageProcessing");
@@ -386,6 +386,6 @@ extern "C" void Init_ext() {
   rb_define_module_function(ImageProcessing, "getGraveStats", getGraveStats, 2);
   rb_define_module_function(ImageProcessing, "analyzePage", analyzePage, 1);
 
-  VALUE TesseractAPI = rb_define_module("Tesseract");
-  rb_define_module_function(TesseractAPI, "init", initTesseract, 0);
+  // VALUE TesseractAPI = rb_define_module("Tesseract");
+  // rb_define_module_function(TesseractAPI, "init", initTesseract, 0);
 }

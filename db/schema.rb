@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_11_29_184744) do
+ActiveRecord::Schema[7.0].define(version: 2022_12_04_154639) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -74,6 +74,15 @@ ActiveRecord::Schema[7.0].define(version: 2022_11_29_184744) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "lines", force: :cascade do |t|
+    t.integer "x"
+    t.integer "y"
+    t.bigint "page_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["page_id"], name: "index_lines_on_page_id"
+  end
+
   create_table "pages", force: :cascade do |t|
     t.bigint "publication_id", null: false
     t.integer "number"
@@ -127,6 +136,13 @@ ActiveRecord::Schema[7.0].define(version: 2022_11_29_184744) do
     t.index ["skeleton_id"], name: "index_skulls_on_skeleton_id"
   end
 
+  create_table "spines", force: :cascade do |t|
+    t.bigint "line_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["line_id"], name: "index_spines_on_line_id"
+  end
+
   add_foreign_key "arrows", "figures"
   add_foreign_key "arrows", "graves"
   add_foreign_key "figures", "pages", on_delete: :cascade
@@ -135,6 +151,7 @@ ActiveRecord::Schema[7.0].define(version: 2022_11_29_184744) do
   add_foreign_key "grave_cross_sections", "figures"
   add_foreign_key "grave_cross_sections", "graves"
   add_foreign_key "graves", "figures"
+  add_foreign_key "lines", "pages"
   add_foreign_key "pages", "images", on_delete: :cascade
   add_foreign_key "pages", "publications", on_delete: :cascade
   add_foreign_key "scales", "figures"
@@ -143,4 +160,5 @@ ActiveRecord::Schema[7.0].define(version: 2022_11_29_184744) do
   add_foreign_key "skeletons", "graves"
   add_foreign_key "skulls", "figures"
   add_foreign_key "skulls", "skeletons"
+  add_foreign_key "spines", "lines"
 end
