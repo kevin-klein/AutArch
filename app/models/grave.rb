@@ -1,9 +1,23 @@
+# == Schema Information
+#
+# Table name: graves
+#
+#  id         :bigint           not null, primary key
+#  location   :string
+#  figure_id  :integer          not null
+#  site_id    :integer
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#  arc_length :float
+#  area       :float
+#
 class Grave < ApplicationRecord
   belongs_to :figure
-  belongs_to :site
+  belongs_to :site, required: false
   has_one :scale
   has_one :arrow
   has_many :graves
+  has_one :grave_cross_section
   has_many :goods
   has_many :skeletons
 
@@ -30,7 +44,7 @@ class Grave < ApplicationRecord
       figure,
       scale&.figure,
       arrow&.figure,
-
+      grave_cross_section&.figure,
     ] + skeletons.map(&:figure) + goods.map(&:figure)).compact
   end
 end

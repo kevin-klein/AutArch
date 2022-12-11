@@ -1,10 +1,57 @@
-<p style="color: green"><%= notice %></p>
+<style media="screen">
+  html { height: 100%; }
+  body { height: 100%; overflow: hidden; }
+  .row { height: 100%; }
+  #map { height: 100%; }
+</style>
 
-<%= render @site %>
+<div class='row'>
+  <div class='col-md-12'>
+    <div id="map"></div>
 
-<div>
-  <%= link_to "Edit this site", edit_site_path(@site) %> |
-  <%= link_to "Back to sites", sites_path %>
+    <div class="card map-overlay" style="width: 18rem;">
+      <div class="card-body">
+        <h5 class="card-title"><%= @site.name %></h5>
+        <h6 class="card-subtitle mb-2 text-muted">(<%= @site.lat %>, <%= @site.lon %>)</h6>
+        <p class="card-text">
+          <table class='table'>
+            <thead>
+              <tr>
+                <th>ID</th>
+              <tr>
+            </thead>
 
-  <%= button_to "Destroy this site", @site, method: :delete %>
+            <tbody>
+              <% @site.graves.each do |grave| %>
+                <tr>
+                  <td><a href="<%= grave_path(grave) %>"><%= grave.id %></a></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+
+        </p>
+        <a href="#" class="card-link">Edit</a>
+        <a href="#" class="card-link">Delete</a>
+      </div>
+    </div>
+  </div>
 </div>
+
+
+<script type="text/javascript">
+  var siteData = <%= raw @sites.to_json %>;
+
+  var map = L.map('map').setView([50.08804, 14.42076], 4);
+
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+  }).addTo(map);
+
+  const site = <%= raw @site.to_json %>;
+
+  var marker = L.marker([site.lat, site.lon]).addTo(map);
+  marker.bindPopup(`<a href="/sites/${site.id}">${site.name}</a>`).openPopup();
+</script>
+

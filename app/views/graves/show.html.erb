@@ -4,8 +4,16 @@
 <div class="row">
   <div class="col-md-12">
 
-    <div id="box-editor" data-arrow-angle='<%= @grave&.arrow&.angle %>' data-image="data:image/jpeg;base64,<%= Base64.encode64 @grave.figure.page.image.data %>" data-figures="<%= @grave.figures.to_json(methods: [:width, :height]) %>">
-    </div>
+    <%= react_component(
+      'GraveEditor', {
+        image: "data:image/jpeg;base64,#{Base64.encode64 @grave.figure.page.image.data}",
+        arrowAngle: @grave&.arrow&.angle,
+        id: @grave.id,
+        grave: @grave.as_json,
+        sites: Site.order(:name).all,
+        figures: @grave.figures.as_json(methods: [:width, :height])
+      }
+    ) %>
   </div>
 
   <div class="col-md-6">

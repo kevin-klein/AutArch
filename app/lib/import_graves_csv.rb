@@ -26,6 +26,14 @@ class ImportGravesCsv
 
         type_name = row['class']
 
+        if type_name.include?('skeleton')
+          type_name = 'skeleton'
+        end
+
+        if type_name.include?('arrow')
+          type_name = 'arrow'
+        end
+
         page.image = Image.create!(data: image_data)
         page.save!
         page.figures.create!({ x1:, y1:, x2:, y2:, type_name:, tags: [] })

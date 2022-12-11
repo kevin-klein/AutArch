@@ -36,15 +36,56 @@ class GravesController < ApplicationController
 
   # PATCH/PUT /graves/1 or /graves/1.json
   def update
-    respond_to do |format|
-      if @grave.update(grafe_params)
-        format.html { redirect_to grafe_url(@grave), notice: "Grave was successfully updated." }
-        format.json { render :show, status: :ok, location: @grave }
-      else
-        format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @grave.errors, status: :unprocessable_entity }
+    Grave.transaction do
+      angle = grave_params[:arrowAngle]
+      figure_ids = grave_params[:figures].map { _1[:id] }
+      @grave.site_id = grave_params[:site_id]
+      @grave.save!
+
+      @grave.figures.each do |figure|
+        unless figure_ids.include?(figure.id)
+          figure.destroy
+          next
+        end
+
+        new_figure_data = grave_params[:figures].find { _1[:id] == figure.id }
+        figure.x1 = new_figure_data[:x1]
+        figure.x2 = new_figure_data[:x2]
+        figure.y1 = new_figure_data[:y1]
+        figure.y2 = new_figure_data[:y2]
+
+        if figure.type_name == 'arrow'
+          arrow = figure.arrow
+          arrow.angle = angle
+          arrow.save!
+        end
+
+        figure.save!
+      end
+
+      grave_params[:figures].select { _1[:id].is_a?(String) }.each do |new_figure|
+        figure = @grave.figure.page.figures.create!({
+          tags: []
+        }.merge(new_figure.except(:id)))
+
+        case figure.type_name
+        when 'arrow'
+          Arrow.create!(grave: @grave, figure: figure, angle: angle)
+        when 'skeleton'
+          Skeleton.create!(grave: @grave, figure: figure)
+        when 'good'
+          Good.create!(grave: @grave, figure: figure)
+        when 'grave_cross_section'
+          GraveCrossSection.create!(grave: @grave, figure: figure)
+        when 'scale'
+          Scale.create!(grave: @grave, figure: figure)
+        when 'spine'
+          Spine.create!(grave: @grave, figure: figure)
+        end
       end
     end
+
+    render json: { status: :ok }
   end
 
   # DELETE /graves/1 or /graves/1.json
@@ -65,6 +106,6 @@ class GravesController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def grave_params
-      params.require(:grave).permit(:location, :figure_id)
+      params.require(:grave).permit(:arrowAngle, :site_id, figures: [:id, :type_name, :x1, :x2, :y1, :y2])
     end
 end

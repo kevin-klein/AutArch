@@ -1,14 +1,11 @@
-<p style="color: green"><%= notice %></p>
+<style media="screen">
+  html { height: 100%; }
+  body { height: 100%; overflow: hidden; }
+  #map { height: 100%; }
+  div[data-react-class="SiteMap"] { height: 100%; }
+  .leaflet-container { height: calc(100% - 40px); }
+  .map-overlay { border-radius: 15px; padding: 30px; background-color: white; position: absolute; top: 150px; left: 0; z-index: 99999; }
+</style>
 
-<h1>Sites</h1>
 
-<div id="sites">
-  <% @sites.each do |site| %>
-    <%= render site %>
-    <p>
-      <%= link_to "Show this site", site %>
-    </p>
-  <% end %>
-</div>
-
-<%= link_to "New site", new_site_path %>
+<%= react_component('SiteMap', { sites: @sites.as_json(include: [:graves]) }) %>

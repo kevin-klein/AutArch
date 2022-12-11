@@ -8,7 +8,6 @@ class CreateGraves
     Page.transaction do
       Page.includes(:figures).find_each do |page|
         figures = convert_figures(page.figures)
-        @site = Site.create!
 
         grave_figures = figures['grave']
         grave_figures&.each do |grave|
@@ -45,7 +44,6 @@ class CreateGraves
 
     grave = Grave.create!(
       figure: grave_figure,
-      site: @site
     )
 
     find_closest_item(grave_figure, figures['scale']) do |closest_scale|
@@ -62,7 +60,7 @@ class CreateGraves
       )
     end
 
-    skeletons = inside_grave.select { |figure| ['skeleton_left_side', 'skeleton_right_side'].include?(figure.type_name) }
+    skeletons = inside_grave.select { |figure| figure.type_name == 'skeleton' }
     skeletons.each { |skeleton| handle_skeleton(skeleton, grave, figures) }
 
     goods = inside_grave.select { |figure| figure.type_name == 'goods' }
