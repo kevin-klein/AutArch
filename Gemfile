@@ -14,6 +14,12 @@ gem 'sprockets-rails'
 gem 'pg'
 gem 'rails-erd', group: :development
 
+gem 'xlsxtream'
+
+group :development do
+  gem "ruby-lsp", require: false
+end
+
 # gem 'pycall', require: ['pycall', 'pycall/import']
 # gem 'numpy'
 
@@ -89,3 +95,7 @@ gem 'sidekiq', '~> 6.5'
 
 gem 'dotenv-rails', '~> 2.8'
 gem 'pkg-config'
+
+gem "shakapacker", "= 6.5"
+
+gem "react-rails", "= 2.6"

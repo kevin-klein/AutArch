@@ -10,13 +10,13 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_12_04_154639) do
+ActiveRecord::Schema[7.0].define(version: 2022_12_11_201706) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
   create_table "arrows", force: :cascade do |t|
     t.bigint "grave_id", null: false
-    t.bigint "figure_id", null: false
+    t.integer "figure_id", null: false
     t.float "angle"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -39,7 +39,7 @@ ActiveRecord::Schema[7.0].define(version: 2022_12_04_154639) do
 
   create_table "goods", force: :cascade do |t|
     t.bigint "grave_id", null: false
-    t.bigint "figure_id", null: false
+    t.integer "figure_id", null: false
     t.integer "type"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -49,7 +49,7 @@ ActiveRecord::Schema[7.0].define(version: 2022_12_04_154639) do
 
   create_table "grave_cross_sections", force: :cascade do |t|
     t.bigint "grave_id", null: false
-    t.bigint "figure_id", null: false
+    t.integer "figure_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["figure_id"], name: "index_grave_cross_sections_on_figure_id"
@@ -58,8 +58,8 @@ ActiveRecord::Schema[7.0].define(version: 2022_12_04_154639) do
 
   create_table "graves", force: :cascade do |t|
     t.string "location"
-    t.bigint "figure_id", null: false
-    t.bigint "site_id", null: false
+    t.integer "figure_id", null: false
+    t.integer "site_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.float "arc_length"
@@ -72,15 +72,6 @@ ActiveRecord::Schema[7.0].define(version: 2022_12_04_154639) do
     t.binary "data"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-  end
-
-  create_table "lines", force: :cascade do |t|
-    t.integer "x"
-    t.integer "y"
-    t.bigint "page_id", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["page_id"], name: "index_lines_on_page_id"
   end
 
   create_table "pages", force: :cascade do |t|
@@ -102,7 +93,7 @@ ActiveRecord::Schema[7.0].define(version: 2022_12_04_154639) do
   end
 
   create_table "scales", force: :cascade do |t|
-    t.bigint "figure_id", null: false
+    t.integer "figure_id", null: false
     t.bigint "grave_id", null: false
     t.float "meter_ratio"
     t.datetime "created_at", null: false
@@ -119,7 +110,7 @@ ActiveRecord::Schema[7.0].define(version: 2022_12_04_154639) do
 
   create_table "skeletons", force: :cascade do |t|
     t.bigint "grave_id", null: false
-    t.bigint "figure_id", null: false
+    t.integer "figure_id", null: false
     t.float "angle"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -129,7 +120,7 @@ ActiveRecord::Schema[7.0].define(version: 2022_12_04_154639) do
 
   create_table "skulls", force: :cascade do |t|
     t.bigint "skeleton_id", null: false
-    t.bigint "figure_id", null: false
+    t.integer "figure_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["figure_id"], name: "index_skulls_on_figure_id"
@@ -137,10 +128,12 @@ ActiveRecord::Schema[7.0].define(version: 2022_12_04_154639) do
   end
 
   create_table "spines", force: :cascade do |t|
-    t.bigint "line_id", null: false
+    t.bigint "grave_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["line_id"], name: "index_spines_on_line_id"
+    t.bigint "figure_id"
+    t.index ["figure_id"], name: "index_spines_on_figure_id"
+    t.index ["grave_id"], name: "index_spines_on_grave_id"
   end
 
   add_foreign_key "arrows", "figures"
@@ -151,7 +144,6 @@ ActiveRecord::Schema[7.0].define(version: 2022_12_04_154639) do
   add_foreign_key "grave_cross_sections", "figures"
   add_foreign_key "grave_cross_sections", "graves"
   add_foreign_key "graves", "figures"
-  add_foreign_key "lines", "pages"
   add_foreign_key "pages", "images", on_delete: :cascade
   add_foreign_key "pages", "publications", on_delete: :cascade
   add_foreign_key "scales", "figures"
@@ -160,5 +152,6 @@ ActiveRecord::Schema[7.0].define(version: 2022_12_04_154639) do
   add_foreign_key "skeletons", "graves"
   add_foreign_key "skulls", "figures"
   add_foreign_key "skulls", "skeletons"
-  add_foreign_key "spines", "lines"
+  add_foreign_key "spines", "figures"
+  add_foreign_key "spines", "graves"
 end

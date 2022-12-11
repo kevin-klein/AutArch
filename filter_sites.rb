@@ -1,25 +1,39 @@
 COUNTRIES = "Albania
 Austria
+Belgium
+Bosnia-Herzegovina
+Belarus
 Bulgaria
 Channel Islands
 Croatia
-Czech Repulic
+Czech Republic
+Czechia
+Czechoslovakia
 Denmark
 Estonia
+Finland
 France
 Germany
+Gernamy
+Gibraltar
 Greece
 Hungary
 Italy
+Ireland
+Isle of Man
 Kazakhstan
 Latvia
+Malta
 Lithuania
 Moldova
 Montenegro
 Netherlands
+Norway
 North Macedonia
 Poland
 Portugal
+Romania
+Luxembourg
 Russia
 Serbia
 Slovakia
@@ -30,8 +44,8 @@ Switzerland
 Ukraine
 United Kingdom".split("\n")
 
-PRAGUE_LAT = 50.08804
-PRAGUE_LON = 14.42076
+VIENNA_LAT = 48.2248977
+VIENNA_LON = 16.3522951
 
 def haversine_distance(lat1, lon1, lat2, lon2)
   d_lat = (lat2 - lat1) * Math::PI / 180
@@ -49,13 +63,43 @@ def haversine_distance(lat1, lon1, lat2, lon2)
 end
 
 CSV.open('filtered.csv', 'w') do |filtered|
-  filtered << CSV.read('v54.1_HO_public.csv', col_sep: "\t", quote_char: nil, headers: true).headers
-  CSV.foreach('v54.1_HO_public.csv', col_sep: "\t", quote_char: nil, headers: true) do |row|
-    age = row['Date mean in BP in years before 1950 CE [OxCal mu for a direct radiocarbon date, and average of range for a contextual date]'].to_i
-    if age < 3500 && age > 1800 && COUNTRIES.include?(row['Political Entity']) && row['Lat.'] != '..' && row['Long.'] != '..'
-      if haversine_distance(PRAGUE_LAT, PRAGUE_LON, row['Lat.'].to_f, row['Long.'].to_f) < 2300
-        filtered << row
+  Xlsxtream::Workbook.open('sites.xlsx') do |xlsx|
+    xlsx.write_worksheet('filter_countries') do |countries_sheet|
+      headers = CSV.read('v54.1_HO_public.csv', col_sep: "\t", quote_char: nil, headers: true).headers
+      countries_sheet << headers
+      filtered << headers
+
+      CSV.foreach('v54.1_HO_public.csv', col_sep: "\t", quote_char: nil, headers: true) do |row|
+        age = row['Date mean in BP in years before 1950 CE [OxCal mu for a direct radiocarbon date, and average of range for a contextual date]'].to_i
+        if age < 5450 && age > 3750 && COUNTRIES.include?(row['Political Entity']) && row['Lat.'] != '..' && row['Long.'] != '..'
+          countries_sheet << row.to_hash.values
+          filtered << row
+        end
+      end
+    end
+
+    xlsx.write_worksheet('filter_age') do |age_sheet|
+      headers = CSV.read('v54.1_HO_public.csv', col_sep: "\t", quote_char: nil, headers: true).headers
+      age_sheet << headers
+
+      CSV.foreach('v54.1_HO_public.csv', col_sep: "\t", quote_char: nil, headers: true) do |row|
+        age = row['Date mean in BP in years before 1950 CE [OxCal mu for a direct radiocarbon date, and average of range for a contextual date]'].to_i
+
+        if age < 5450 && age > 3750 && row['Lat.'] != '..' && row['Long.'] != '..'
+          age_sheet << row.to_hash.values
+        end
       end
     end
   end
 end
+
+
+# CSV.open('filtered_2300.csv', 'w') do |filtered|
+#   filtered << CSV.read('v54.1_HO_public.csv', col_sep: "\t", quote_char: nil, headers: true).headers
+#   CSV.foreach('v54.1_HO_public.csv', col_sep: "\t", quote_char: nil, headers: true) do |row|
+#     age = row['Date mean in BP in years before 1950 CE [OxCal mu for a direct radiocarbon date, and average of range for a contextual date]'].to_i
+#     if age < 5450 && age > 3750 && row['Lat.'] != '..' && row['Long.'] != '..'
+#       filtered << row
+#     end
+#   end
+# end
