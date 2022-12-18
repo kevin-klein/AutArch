@@ -19,6 +19,8 @@ class Grave < ApplicationRecord
   has_many :graves
   has_one :grave_cross_section
   has_many :goods
+  has_many :spines
+  has_one :cross_section_arrow
   has_many :skeletons
 
   def upwards?
@@ -45,6 +47,7 @@ class Grave < ApplicationRecord
       scale&.figure,
       arrow&.figure,
       grave_cross_section&.figure,
-    ] + skeletons.map(&:figure) + goods.map(&:figure)).compact
+      cross_section_arrow&.figure
+    ] + skeletons.map(&:figure) + goods.map(&:figure) + spines.map(&:figure)).compact
   end
 end

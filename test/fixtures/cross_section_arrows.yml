@@ -1,0 +1,9 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  figure: one
+  length: 1
+
+two:
+  figure: two
+  length: 1

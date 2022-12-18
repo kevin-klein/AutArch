@@ -35,8 +35,17 @@
           <td>Area</td>
           <td><%= @grave.area %></td>
         </tr>
+
+        <tr>
+          <td>Spine Angle</td>
+          <td><%= @grave.spines.first&.angle %></td>
+        </tr>
+
+        <tr>
+          <td>Cross Section Depth</td>
+          <td><%= @grave.cross_section_arrow&.length.abs %></td>
+        </tr>
       </tbody>
     </table>
-
   </div>
 </div>

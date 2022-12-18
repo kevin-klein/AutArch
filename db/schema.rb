@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_12_11_201706) do
+ActiveRecord::Schema[7.0].define(version: 2022_12_18_162319) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -22,6 +22,16 @@ ActiveRecord::Schema[7.0].define(version: 2022_12_11_201706) do
     t.datetime "updated_at", null: false
     t.index ["figure_id"], name: "index_arrows_on_figure_id"
     t.index ["grave_id"], name: "index_arrows_on_grave_id"
+  end
+
+  create_table "cross_section_arrows", force: :cascade do |t|
+    t.bigint "figure_id", null: false
+    t.bigint "grave_id", null: false
+    t.integer "length"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["figure_id"], name: "index_cross_section_arrows_on_figure_id"
+    t.index ["grave_id"], name: "index_cross_section_arrows_on_grave_id"
   end
 
   create_table "figures", force: :cascade do |t|
@@ -138,6 +148,8 @@ ActiveRecord::Schema[7.0].define(version: 2022_12_11_201706) do
 
   add_foreign_key "arrows", "figures"
   add_foreign_key "arrows", "graves"
+  add_foreign_key "cross_section_arrows", "figures"
+  add_foreign_key "cross_section_arrows", "graves"
   add_foreign_key "figures", "pages", on_delete: :cascade
   add_foreign_key "goods", "figures"
   add_foreign_key "goods", "graves"

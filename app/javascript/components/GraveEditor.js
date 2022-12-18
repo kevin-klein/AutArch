@@ -19,15 +19,27 @@ function Box({setDraggingPoint, active, figure: { id, x1, y1, x2, y2, width, hei
   }
 
   return (<>
-    {type_name === 'spine' && <line
-      fill='none'
-      stroke={color}
-      strokeWidth="2"
-      x1={x1}
-      y1={y1}
-      x2={x2}
-      y2={y2}
-    />}
+    <defs>
+      <marker id="arrowhead" markerWidth="10" markerHeight="7"
+      refX="0" refY="3.5" orient="auto">
+        <polygon points="0 0, 10 3.5, 0 7" />
+      </marker>
+    </defs>
+
+    {(type_name === 'spine' || type_name === 'cross_section_arrow') && <>
+      <line
+        fill='none'
+        stroke={color}
+        strokeWidth="2"
+        x1={x1}
+        y1={y1}
+        x2={x2}
+        y2={y2}
+
+        marker-end="url(#arrowhead)" />
+      />
+      </>
+    }
 
     {type_name !== 'spine' && <rect
       fill='none'
@@ -81,6 +93,7 @@ function NewFigureDialog({ closeDialog, addFigure }) {
                 <option value="arrow">Arrow</option>
                 <option value="good">Good</option>
                 <option value="spine">Spine</option>
+                <option value="cross_section_arrow">Cross Section Arrow</option>
               </select>
             </div>
           </form>
@@ -225,25 +238,28 @@ export default function BoxEditor(props) {
 
               <ul className="list-group">
                 {figures.map(figure =>
-                    <>
-                    <div
-                      key={figure.id}
-                      onClick={(evt) => { setCurrentEditBox(figure.id); } }
-                      className={`list-group-item list-group-item-action d-flex justify-content-between align-items-start ${currentEditBoxActiveClass(figure)}`}
-                      >
-                        <div className="ms-2 me-auto">
-                          <div className="fw-bold">{figure.type_name}</div>
-                        </div>
-                        <div
-                          onClick={(evt) => { removeEditBox(figure.id); } }
-                          className="btn btn-primary badge bg-primary rounded-pill"
-                          role="button" data-bs-toggle="button">
-                            X
-                        </div>
+                  <>
+                  <div
+                    key={figure.id}
+                    onClick={(evt) => { setCurrentEditBox(figure.id); } }
+                    className={`list-group-item list-group-item-action d-flex justify-content-between align-items-start ${currentEditBoxActiveClass(figure)}`}
+                    >
+                      <div className="ms-2 me-auto">
+                        <div className="fw-bold">{figure.type_name}</div>
                       </div>
-                      {currentEditBox === figure.id && <Select className='form-select' options={[{value: 0, label: 'supine position' }]} />}
-                      </>
-                    )}
+                      <div
+                        onClick={(evt) => { removeEditBox(figure.id); } }
+                        className="btn btn-primary badge bg-primary rounded-pill"
+                        role="button" data-bs-toggle="button">
+                          X
+                      </div>
+                    </div>
+                    {currentEditBox === figure.id && figure.type_name === 'skeleton' &&
+                      <>
+                        <Select className='form-select' options={[{value: 0, label: 'supine position' }]} />
+                      </>}
+                    </>
+                  )}
 
                 <a
                   href="#"
@@ -255,10 +271,6 @@ export default function BoxEditor(props) {
                     </div>
                   </a>
                 </ul>
-
-
-
-
             </p>
             <button onClick={save} className="btn btn-primary card-link">
               Save

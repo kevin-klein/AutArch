@@ -3,7 +3,7 @@ class SitesController < ApplicationController
 
   # GET /sites or /sites.json
   def index
-    @sites = Site.all
+    @sites = Site.includes(:graves).all
   end
 
   # GET /sites/1 or /sites/1.json
