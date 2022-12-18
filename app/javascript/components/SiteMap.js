@@ -27,8 +27,7 @@ function SiteDetail({site}) {
           </table>
 
         </div>
-        <a href="#" className="card-link">Edit</a>
-        <a href="#" className="card-link">Delete</a>
+        <a href={`/sites/${site.id}/edit`} className="card-link">Edit</a>
       </div>
     </div>
   )

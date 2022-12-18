@@ -14,7 +14,10 @@ gem 'sprockets-rails'
 gem 'pg'
 gem 'rails-erd', group: :development
 
+gem 'rice'
 gem 'xlsxtream'
+gem 'rtesseract'
+gem 'matrix'
 
 group :development do
   gem "ruby-lsp", require: false

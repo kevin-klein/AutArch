@@ -81,6 +81,8 @@ class GravesController < ApplicationController
           Scale.create!(grave: @grave, figure: figure)
         when 'spine'
           Spine.create!(grave: @grave, figure: figure)
+        when 'cross_section_arrow'
+          CrossSectionArrow.create!(grave: @grave, figure: figure, length: length)
         end
       end
     end
