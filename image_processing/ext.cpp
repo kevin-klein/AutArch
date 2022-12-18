@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <opencv2/opencv.hpp>
 #include <ruby.h>
+#include "rice.hpp"
 // #include <tesseract/baseapi.h>
 
 using namespace cv;
@@ -28,9 +29,6 @@ uint32_t angle(const Vector2i &v1, const Vector2i &v2) {
 }
 
 vector<Point> findBestArrowContour(const vector<vector<Point>> &contours) {
-  size_t longestArc_index = 0;
-  double longestArcLength = 0;
-
   vector<double> lengths;
   std::transform(
       contours.begin(), contours.end(), std::back_inserter(lengths),
@@ -81,6 +79,15 @@ Mat convertRubyStringToMat(VALUE image_value) {
   Mat undecoded_image_mat(image_data, true);
   Mat image_mat = imdecode(undecoded_image_mat, cv::IMREAD_COLOR);
   return image_mat;
+}
+
+VALUE convertMatToRubyString(const Mat &mat) {
+  std::vector<uchar> buf;
+  cv::imencode(".jpg", mat, buf);
+
+  std::string image_string(buf.begin(), buf.end());
+
+  return rb_str_new(image_string.c_str(), image_string.size());
 }
 
 Mat extractContour(const Mat &image, vector<Point> contour) {
@@ -178,7 +185,7 @@ vector<vector<Point>> findGraves(Mat image, vector<vector<Point>> contours) {
   return graves;
 }
 
-VALUE analyzePage(VALUE self, VALUE image_value) {
+extern "C" VALUE analyzePage(VALUE self, VALUE image_value) {
   Mat base_image = convertRubyStringToMat(image_value);
 
   Mat image_mat;
@@ -222,8 +229,6 @@ extern "C" VALUE getGraveStats(VALUE self, VALUE figure, VALUE image_value) {
   arrow_image = Scalar(255) - arrow_image;
 
   threshold(arrow_image, arrow_image, 40, 255, THRESH_BINARY);
-
-  imwrite("grave.jpg", arrow_image);
 
   vector<vector<Point>> contours;
   vector<Vec4i> hierarchy;
@@ -380,11 +385,101 @@ extern "C" VALUE getAngle(VALUE self, VALUE figure, VALUE image_value) {
 //   return Qnil;
 // }
 
+template<typename T>
+VALUE convert_to_ruby(T) {
+  // static_assert(false, NAMEOF_TYPE(T));
+  return Qnil;
+}
+
+template<>
+VALUE convert_to_ruby<Point>(Point point) {
+  VALUE point_array = rb_ary_new2(2);
+  rb_ary_push(point_array, LONG2FIX(point.x));
+  rb_ary_push(point_array, LONG2FIX(point.y));
+  return point_array;
+}
+
+template<>
+VALUE convert_to_ruby<Rect>(Rect rect) {
+  VALUE result = rb_hash_new();
+
+  rb_hash_aset(result, ID2SYM(rb_intern("x")), LONG2FIX(rect.x));
+  rb_hash_aset(result, ID2SYM(rb_intern("y")), LONG2FIX(rect.y));
+
+  rb_hash_aset(result, ID2SYM(rb_intern("width")), LONG2FIX(rect.width));
+  rb_hash_aset(result, ID2SYM(rb_intern("height")), LONG2FIX(rect.height));
+  return result;
+}
+
+template<typename T>
+VALUE convert_to_ruby(vector<T> vec) {
+  VALUE result = rb_ary_new2(vec.size());
+
+  for(const T &item : vec) {
+    VALUE rb_item = convert_to_ruby(item);
+    rb_ary_push(result, rb_item);
+  }
+
+  return result;
+}
+
+extern "C" VALUE rb_findContours(VALUE self, VALUE rb_mat) {
+  Mat mat = convertRubyStringToMat(rb_mat);
+
+  cvtColor(mat, mat, COLOR_BGR2GRAY);
+  mat = Scalar(255) - mat;
+
+  threshold(mat, mat, 40, 255, THRESH_BINARY);
+
+  vector<vector<Point>> contours;
+  vector<Vec4i> hierarchy;
+  findContours(mat, contours, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE);
+
+  return convert_to_ruby(contours);
+}
+
+extern "C" VALUE rb_minAreaRect(VALUE self, VALUE rb_contour) {
+  vector<Point> contour;
+
+  long point_count = RARRAY_LEN(rb_contour);
+  for(long index = 0; index < point_count; index++) {
+    VALUE rb_point = RARRAY_AREF(rb_contour, index);
+    long x = FIX2LONG(RARRAY_AREF(rb_point, 0));
+    long y = FIX2LONG(RARRAY_AREF(rb_point, 1));
+    Point point(x, y);
+    contour.push_back(point);
+  }
+
+
+  RotatedRect rect = minAreaRect(contour);
+  // return LONG2FIX(rect.boundingRect().width);
+
+  return convert_to_ruby(rect.boundingRect());
+}
+
+extern "C" VALUE rb_extractFigure(VALUE self, VALUE figure, VALUE rb_mat) {
+  Mat mat = convertRubyStringToMat(rb_mat);
+  Mat figure_mat = cropToFigure(figure, mat);
+
+  return convertMatToRubyString(figure_mat);
+}
+
+extern "C" VALUE rb_imwrite(VALUE self, VALUE filename, VALUE rb_mat) {
+  Mat mat = convertRubyStringToMat(rb_mat);
+  imwrite(StringValueCStr(filename), mat);
+
+  return Qnil;
+}
+
 extern "C" void Init_ext() {
   VALUE ImageProcessing = rb_define_module("ImageProcessing");
   rb_define_module_function(ImageProcessing, "getAngle", getAngle, 2);
   rb_define_module_function(ImageProcessing, "getGraveStats", getGraveStats, 2);
   rb_define_module_function(ImageProcessing, "analyzePage", analyzePage, 1);
+  rb_define_module_function(ImageProcessing, "extractFigure", rb_extractFigure, 2);
+  rb_define_module_function(ImageProcessing, "findContours", rb_findContours, 1);
+  rb_define_module_function(ImageProcessing, "minAreaRect", rb_minAreaRect, 1);
+  rb_define_module_function(ImageProcessing, "imwrite", rb_imwrite, 2);
 
   // VALUE TesseractAPI = rb_define_module("Tesseract");
   // rb_define_module_function(TesseractAPI, "init", initTesseract, 0);
