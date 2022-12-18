@@ -1,5 +1,6 @@
 COUNTRIES = "Albania
 Austria
+Armenia
 Belgium
 Bosnia-Herzegovina
 Belarus
@@ -24,6 +25,7 @@ Isle of Man
 Kazakhstan
 Latvia
 Malta
+Morocco
 Lithuania
 Moldova
 Montenegro
@@ -71,6 +73,7 @@ CSV.open('filtered.csv', 'w') do |filtered|
 
       CSV.foreach('v54.1_HO_public.csv', col_sep: "\t", quote_char: nil, headers: true) do |row|
         age = row['Date mean in BP in years before 1950 CE [OxCal mu for a direct radiocarbon date, and average of range for a contextual date]'].to_i
+
         if age < 5450 && age > 3750 && COUNTRIES.include?(row['Political Entity']) && row['Lat.'] != '..' && row['Long.'] != '..'
           countries_sheet << row.to_hash.values
           filtered << row
