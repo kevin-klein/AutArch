@@ -35,6 +35,8 @@ class PublicationsController < ApplicationController
 
     respond_to do |format|
       if @publication.save
+        AnalyzePublicationJob.perform_later(@publication, site_id: publication_params[:site])
+
         format.html { redirect_to publications_path, notice: "Publication was successfully created." }
         format.json { render :show, status: :created, location: @publication }
       else
@@ -75,6 +77,6 @@ class PublicationsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def publication_params
-      params.require(:publication).permit(:pdf, :author, :title)
+      params.require(:publication).permit(:pdf, :author, :title, :site)
     end
 end

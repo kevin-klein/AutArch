@@ -3,11 +3,15 @@ class GravesController < ApplicationController
 
   # GET /graves or /graves.json
   def index
-    @graves = Grave.all
+    @graves = Grave.order(:id).all
   end
 
   # GET /graves/1 or /graves/1.json
   def show
+  end
+
+  def stats
+
   end
 
   # GET /graves/new
@@ -92,7 +96,7 @@ class GravesController < ApplicationController
 
   # DELETE /graves/1 or /graves/1.json
   def destroy
-    @grafe.destroy
+    @grave.destroy
 
     respond_to do |format|
       format.html { redirect_to graves_url, notice: "Grave was successfully destroyed." }

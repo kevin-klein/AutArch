@@ -17,6 +17,7 @@ class Figure < ApplicationRecord
   belongs_to :page
   has_many :skeletons, dependent: :destroy
   has_many :graves, class_name: 'Grave'
+  has_many :grave_cross_sections, dependent: :destroy
   has_one :arrow
 
   def width

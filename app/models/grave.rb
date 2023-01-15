@@ -14,14 +14,13 @@
 class Grave < ApplicationRecord
   belongs_to :figure
   belongs_to :site, required: false
-  has_one :scale
-  has_one :arrow
-  has_many :graves
-  has_one :grave_cross_section
-  has_many :goods
-  has_many :spines
-  has_one :cross_section_arrow
-  has_many :skeletons
+  has_one :scale, dependent: :destroy
+  has_one :arrow, dependent: :destroy
+  has_one :grave_cross_section, dependent: :destroy
+  has_many :goods, dependent: :destroy
+  has_many :spines, dependent: :destroy
+  has_one :cross_section_arrow, dependent: :destroy
+  has_many :skeletons, dependent: :destroy
 
   def upwards?
     figure.width < figure.height
@@ -41,6 +40,22 @@ class Grave < ApplicationRecord
     scale&.figure&.width
   end
 
+  def area_with_unit
+    if scale.present? && scale.meter_ratio > 0 && area > 0
+      { value: area * scale.meter_ratio ** 2, unit: 'm' }
+    else
+      { value: area, unit: 'px' }
+    end
+  end
+
+  def arc_length_with_unit
+    if scale.present? && scale.meter_ratio > 0 && arc_length > 0
+      { value: arc_length * scale.meter_ratio, unit: 'm' }
+    else
+      { value: arc_length, unit: 'px' }
+    end
+  end
+
   def figures
     ([
       figure,
@@ -49,5 +64,13 @@ class Grave < ApplicationRecord
       grave_cross_section&.figure,
       cross_section_arrow&.figure
     ] + skeletons.map(&:figure) + goods.map(&:figure) + spines.map(&:figure)).compact
+  end
+
+  def self.area_arc_stats
+    Grave
+      .select { _1.area_with_unit[:unit] == 'm' }
+      .select { _1.area_with_unit[:value].round(1) > 0 }
+      .group_by { _1.area_with_unit[:value].round(1) }
+      .map { |k, v| [k, v.count] }
   end
 end
