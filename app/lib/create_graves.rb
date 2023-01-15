@@ -4,15 +4,13 @@ class CreateGraves
 
   end
 
-  def build
-    Page.transaction do
-      Page.includes(:figures).find_each do |page|
-        figures = convert_figures(page.figures)
+  def run
+    Page.includes(:figures).find_each do |page|
+      figures = convert_figures(page.figures)
 
-        grave_figures = figures['grave']
-        grave_figures&.each do |grave|
-          handle_grave(grave, figures)
-        end
+      grave_figures = figures['grave']
+      grave_figures&.each do |grave|
+        handle_grave(grave, figures)
       end
     end
   end
@@ -21,17 +19,10 @@ class CreateGraves
     result = {}
 
     figures.each do |figure|
-      if ['arrow_up', 'arrow_left', 'arrow_right'].include?(figure.type_name)
-        arr = result['arrow']
-        arr ||= []
-        arr << figure
-        result['arrow'] = arr
-      else
-        arr = result[figure.type_name]
-        arr ||= []
-        arr << figure
-        result[figure.type_name] = arr
-      end
+      arr = result[figure.type_name]
+      arr ||= []
+      arr << figure
+      result[figure.type_name] = arr
     end
 
     result

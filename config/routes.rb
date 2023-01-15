@@ -1,6 +1,10 @@
 Rails.application.routes.draw do
   resources :sites
-  resources :graves
+  resources :graves do
+    collection do
+      get :stats
+    end
+  end
   resources :figures
   resources :pages
   resources :images

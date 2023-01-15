@@ -11,4 +11,7 @@
 #
 class Publication < ApplicationRecord
   has_many :pages
+  has_many :graves, through: :pages
+
+  attribute :site, :string
 end

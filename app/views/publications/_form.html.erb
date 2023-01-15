@@ -1,32 +1,9 @@
-<%= form_with(model: publication) do |form| %>
-  <% if publication.errors.any? %>
-    <div style="color: red">
-      <h2><%= pluralize(publication.errors.count, "error") %> prohibited this publication from being saved:</h2>
-
-      <ul>
-        <% publication.errors.each do |error| %>
-          <li><%= error.full_message %></li>
-        <% end %>
-      </ul>
-    </div>
+<div class='container'>
+  <%= simple_form_for(publication) do |f| %>
+    <%= f.input :pdf, as: :file %>
+    <%= f.input :author %>
+    <%= f.input :title %>
+    <%= f.input :site, collection: Site.order(:name).pluck(:name, :id) %>
+    <%= f.submit %>
   <% end %>
-
-  <div>
-    <%= form.label :pdf, style: "display: block" %>
-    <%= form.file_field :pdf %>
-  </div>
-
-  <div>
-    <%= form.label :author, style: "display: block" %>
-    <%= form.text_field :author %>
-  </div>
-
-  <div>
-    <%= form.label :title, style: "display: block" %>
-    <%= form.text_field :title %>
-  </div>
-
-  <div>
-    <%= form.submit %>
-  </div>
-<% end %>
+</div>

@@ -4,6 +4,17 @@
 <div class="row">
   <div class="col-md-12">
 
+    <nav class='nav' aria-label="Page navigation example">
+      <li class="nav-item">
+        <%= button_to "Delete", @grave, method: :delete, class: 'btn btn-warning nav-link' %>
+      </li>
+
+      <ul class="pagination">
+        <li class="page-item"><a class="page-link" href="<%= grave_path(Grave.order(:id).where('id < ?', @grave.id).last || @grave.id) %>">Previous</a></li>
+        <li class="page-item"><a class="page-link" href="<%= grave_path(Grave.order(:id).where('id > ?', @grave.id).first || @grave.id) %>">Next</a></li>
+      </ul>
+    </nav>
+
     <%= react_component(
       'GraveEditor', {
         image: "data:image/jpeg;base64,#{Base64.encode64 @grave.figure.page.image.data}",
@@ -11,6 +22,8 @@
         id: @grave.id,
         grave: @grave.as_json,
         sites: Site.order(:name).all,
+        width: @grave.figure.page.image.width,
+        height: @grave.figure.page.image.height,
         figures: @grave.figures.as_json(methods: [:width, :height])
       }
     ) %>
@@ -29,11 +42,11 @@
 
         <tr>
           <td>Arc Length</td>
-          <td><%= @grave.arc_length %></td>
+          <td><%= @grave.arc_length_with_unit[:value] %> <%= @grave.arc_length_with_unit[:unit] %></td>
         </tr>
         <tr>
           <td>Area</td>
-          <td><%= @grave.area %></td>
+          <td><%= @grave.area_with_unit[:value] %> <%= @grave.area_with_unit[:unit] %>^2</td>
         </tr>
 
         <tr>
@@ -42,8 +55,13 @@
         </tr>
 
         <tr>
+          <td>Meter Ratio</td>
+          <td><%= @grave&.scale&.meter_ratio %></td>
+        </tr>
+
+        <tr>
           <td>Cross Section Depth</td>
-          <td><%= @grave.cross_section_arrow&.length.abs %></td>
+          <td><%= @grave.cross_section_arrow&.length&.abs %></td>
         </tr>
       </tbody>
     </table>

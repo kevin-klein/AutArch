@@ -19,6 +19,9 @@ gem 'xlsxtream'
 gem 'rtesseract'
 gem 'matrix'
 
+gem 'http'
+gem 'http-form_data'
+
 group :development do
   gem "ruby-lsp", require: false
 end
@@ -27,7 +30,7 @@ end
 # gem 'numpy'
 
 gem 'chartkick'
-gem 'mini_magick'
+gem 'pdf-reader'
 
 # Use the Puma web server [https://github.com/puma/puma]
 gem 'puma', '~> 5.0'
@@ -58,6 +61,7 @@ gem 'tzinfo-data', platforms: %i[ mingw mswin x64_mingw jruby ]
 
 # Reduces boot times through caching; required in config/boot.rb
 gem 'bootsnap', require: false
+gem 'simple_form'
 
 # Use Sass to process CSS
 # gem 'sassc-rails'
@@ -66,8 +70,8 @@ gem 'bootsnap', require: false
 # gem 'image_processing', '~> 1.2'
 
 gem 'ruby-vips'
-# gem 'torch-rb'
-# gem 'torchvision'
+gem 'torch-rb'
+gem 'torchvision'
 gem 'csv'
 
 group :development, :test do
