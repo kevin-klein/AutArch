@@ -10,6 +10,7 @@ Rails.application.routes.draw do
   resources :images
   resources :page_images
   resources :publications do
+    get :stats
     get :analyze, on: :member
   end
 end
