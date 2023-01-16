@@ -21,6 +21,8 @@ class Grave < ApplicationRecord
   has_many :spines, dependent: :destroy
   has_one :cross_section_arrow, dependent: :destroy
   has_many :skeletons, dependent: :destroy
+  has_many :skulls, through: :skeletons
+  has_many :spines, dependent: :destroy
 
   def upwards?
     figure.width < figure.height
@@ -63,7 +65,7 @@ class Grave < ApplicationRecord
       arrow&.figure,
       grave_cross_section&.figure,
       cross_section_arrow&.figure
-    ] + skeletons.map(&:figure) + goods.map(&:figure) + spines.map(&:figure)).compact
+    ] + spines.map(&:figure) + skulls.map(&:figure) + skeletons.map(&:figure) + goods.map(&:figure) + spines.map(&:figure)).compact
   end
 
   def self.area_arc_stats

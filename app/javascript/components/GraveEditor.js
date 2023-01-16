@@ -73,7 +73,7 @@ function Box({setDraggingPoint, active, figure: { id, x1, y1, x2, y2, width, hei
 }
 
 function NewFigureDialog({ closeDialog, addFigure }) {
-  const [type, setType] = React.useState('default');
+  const [type, setType] = React.useState('spine');
 
   return (<div className="modal d-block" aria-hidden="false">
     <div className="modal-dialog">
@@ -86,14 +86,13 @@ function NewFigureDialog({ closeDialog, addFigure }) {
           <form>
             <div className="input-group mb-3">
               <select value={type} onChange={evt => setType(evt.target.value)} className="form-select" aria-label="Default select example">
-                <option value="default">Please select type</option>
+                <option value="spine">Spine</option>
                 <option value="skeleton">Skeleton</option>
                 <option value="skull">Skull</option>
                 <option value="scale">Scale</option>
                 <option value="grave_cross_section">Grave Cross Section</option>
                 <option value="arrow">Arrow</option>
                 <option value="good">Good</option>
-                <option value="spine">Spine</option>
                 <option value="cross_section_arrow">Cross Section Arrow</option>
               </select>
             </div>
@@ -113,8 +112,6 @@ function useStyle(element) {
     const savedBodyStyle = React.useRef({});
 
     React.useEffect(() => {
-      console.log(element);
-      console.log(style);
       const backupBodyStyle = {};
       Object.entries(style).forEach(([key, value]) => {
         backupBodyStyle[key] = document.body.style[key];
@@ -207,10 +204,22 @@ export default function BoxEditor(props) {
     const grave = figures.filter(figure => figure.type_name === 'grave')[0];
 
     if(grave !== undefined) {
-      setFigures([...figures, { ...grave, type_name: type, id: genUUID() }]);
+      const graveWidth = grave.x2 - grave.x1;
+      const graveHeight = grave.y2 - grave.y1;
+      const x1 = grave.x1 + graveWidth * 0.3;
+      const x2 = grave.x1 + graveWidth * 0.6;
+
+      const y1 = grave.y1 + graveHeight * 0.4;
+      const y2 = grave.y1 + graveHeight * 0.6;
+
+      const newFigure = { ...grave, y1: y1, y2: y2, x1: x1, x2: x2, type_name: type, id: genUUID() };
+      setFigures([...figures, newFigure]);
+      setCurrentEditBox(newFigure.id);
     }
     else{
-      setFigures([...figures, { type_name: type, id: genUUID(), x1: 0, y1: 0, x2: 100, y2: 100 }]);
+      const newFigure = { type_name: type, id: genUUID(), x1: 0, y1: 0, x2: 100, y2: 100 };
+      setFigures([...figures, newFigure]);
+      setCurrentEditBox(newFigure.id);
     }
   }
 

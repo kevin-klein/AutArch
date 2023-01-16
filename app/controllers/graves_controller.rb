@@ -77,6 +77,8 @@ class GravesController < ApplicationController
           Arrow.create!(grave: @grave, figure: figure, angle: angle)
         when 'skeleton'
           Skeleton.create!(grave: @grave, figure: figure)
+        when 'skull'
+          Skull.create!(skeleton: @grave.skeletons.first, figure: figure)
         when 'good'
           Good.create!(grave: @grave, figure: figure)
         when 'grave_cross_section'
