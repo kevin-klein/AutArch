@@ -70,6 +70,19 @@ class CreateGraves
     end
   end
 
+  def assign_spines_to_skeletons
+    Grave.includes(skeletons: :figure, spines: :figure).find_each do |grave|
+      grave.skeletons.each do |skeleton|
+        spines = grave.spines
+        next if grave.spines.empty?
+        spines_index = spines.map { |spine| skeleton.figure.distance_to(spine.figure) }.each_with_index.min[1]
+        closest_spine = spines[spines_index]
+        closest_spine.skeleton = skeleton
+        closest_spine.save!
+      end
+    end
+  end
+
   def find_closest_item(grave_figure, figures)
     return if figures.nil?
 

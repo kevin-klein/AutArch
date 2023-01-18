@@ -1,0 +1,14 @@
+<p style="color: green"><%= notice %></p>
+
+<h1>Chronologies</h1>
+
+<div id="chronologies">
+  <% @chronologies.each do |chronology| %>
+    <%= render chronology %>
+    <p>
+      <%= link_to "Show this chronology", chronology %>
+    </p>
+  <% end %>
+</div>
+
+<%= link_to "New chronology", new_chronology_path %>

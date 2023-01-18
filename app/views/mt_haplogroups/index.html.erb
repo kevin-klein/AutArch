@@ -1,0 +1,14 @@
+<p style="color: green"><%= notice %></p>
+
+<h1>Mt haplogroups</h1>
+
+<div id="mt_haplogroups">
+  <% @mt_haplogroups.each do |mt_haplogroup| %>
+    <%= render mt_haplogroup %>
+    <p>
+      <%= link_to "Show this mt haplogroup", mt_haplogroup %>
+    </p>
+  <% end %>
+</div>
+
+<%= link_to "New mt haplogroup", new_mt_haplogroup_path %>

@@ -45,6 +45,31 @@ SimpleForm.setup do |config|
   config.input_field_error_class = 'is-invalid'
   config.input_field_valid_class = 'is-valid'
 
+  config.wrappers :left_right_form, tag: 'div', class: 'mb-3 row' do |b|
+    b.use :html5
+    b.use :placeholder
+
+    b.optional :maxlength
+    b.optional :minlength
+    b.optional :pattern
+    b.optional :min_max
+    b.optional :readonly
+    b.use :label, class: 'col-sm-2 col-form-label'
+    b.use :input, class: 'form-control', wrap_with: { tag: 'div', class: 'col-sm-10' }
+  end
+
+  config.wrappers :left_right_select, tag: 'div', class: 'row mb-3', error_class: 'form-group-invalid', valid_class: 'form-group-valid' do |b|
+    b.use :html5
+    b.use :placeholder
+
+    b.optional :maxlength
+    b.optional :minlength
+    b.optional :pattern
+    b.optional :min_max
+    b.optional :readonly
+    b.use :label, class: 'col-sm-2 col-form-label'
+    b.use :input, class: 'form-select', wrap_with: { tag: 'div', class: 'col-sm-10' }
+  end
 
   # vertical forms
   #

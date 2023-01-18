@@ -1,0 +1,14 @@
+<p style="color: green"><%= notice %></p>
+
+<h1>Stable isotopes</h1>
+
+<div id="stable_isotopes">
+  <% @stable_isotopes.each do |stable_isotope| %>
+    <%= render stable_isotope %>
+    <p>
+      <%= link_to "Show this stable isotope", stable_isotope %>
+    </p>
+  <% end %>
+</div>
+
+<%= link_to "New stable isotope", new_stable_isotope_path %>

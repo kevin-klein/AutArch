@@ -1,0 +1,14 @@
+<p style="color: green"><%= notice %></p>
+
+<h1>C14 dates</h1>
+
+<div id="c14_dates">
+  <% @c14_dates.each do |c14_date| %>
+    <%= render c14_date %>
+    <p>
+      <%= link_to "Show this c14 date", c14_date %>
+    </p>
+  <% end %>
+</div>
+
+<%= link_to "New c14 date", new_c14_date_path %>

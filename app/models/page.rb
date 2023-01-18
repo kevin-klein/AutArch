@@ -12,7 +12,6 @@
 class Page < ApplicationRecord
   belongs_to :publication
   belongs_to :image
-  has_many :page_images
   has_many :figures
   has_many :graves, through: :figures
 end

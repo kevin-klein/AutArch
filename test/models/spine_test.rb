@@ -2,11 +2,12 @@
 #
 # Table name: spines
 #
-#  id         :bigint           not null, primary key
-#  grave_id   :bigint           not null
-#  created_at :datetime         not null
-#  updated_at :datetime         not null
-#  figure_id  :bigint
+#  id          :bigint           not null, primary key
+#  grave_id    :bigint           not null
+#  created_at  :datetime         not null
+#  updated_at  :datetime         not null
+#  figure_id   :bigint
+#  skeleton_id :bigint
 #
 require "test_helper"
 

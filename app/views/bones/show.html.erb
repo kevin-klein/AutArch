@@ -1,0 +1,10 @@
+<p style="color: green"><%= notice %></p>
+
+<%= render @bone %>
+
+<div>
+  <%= link_to "Edit this bone", edit_bone_path(@bone) %> |
+  <%= link_to "Back to bones", bones_path %>
+
+  <%= button_to "Destroy this bone", @bone, method: :delete %>
+</div>

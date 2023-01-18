@@ -10,6 +10,7 @@
 #  updated_at :datetime         not null
 #  arc_length :float
 #  area       :float
+#  kurgan_id  :bigint
 #
 require "test_helper"
 

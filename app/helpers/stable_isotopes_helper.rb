@@ -1,0 +1,2 @@
+module StableIsotopesHelper
+end

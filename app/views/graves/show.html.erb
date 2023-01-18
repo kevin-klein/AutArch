@@ -1,5 +1,10 @@
 <p style="color: green"><%= notice %></p>
-
+<style media="screen">
+  #map { height: 800px; }
+  div[data-react-class="SiteMap"] { height: 800px; }
+  .leaflet-container { height: calc(100% - 40px); }
+  .map-overlay { border-radius: 15px; padding: 30px; background-color: white; position: absolute; top: 150px; left: 0; z-index: 99999; }
+</style>
 
 <div class="row">
   <div class="col-md-12">
@@ -15,6 +20,20 @@
       </ul>
     </nav>
 
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home-tab-pane" type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true">Home</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <%= link_to('Site', sites_path(grave: @grave), class: 'nav-link') %>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact-tab-pane" type="button" role="tab" aria-controls="contact-tab-pane" aria-selected="false">Contact</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="disabled-tab" data-bs-toggle="tab" data-bs-target="#disabled-tab-pane" type="button" role="tab" aria-controls="disabled-tab-pane" aria-selected="false" disabled>Disabled</button>
+      </li>
+    </ul>
     <%= react_component(
       'GraveEditor', {
         image: "data:image/jpeg;base64,#{Base64.encode64 @grave.figure.page.image.data}",
@@ -24,10 +43,13 @@
         sites: Site.order(:name).all,
         width: @grave.figure.page.image.width,
         height: @grave.figure.page.image.height,
-        figures: @grave.figures.as_json(methods: [:width, :height])
+        figures: @grave.figures.as_json(methods: [:width, :height, :skeletons])
       }
     ) %>
+
   </div>
+<%
+=begin%>
 
   <div class="col-md-6">
     <table class="table">
@@ -67,3 +89,5 @@
     </table>
   </div>
 </div>
+<%
+=end%>

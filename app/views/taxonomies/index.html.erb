@@ -1,0 +1,14 @@
+<p style="color: green"><%= notice %></p>
+
+<h1>Taxonomies</h1>
+
+<div id="taxonomies">
+  <% @taxonomies.each do |taxonomy| %>
+    <%= render taxonomy %>
+    <p>
+      <%= link_to "Show this taxonomy", taxonomy %>
+    </p>
+  <% end %>
+</div>
+
+<%= link_to "New taxonomy", new_taxonomy_path %>

@@ -329,6 +329,7 @@ export default function BoxEditor(props) {
                       {currentEditBox === figure.id && figure.type_name === 'skeleton' &&
                         <>
                           <Select className='form-select' options={[{value: 0, label: 'supine position' }]} />
+                          <a href={`/skeletons/${figure.skeletons[0].id}/edit`}>Edit</a>
                         </>}
                       </>
                     )}

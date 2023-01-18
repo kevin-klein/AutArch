@@ -22,11 +22,11 @@
  * @returns {Object} The merged object.
  */
 function jsonHeader (options) {
-    options = options || {};
-    return Object.assign(options, {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-    });
+  options = options || {};
+  return Object.assign(options, {
+    'Accept': 'application/json',
+    'Content-Type': 'application/json'
+  });
 }
 
 /**
@@ -36,29 +36,29 @@ function jsonHeader (options) {
  * @returns {Object} The merged object.
  */
 export default function safeCredentials (options) {
-    options = options || {};
-    return Object.assign(options, {
-        credentials: 'include',
-        mode: 'same-origin',
-        headers: Object.assign((options['headers'] || {}), authenticityHeader(), jsonHeader())
-    });
+  options = options || {};
+  return Object.assign(options, {
+    credentials: 'include',
+    mode: 'same-origin',
+    headers: Object.assign((options['headers'] || {}), authenticityHeader(), jsonHeader())
+  });
 }
 
 // Additional helper methods
 
 function authenticityHeader (options) {
-    options = options || {};
-    return Object.assign(options, {
-        'X-CSRF-Token': getAuthenticityToken(),
-        'X-Requested-With': 'XMLHttpRequest'
-    });
+  options = options || {};
+  return Object.assign(options, {
+    'X-CSRF-Token': getAuthenticityToken(),
+    'X-Requested-With': 'XMLHttpRequest'
+  });
 }
 
 function getAuthenticityToken () {
-    return getMetaContent('csrf-token');
+  return getMetaContent('csrf-token');
 }
 
 function getMetaContent (name) {
-    const header = document.querySelector(`meta[name="${name}"]`);
-    return header && header.content;
+  const header = document.querySelector(`meta[name="${name}"]`);
+  return header && header.content;
 }

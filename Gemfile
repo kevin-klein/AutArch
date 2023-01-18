@@ -13,6 +13,8 @@ gem 'sprockets-rails'
 
 gem 'pg'
 gem 'rails-erd', group: :development
+gem 'pagy', '~> 6.0' # omit patch digit
+gem 'graphql'
 
 gem 'rice'
 gem 'xlsxtream'
@@ -106,3 +108,4 @@ gem 'pkg-config'
 gem "shakapacker", "= 6.5"
 
 gem "react-rails", "= 2.6"
+gem "graphiql-rails", group: :development
