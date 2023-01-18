@@ -10,9 +10,11 @@
 #  updated_at :datetime         not null
 #  arc_length :float
 #  area       :float
+#  kurgan_id  :bigint
 #
 class Grave < ApplicationRecord
   belongs_to :figure
+  delegate :page, to: :figure
   belongs_to :site, required: false
   has_one :scale, dependent: :destroy
   has_one :arrow, dependent: :destroy
@@ -23,6 +25,7 @@ class Grave < ApplicationRecord
   has_many :skeletons, dependent: :destroy
   has_many :skulls, through: :skeletons
   has_many :spines, dependent: :destroy
+  belongs_to :kurgan
 
   def upwards?
     figure.width < figure.height

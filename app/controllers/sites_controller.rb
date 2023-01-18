@@ -3,7 +3,12 @@ class SitesController < ApplicationController
 
   # GET /sites or /sites.json
   def index
-    @sites = Site.includes(:graves).all
+    sites = Site.all
+    if site_params
+      sites = Site.where('name ilike ?', "%#{site_params[:name]}%")
+    end
+
+    @sites_pagy, @sites = pagy(sites.order(:name).all)
   end
 
   # GET /sites/1 or /sites/1.json
@@ -65,6 +70,6 @@ class SitesController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def site_params
-      params.require(:site).permit(:lat, :lon, :name)
+      params.require(:site).permit(:lat, :lon, :name) if params[:site]
     end
 end

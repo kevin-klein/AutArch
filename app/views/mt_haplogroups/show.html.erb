@@ -1,0 +1,10 @@
+<p style="color: green"><%= notice %></p>
+
+<%= render @mt_haplogroup %>
+
+<div>
+  <%= link_to "Edit this mt haplogroup", edit_mt_haplogroup_path(@mt_haplogroup) %> |
+  <%= link_to "Back to mt haplogroups", mt_haplogroups_path %>
+
+  <%= button_to "Destroy this mt haplogroup", @mt_haplogroup, method: :delete %>
+</div>

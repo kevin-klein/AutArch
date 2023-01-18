@@ -1,0 +1,14 @@
+<p style="color: green"><%= notice %></p>
+
+<h1>Anthropologies</h1>
+
+<div id="anthropologies">
+  <% @anthropologies.each do |anthropology| %>
+    <%= render anthropology %>
+    <p>
+      <%= link_to "Show this anthropology", anthropology %>
+    </p>
+  <% end %>
+</div>
+
+<%= link_to "New anthropology", new_anthropology_path %>

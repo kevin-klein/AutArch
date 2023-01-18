@@ -1,0 +1,20 @@
+
+<%= simple_form_for(@anthropology) do |f| %>
+  <%= f.error_notification %>
+  <%= f.error_notification message: f.object.errors[:base].to_sentence if f.object.errors[:base].present? %>
+
+  <div class="form-inputs">
+    <%= f.input :sex_morph %>
+    <%= f.input :sex_gen %>
+    <%= f.input :sex_consensus %>
+    <%= f.input :age_as_reported %>
+    <%= f.input :age_class %>
+    <%= f.input :height %>
+    <%= f.input :pathologies %>
+    <%= f.input :pathologies_type %>
+  </div>
+
+  <div class="form-actions">
+    <%= f.button :submit %>
+  </div>
+<% end %>

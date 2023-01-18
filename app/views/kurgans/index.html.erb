@@ -1,0 +1,14 @@
+<p style="color: green"><%= notice %></p>
+
+<h1>Kurgans</h1>
+
+<div id="kurgans">
+  <% @kurgans.each do |kurgan| %>
+    <%= render kurgan %>
+    <p>
+      <%= link_to "Show this kurgan", kurgan %>
+    </p>
+  <% end %>
+</div>
+
+<%= link_to "New kurgan", new_kurgan_path %>

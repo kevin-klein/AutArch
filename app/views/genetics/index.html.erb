@@ -1,0 +1,14 @@
+<p style="color: green"><%= notice %></p>
+
+<h1>Genetics</h1>
+
+<div id="genetics">
+  <% @genetics.each do |genetic| %>
+    <%= render genetic %>
+    <p>
+      <%= link_to "Show this genetic", genetic %>
+    </p>
+  <% end %>
+</div>
+
+<%= link_to "New genetic", new_genetic_path %>

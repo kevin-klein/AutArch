@@ -1,0 +1,37 @@
+# == Schema Information
+#
+# Table name: anthropologies
+#
+#  id               :bigint           not null, primary key
+#  sex_morph        :integer
+#  sex_gen          :integer
+#  sex_consensus    :integer
+#  age_as_reported  :string
+#  age_class        :integer
+#  height           :float
+#  pathologies      :integer
+#  pathologies_type :string
+#  skeleton_id      :bigint
+#  created_at       :datetime         not null
+#  updated_at       :datetime         not null
+#
+
+one:
+  sex_morph: 1
+  sex_gen: 1
+  sex_consensus: 1
+  age_as_reported: MyString
+  age_class: 1
+  height: 1.5
+  pathologies: 1
+  pathologies_type: MyString
+
+two:
+  sex_morph: 1
+  sex_gen: 1
+  sex_consensus: 1
+  age_as_reported: MyString
+  age_class: 1
+  height: 1.5
+  pathologies: 1
+  pathologies_type: MyString

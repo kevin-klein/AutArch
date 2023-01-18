@@ -1,0 +1,19 @@
+
+<%= simple_form_for(@stable_isotope) do |f| %>
+  <%= f.error_notification %>
+  <%= f.error_notification message: f.object.errors[:base].to_sentence if f.object.errors[:base].present? %>
+
+  <div class="form-inputs">
+    <%= f.association :skeleton %>
+    <%= f.input :iso_id %>
+    <%= f.input :iso_bone %>
+    <%= f.input :iso_value %>
+    <%= f.input :ref_iso %>
+    <%= f.input :isotope %>
+    <%= f.input :baseline %>
+  </div>
+
+  <div class="form-actions">
+    <%= f.button :submit %>
+  </div>
+<% end %>

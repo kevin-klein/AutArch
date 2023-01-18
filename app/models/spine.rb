@@ -2,15 +2,17 @@
 #
 # Table name: spines
 #
-#  id         :bigint           not null, primary key
-#  grave_id   :bigint           not null
-#  created_at :datetime         not null
-#  updated_at :datetime         not null
-#  figure_id  :bigint
+#  id          :bigint           not null, primary key
+#  grave_id    :bigint           not null
+#  created_at  :datetime         not null
+#  updated_at  :datetime         not null
+#  figure_id   :bigint
+#  skeleton_id :bigint
 #
 class Spine < ApplicationRecord
   belongs_to :grave
   belongs_to :figure
+  belongs_to :skeleton
 
   def angle
     y_axis = Vector[0, 1]

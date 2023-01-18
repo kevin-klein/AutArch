@@ -1,13 +1,26 @@
 namespace :import do
   task sites: :environment do
-    Site.delete_all
+    Site.transaction do
+      Site.delete_all
 
-    table = CSV.parse(File.read("filtered.csv"), headers: true)
+      countries = CSV.read(Rails.root.join('assets', 'countries.csv').to_s, headers: true).map(&:to_h)
 
-    sites = table.map do |row|
-      { name: row['Locality'], lat: row['Lat.'], lon: row['Long.']}
-    end.uniq { |r| r[:name] }
+      table = CSV.parse(File.read("filtered.csv"), headers: true)
 
-    Site.insert_all(sites)
+      sites = table.map do |row|
+        country_code = countries.filter { _1['name'] == row['Political Entity'] }.first&.[]('alpha-2')
+
+        { name: row['Locality'],
+          lat: row['Lat.'],
+          lon: row['Long.'],
+          country_code: country_code,
+          locality: row['Locality']
+        }
+      end.uniq { |r| r[:name] }
+
+      sites.each do |site|
+        Site.create!(site)
+      end
+    end
   end
 end

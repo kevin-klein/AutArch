@@ -1,0 +1,2 @@
+module YHaplogroupsHelper
+end

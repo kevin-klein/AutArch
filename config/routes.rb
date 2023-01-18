@@ -1,4 +1,21 @@
 Rails.application.routes.draw do
+  if Rails.env.development?
+    mount GraphiQL::Rails::Engine, at: "/graphiql", graphql_path: "/graphql"
+  end
+  post "/graphql", to: "graphql#execute"
+
+  resources :periods
+  resources :bones
+  resources :y_haplogroups
+  resources :mt_haplogroups
+  resources :genetics
+  resources :anthropologies
+  resources :cultures
+  resources :taxonomies
+  resources :chronologies do
+    resources :c14_dates
+  end
+  resources :kurgans
   resources :sites
   resources :graves do
     collection do
@@ -8,9 +25,14 @@ Rails.application.routes.draw do
   resources :figures
   resources :pages
   resources :images
+  resources :skeletons do
+    resources :stable_isotopes
+  end
   resources :page_images
   resources :publications do
     get :stats
     get :analyze, on: :member
   end
+
+  root 'graves#index'
 end

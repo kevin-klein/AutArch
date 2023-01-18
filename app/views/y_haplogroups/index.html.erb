@@ -1,0 +1,14 @@
+<p style="color: green"><%= notice %></p>
+
+<h1>Y haplogroups</h1>
+
+<div id="y_haplogroups">
+  <% @y_haplogroups.each do |y_haplogroup| %>
+    <%= render y_haplogroup %>
+    <p>
+      <%= link_to "Show this y haplogroup", y_haplogroup %>
+    </p>
+  <% end %>
+</div>
+
+<%= link_to "New y haplogroup", new_y_haplogroup_path %>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { MapContainer, ScaleControl, TileLayer, useMap, Marker, Popup } from 'react-leaflet'
+import { MapContainer, ScaleControl, TileLayer, useMap, Marker, Popup } from 'react-leaflet';
 
 // <% @site.graves.each do |grave| %>
 // <tr>
@@ -30,7 +30,7 @@ function SiteDetail({site}) {
         <a href={`/sites/${site.id}/edit`} className="card-link">Edit</a>
       </div>
     </div>
-  )
+  );
 }
 
 export default function({ sites }) {

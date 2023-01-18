@@ -1,0 +1,2 @@
+module MtHaplogroupsHelper
+end

@@ -1,0 +1,10 @@
+<p style="color: green"><%= notice %></p>
+
+<%= render @culture %>
+
+<div>
+  <%= link_to "Edit this culture", edit_culture_path(@culture) %> |
+  <%= link_to "Back to cultures", cultures_path %>
+
+  <%= button_to "Destroy this culture", @culture, method: :delete %>
+</div>

@@ -1,0 +1,2 @@
+module KurgansHelper
+end
