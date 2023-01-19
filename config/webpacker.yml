@@ -56,7 +56,7 @@ development:
     # In that case, style-loader is not needed as a dependency.
     #
     # mini-extract-css-plugin is a required dependency in both cases.
-    inline_css: false
+    inline_css: true
     # Defaults to the inverse of hmr. Uncomment to manually set this.
     # live_reload: true
     client:
