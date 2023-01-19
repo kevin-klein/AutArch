@@ -7,6 +7,17 @@ module Types
     # Add root-level fields here.
     # They will be entry points for queries on your schema.
 
+    field :sites, [LocationType], null: false do
+      argument :search, String, required: false
+    end
+    def sites(search: nil)
+      if search.present?
+        Site.where('name ilike ?', "%#{search}%")
+      else
+        Site.all
+      end
+    end
+
     # TODO: remove me
     field :test_field, String, null: false,
       description: "An example field added by the generator"
