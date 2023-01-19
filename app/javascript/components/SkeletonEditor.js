@@ -1,7 +1,8 @@
+/* eslint-disable react/prop-types */
 import * as React from 'react';
 import { useQuery } from 'graphql-hooks';
 import { useFieldArray, useForm } from 'react-hook-form';
-
+import Collapse from './Collapse';
 
 const GRAVES_QUERY = `
   query($id: Int!) {
@@ -103,45 +104,37 @@ const SITE_QUERY = `
       countryCode
     }
   }
-`
+`;
 
 function Row({site}) {
   const [open, setOpen] = React.useState(false);
 
-  // {row.history.map((historyRow) => (
-  //   <TableRow key={historyRow.date}>
-  //     <TableCell component="th" scope="row">
-  //       {historyRow.date}
-  //     </TableCell>
-  //     <TableCell>{historyRow.customerId}</TableCell>
-  //     <TableCell align="right">{historyRow.amount}</TableCell>
-  //     <TableCell align="right">
-  //       {Math.round(historyRow.amount * row.price * 100) / 100}
-  //     </TableCell>
-  //   </TableRow>
-  // ))}
-
   return (
     <React.Fragment>
-      <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
-        <TableCell>
-          <IconButton
-            aria-label="expand row"
-            size="small"
-            onClick={() => setOpen(!open)}
-          >
-            {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-          </IconButton>
-        </TableCell>
-        <TableCell component="th" scope="row">{site.name}</TableCell>
-        <TableCell>{site.locality}</TableCell>
-        <TableCell>{site.countryCode}</TableCell>
-        <TableCell>{site.siteCode}</TableCell>
-        <TableCell>{site.protein}</TableCell>
-      </TableRow>
-      <TableRow>
-        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
-          <Collapse in={open} timeout="auto" unmountOnExit>
+      <tr>
+        <td>
+          <button onClick={() => setOpen(!open)}>
+            {open}
+          </button>
+        </td>
+        <td>{site.name}</td>
+        <td>{site.locality}</td>
+        <td>{site.countryCode}</td>
+        <td>{site.siteCode}</td>
+        <td><button onClick={() => console.log('select site')} className='btn btn-default'>select</button></td>
+      </tr>
+      <tr>
+        <Collapse open={open}>
+          <td colSpan='5'>
+            <h4>Details</h4>
+          </td>
+        </Collapse>
+      </tr>
+    </React.Fragment>
+  );
+}
+
+{/* <Collapse in={open} timeout="auto" unmountOnExit>
             <Box sx={{ margin: 1 }}>
               <Typography variant="h6" gutterBottom component="div">
                 History
@@ -149,10 +142,10 @@ function Row({site}) {
               <Table size="small" aria-label="purchases">
                 <TableHead>
                   <TableRow>
-                    <TableCell>Date</TableCell>
-                    <TableCell>Customer</TableCell>
-                    <TableCell align="right">Amount</TableCell>
-                    <TableCell align="right">Total price ($)</TableCell>
+                    <td>Date</td>
+                    <td>Customer</td>
+                    <td align="right">Amount</td>
+                    <td align="right">Total price ($)</td>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -160,14 +153,13 @@ function Row({site}) {
                 </TableBody>
               </Table>
             </Box>
-          </Collapse>
-        </TableCell>
-      </TableRow>
-    </React.Fragment>
-  );
-}
+          </Collapse> */}
 
 function SiteSearchField({onSearchChange, searchValue}) {
+
+  return (
+    <input type='text' onChange={evt => onSearchChange(evt.target.value)} />
+  );
 
   return (
     <Grid container direction="row" justifyContent='flex-end'>
@@ -189,60 +181,70 @@ function GeographyDialog({open, selectedValue, onClose}) {
   const [page, setPage] = React.useState(0);
   const [searchValue, setSearchValue] = React.useState('');
   const rowsPerPage = 8;
+
   const { loading, error, data } = useQuery(SITE_QUERY, {
     variables: {
       search: searchValue
     }
   });
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Oh no... {error.message}</p>;
-
   return (
-    <Dialog maxWidth='lg' onClose={onClose} open={open}>
-      <DialogTitle>Select Site</DialogTitle>
+    <div className={`modal modal-xl ${open ? 'd-block' : ''}`}>
+      <div className='modal-dialog'>
+        <div className='modal-content'>
+          <div className='modal-header'>
+            <h4 className='modal-title'>Select Site</h4>
+            <button className='btn-close' onClick={onClose} />
+          </div>
 
-      <SiteSearchField onSearchChange={setSearchValue} searchValue={searchValue} />
-      <TableContainer>
-        <Table sx={{ minWidth: 1200 }}>
-          <TableHead>
-            <TableRow>
-              <TableCell />
-              <TableCell>Name</TableCell>
-              <TableCell>Locality</TableCell>
-              <TableCell>Country Code</TableCell>
-              <TableCell>Site Code</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {data.sites.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(site => (
-              <Row key={site.id} site={site} />
-            ))}
-          </TableBody>
+          <div className="modal-body">
+            <SiteSearchField onSearchChange={setSearchValue} searchValue={searchValue} />
+            {loading && <p>Loading...</p>}
+            {error && <p>Oh no... {error.message}</p>}
+            <table className='table'>
+              <thead>
+                <tr>
+                  <td />
+                  <td>Name</td>
+                  <td>Locality</td>
+                  <td>Country Code</td>
+                  <td>Site Code</td>
+                  <td></td>
+                </tr>
+              </thead>
+              <tbody>
+                {data && data.sites.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(site => (
+                  <Row key={site.id} site={site} />
+                ))}
+              </tbody>
 
-          <TableFooter>
-            <TableRow>
-              <TablePagination
-                rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
-                colSpan={3}
-                count={data.sites.length}
-                rowsPerPage={rowsPerPage}
-                page={page}
-                SelectProps={{
-                  inputProps: {
-                    'aria-label': 'rows per page',
-                  },
-                  native: true,
-                }}
-                onPageChange={(_, newPage) => setPage(newPage)}
-              />
-            </TableRow>
-          </TableFooter>
-        </Table>
-      </TableContainer>
-    </Dialog>
-  )
+              <tfoot>
+                <tr>
+
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
+
+{/* <TablePagination
+                  rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
+                  colSpan={3}
+                  count={data.sites.length}
+                  rowsPerPage={rowsPerPage}
+                  page={page}
+                  SelectProps={{
+                    inputProps: {
+                      'aria-label': 'rows per page',
+                    },
+                    native: true,
+                  }}
+                  onPageChange={(_, newPage) => setPage(newPage)}
+                /> */}
 
 function GeographyButton({geography}) {
   const [dialogOpen, setDialogOpen] = React.useState(false);
@@ -256,27 +258,48 @@ function GeographyButton({geography}) {
     setDialogOpen(true);
   }
 
+  function setGeography(value) {
+
+  }
+
   return (
     <div>
       <GeographyDialog
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}
         selectedValue={geography}
+        setGeography={setGeography}
       />
-      <Button onClick={selectGeography} variant="outlined">{text}</Button>
+      <button className='btn btn-primary' onClick={selectGeography}>{text}</button>
     </div>
   );
 }
 
-export default function SkeletonEditor({id}) {
-  const formContext = useForm();
-  const {control, register, handleSubmit} = formContext;
+function SkeletonForm({skeleton}) {
+  const {control, setValue, register, handleSubmit} = useForm({
+    defaultValues: skeleton
+  });
 
   const { fields, append, prepend, remove, swap, move, insert } = useFieldArray({
     control, // control props comes from useForm (optional: if you are using FormContext)
-    name: "c14_dates", // unique name for your Field Array
+    name: 'c14_dates', // unique name for your Field Array
   });
 
+  const location = skeleton.location;
+
+  return (
+    <form
+      onSubmit={handleSubmit((args) => console.log(args))}
+    >
+      <input {...register('skeleton_id')} />
+      <h4>Geography</h4>
+      <GeographyButton geography={location} />
+      {JSON.stringify(skeleton.location)}
+    </form>
+  )
+}
+
+export default function SkeletonEditor({id}) {
   const { loading, error, data } = useQuery(GRAVES_QUERY, {
     variables: {
       id: parseInt(id),
@@ -285,19 +308,8 @@ export default function SkeletonEditor({id}) {
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Oh no... {error.message}</p>;
-  const location = data.skeleton.location;
 
   return (
-    <FormContainer
-      formContext={formContext}
-      handleSubmit={handleSubmit(() => console.log('submit'))}
-    >
-      <TextFieldElement fullWidth name="outlined-basic" label="Outlined" variant="outlined" />
-      <h4>Geography</h4>
-      <GeographyButton geography={location} />
-      {JSON.stringify(data.skeleton.location)}
-      <TextFieldElement name="filled-basic" label="Filled" variant="filled" />
-      <TextFieldElement name="standard-basic" label="Standard" variant="standard" />
-    </FormContainer>
+    <SkeletonForm skeleton={data.skeleton} />
   );
 }

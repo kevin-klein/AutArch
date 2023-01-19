@@ -37,33 +37,33 @@ export default function Orders() {
 
   return (
     <React.Fragment>
-      <Title>Skeletons</Title>
-      <Table size="small">
-        <TableHead>
-          <TableRow>
-            <TableCell>ID</TableCell>
-            <TableCell>Skeleton ID</TableCell>
-            <TableCell>Ship To</TableCell>
-            <TableCell>Payment Method</TableCell>
-            <TableCell align="right"></TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
+      <h4>Skeletons</h4>
+      <table className='table'>
+        <thead>
+          <tr>
+            <td>ID</td>
+            <td>Skeleton ID</td>
+            <td>Ship To</td>
+            <td>Payment Method</td>
+            <td align="right"></td>
+          </tr>
+        </thead>
+        <tbody>
           {data.skeletons.map((skeleton) => (
-            <TableRow key={skeleton.id}>
-              <TableCell>{skeleton.id}</TableCell>
-              <TableCell></TableCell>
-              <TableCell></TableCell>
-              <TableCell></TableCell>
-              <TableCell align="right">
+            <tr key={skeleton.id}>
+              <td>{skeleton.id}</td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td align="right">
                 <Link href={`/skeletons/${skeleton.id}`}>
                   Edit
                 </Link>
-              </TableCell>
-            </TableRow>
+              </td>
+            </tr>
           ))}
-        </TableBody>
-      </Table>
+        </tbody>
+      </table>
       <Link color="primary" href="#" onClick={preventDefault} sx={{ mt: 3 }}>
         See more orders
       </Link>
