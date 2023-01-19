@@ -6,5 +6,8 @@ module Types
     field :lat, Float
     field :lon, Float
     field :name, String
+    field :site_code, String
+    field :locality, String
+    field :country_code, String
   end
 end
