@@ -15,14 +15,18 @@ class Skeleton < ApplicationRecord
   belongs_to :figure
   has_one :skull, dependent: :destroy
 
-  has_one :chronology
-  has_one :taxonomy
-  has_one :anthropology
-  has_one :spine
+  has_one :chronology, dependent: :destroy
+  has_one :taxonomy, dependent: :destroy
+  has_one :anthropology, dependent: :destroy
+  has_one :spine, dependent: :destroy
 
-  has_many :stable_isotopes
-  has_many :genetics
+  has_many :stable_isotopes, dependent: :destroy
+  has_many :genetics, dependent: :destroy
 
   accepts_nested_attributes_for :chronology
   accepts_nested_attributes_for :taxonomy
+  accepts_nested_attributes_for :anthropology
+  accepts_nested_attributes_for :spine
+  accepts_nested_attributes_for :stable_isotopes
+  accepts_nested_attributes_for :genetics
 end

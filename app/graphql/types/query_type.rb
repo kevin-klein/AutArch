@@ -11,7 +11,6 @@ module Types
       argument :search, String, required: false
     end
     def sites(search: nil)
-      ap search
       if search.present?
         Site.where('name ilike ?', "%#{search}%")
       else
@@ -57,7 +56,24 @@ module Types
       argument :name, String, required: false
     end
     def graves(offset:, limit:)
-      Grave.offset(offset).limit(limit)
+      Grave.order(:id).offset(offset).limit(limit)
+    end
+
+    field :grave, Types::GraveType, null: false do
+      argument :id, Integer, required: true
+    end
+    def grave(id:)
+      Grave.find(id)
+    end
+
+    field :graves_count, Int, null: false
+    def graves_count
+      Grave.count
+    end
+
+    field :skeletons_count, Int, null: false
+    def skeletons_count
+      Skeleton.count
     end
 
     field :skeletons, [Types::SkeletonType], null: false, description: 'Graves' do

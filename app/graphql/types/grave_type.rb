@@ -13,6 +13,8 @@ module Types
     field :kurgan_id, Integer
     field :figures, [FigureType]
 
+    field :arrow, ArrowType
+
     field :page, PageType
   end
 end
