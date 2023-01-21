@@ -9,7 +9,6 @@ module Types
     field :age_as_reported, String
     field :age_class, Integer
     field :height, Float
-    field :pathologies, Integer
     field :pathologies_type, String
     field :skeleton_id, Integer
     field :created_at, GraphQL::Types::ISO8601DateTime, null: false

@@ -20,5 +20,8 @@ module Types
     field :figure, FigureType, null: true
     field :chronology, ChronologyType, null: true
     field :taxonomy, TaxonomyType, null: true
+    field :genetics, [GeneticType], null: false
+
+    field :stable_isotopes, [StableIsotopeType], null: false
   end
 end

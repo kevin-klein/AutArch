@@ -9,13 +9,14 @@
 #  age_as_reported  :string
 #  age_class        :integer
 #  height           :float
-#  pathologies      :integer
 #  pathologies_type :string
 #  skeleton_id      :bigint
 #  created_at       :datetime         not null
 #  updated_at       :datetime         not null
 #
 class Anthropology < ApplicationRecord
+  belongs_to :skeleton
+
   enum sex_morph: {
     female: 1,
     male: 2,
@@ -36,16 +37,4 @@ class Anthropology < ApplicationRecord
     unclear: 3,
     no_data: 4
   }, _prefix: true
-
-  enum age_class: {
-    neonate: 1,
-    child: 2,
-    young_adult: 3,
-  }
-
-  enum pathologies: {
-    yes: 1,
-    no: 2,
-    no_data: 3,
-  }
 end

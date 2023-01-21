@@ -9,7 +9,6 @@
 #  age_as_reported  :string
 #  age_class        :integer
 #  height           :float
-#  pathologies      :integer
 #  pathologies_type :string
 #  skeleton_id      :bigint
 #  created_at       :datetime         not null

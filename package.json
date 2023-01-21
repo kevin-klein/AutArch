@@ -25,6 +25,7 @@
     "mini-css-extract-plugin": "^2.7.2",
     "prop-types": "^15.8.1",
     "react": "^18.2.0",
+    "react-bootstrap": "^2.7.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.42.1",
     "react-leaflet": "^4.2.0",
