@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_01_18_220855) do
+ActiveRecord::Schema[7.0].define(version: 2023_01_20_205619) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -21,7 +21,6 @@ ActiveRecord::Schema[7.0].define(version: 2023_01_18_220855) do
     t.string "age_as_reported"
     t.integer "age_class"
     t.float "height"
-    t.integer "pathologies"
     t.string "pathologies_type"
     t.bigint "skeleton_id"
     t.datetime "created_at", null: false
@@ -110,7 +109,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_01_18_220855) do
 
   create_table "genetics", force: :cascade do |t|
     t.integer "data_type"
-    t.float "end_content"
+    t.float "endo_content"
     t.string "ref_gen"
     t.bigint "skeleton_id", null: false
     t.datetime "created_at", null: false

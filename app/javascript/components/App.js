@@ -1,6 +1,7 @@
 import * as React from 'react';
 import Skeletons from './Skeletons';
 import SkeletonEditor from './SkeletonEditor';
+import GraveList from './GraveList';
 import { Route, Router } from 'wouter';
 import { useLocationProperty, navigate } from 'wouter/use-location';
 
@@ -46,15 +47,15 @@ function DashboardContent() {
             <div className="position-sticky pt-3 sidebar-sticky">
               <ul className="nav flex-column">
                 <li className="nav-item">
-                  <a className="nav-link active" aria-current="page" href="#">
+                  <a className="nav-link" aria-current="page" href="#">
                     <span data-feather="home" className="align-text-bottom"></span>
-                  Dashboard
+                    Skeleton List
                   </a>
                 </li>
                 <li className="nav-item">
-                  <a className="nav-link" href="#">
+                  <a className="nav-link" href="#/graves">
                     <span data-feather="file" className="align-text-bottom"></span>
-                  Orders
+                  Grave List
                   </a>
                 </li>
                 <li className="nav-item">
@@ -125,6 +126,9 @@ function DashboardContent() {
               </Route>
               <Route path='/skeletons/:id'>
                 {(params) => <SkeletonEditor id={params.id} />}
+              </Route>
+              <Route path='/graves'>
+                <GraveList />
               </Route>
             </Router>
           </main>

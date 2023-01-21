@@ -8,4 +8,5 @@
 #  updated_at :datetime         not null
 #
 class Period < ApplicationRecord
+  validates :name, uniqueness: true, presence: true
 end

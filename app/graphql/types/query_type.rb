@@ -11,6 +11,7 @@ module Types
       argument :search, String, required: false
     end
     def sites(search: nil)
+      ap search
       if search.present?
         Site.where('name ilike ?', "%#{search}%")
       else
@@ -27,12 +28,27 @@ module Types
 
     field :bones, [BoneType], null: false
     def bones
-      Bone.all
+      Bone.order(:name).all
     end
 
     field :periods, [PeriodType], null: false
     def periods
-      Period.all
+      Period.order(:name).all
+    end
+
+    field :cultures, [CultureType], null: false
+    def cultures
+      Culture.order(:name).all
+    end
+
+    field :mtHaplogroups, [MtHaplogroupType], null: false
+    def mtHaplogroups
+      MtHaplogroup.order(:name).all
+    end
+
+    field :yHaplogroups, [YHaplogroupType], null: false
+    def yHaplogroups
+      YHaplogroup.order(:name).all
     end
 
     field :graves, [Types::GraveType], null: false, description: 'Graves' do

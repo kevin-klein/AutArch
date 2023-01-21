@@ -8,4 +8,5 @@
 #  updated_at :datetime         not null
 #
 class YHaplogroup < ApplicationRecord
+  validates :name, uniqueness: true, presence: true
 end

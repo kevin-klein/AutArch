@@ -16,5 +16,5 @@ class Chronology < ApplicationRecord
   belongs_to :skeleton
   belongs_to :period
 
-  has_many :c14dates
+  has_many :c14_dates
 end
