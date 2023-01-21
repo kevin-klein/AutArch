@@ -68,7 +68,7 @@ class Grave < ApplicationRecord
       arrow&.figure,
       grave_cross_section&.figure,
       cross_section_arrow&.figure
-    ] + spines.map(&:figure) + skulls.map(&:figure) + skeletons.map(&:figure) + goods.map(&:figure) + spines.map(&:figure)).compact
+    ] + spines.map(&:figure) + skulls.map(&:figure) + skeletons.map(&:figure) + goods.map(&:figure) + spines.map(&:figure)).compact.uniq
   end
 
   def self.area_arc_stats

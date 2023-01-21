@@ -8,12 +8,11 @@ module Types
     field :x2, Integer, null: false
     field :y1, Integer, null: false
     field :y2, Integer, null: false
-    field :label, String, null: false
-    def label
-      object.type_name
-    end
+    field :type_name, String, null: false
     field :tags, String, null: false
     field :created_at, GraphQL::Types::ISO8601DateTime, null: false
     field :updated_at, GraphQL::Types::ISO8601DateTime, null: false
+
+    field :skeletons, [SkeletonType]
   end
 end

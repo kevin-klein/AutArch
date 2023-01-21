@@ -1,5 +1,6 @@
 module Types
   class MutationType < Types::BaseObject
+    field :update_skeleton, mutation: Mutations::UpdateSkeleton
     field :delete_mt_haplogroup, mutation: Mutations::DeleteMtHaplogroup
     field :delete_y_haplogroup, mutation: Mutations::DeleteYHaplogroup
     field :create_y_haplogroup, mutation: Mutations::CreateYHaplogroup

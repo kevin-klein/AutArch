@@ -12,6 +12,6 @@ module Types
     field :period_id, Integer
 
     field :period, PeriodType
-    field :c14dates, [C14DateType]
+    field :c14_dates, [C14DateType]
   end
 end

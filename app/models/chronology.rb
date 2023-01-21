@@ -12,9 +12,11 @@
 #  period_id    :bigint
 #
 class Chronology < ApplicationRecord
-  belongs_to :grave
-  belongs_to :skeleton
-  belongs_to :period
+  belongs_to :grave, optional: true
+  belongs_to :skeleton, optional: true
+  belongs_to :period, optional: true
 
   has_many :c14_dates
+
+  accepts_nested_attributes_for :c14_dates
 end

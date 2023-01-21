@@ -12,5 +12,5 @@
 #
 class Taxonomy < ApplicationRecord
   belongs_to :skeleton
-  belongs_to :culture
+  belongs_to :culture, optional: true
 end

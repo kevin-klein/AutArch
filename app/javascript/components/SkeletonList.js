@@ -1,20 +1,12 @@
 import * as React from 'react';
 import {Link} from 'wouter';
-import { useQuery } from 'graphql-hooks';
+import {Pagination, usePagination} from './Pagination';
 
-const GRAVES_QUERY = `
+const SKELETONS_QUERY = `
   query($offset: Int!, $limit: Int!) {
+    count: skeletonsCount
     skeletons(offset: $offset, limit: $limit) {
       id
-      grave {
-        id
-
-        page {
-          image {
-            data
-          }
-        }
-      }
     }
   }
 `;
@@ -25,12 +17,8 @@ function preventDefault(event) {
 }
 
 export default function Orders() {
-  const { loading, error, data } = useQuery(GRAVES_QUERY, {
-    variables: {
-      limit: 10,
-      offset: 0
-    }
-  });
+  const paginationData = usePagination(SKELETONS_QUERY);
+  const {data, loading, error} = paginationData;
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Oh no... {error.message}</p>;
@@ -64,9 +52,8 @@ export default function Orders() {
           ))}
         </tbody>
       </table>
-      <Link color="primary" href="#" onClick={preventDefault} sx={{ mt: 3 }}>
-        See more orders
-      </Link>
+
+      <Pagination paginationData={paginationData} />
     </React.Fragment>
   );
 }

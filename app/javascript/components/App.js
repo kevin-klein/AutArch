@@ -1,16 +1,15 @@
 import * as React from 'react';
-import Skeletons from './Skeletons';
+import SkeletonList from './SkeletonList';
 import SkeletonEditor from './SkeletonEditor';
 import GraveList from './GraveList';
+import GraveEditor from './GraveEditor';
 import { Route, Router } from 'wouter';
 import { useLocationProperty, navigate } from 'wouter/use-location';
-
 import { GraphQLClient, ClientContext } from 'graphql-hooks';
 
 const client = new GraphQLClient({
   url: '/graphql'
 });
-
 
 const hashLocation = () => window.location.hash.replace(/^#/, '') || '/';
 
@@ -22,11 +21,6 @@ const useHashLocation = () => {
 };
 
 function DashboardContent() {
-  const [open, setOpen] = React.useState(true);
-  const toggleDrawer = () => {
-    setOpen(!open);
-  };
-
   return (
     <React.Fragment>
       <header className="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
@@ -122,13 +116,16 @@ function DashboardContent() {
           <main className="card p-4 m-3 col-md-9 ms-sm-auto col-lg-10 px-md-4">
             <Router hook={useHashLocation}>
               <Route path='/'>
-                <Skeletons />
+                <SkeletonList />
               </Route>
               <Route path='/skeletons/:id'>
                 {(params) => <SkeletonEditor id={params.id} />}
               </Route>
               <Route path='/graves'>
                 <GraveList />
+              </Route>
+              <Route path='/graves/:id'>
+                {params => <GraveEditor id={params.id} />}
               </Route>
             </Router>
           </main>
