@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_01_22_111902) do
+ActiveRecord::Schema[7.0].define(version: 2023_01_22_173728) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -25,6 +25,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_01_22_111902) do
     t.bigint "skeleton_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "species"
     t.index ["skeleton_id"], name: "index_anthropologies_on_skeleton_id"
   end
 
@@ -143,7 +144,6 @@ ActiveRecord::Schema[7.0].define(version: 2023_01_22_111902) do
   end
 
   create_table "graves", force: :cascade do |t|
-    t.string "location"
     t.integer "figure_id", null: false
     t.integer "site_id"
     t.datetime "created_at", null: false
@@ -230,6 +230,15 @@ ActiveRecord::Schema[7.0].define(version: 2023_01_22_111902) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "skeleton_id"
+    t.integer "funerary_practice"
+    t.integer "inhumation_type"
+    t.integer "anatonimcal_connection"
+    t.integer "body_position"
+    t.integer "crouching_type"
+    t.string "other"
+    t.float "head_facing"
+    t.integer "ochre"
+    t.integer "ochre_position"
     t.index ["figure_id"], name: "index_skeletons_on_figure_id"
     t.index ["grave_id"], name: "index_skeletons_on_grave_id"
   end
