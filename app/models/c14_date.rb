@@ -22,6 +22,7 @@
 #
 class C14Date < ApplicationRecord
   belongs_to :chronology
+  belongs_to :bone, optional: true
 
   enum c14_type: {
     direct: 1,

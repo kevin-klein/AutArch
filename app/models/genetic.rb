@@ -15,9 +15,9 @@
 #
 class Genetic < ApplicationRecord
   belongs_to :skeleton
-  belongs_to :mt_haplogroup
-  belongs_to :y_haplogroup
-  belongs_to :bone
+  belongs_to :mt_haplogroup, optional: true
+  belongs_to :y_haplogroup, optional: true
+  belongs_to :bone, optional: true
 
   enum data_type: {
     k1240: 1,

@@ -2,6 +2,7 @@
 
 module Types
   class AnthropologyInputType < Types::BaseInputObject
+    argument :id, ID, required: false
     argument :sex_morph, String, required: false
     argument :sex_gen, String, required: false
     argument :sex_consensus, String, required: false

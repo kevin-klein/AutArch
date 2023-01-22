@@ -82,7 +82,7 @@ module Types
       argument :name, String, required: false
     end
     def skeletons(offset:, limit:)
-      Skeleton.offset(offset).limit(limit)
+      Skeleton.order(:id).offset(offset).limit(limit)
     end
 
     field :skeleton, Types::SkeletonType, null: false, description: 'Graves' do

@@ -6,6 +6,14 @@ import {Link} from 'wouter';
 const GRAVES_QUERY = `query($limit: Int!, $offset: Int!) {
   graves(offset: $offset, limit: $limit) {
     id
+    areaWithUnit {
+      unit
+      value
+    }
+    arcLengthWithUnit {
+      unit
+      value
+    }
   }
   count: gravesCount
 }
@@ -37,8 +45,8 @@ export default function GraveList() {
           {data.graves.map((grave) => (
             <tr key={grave.id}>
               <td>{grave.id}</td>
-              <td>{grave.area}</td>
-              <td>{grave.arc}</td>
+              <td>{grave.areaWithUnit.value.toFixed(2)}{grave.areaWithUnit.unit} </td>
+              <td>{grave.arcLengthWithUnit.value.toFixed(2)}{grave.arcLengthWithUnit.unit} </td>
               <td align="right">
                 <Link href={`/graves/${grave.id}`}>
                   Edit

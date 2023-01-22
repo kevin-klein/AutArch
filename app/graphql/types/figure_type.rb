@@ -3,7 +3,7 @@
 module Types
   class FigureType < Types::BaseObject
     field :id, ID, null: false
-    field :page_id, Integer, null: false
+    field :page_id, ID, null: false
     field :x1, Integer, null: false
     field :x2, Integer, null: false
     field :y1, Integer, null: false

@@ -15,10 +15,14 @@ module Mutations
       data[:stable_isotopes_attributes] = data.delete(:stable_isotopes)
       data[:anthropology_attributes] = data.delete(:anthropology)
       data[:taxonomy_attributes] = data.delete(:taxonomy)
-      ap data
+      data[:genetics_attributes] = data.delete(:genetics)
+
+      data[:chronology_attributes][:c14_dates_attributes] = data[:chronology_attributes].delete(:c14_dates)
+
+      site = data.delete(:location)
 
       unless db_skeleton.update(data)
-        raise data.errors
+        raise GraphQL::ExecutionError, db_skeleton.errors.full_messages
       end
 
       {

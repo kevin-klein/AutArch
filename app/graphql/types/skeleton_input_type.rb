@@ -9,5 +9,6 @@ module Types
     argument :taxonomy, TaxonomyInputType, required: true
     argument :stable_isotopes, [StableIsotopeInputType], required: false
     argument :genetics, [GeneticInputType], required: false
+    argument :location, SiteInputType, required: false
   end
 end

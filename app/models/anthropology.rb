@@ -37,4 +37,10 @@ class Anthropology < ApplicationRecord
     unclear: 3,
     no_data: 4
   }, _prefix: true
+
+  enum age_class: {
+    neonate: 1,
+    child: 2,
+    young_adult: 3,
+  }, _prefix: true
 end

@@ -33,6 +33,7 @@ query($id: Int!) {
       typeName
     }
     genetics {
+      id
       dataType
       endoContent
       boneId
@@ -50,10 +51,7 @@ query($id: Int!) {
       id
       contextFrom
       contextTo
-      period {
-        id
-        name
-      }
+      periodId
       c14Dates {
         id
         c14Type
@@ -68,24 +66,20 @@ query($id: Int!) {
         dateNote
         calMethod
         ref14c
-        bone {
-          id
-          name
-        }
+        boneId
       }
     }
     stableIsotopes {
+      id
       isoId
       isoValue
       refIso
       isotope
       baseline
-      bone {
-        id
-        name
-      }
+      boneId
     }
     anthropology {
+      id
       sexMorph
       sexGen
       sexConsensus
@@ -95,6 +89,7 @@ query($id: Int!) {
       pathologiesType
     }
     taxonomy {
+      id
       cultureReference
       cultureNote
       cultureId

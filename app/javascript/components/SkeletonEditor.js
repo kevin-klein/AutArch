@@ -7,6 +7,7 @@ import SimpleReferenceFieldDialog from './SimpleReferenceFieldDialog';
 import SelectInput, { EnumSelectConverter, ObjectSelectConverter } from './inputs/SelectInput';
 import { useQuery, useMutation } from 'graphql-hooks';
 import GraveView from './GraveView';
+import ErrorAlert from './ErrorAlert';
 import {
   GRAVES_QUERY,
   UPDATE_SKELETON_MUTATION,
@@ -69,7 +70,10 @@ function SkeletonForm({skeleton, periods, bones, cultures, mtHaplogroups, yHaplo
   let defaultValues = {};
   if(skeleton !== null && skeleton !== undefined) {
     defaultValues = (({grave, ...skeleton}) => skeleton)(skeleton);
+    delete defaultValues.id;
+    delete defaultValues.figure;
   }
+
   const {control, formState: { errors }, register, handleSubmit} = useForm({
     values: defaultValues
   });
@@ -86,7 +90,7 @@ function SkeletonForm({skeleton, periods, bones, cultures, mtHaplogroups, yHaplo
 
   const { fields: geneticsFields , append: geneticsAppend, remove: geneticsRemove } = useFieldArray({
     control, // control props comes from useForm (optional: if you are using FormContext)
-    name: 'stableIsotopes', // unique name for your Field Array
+    name: 'genetics', // unique name for your Field Array
   });
 
   const [updateSkeleton] = useMutation(UPDATE_SKELETON_MUTATION);
@@ -130,9 +134,15 @@ function SkeletonForm({skeleton, periods, bones, cultures, mtHaplogroups, yHaplo
         onClose={() => setShowCulturesModal(false)}
       />
       <form
-        onSubmit={handleSubmit((args) => {
+        onSubmit={handleSubmit(async (args) => {
           console.log(args);
-          updateSkeleton({ variables: { id: parseInt(skeleton.id), skeleton: args } });
+          const { data, error } = await updateSkeleton({ variables: { id: parseInt(skeleton.id), skeleton: args } });
+          if(error) {
+            ErrorAlert(error);
+          }
+          else {
+            alert('Save successful');
+          }
         })}
       >
         <TextInput register={register('skeletonId')} text='Skeleton ID' />
@@ -177,37 +187,37 @@ function SkeletonForm({skeleton, periods, bones, cultures, mtHaplogroups, yHaplo
             </div>
             <TextInput
               text='Lab ID'
-              register={register(`chronology.c14_dates.${index}.labId`)} />
+              register={register(`chronology.c14Dates.${index}.labId`)} />
             <TextInput
               type='number'
               text='Age BP'
-              register={register(`chronology.c14_dates.${index}.ageBp`)} />
+              register={register(`chronology.c14Dates.${index}.ageBp`)} />
             <TextInput
               text='Interval'
               type='number'
-              register={register(`chronology.c14_dates.${index}.interval`)} />
+              register={register(`chronology.c14Dates.${index}.interval`)} />
             <TextInput
               text='calbc1SigmaMax'
               type='number'
-              register={register(`chronology.c14_dates.${index}.calbc1SigmaMax`)} />
+              register={register(`chronology.c14Dates.${index}.calbc1SigmaMax`)} />
             <TextInput
               text='calbc1SigmaMin'
               type='number'
-              register={register(`chronology.c14_dates.${index}.calbc1SigmaMin`)} />
+              register={register(`chronology.c14Dates.${index}.calbc1SigmaMin`)} />
             <TextInput
               text='calbc2SigmaMax'
               type='number'
-              register={register(`chronology.c14_dates.${index}.calbc2SigmaMax`)} />
+              register={register(`chronology.c14Dates.${index}.calbc2SigmaMax`)} />
             <TextInput
               text='calbc2SigmaMin'
               type='number'
-              register={register(`chronology.c14_dates.${index}.calbc2SigmaMin`)} />
+              register={register(`chronology.c14Dates.${index}.calbc2SigmaMin`)} />
             <TextInput
               text='Date Note'
-              register={register(`chronology.c14_dates.${index}.dateNote`)} />
+              register={register(`chronology.c14Dates.${index}.dateNote`)} />
             <TextInput
               text='Ref C14 Date'
-              register={register(`chronology.c14_dates.${index}.ref14c`)} />
+              register={register(`chronology.c14Dates.${index}.ref14c`)} />
             <SelectInput
               converter={EnumSelectConverter}
               options={[
@@ -215,7 +225,7 @@ function SkeletonForm({skeleton, periods, bones, cultures, mtHaplogroups, yHaplo
                 {id: 'indirect', text: 'Indirect'},
               ]}
               text='C14 Type'
-              register={register(`chronology.c14_dates.${index}.c14Type`)} />
+              register={register(`chronology.c14Dates.${index}.c14Type`)} />
             <SelectInput
               converter={EnumSelectConverter}
               options={[
@@ -225,7 +235,7 @@ function SkeletonForm({skeleton, periods, bones, cultures, mtHaplogroups, yHaplo
                 {id: 'animal_bone', text: 'Animal Bone'}
               ]}
               text='Material'
-              register={register(`chronology.c14_dates.${index}.material`)} />
+              register={register(`chronology.c14Dates.${index}.material`)} />
             <SelectInput
               converter={EnumSelectConverter}
               options={[
@@ -233,7 +243,7 @@ function SkeletonForm({skeleton, periods, bones, cultures, mtHaplogroups, yHaplo
                 {id: 'int_cal_20', text: 'IntCal20'},
               ]}
               text='Calibration Method'
-              register={register(`chronology.c14_dates.${index}.calMethod`)} />
+              register={register(`chronology.c14Dates.${index}.calMethod`)} />
             <div className='mb-3'>
               <button onClick={(evt) => { evt.preventDefault(); c14Remove(index); }} className='btn btn-primary'>Delete</button>
             </div>
@@ -316,10 +326,10 @@ function SkeletonForm({skeleton, periods, bones, cultures, mtHaplogroups, yHaplo
             <TextInput
               text='ISO Value'
               type='number'
-              register={register(`stableIsotopes.${index}.isoId`)} />
+              register={register(`stableIsotopes.${index}.isoValue`)} />
             <TextInput
               text='Ref ISO'
-              register={register(`stableIsotopes.${index}.isoId`)} />
+              register={register(`stableIsotopes.${index}.refIso`)} />
             <SelectInput
               converter={EnumSelectConverter}
               options={[
@@ -333,12 +343,12 @@ function SkeletonForm({skeleton, periods, bones, cultures, mtHaplogroups, yHaplo
             <TextInput
               text='Baseline'
               type='number'
-              register={register(`stableIsotopes.${index}.isoId`)} />
+              register={register(`stableIsotopes.${index}.baseline`)} />
             <SelectInput
               converter={ObjectSelectConverter}
               options={bones}
               text='Bone'
-              register={register(`stableIsotopes.${index}.isotope`)} />
+              register={register(`stableIsotopes.${index}.boneId`)} />
           </React.Fragment>
         ))}
         <button
@@ -378,7 +388,7 @@ function SkeletonForm({skeleton, periods, bones, cultures, mtHaplogroups, yHaplo
               converter={ObjectSelectConverter}
               options={bones}
               text='Bone'
-              register={register(`genetics.${index}.bone`)} />
+              register={register(`genetics.${index}.boneId`)} />
             <SelectInput
               converter={ObjectSelectConverter}
               options={mtHaplogroups}
@@ -390,7 +400,7 @@ function SkeletonForm({skeleton, periods, bones, cultures, mtHaplogroups, yHaplo
                   </a>
                 </div>
               }
-              register={register(`genetics.${index}.bone`)} />
+              register={register(`genetics.${index}.mtHaplogroupId`)} />
             <SelectInput
               converter={ObjectSelectConverter}
               options={yHaplogroups}
@@ -402,7 +412,7 @@ function SkeletonForm({skeleton, periods, bones, cultures, mtHaplogroups, yHaplo
                   </a>
                 </div>
               }
-              register={register(`genetics.${index}.bone`)} />
+              register={register(`genetics.${index}.yHaplogroupId`)} />
             <TextInput
               text='Reference Genetic'
               register={register(`genetics.${index}.refGen`)} />
