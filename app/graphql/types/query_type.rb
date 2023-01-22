@@ -71,6 +71,11 @@ module Types
       Grave.count
     end
 
+    field :publications, [Types::PublicationType], null: false
+    def publications
+      Publication.select(:id, :title, :author).order(:title).all
+    end
+
     field :skeletons_count, Int, null: false
     def skeletons_count
       Skeleton.count
@@ -79,10 +84,14 @@ module Types
     field :skeletons, [Types::SkeletonType], null: false, description: 'Graves' do
       argument :offset, Int, required: true
       argument :limit, Int, required: true
-      argument :name, String, required: false
+      argument :publication_id, ID, required: false
     end
-    def skeletons(offset:, limit:)
-      Skeleton.order(:id).offset(offset).limit(limit)
+    def skeletons(offset:, limit:, publication_id: nil)
+      skeletons = Skeleton.order(:id).offset(offset).limit(limit)
+      if publication_id.present?
+        skeletons = skeletons.join(grave: { figure: { page: :publication } }).where(publication: { id: publication_id })
+      end
+      skeletons
     end
 
     field :skeleton, Types::SkeletonType, null: false, description: 'Graves' do

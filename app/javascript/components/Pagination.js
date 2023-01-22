@@ -1,14 +1,15 @@
+/* eslint-disable react/prop-types */
 import React from 'react';
 import BootstrapPagination from 'react-bootstrap/Pagination';
 import PageItem from 'react-bootstrap/PageItem';
 import { useQuery } from 'graphql-hooks';
 
-export function usePagination(query, { pageSize=25 } = {}) {
+export function usePagination(query, { pageSize=25, variables } = {}) {
   const [limit, setLimit] = React.useState(25);
   const [offset, setOffset] = React.useState(0);
 
   const {data, loading, error} = useQuery(query, {
-    variables: { limit, offset }
+    variables: { limit, offset, ...variables }
   });
 
   return {
