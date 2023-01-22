@@ -3,10 +3,10 @@
 module Types
   class C14DateType < Types::BaseObject
     field :id, ID, null: false
-    field :c14_type, String, null: false
+    field :c14_type, String
     field :lab_id, String
-    field :age_bp, Integer, null: false
-    field :interval, Integer, null: false
+    field :age_bp, Integer
+    field :interval, Integer
     field :material, String
     field :calbc_1_sigma_max, Float
     field :calbc_1_sigma_min, Float
@@ -15,8 +15,10 @@ module Types
     field :date_note, String
     field :cal_method, String
     field :ref_14c, String
-    field :created_at, GraphQL::Types::ISO8601DateTime, null: false
-    field :updated_at, GraphQL::Types::ISO8601DateTime, null: false
+    def ref_14c
+      object.ref_14c.join(', ')
+    end
     field :bone, BoneType
+    field :bone_id, Integer
   end
 end

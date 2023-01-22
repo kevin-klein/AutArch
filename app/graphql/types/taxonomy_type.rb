@@ -3,13 +3,13 @@
 module Types
   class TaxonomyType < Types::BaseObject
     field :id, ID, null: false
-    field :skeleton_id, Integer
+    field :skeleton_id, ID
     field :culture_note, String
     field :culture_reference, String
     field :created_at, GraphQL::Types::ISO8601DateTime, null: false
     field :updated_at, GraphQL::Types::ISO8601DateTime, null: false
 
     field :culture, CultureType
-    field :culture_id, Int
+    field :culture_id, ID
   end
 end

@@ -3,11 +3,11 @@
 module Types
   class AnthropologyType < Types::BaseObject
     field :id, ID, null: false
-    field :sex_morph, Integer
-    field :sex_gen, Integer
-    field :sex_consensus, Integer
+    field :sex_morph, String
+    field :sex_gen, String
+    field :sex_consensus, String
     field :age_as_reported, String
-    field :age_class, Integer
+    field :age_class, String
     field :height, Float
     field :pathologies_type, String
     field :skeleton_id, Integer

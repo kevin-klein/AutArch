@@ -3,8 +3,8 @@
 module Types
   class SkeletonType < Types::BaseObject
     field :id, ID, null: false
-    field :grave_id, Integer, null: false
-    field :figure_id, Integer, null: false
+    field :grave_id, ID, null: false
+    field :figure_id, ID, null: false
     field :skeleton_id, String
     field :angle, Float
     field :created_at, GraphQL::Types::ISO8601DateTime, null: false

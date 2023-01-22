@@ -15,7 +15,7 @@
 #
 class StableIsotope < ApplicationRecord
   belongs_to :skeleton
-  belongs_to :bone
+  belongs_to :bone, optional: true
 
   enum isotope: {
     c13: 1,

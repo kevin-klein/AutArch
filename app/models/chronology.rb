@@ -13,7 +13,7 @@
 #
 class Chronology < ApplicationRecord
   belongs_to :grave, optional: true
-  belongs_to :skeleton, optional: true
+  belongs_to :skeleton
   belongs_to :period, optional: true
 
   has_many :c14_dates

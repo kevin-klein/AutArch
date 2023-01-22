@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React from 'react';
 
 
@@ -13,7 +14,7 @@ export function ObjectSelectConverter(item) {
   return {
     key: item.id,
     text: item.name,
-    value: item.id,
+    value: parseInt(item.id),
   };
 }
 

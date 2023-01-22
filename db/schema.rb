@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_01_20_205619) do
+ActiveRecord::Schema[7.0].define(version: 2023_01_22_111902) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -47,8 +47,8 @@ ActiveRecord::Schema[7.0].define(version: 2023_01_20_205619) do
   create_table "c14_dates", force: :cascade do |t|
     t.integer "c14_type", null: false
     t.string "lab_id"
-    t.integer "age_bp", null: false
-    t.integer "interval", null: false
+    t.integer "age_bp"
+    t.integer "interval"
     t.integer "material"
     t.float "calbc_1_sigma_max"
     t.float "calbc_1_sigma_min"

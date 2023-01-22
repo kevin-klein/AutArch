@@ -5,11 +5,11 @@ module Types
     field :id, ID, null: false
     field :context_from, Integer
     field :context_to, Integer
-    field :skeleton_id, Integer
-    field :grave_id, Integer
+    field :skeleton_id, ID
+    field :grave_id, ID
     field :created_at, GraphQL::Types::ISO8601DateTime, null: false
     field :updated_at, GraphQL::Types::ISO8601DateTime, null: false
-    field :period_id, Integer
+    field :period_id, ID
 
     field :period, PeriodType
     field :c14_dates, [C14DateType]

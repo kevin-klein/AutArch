@@ -3,14 +3,15 @@
 module Types
   class StableIsotopeType < Types::BaseObject
     field :id, ID, null: false
-    field :skeleton_id, Integer, null: false
+    field :skeleton_id, ID, null: false
     field :iso_id, String
-    field :iso_value, Float
+    field :iso_value, String
     field :ref_iso, String
-    field :isotope, Integer
-    field :baseline, Integer
+    field :isotope, String
+    field :baseline, String
     field :created_at, GraphQL::Types::ISO8601DateTime, null: false
     field :updated_at, GraphQL::Types::ISO8601DateTime, null: false
     field :bone, BoneType
+    field :bone_id, ID
   end
 end
