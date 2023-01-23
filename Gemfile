@@ -15,6 +15,7 @@ gem 'pg'
 gem 'rails-erd', group: :development
 gem 'pagy', '~> 6.0' # omit patch digit
 gem 'graphql'
+gem 'parslet', git: 'https://github.com/kschiess/parslet'
 
 gem 'rice'
 gem 'xlsxtream'
