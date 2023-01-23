@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_01_22_173728) do
+ActiveRecord::Schema[7.0].define(version: 2023_01_23_195757) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -223,6 +223,15 @@ ActiveRecord::Schema[7.0].define(version: 2023_01_22_173728) do
     t.string "site_code"
   end
 
+  create_table "skeleton_figures", force: :cascade do |t|
+    t.bigint "figure_id"
+    t.bigint "grave_id"
+    t.bigint "skeleton_id"
+    t.index ["figure_id"], name: "index_skeleton_figures_on_figure_id"
+    t.index ["grave_id"], name: "index_skeleton_figures_on_grave_id"
+    t.index ["skeleton_id"], name: "index_skeleton_figures_on_skeleton_id"
+  end
+
   create_table "skeletons", force: :cascade do |t|
     t.bigint "grave_id", null: false
     t.integer "figure_id", null: false
@@ -239,8 +248,10 @@ ActiveRecord::Schema[7.0].define(version: 2023_01_22_173728) do
     t.float "head_facing"
     t.integer "ochre"
     t.integer "ochre_position"
+    t.bigint "skeleton_figure_id"
     t.index ["figure_id"], name: "index_skeletons_on_figure_id"
     t.index ["grave_id"], name: "index_skeletons_on_grave_id"
+    t.index ["skeleton_figure_id"], name: "index_skeletons_on_skeleton_figure_id"
   end
 
   create_table "skulls", force: :cascade do |t|

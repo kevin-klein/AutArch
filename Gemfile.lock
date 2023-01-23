@@ -1,3 +1,9 @@
+GIT
+  remote: https://github.com/kschiess/parslet
+  revision: f61daf0ef11a7b6ff795043ec8f64a6803e5162b
+  specs:
+    parslet (2.0.0)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -340,6 +346,7 @@ DEPENDENCIES
   jbuilder
   matrix
   pagy (~> 6.0)
+  parslet!
   pdf-reader
   pg
   pkg-config
