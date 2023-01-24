@@ -25,8 +25,8 @@ namespace :import do
       table.each do |row|
         dating = row['Full Date One of two formats. (Format 1) 95.4% CI calibrated radiocarbon age (Conventional Radiocarbon Age BP, Lab number) e.g. 2624-2350 calBCE (3990±40 BP, Ua-35016). (Format 2) Archaeological context range, e.g. 2500-1700 BCE']
 
-        ap dating
         date = DatingParser.parse(dating)
+        ap date
       end
     end
   end
