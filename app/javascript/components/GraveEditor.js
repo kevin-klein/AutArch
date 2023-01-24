@@ -140,7 +140,7 @@ function BoxEditor({grave, sites}) {
 
   async function save() {
     setIsSaving(true);
-    const response = await fetch('/graves/'+props.id, safeCredentials({
+    const response = await fetch('/graves/'+grave.id, safeCredentials({
       method: 'put',
       body: JSON.stringify({
         grave: {
