@@ -1,7 +1,7 @@
 module Mutations
-  class UpateGrave < BaseMutation
+  class UpdateGrave < BaseMutation
     argument :id, ID, required: true
-    argument :grave, GraveInputType
+    argument :grave, Types::GraveInputType
 
     field :id, String
 

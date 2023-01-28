@@ -1,10 +1,10 @@
-<%= form_with(model: grafe) do |form| %>
-  <% if grafe.errors.any? %>
+<%= form_with(model: grave) do |form| %>
+  <% if grave.errors.any? %>
     <div style="color: red">
-      <h2><%= pluralize(grafe.errors.count, "error") %> prohibited this grafe from being saved:</h2>
+      <h2><%= pluralize(grave.errors.count, "error") %> prohibited this grave from being saved:</h2>
 
       <ul>
-        <% grafe.errors.each do |error| %>
+        <% grave.errors.each do |error| %>
           <li><%= error.full_message %></li>
         <% end %>
       </ul>
@@ -25,3 +25,12 @@
     <%= form.submit %>
   </div>
 <% end %>
+
+<div class='row'>
+  <div class='col-md-8'>
+    <a href='#' data-grave-id='<%= grave.id %>' class="btn btn-secondary" id='new-figure-button' data-reflex='click->Figures#create'>
+      New Figure
+    </a>
+    <%= render('figures/figure_view', { figures: grave.figures, image: grave.page.image }) %>
+  </div>
+</div>

@@ -473,7 +473,7 @@ export default function SkeletonEditor({id}) {
       </div>
 
       <div className='col-md-6'>
-        {data && <GraveView id={data.skeleton.grave.id} />}
+        {data && <GraveView id={data.skeleton.skeleton_figure?.grave?.id} />}
       </div>
     </div>
   );

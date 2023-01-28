@@ -1,0 +1,3 @@
+class Oxcal < Figure
+
+end

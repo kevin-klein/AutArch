@@ -57,6 +57,9 @@ function Box({figure: {x1, y1, x2, y2, typeName}}) {
 
 
 export default function GraveView({id}) {
+  if(!id) {
+    return (<div>No Grave Selected</div>);
+  }
   const {data, loading, error} = useQuery(GRAVE_VIEW_QUERY, {
     variables: {
       id: parseInt(id)

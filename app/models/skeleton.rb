@@ -2,17 +2,27 @@
 #
 # Table name: skeletons
 #
-#  id          :bigint           not null, primary key
-#  grave_id    :bigint           not null
-#  figure_id   :integer          not null
-#  angle       :float
-#  created_at  :datetime         not null
-#  updated_at  :datetime         not null
-#  skeleton_id :string
+#  id                     :bigint           not null, primary key
+#  figure_id              :integer          not null
+#  angle                  :float
+#  created_at             :datetime         not null
+#  updated_at             :datetime         not null
+#  skeleton_id            :string
+#  funerary_practice      :integer
+#  inhumation_type        :integer
+#  anatonimcal_connection :integer
+#  body_position          :integer
+#  crouching_type         :integer
+#  other                  :string
+#  head_facing            :float
+#  ochre                  :integer
+#  ochre_position         :integer
+#  skeleton_figure_id     :bigint
+#  site_id                :bigint
 #
 class Skeleton < ApplicationRecord
-  belongs_to :grave
-  belongs_to :figure
+  belongs_to :skeleton_figure
+  belongs_to :site
   has_one :skull, dependent: :destroy
 
   has_one :chronology, dependent: :destroy

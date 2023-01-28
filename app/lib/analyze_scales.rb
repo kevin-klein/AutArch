@@ -4,7 +4,7 @@ class AnalyzeScales
   end
 
   def analyze_scale(scale)
-    image = ImageProcessing.extractFigure(scale.figure, scale.figure.page.image.data)
+    image = ImageProcessing.extractFigure(scale, scale.page.image.data)
     contours = ImageProcessing.findContours(image)
     rects = contours.lazy.map { ImageProcessing.minAreaRect _1 }
 
@@ -14,7 +14,6 @@ class AnalyzeScales
     ImageProcessing.imwrite('scale.jpg', image)
     t = RTesseract.new('scale.jpg', lang: 'eng')
     result = t.to_s.strip
-    ap result
 
     cm_match = result.match(/^([0-9]+)cm$/)
     m_match = result.match(/^([0-9]+)m$/)
@@ -35,8 +34,10 @@ class AnalyzeScales
   end
 
   def run
-    Scale.find_each do |scale|
-      analyze_scale(scale)
+    Scale.transaction do
+      Scale.find_each do |scale|
+        analyze_scale(scale)
+      end
     end
   end
 end

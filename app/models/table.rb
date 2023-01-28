@@ -1,0 +1,3 @@
+class Table < Figure
+
+end

@@ -16,6 +16,7 @@ gem 'rails-erd', group: :development
 gem 'pagy', '~> 6.0' # omit patch digit
 gem 'graphql'
 gem 'parslet', git: 'https://github.com/kschiess/parslet'
+gem 'bootstrap'
 
 gem 'rice'
 gem 'xlsxtream'
@@ -110,3 +111,12 @@ gem "shakapacker", "= 6.5"
 
 gem "react-rails", "= 2.6"
 gem "graphiql-rails", group: :development
+
+gem "rwordnet", "~> 2.0"
+
+gem "stemmify", "~> 0.0.2"
+
+gem "amatch", "~> 0.4.1"
+
+gem "stimulus_reflex", ">= 3.5.0.pre9"
+gem 'view_component_reflex', git: 'https://github.com/joshleblanc/view_component_reflex.git'
