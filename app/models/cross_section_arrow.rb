@@ -9,11 +9,10 @@
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #
-class CrossSectionArrow < ApplicationRecord
-  belongs_to :figure
-  belongs_to :grave
+class CrossSectionArrow < Figure
+  belongs_to :grave, foreign_key: 'parent_id', optional: true
 
   def length
-    figure.y2 - figure.y1
+    y2 - y1
   end
 end

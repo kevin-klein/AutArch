@@ -1,0 +1,3 @@
+class Artefact < Figure
+
+end

@@ -13,6 +13,7 @@
 #  skeleton_id      :bigint
 #  created_at       :datetime         not null
 #  updated_at       :datetime         not null
+#  species          :integer
 #
 class Anthropology < ApplicationRecord
   belongs_to :skeleton

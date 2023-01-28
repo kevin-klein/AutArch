@@ -1,0 +1,3 @@
+class SkullPhoto < Figure
+
+end

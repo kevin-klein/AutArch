@@ -100,5 +100,23 @@ module Types
     def skeleton(id:)
       Skeleton.find(id)
     end
+
+    field :skeleton_figures, [Types::SkeletonFigureType], null: false, description: 'skeleton figures' do
+      argument :offset, Int, required: true
+      argument :limit, Int, required: true
+      argument :publication_id, ID, required: false
+    end
+    def skeleton_figures(offset:, limit:, publication_id: nil)
+      skeletons = SkeletonFigure.order(:id).offset(offset).limit(limit)
+      if publication_id.present?
+        skeletons = skeletons.join(grave: { page: :publication } ).where(publication: { id: publication_id })
+      end
+      skeletons
+    end
+
+    field :skeleton_figures_count, Int, null: false
+    def skeleton_figures_count
+      SkeletonFigure.count
+    end
   end
 end

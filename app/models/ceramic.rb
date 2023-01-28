@@ -1,0 +1,2 @@
+class Ceramic < Figure
+end

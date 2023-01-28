@@ -1,24 +1,32 @@
 # == Schema Information
 #
-# Table name: goods
+# Table name: figures
 #
-#  id         :bigint           not null, primary key
-#  grave_id   :bigint           not null
-#  figure_id  :integer          not null
-#  type       :integer
-#  created_at :datetime         not null
-#  updated_at :datetime         not null
+#  id          :bigint           not null, primary key
+#  page_id     :bigint           not null
+#  x1          :integer          not null
+#  x2          :integer          not null
+#  y1          :integer          not null
+#  y2          :integer          not null
+#  type        :string           not null
+#  tags        :string           not null, is an Array
+#  created_at  :datetime         not null
+#  updated_at  :datetime         not null
+#  area        :float
+#  perimeter   :float
+#  meter_ratio :float
+#  angle       :float
+#  parent_id   :integer
 #
-class Good < ApplicationRecord
-  belongs_to :grave
-  belongs_to :figure
+class Good < Figure
+  belongs_to :grave, foreign_key: 'parent_id', optional: true
 
   def relative_center_to_grave
-    x1 = (figure.x1 - grave.figure.x1).abs
-    x2 = (figure.x1 - grave.figure.x2).abs
+    x1 = (x1 - grave.x1).abs
+    x2 = (x1 - grave.x2).abs
 
-    y1 = (figure.y1 - grave.figure.y1).abs
-    y2 = (figure.y2 - grave.figure.y2).abs
+    y1 = (y1 - grave.y1).abs
+    y2 = (y2 - grave.y2).abs
 
     [(x1 + x2) / 2, (y1 + y2) / 2]
   end

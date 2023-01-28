@@ -3,6 +3,7 @@ import SkeletonList from './SkeletonList';
 import SkeletonEditor from './SkeletonEditor';
 import GraveList from './GraveList';
 import GraveEditor from './GraveEditor';
+import SkeletonFigureList from './SkeletonFigureList';
 import { Route, Router } from 'wouter';
 import { useLocationProperty, navigate } from 'wouter/use-location';
 import { GraphQLClient, ClientContext } from 'graphql-hooks';
@@ -59,6 +60,13 @@ function DashboardContent() {
                   </a>
                 </li>
 
+                <li className="nav-item">
+                  <a className="nav-link" href="#/skeleton_figures">
+                    <span data-feather="shopping-cart" className="align-text-bottom"></span>
+                    Skeleton Figures
+                  </a>
+                </li>
+
               </ul>
             </div>
           </nav>
@@ -76,6 +84,9 @@ function DashboardContent() {
               </Route>
               <Route path='/graves/:id'>
                 {params => <GraveEditor id={params.id} />}
+              </Route>
+              <Route path='/skeleton_figures'>
+                <SkeletonFigureList />
               </Route>
             </Router>
           </main>
