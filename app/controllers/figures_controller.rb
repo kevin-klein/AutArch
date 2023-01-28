@@ -26,7 +26,7 @@ class FiguresController < ApplicationController
     respond_to do |format|
       if @figure.save
         format.html { redirect_to figure_url(@figure), notice: "Figure was successfully created." }
-        format.json { render :show, status: :created, location: @figure }
+        format.json { render json: @figure }
       else
         format.html { render :new, status: :unprocessable_entity }
         format.json { render json: @figure.errors, status: :unprocessable_entity }
@@ -65,6 +65,6 @@ class FiguresController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def figure_params
-      params.require(:figure).permit(:page_id, :image_id, :shape, :tags)
+      params.require(:figure).permit(:parent_id, :angle, :page_id, :x1, :x2, :y1, :y2, :page_id, :type)
     end
 end

@@ -436,6 +436,7 @@ DEPENDENCIES
   torchvision
   turbo-rails
   tzinfo-data
+  view_component (~> 2.82)
   view_component_reflex!
   web-console
   webdrivers

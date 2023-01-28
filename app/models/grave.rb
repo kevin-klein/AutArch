@@ -9,7 +9,6 @@
 #  y1          :integer          not null
 #  y2          :integer          not null
 #  type        :string           not null
-#  tags        :string           not null, is an Array
 #  created_at  :datetime         not null
 #  updated_at  :datetime         not null
 #  area        :float
@@ -17,6 +16,9 @@
 #  meter_ratio :float
 #  angle       :float
 #  parent_id   :integer
+#  identifier  :string
+#  width       :float
+#  height      :float
 #
 class Grave < Figure
   belongs_to :site, required: false
@@ -29,7 +31,6 @@ class Grave < Figure
   has_many :skeleton_figures, dependent: :destroy, foreign_key: 'parent_id', class_name: 'SkeletonFigure'
   has_many :skulls, through: :skeleton_figures, foreign_key: 'parent_id', class_name: 'Skull'
   has_many :spines, dependent: :destroy, foreign_key: 'parent_id', class_name: 'Spine'
-  # belongs_to :kurgan
 
   def upwards?
     width < height
@@ -49,21 +50,10 @@ class Grave < Figure
     scale&.width
   end
 
-  def area_with_unit
-    if scale.present? && scale.meter_ratio > 0 && area > 0
-      { value: area * scale.meter_ratio ** 2, unit: 'm' }
-    else
-      { value: area, unit: 'px' }
-    end
-  end
-
-  def perimeter_with_unit
-    if scale.present? && scale.meter_ratio > 0 && perimeter > 0
-      { value: perimeter * scale.meter_ratio, unit: 'm' }
-    else
-      { value: perimeter, unit: 'px' }
-    end
-  end
+  with_unit :area, square: true
+  with_unit :perimeter
+  with_unit :width
+  with_unit :height
 
   def figures
     ([

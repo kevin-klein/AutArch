@@ -41,59 +41,62 @@ class GravesController < ApplicationController
   # PATCH/PUT /graves/1 or /graves/1.json
   def update
     Grave.transaction do
-      angle = grave_params[:arrowAngle]
-      figure_ids = grave_params[:figures].map { _1[:id] }
-      @grave.site_id = grave_params[:site_id]
-      @grave.save!
+      result = Figure.update(params[:figures].keys, params[:figures].values).reject { |p| p.errors.empty? }
 
-      @grave.figures.each do |figure|
-        unless figure_ids.include?(figure.id)
-          figure.destroy
-          next
-        end
+      # raise
+      # angle = grave_params[:arrowAngle]
+      # figure_ids = grave_params[:figures].map { _1[:id] }
+      # @grave.site_id = grave_params[:site_id]
+      # @grave.save!
 
-        new_figure_data = grave_params[:figures].find { _1[:id] == figure.id }
-        figure.x1 = new_figure_data[:x1]
-        figure.x2 = new_figure_data[:x2]
-        figure.y1 = new_figure_data[:y1]
-        figure.y2 = new_figure_data[:y2]
+      # @grave.figures.each do |figure|
+      #   unless figure_ids.include?(figure.id)
+      #     figure.destroy
+      #     next
+      #   end
 
-        if figure.type_name == 'arrow'
-          arrow = figure.arrow
-          arrow.angle = angle
-          arrow.save!
-        end
+      #   new_figure_data = grave_params[:figures].find { _1[:id] == figure.id }
+      #   figure.x1 = new_figure_data[:x1]
+      #   figure.x2 = new_figure_data[:x2]
+      #   figure.y1 = new_figure_data[:y1]
+      #   figure.y2 = new_figure_data[:y2]
 
-        figure.save!
-      end
+      #   if figure.type_name == 'arrow'
+      #     arrow = figure.arrow
+      #     arrow.angle = angle
+      #     arrow.save!
+      #   end
 
-      grave_params[:figures].select { _1[:id].is_a?(String) }.each do |new_figure|
-        figure = @grave.figure.page.figures.create!({
-          tags: []
-        }.merge(new_figure.except(:id)))
+      #   figure.save!
+      # end
 
-        case figure.type_name
-        when 'arrow'
-          Arrow.create!(grave: @grave, figure: figure, angle: angle)
-        when 'skeleton'
-          Skeleton.create!(grave: @grave, figure: figure)
-        when 'skull'
-          Skull.create!(skeleton: @grave.skeletons.first, figure: figure)
-        when 'good'
-          Good.create!(grave: @grave, figure: figure)
-        when 'grave_cross_section'
-          GraveCrossSection.create!(grave: @grave, figure: figure)
-        when 'scale'
-          Scale.create!(grave: @grave, figure: figure)
-        when 'spine'
-          Spine.create!(grave: @grave, figure: figure)
-        when 'cross_section_arrow'
-          CrossSectionArrow.create!(grave: @grave, figure: figure, length: length)
-        end
-      end
+      # grave_params[:figures].select { _1[:id].is_a?(String) }.each do |new_figure|
+      #   figure = @grave.figure.page.figures.create!({
+      #     tags: []
+      #   }.merge(new_figure.except(:id)))
+
+      #   case figure.type_name
+      #   when 'arrow'
+      #     Arrow.create!(grave: @grave, figure: figure, angle: angle)
+      #   when 'skeleton'
+      #     Skeleton.create!(grave: @grave, figure: figure)
+      #   when 'skull'
+      #     Skull.create!(skeleton: @grave.skeletons.first, figure: figure)
+      #   when 'good'
+      #     Good.create!(grave: @grave, figure: figure)
+      #   when 'grave_cross_section'
+      #     GraveCrossSection.create!(grave: @grave, figure: figure)
+      #   when 'scale'
+      #     Scale.create!(grave: @grave, figure: figure)
+      #   when 'spine'
+      #     Spine.create!(grave: @grave, figure: figure)
+      #   when 'cross_section_arrow'
+      #     CrossSectionArrow.create!(grave: @grave, figure: figure, length: length)
+      #   end
+      # end
     end
 
-    render json: { status: :ok }
+    redirect_to edit_grave_path(@grave)
   end
 
   # DELETE /graves/1 or /graves/1.json

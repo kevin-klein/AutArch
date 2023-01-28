@@ -17,6 +17,7 @@ Rails.application.routes.draw do
   end
   resources :kurgans
   resources :sites
+  resources :maps
   resources :graves do
     collection do
       get :stats

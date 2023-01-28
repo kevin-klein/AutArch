@@ -1,7 +1,6 @@
 require 'mkmf'
 
-
-$CXXFLAGS += " -stdlib=libc++ -std=c++17"
+$CXXFLAGS += " -stdlib=libc++ -std=c++17" if Gem::Platform.local.os === 'osx'
 $CXXFLAGS += " #{`pkg-config --cflags --libs opencv4`}"
 
 # $LDFLAGS += " -ltesseract "

@@ -2,7 +2,6 @@
 #include <cstdint>
 #include <opencv2/opencv.hpp>
 #include <ruby.h>
-#include "rice.hpp"
 // #include <tesseract/baseapi.h>
 
 using namespace cv;
@@ -28,7 +27,7 @@ uint32_t angle(const Vector2i &v1, const Vector2i &v2) {
   return static_cast<uint32_t>(radiansToDegree(radians));
 }
 
-vector<Point> findBestArrowContour(const vector<vector<Point>> &contours) {
+vector<Point> findLargestContour(const vector<vector<Point>> &contours) {
   vector<double> lengths;
   std::transform(
       contours.begin(), contours.end(), std::back_inserter(lengths),
@@ -221,6 +220,35 @@ extern "C" VALUE analyzePage(VALUE self, VALUE image_value) {
   return LONG2FIX(contours.size());
 }
 
+extern "C" VALUE getCrossSectionStats(VALUE self, VALUE figure, VALUE image_value) {
+  Mat image_mat = convertRubyStringToMat(image_value);
+  Mat arrow_image = cropToFigure(figure, image_mat);
+
+  cvtColor(arrow_image, arrow_image, COLOR_BGR2GRAY);
+  arrow_image = Scalar(255) - arrow_image;
+
+  threshold(arrow_image, arrow_image, 40, 255, THRESH_BINARY);
+
+  vector<vector<Point>> contours;
+  vector<Vec4i> hierarchy;
+  findContours(arrow_image, contours, hierarchy, RETR_EXTERNAL,
+               CHAIN_APPROX_SIMPLE);
+
+  if (contours.size() == 0) {
+    std::cout << "contour is empty" << endl;
+    return Qnil;
+  }
+
+  auto contour = findLargestContour(contours);
+
+  Rect rect = boundingRect(contour);
+  VALUE result = rb_hash_new();
+  rb_hash_aset(result, ID2SYM(rb_intern("width")), LONG2FIX(rect.width));
+  rb_hash_aset(result, ID2SYM(rb_intern("height")), LONG2FIX(rect.height));
+
+  return result;
+}
+
 extern "C" VALUE getGraveStats(VALUE self, VALUE figure, VALUE image_value) {
   Mat image_mat = convertRubyStringToMat(image_value);
   Mat arrow_image = cropToFigure(figure, image_mat);
@@ -240,13 +268,18 @@ extern "C" VALUE getGraveStats(VALUE self, VALUE figure, VALUE image_value) {
     return Qnil;
   }
 
-  auto contour = findBestArrowContour(contours);
+  auto contour = findLargestContour(contours);
   double arc = arcLength(contour, true);
   double area = contourArea(contour);
+
+  RotatedRect boundingRectangle = minAreaRect(contour);
+  Size2f size = boundingRectangle.size;
 
   VALUE result = rb_hash_new();
   rb_hash_aset(result, ID2SYM(rb_intern("area")), DBL2NUM(area));
   rb_hash_aset(result, ID2SYM(rb_intern("arc")), DBL2NUM(arc));
+  rb_hash_aset(result, ID2SYM(rb_intern("width")), DBL2NUM(size.width));
+  rb_hash_aset(result, ID2SYM(rb_intern("height")), DBL2NUM(size.height));
 
   return result;
 }
@@ -475,6 +508,7 @@ extern "C" void Init_ext() {
   VALUE ImageProcessing = rb_define_module("ImageProcessing");
   rb_define_module_function(ImageProcessing, "getAngle", getAngle, 2);
   rb_define_module_function(ImageProcessing, "getGraveStats", getGraveStats, 2);
+    rb_define_module_function(ImageProcessing, "getCrossSectionStats", getCrossSectionStats, 2);
   rb_define_module_function(ImageProcessing, "analyzePage", analyzePage, 1);
   rb_define_module_function(ImageProcessing, "extractFigure", rb_extractFigure, 2);
   rb_define_module_function(ImageProcessing, "findContours", rb_findContours, 1);
