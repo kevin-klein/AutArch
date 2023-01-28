@@ -10,4 +10,9 @@
 #  height     :integer
 #
 class Image < ApplicationRecord
+    include Rails.application.routes.url_helpers
+
+    def href
+        image_path(self)
+    end
 end

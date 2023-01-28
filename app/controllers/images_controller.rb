@@ -8,6 +8,7 @@ class ImagesController < ApplicationController
 
   # GET /images/1 or /images/1.json
   def show
+    send_data @image.data, type: 'image/jpeg', disposition: 'inline'
   end
 
   # GET /images/new
