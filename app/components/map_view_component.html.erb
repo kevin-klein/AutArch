@@ -1,0 +1,30 @@
+<svg viewBox='<%= "0 0 #{@image.width} #{@image.height}" %>'>
+  <image width='<%= @image.width %>' height='<%= @image.height %>' href='<%= @image.href %>' />
+
+  <% @text_items.each do |text_item| %>
+    <rect
+      fill='none'
+      stroke="red"
+      strokeWidth="2"
+      x='<%= text_item.x1 %>'
+      y='<%= text_item.y1 %>'
+      width='<%= text_item.x2 - text_item.x1 %>'
+      height='<%= text_item.y2 - text_item.y1 %>'
+    />
+  <% end %>
+</svg>
+
+<table class='table'>
+  <thead>
+    <tr>
+      <th>Text</th>
+    </tr>
+  </thead>
+  <tbody>
+  <% @text_items.each do |text_item| %>
+    <tr>
+      <td><%= text_item.text %></td>
+    </tr>
+  <% end %>
+  </tbody>
+</table>

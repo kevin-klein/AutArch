@@ -1,12 +1,16 @@
 <table class='table'>
   <thead>
-
+    <tr>
+      <th>ID</th>
+      <th></th>
+    </tr>
   </thead>
 
   <tbody>
     <% @skeletons.each do |skeleton| %>
       <tr>
         <td><%= skeleton.id %></td>
+        <td><%= link_to('Edit', edit_skeleton_path(skeleton)) %></td>
       </tr>
     <% end %>
   </tbody>

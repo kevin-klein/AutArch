@@ -10,7 +10,9 @@
 #  height     :integer
 #
 class Image < ApplicationRecord
-  def svg_href
-    "data:image/jpeg;base64,#{Base64.encode64 data}"
+  include Rails.application.routes.url_helpers
+
+  def href
+    image_path(self)
   end
 end

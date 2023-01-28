@@ -1,19 +1,23 @@
 /* eslint-disable react/prop-types */
 import React from 'react';
 import Select from 'react-select';
-import {useQuery} from 'graphql-hooks';
-import {GRAVE_EDITOR_QUERY} from './queries';
 
 const genUUID = () =>
   ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
     (c ^ (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (c / 4)))).toString(16)
   );
 
-function Box({setDraggingPoint, active, figure: { id, x1, y1, x2, y2, width, height, typeName}}) {
+function Box({onDraggingStart, active, figure: { id, x1, y1, x2, y2, type}}) {
   let color = 'black';
-
   if(active === id) {
     color = 'red';
+  }
+
+  function onMouseDown(figure) {
+    return function(evt) {
+      evt.preventDefault();
+      onDraggingStart(evt, figure);
+    };
   }
 
   return (<React.Fragment>
@@ -24,7 +28,7 @@ function Box({setDraggingPoint, active, figure: { id, x1, y1, x2, y2, width, hei
       </marker>
     </defs>
 
-    {(typeName === 'spine' || typeName === 'cross_section_arrow') &&
+    {(type === 'Spine' || type === 'CrossSectionArrow') &&
       <line
         fill='none'
         stroke={color}
@@ -37,7 +41,7 @@ function Box({setDraggingPoint, active, figure: { id, x1, y1, x2, y2, width, hei
         markerEnd="url(#arrowhead)" />
     }
 
-    {typeName !== 'spine' && <rect
+    {type !== 'Spine' && <rect
       fill='none'
       stroke={color}
       strokeWidth="2"
@@ -48,7 +52,7 @@ function Box({setDraggingPoint, active, figure: { id, x1, y1, x2, y2, width, hei
     />}
 
     <circle
-      onMouseDown={(evt) => { evt.preventDefault(); setDraggingPoint({ figure: { id, x1, x2, y1, y2 }, point: 1 }); } }
+      onMouseDown={onMouseDown({ figure: { id, x1, x2, y1, y2 }, point: 1 })}
       className="moveable-point"
       r='4'
       cx={x1}
@@ -56,7 +60,7 @@ function Box({setDraggingPoint, active, figure: { id, x1, y1, x2, y2, width, hei
       stroke="black"
     />
     <circle
-      onMouseDown={(evt) => { evt.preventDefault(); setDraggingPoint({ figure: { id, x1, x2, y1, y2 }, point: 2 }); } }
+      onMouseDown={onMouseDown({ figure: { id, x1, x2, y1, y2 }, point: 2 })}
       className="moveable-point"
       r='4'
       cx={x2}
@@ -68,7 +72,7 @@ function Box({setDraggingPoint, active, figure: { id, x1, y1, x2, y2, width, hei
 }
 
 function NewFigureDialog({ closeDialog, addFigure }) {
-  const [type, setType] = React.useState('spine');
+  const [type, setType] = React.useState('Spine');
 
   return (<div className="modal d-block" aria-hidden="false">
     <div className="modal-dialog">
@@ -81,14 +85,14 @@ function NewFigureDialog({ closeDialog, addFigure }) {
           <form>
             <div className="input-group mb-3">
               <select value={type} onChange={evt => setType(evt.target.value)} className="form-select" aria-label="Default select example">
-                <option value="spine">Spine</option>
-                <option value="skeleton">Skeleton</option>
-                <option value="skull">Skull</option>
-                <option value="scale">Scale</option>
-                <option value="grave_cross_section">Grave Cross Section</option>
-                <option value="arrow">Arrow</option>
-                <option value="good">Good</option>
-                <option value="cross_section_arrow">Cross Section Arrow</option>
+                <option value="Spine">Spine</option>
+                <option value="Skeleton">Skeleton</option>
+                <option value="Skull">Skull</option>
+                <option value="Scale">Scale</option>
+                <option value="GraveCrossSection">Grave Cross Section</option>
+                <option value="Arrow">Arrow</option>
+                <option value="Good">Good</option>
+                <option value="CrossSectionArrow">Cross Section Arrow</option>
               </select>
             </div>
           </form>
@@ -102,33 +106,18 @@ function NewFigureDialog({ closeDialog, addFigure }) {
   </div>);
 }
 
-export default function BoxEditorWrapper({id}) {
-  const {loading, error, data} = useQuery(GRAVE_EDITOR_QUERY, {
-    variables: { id: parseInt(id) }
-  });
-
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Oh no... {JSON.stringify(error)}</p>;
-
-  const grave = data.grave;
-
-  return (
-    <BoxEditor grave={grave} sites={data.sites} />
-  );
-}
-
-function BoxEditor({grave, sites}) {
-  const [startPos, setStartPos] = React.useState(null);
-  const [isCreatingBox, setIsCreatingBox] = React.useState(false);
+export default function BoxEditor({grave, sites, image, page}) {
   const [figures, setFigures] = React.useState(grave.figures);
-  const [arrowAngle, setArrowAngle] = React.useState(grave.arrow?.angle || 0);
+  const [arrowAngle, setArrowAngle] = React.useState(grave.figures.filter(figure => figure.type === 'Arrow')[0]?.angle || 0);
   const [showFigures, setShowFigures] = React.useState(true);
-  const [draggingPoint, setDraggingPoint] = React.useState(null);
+  const [draggingState, setDraggingState] = React.useState(null);
   const [creatingNewFigure, setCreatingNewFigure] = React.useState(false);
-  const [isSaving, setIsSaving] = React.useState(false);
   const [site, setSite] = React.useState(grave.site_id);
   const canvasRef = React.useRef(null);
-  const [currentEditBox, setCurrentEditBox] = React.useState(grave.figures.filter((f) => f.typeName == 'grave')[0]?.id);
+  const [currentEditBox, setCurrentEditBox] = React.useState(grave.figures.filter((f) => f.type == 'Grave')[0]?.id);
+
+  const token =
+      document.querySelector('[name=csrf-token]').content;
 
   const angle = Math.abs(360 - arrowAngle);
 
@@ -138,32 +127,56 @@ function BoxEditor({grave, sites}) {
     }
   }
 
-  async function save() {
-    setIsSaving(true);
-    const response = await fetch('/graves/'+grave.id, safeCredentials({
-      method: 'put',
-      body: JSON.stringify({
-        grave: {
-          arrowAngle: arrowAngle,
-          site_id: site,
-          figures: figures.map((figure) => { return { typeName: figure.typeName, id: figure.id, x1: figure.x1, x2: figure.x2, y1: figure.y1, y2: figure.y2 };}),
-        }
-      })
-    }));
-    setIsSaving(false);
-  }
-
   function createNewFigure() {
     setCreatingNewFigure(true);
   }
 
-  function removeEditBox(id) {
-    setFigures(figures.filter((figure) => figure.id !== id));
+  async function removeEditBox(id) {
+    const response = await fetch(`/figures/${id}.json`, {
+      method: 'DELETE',
+      headers: {
+        'X-CSRF-Token': token,
+        'Content-Type': 'application/json',
+      }
+    });
+    if (response.ok) {
+      setFigures(figures.filter((figure) => figure.id !== id));
+    } else {
+      return Promise.reject(response);
+    }
   }
 
-  function addFigure(type) {
-    const grave = figures.filter(figure => figure.typeName === 'grave')[0];
+  function onDraggingStart(evt, data) {
+    const figure = data.figure;
+    setCurrentEditBox(figure.id);
+    let svgPoint = canvasRef.current.createSVGPoint();
+    svgPoint.x = evt.clientX;
+    svgPoint.y = evt.clientY;
+    svgPoint = svgPoint.matrixTransform(canvasRef.current.getScreenCTM().inverse());
 
+    let x = 0;
+    let y = 0;
+    if(data.point === 1) {
+      x = figure.x1;
+      y = figure.y1;
+    }
+    else {
+      x = figure.x2;
+      y = figure.y2;
+    }
+
+    setDraggingState({
+      point: svgPoint,
+      x: svgPoint.x - x,
+      y: svgPoint.y - y,
+      data: data,
+    });
+  }
+
+  async function addFigure(type) {
+    const grave = figures.filter(figure => figure.type === 'Grave')[0];
+
+    let newFigure = null;
     if(grave !== undefined) {
       const graveWidth = grave.x2 - grave.x1;
       const graveHeight = grave.y2 - grave.y1;
@@ -173,14 +186,34 @@ function BoxEditor({grave, sites}) {
       const y1 = grave.y1 + graveHeight * 0.4;
       const y2 = grave.y1 + graveHeight * 0.6;
 
-      const newFigure = { ...grave, y1: y1, y2: y2, x1: x1, x2: x2, typeName: type, id: genUUID() };
-      setFigures([...figures, newFigure]);
-      setCurrentEditBox(newFigure.id);
+      newFigure = { ...grave, page_id: page.id, y1: y1, y2: y2, x1: x1, x2: x2, type: type };
     }
     else{
-      const newFigure = { typeName: type, id: genUUID(), x1: 0, y1: 0, x2: 100, y2: 100 };
-      setFigures([...figures, newFigure]);
+      newFigure = { type: type, page_id: page.id, x1: 0, y1: 0, x2: 100, y2: 100 };
+    }
+
+    const response = await fetch('/figures.json', {
+      method: 'POST',
+      body: JSON.stringify({grave_id: grave.id, figure: {
+        x1: newFigure.x1,
+        x2: newFigure.x2,
+        y1: newFigure.y1,
+        y2: newFigure.y2,
+        page_id: newFigure.page_id,
+        type: newFigure.type,
+        parent_id: grave.id,
+      }}),
+      headers: {
+        'X-CSRF-Token': token,
+        'Content-Type': 'application/json',
+      }
+    });
+    if (response.ok) {
+      newFigure = await response.json();
+      setFigures([...figures, {...newFigure, type: type}]);
       setCurrentEditBox(newFigure.id);
+    } else {
+      return Promise.reject(response);
     }
   }
 
@@ -189,16 +222,21 @@ function BoxEditor({grave, sites}) {
   }
 
   function onDrag(evt) {
-    // var coord = getMousePosition(evt);
-    if(draggingPoint !== null) {
+    if(draggingState !== null) {
       setFigures(figures.map((figure) => {
-        const factor = 2.5;
-        if(figure.id === draggingPoint.figure.id) {
-          if(draggingPoint.point === 1) {
-            return { ...figure, x1: figure.x1 + evt.movementX * factor, y1: figure.y1 + evt.movementY * factor };
+        if(figure.id === draggingState.data.figure.id) {
+          draggingState.point.x = evt.clientX;
+          draggingState.point.y = evt.clientY;
+          const cursor = draggingState.point.matrixTransform(canvasRef.current.getScreenCTM().inverse());
+
+          const x = cursor.x - draggingState.x;
+          const y = cursor.y - draggingState.y;
+
+          if(draggingState.data.point === 1) {
+            return { ...figure, x1: x, y1: y };
           }
           else {
-            return { ...figure, x2: figure.x2 + evt.movementX * factor, y2: figure.y2 + evt.movementY * factor };
+            return { ...figure, x2: x, y2: y };
           }
         }
         return figure;
@@ -207,22 +245,17 @@ function BoxEditor({grave, sites}) {
 
   }
 
-  function setDraggingFigure(point) {
-    setDraggingPoint(point);
-    setCurrentEditBox(point.figure.id);
-  }
-
   const siteOptions = sites.map((site) => { return { value: site.id, label: site.name }; });
   const siteValue = siteOptions.filter((option) => option.value === site )[0];
 
   let arrowView = null;
-  const arrow = grave.figures.filter((f) => f.typeName == 'arrow')[0];
+  const arrow = grave.figures.filter((f) => f.type == 'Arrow')[0];
   if(arrow) {
     const arrowCenterX = (arrow.x1 + arrow.x2) / 2;
     const arrowCenterY = (arrow.y1 + arrow.y2) / 2;
 
     arrowView = (<svg width="512" height="200" viewBox={`${arrow.x1} ${arrow.y1} ${arrow.x2 - arrow.x1} ${arrow.y2 - arrow.y1}`}>
-      <image width={grave.page.image.width} height={grave.page.image.height} href={grave.page.image.data} />
+      <image width={image.width} height={image.height} href={image.href} />
       <g transform={`rotate(${angle} ${arrowCenterX} ${arrowCenterY}) translate(${arrowCenterX - 100} ${arrowCenterY - 80})`} stroke="blue" shapeRendering="geometricPrecision">
         <line x1="100" y1="20" x2="100" y2="150" />
         <line x1="100" x2="110" y1="20" y2="40" />
@@ -231,8 +264,7 @@ function BoxEditor({grave, sites}) {
     </svg>);
   }
 
-  // transform={"rotate(" + angle + " 100 85)"}
-  return (<>
+  return (<React.StrictMode>
     {creatingNewFigure && <NewFigureDialog addFigure={addFigure} closeDialog={() => setCreatingNewFigure(false)} />}
     <div className='row'>
       <div className='col-md-8'>
@@ -247,14 +279,14 @@ function BoxEditor({grave, sites}) {
         <svg
           ref={canvasRef}
           onMouseMove={onDrag}
-          onMouseUp={() => { setDraggingPoint(null); }}
-          onMouseLeave={() => { setDraggingPoint(null); }}
-          viewBox={`0 0 ${grave.page.image.width} ${grave.page.image.height}`}
+          onMouseUp={() => { setDraggingState(null); }}
+          onMouseLeave={() => { setDraggingState(null); }}
+          viewBox={`0 0 ${image.width} ${image.height}`}
           preserveAspectRatio="xMidYMid meet"
           xmlns="http://www.w3.org/2000/svg"
         >
-          <image width={grave.page.image.width} height={grave.page.image.height} href={grave.page.image.data} />
-          {showFigures && figures.map(figure => <Box key={figure.id} setDraggingPoint={setDraggingFigure} active={currentEditBox} figure={figure} />)}
+          <image width={image.width} height={image.height} href={image.href} />
+          {showFigures && figures.map(figure => <Box canvas={canvasRef} key={figure.id} onDraggingStart={onDraggingStart} active={currentEditBox} figure={figure} />)}
         </svg>
       </div>
 
@@ -281,7 +313,7 @@ function BoxEditor({grave, sites}) {
                       className={`list-group-item list-group-item-action d-flex justify-content-between align-items-start ${currentEditBoxActiveClass(figure)}`}
                     >
                       <div className="ms-2 me-auto">
-                        <div className="fw-bold">{figure.typeName}</div>
+                        <div className="fw-bold">{figure.type}</div>
                       </div>
                       <div
                         onClick={() => { removeEditBox(figure.id); } }
@@ -290,11 +322,20 @@ function BoxEditor({grave, sites}) {
                           X
                       </div>
                     </div>
-                    {currentEditBox === figure.id && figure.typeName === 'skeleton' &&
+                    {currentEditBox === figure.id && figure.type === 'SkeletonFigure' &&
                       <>
                         <Select className='form-select' options={[{value: 0, label: 'supine position' }]} />
-                        <a href={`#/skeletons/${figure.skeletons[0].id}`}>Edit</a>
+                        <a href={`#/skeletons/${figure.id}`}>Edit</a>
                       </>}
+                    {currentEditBox === figure.id && figure.type === 'Grave' &&
+                    <>
+                      <div className="row mb-3 mt-3">
+                        <label className="col-sm-2 col-form-label">Grave ID</label>
+                        <div className="col-sm-10">
+                          <input type="email" className="form-control" />
+                        </div>
+                      </div>
+                    </>}
                   </React.Fragment>
                 )}
 
@@ -309,13 +350,34 @@ function BoxEditor({grave, sites}) {
                 </a>
               </ul>
             </span>
-            <button onClick={save} className="btn btn-primary card-link">
-              Save
-            </button>
+            <form action={`/graves/${grave.id}`} method='post'>
+              <input type="hidden" name="_method" value="patch" />
+              <input type="hidden" name="authenticity_token" value={token} />
+              {figures.map(figure => {
+                const id = figure.id;
+                if(figure.type === 'Arrow') {
+                  figure.angle = arrowAngle;
+                }
+                return (
+                  <React.Fragment key={figure.id}>
+                    <input type='hidden' name={`figures[${id}][x1]`} value={figure.x1} />
+                    <input type='hidden' name={`figures[${id}][x2]`} value={figure.x2} />
+                    <input type='hidden' name={`figures[${id}][y1]`} value={figure.y1} />
+                    <input type='hidden' name={`figures[${id}][y2]`} value={figure.y2} />
+                    {figure.angle &&
+                     <input type='hidden' name={`figures[${id}][angle]`} value={figure.angle} />
+                    }
+                  </React.Fragment>
+                );
+              })}
+
+              <input value='Save' type='submit' className="btn btn-primary card-link" />
+            </form>
+
           </div>
         </div>
       </div>
 
     </div>
-  </>);
+  </React.StrictMode>);
 }

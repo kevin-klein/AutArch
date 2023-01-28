@@ -1,7 +1,13 @@
 <table class='table'>
   <thead>
     <tr>
-      <th></th>
+      <th>ID</th>
+      <th>Area</th>
+      <th>Perimeter</th>
+      <th>Width</th>
+      <th>Height</th>
+      <th>Cross Section Width</th>
+      <th>Cross Section Height</th>
       <th></th>
     </tr>
   </thead>
@@ -10,6 +16,12 @@
     <% @graves.each do |grave| %>
       <tr>
         <td><%= grave.id %></td>
+        <td><%= number_with_unit grave.area_with_unit %></td>
+        <td><%= number_with_unit grave.perimeter_with_unit %></td>
+        <td><%= number_with_unit grave.width_with_unit %></td>
+        <td><%= number_with_unit grave.height_with_unit %></td>
+        <td><%= number_with_unit grave.grave_cross_section&.width_with_unit %></td>
+        <td><%= number_with_unit grave.grave_cross_section&.height_with_unit %></td>
         <td><%= link_to('Edit', edit_grave_path(grave)) %></td>
       </tr>
     <% end %>

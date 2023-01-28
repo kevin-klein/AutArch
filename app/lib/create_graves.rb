@@ -29,18 +29,17 @@ class CreateGraves
   end
 
   def handle_grave(grave, figures)
+    figures = convert_figures(figures) if !figures.is_a?(Hash)
     non_grave_figures = figures.values.flatten.select { |figure| !figure.is_a?(Grave) }
 
     inside_grave = non_grave_figures.select { |figure| grave.collides?(figure) }
 
     find_closest_item(grave, figures['Scale']) do |closest_scale|
-      closest_scale.grave = grave
-      closest_scale.save!
+      assign_grave_or_copy(closest_scale, grave)
     end
 
     find_closest_item(grave, figures['Arrow']) do |closest_arrow|
-      closest_arrow.grave = grave
-      grave.save!
+      assign_grave_or_copy(closest_arrow, grave)
     end
 
     skeletons = inside_grave.select { |figure| figure.is_a?(SkeletonFigure) }
@@ -48,26 +47,28 @@ class CreateGraves
 
     goods = inside_grave.select { |figure| figure.is_a?(Good) }
     goods.each do |good|
-      good.grave = grave
-      good.save!
+      assign_grave_or_copy(good, grave)
     end
 
     find_closest_item(grave, figures['GraveCrossSection']) do |cross|
-      cross.grave = grave
-      cross.save!
+
+    end
+
+    spines = inside_grave.select { |figure| figure.is_a?(Spine) }
+    spines.each do |spine|
+      spine.grave = grave
+      spine.save!
     end
   end
 
-  def assign_spines_to_skeletons
-    Grave.includes(:skeleton_figures, :spines).find_each do |grave|
-      spines = grave.page.figures.select { _1.is_a?(Spine) }
-      grave.skeleton_figures.each do |skeleton|
-        next if spines.empty?
-        spines_index = spines.map { |spine| skeleton.distance_to(spine) }.each_with_index.min[1]
-        closest_spine = spines[spines_index]
-        closest_spine.skeleton_figure = skeleton
-        closest_spine.save!
-      end
+  def assign_grave_or_copy(figure, grave)
+    if figure.parent_id.present? && figure.parent_id != grave.id
+      figure = figure.dup
+      figure.grave = grave
+      figure.save!
+    else
+      figure.grave = grave
+      figure.save!
     end
   end
 
