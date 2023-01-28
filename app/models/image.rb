@@ -10,4 +10,7 @@
 #  height     :integer
 #
 class Image < ApplicationRecord
+  def svg_href
+    "data:image/jpeg;base64,#{Base64.encode64 data}"
+  end
 end

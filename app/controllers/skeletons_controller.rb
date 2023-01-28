@@ -1,5 +1,6 @@
 class SkeletonsController < ApplicationController
   def index
+    @skeletons = Skeleton.all
   end
 
   def edit

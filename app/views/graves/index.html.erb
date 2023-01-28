@@ -1,1 +1,17 @@
-<%= react_component('App') %>
+<table class='table'>
+  <thead>
+    <tr>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @graves.each do |grave| %>
+      <tr>
+        <td><%= grave.id %></td>
+        <td><%= link_to('Edit', edit_grave_path(grave)) %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

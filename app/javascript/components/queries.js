@@ -24,13 +24,25 @@ query($id: Int!) {
   skeleton(id: $id) {
     id
     skeletonId
-    figure {
-      id
-      x1
-      y1
-      x2
-      y2
-      typeName
+    skeletonFigure {
+      figure {
+        id
+        x1
+        y1
+        x2
+        y2
+        typeName
+      }
+
+      grave {
+        id
+
+        page {
+          image {
+            data
+          }
+        }
+      }
     }
     genetics {
       id
@@ -93,15 +105,6 @@ query($id: Int!) {
       cultureReference
       cultureNote
       cultureId
-    }
-    grave {
-      id
-
-      page {
-        image {
-          data
-        }
-      }
     }
   }
 }
@@ -225,3 +228,20 @@ export const UPDATE_SKELETON_MUTATION = `mutation($id: Int!, $skeleton: Skeleton
     id
   }
 }`;
+
+export const SKELETONS_FIGURES_LIST_QUERY = `
+  query($offset: Int!, $limit: Int!) {
+    count: skeletonFiguresCount
+    skeletonFigures(offset: $offset, limit: $limit) {
+      id
+
+    }
+
+    publications {
+      id
+      title
+      author
+    }
+  }
+`;
+

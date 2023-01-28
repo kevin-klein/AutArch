@@ -1,0 +1,3 @@
+class SkeletonPhoto < Figure
+
+end
