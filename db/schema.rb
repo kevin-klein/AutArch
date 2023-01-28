@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_01_27_165949) do
+ActiveRecord::Schema[7.0].define(version: 2023_01_28_161241) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -82,7 +82,6 @@ ActiveRecord::Schema[7.0].define(version: 2023_01_27_165949) do
     t.integer "y1", null: false
     t.integer "y2", null: false
     t.string "type", null: false
-    t.string "tags", null: false, array: true
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.float "area"
@@ -90,6 +89,9 @@ ActiveRecord::Schema[7.0].define(version: 2023_01_27_165949) do
     t.float "meter_ratio"
     t.float "angle"
     t.integer "parent_id"
+    t.string "identifier"
+    t.float "width"
+    t.float "height"
     t.index ["page_id"], name: "index_figures_on_page_id"
   end
 
@@ -131,6 +133,14 @@ ActiveRecord::Schema[7.0].define(version: 2023_01_27_165949) do
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "page_texts", force: :cascade do |t|
+    t.bigint "page_id", null: false
+    t.string "text"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["page_id"], name: "index_page_texts_on_page_id"
   end
 
   create_table "pages", force: :cascade do |t|
@@ -213,6 +223,18 @@ ActiveRecord::Schema[7.0].define(version: 2023_01_27_165949) do
     t.index ["skeleton_id"], name: "index_taxonomies_on_skeleton_id"
   end
 
+  create_table "text_items", force: :cascade do |t|
+    t.bigint "page_id", null: false
+    t.string "text"
+    t.integer "x1"
+    t.integer "x2"
+    t.integer "y1"
+    t.integer "y2"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["page_id"], name: "index_text_items_on_page_id"
+  end
+
   create_table "y_haplogroups", force: :cascade do |t|
     t.string "name"
     t.datetime "created_at", null: false
@@ -221,8 +243,10 @@ ActiveRecord::Schema[7.0].define(version: 2023_01_27_165949) do
 
   add_foreign_key "figures", "pages", on_delete: :cascade
   add_foreign_key "genetics", "skeletons"
+  add_foreign_key "page_texts", "pages"
   add_foreign_key "pages", "images", on_delete: :cascade
   add_foreign_key "pages", "publications", on_delete: :cascade
   add_foreign_key "skeletons", "figures"
   add_foreign_key "stable_isotopes", "skeletons"
+  add_foreign_key "text_items", "pages"
 end

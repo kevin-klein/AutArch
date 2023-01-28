@@ -1,8 +1,8 @@
 class GraveAngles
 
   def run
-    Arrow.includes(figure: { page: :image }).find_each do |arrow|
-      image = ImageProcessing.extractFigure(arrow.figure, arrow.figure.page.image.data)
+    Arrow.includes({ page: :image }).find_each do |arrow|
+      image = ImageProcessing.extractFigure(arrow, arrow.page.image.data)
       contours = ImageProcessing.findContours(image)
 
       next if contours.empty?
