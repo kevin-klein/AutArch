@@ -67,6 +67,7 @@ export default function GraveView({id}) {
   if (error) return <p>Oh no... {error.message}</p>;
 
   const grave = data.grave;
+  console.log(grave.page.image);
 
   return (
     <div>

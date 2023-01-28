@@ -11,13 +11,13 @@ module Mutations
       db_skeleton = Skeleton.find(id)
 
       data = skeleton.to_h
-      data[:chronology_attributes] = data.delete(:chronology)
-      data[:stable_isotopes_attributes] = data.delete(:stable_isotopes)
-      data[:anthropology_attributes] = data.delete(:anthropology)
-      data[:taxonomy_attributes] = data.delete(:taxonomy)
-      data[:genetics_attributes] = data.delete(:genetics)
+      data[:chronology_attributes] = data.delete(:chronology) if data[:chronology].present?
+      data[:stable_isotopes_attributes] = data.delete(:stable_isotopes) if data[:stable_isotopes].present?
+      data[:anthropology_attributes] = data.delete(:anthropology) if data[:anthropology].present?
+      data[:taxonomy_attributes] = data.delete(:taxonomy) if data[:taxonomy].present?
+      data[:genetics_attributes] = data.delete(:genetics) if data[:genetics].present?
 
-      data[:chronology_attributes][:c14_dates_attributes] = data[:chronology_attributes].delete(:c14_dates)
+      data[:chronology_attributes][:c14_dates_attributes] = data[:chronology_attributes].delete(:c14_dates) if data[:chronology_attributes].present? && data[:chronology_attributes][:c14_dates].present?
 
       site = data.delete(:location)
 
