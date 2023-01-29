@@ -14,17 +14,23 @@
   <% end %>
 </svg>
 
-<table class='table'>
-  <thead>
-    <tr>
-      <th>Text</th>
-    </tr>
-  </thead>
-  <tbody>
-  <% @text_items.each do |text_item| %>
-    <tr>
-      <td><%= text_item.text %></td>
-    </tr>
-  <% end %>
-  </tbody>
-</table>
+<a class="btn btn-primary" data-bs-toggle="collapse" href="#<%= dom_id(@image) %>" role="button" aria-expanded="false" aria-controls="collapseExample">
+  Text Items Details
+</a>
+
+<div class="collapse" id="<%= dom_id(@image) %>">
+  <table class='table'>
+    <thead>
+      <tr>
+        <th>Text</th>
+      </tr>
+    </thead>
+    <tbody>
+    <% @text_items.each do |text_item| %>
+      <tr>
+        <td><%= text_item.text %></td>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+</div>

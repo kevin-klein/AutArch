@@ -3,7 +3,7 @@ class GravesController < ApplicationController
 
   # GET /graves or /graves.json
   def index
-    @graves = Grave.order(:id).all
+    @graves = Grave.includes(:scale, grave_cross_section: { grave: [:scale] }).order(:id).all
   end
 
   # GET /graves/1 or /graves/1.json

@@ -110,7 +110,6 @@ gem 'pkg-config'
 gem "shakapacker", "= 6.5"
 
 gem "react-rails", "= 2.6"
-gem "graphiql-rails", group: :development
 
 gem "rwordnet", "~> 2.0"
 
