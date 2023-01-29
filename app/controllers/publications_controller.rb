@@ -11,7 +11,7 @@ class PublicationsController < ApplicationController
   end
 
   def stats
-    @skeleton_per_grave_type = Grave.all.map { _1.skeletons.count }.tally
+    @skeleton_per_grave_type = Grave.all.map { _1.skeleton_figures.count }.tally
     @skeleton_angles = Spine.all
       .map { [_1.angle, _1.grave.arrow.angle] }
       .map { |spine_angle, arrow_angle| (spine_angle + arrow_angle) % 360 }
