@@ -4,7 +4,10 @@ class FixFigureTypes < ActiveRecord::Migration[7.0]
   end
 
   def up
-
+    Figure.find_each do |figure|
+      figure.type = figure.type.camelize.singularize
+      figure.save!
+    end
   end
 
   def down

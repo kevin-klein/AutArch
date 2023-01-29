@@ -67,8 +67,9 @@ class Grave < Figure
 
   def self.area_arc_stats
     Grave
-      .select { _1.area_with_unit[:unit] == 'm' }
-      .select { _1.area_with_unit[:value].round(1) > 0 }
+      .all
+      .filter { _1.area_with_unit[:unit] == 'm' }
+      .filter { _1.area_with_unit[:value].round(1) > 0 }
       .group_by { _1.area_with_unit[:value].round(1) }
       .map { |k, v| [k, v.count] }
   end
