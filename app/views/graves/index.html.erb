@@ -5,9 +5,8 @@
       <th>Area</th>
       <th>Perimeter</th>
       <th>Width</th>
-      <th>Height</th>
-      <th>Cross Section Width</th>
-      <th>Cross Section Height</th>
+      <th>Length</th><!-- longer -->
+      <th>Depth</th>
       <th></th>
     </tr>
   </thead>
@@ -20,7 +19,6 @@
         <td><%= number_with_unit grave.perimeter_with_unit %></td>
         <td><%= number_with_unit grave.width_with_unit %></td>
         <td><%= number_with_unit grave.height_with_unit %></td>
-        <td><%= number_with_unit grave.grave_cross_section&.width_with_unit %></td>
         <td><%= number_with_unit grave.grave_cross_section&.height_with_unit %></td>
         <td><%= link_to('Edit', edit_grave_path(grave)) %></td>
       </tr>

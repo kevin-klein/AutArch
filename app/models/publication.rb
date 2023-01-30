@@ -9,6 +9,7 @@
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #
+# TODO: add year
 class Publication < ApplicationRecord
   has_many :pages
   has_many :graves, through: :pages
