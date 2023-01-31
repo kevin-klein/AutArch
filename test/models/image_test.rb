@@ -9,7 +9,7 @@
 #  width      :integer
 #  height     :integer
 #
-require "test_helper"
+require 'test_helper'
 
 class ImageTest < ActiveSupport::TestCase
   # test "the truth" do

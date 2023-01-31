@@ -21,5 +21,4 @@
 #  height      :float
 #
 class SkeletonPhoto < Figure
-
 end

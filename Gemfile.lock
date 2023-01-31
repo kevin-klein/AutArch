@@ -1,4 +1,10 @@
 GIT
+  remote: https://github.com/SciRuby/rb-gsl.git
+  revision: 103a3e1941e220befd037e0f4289a82c551ae250
+  specs:
+    gsl (2.1.0.3)
+
+GIT
   remote: https://github.com/joshleblanc/view_component_reflex.git
   revision: c8c8a5d04da75ee829c45ed5e273a4a7ad8bd13d
   specs:
@@ -214,6 +220,8 @@ GEM
     parallel (1.21.0)
     parser (3.0.2.0)
       ast (~> 2.4.1)
+    pca (0.5.0)
+      gsl (~> 2.1)
     pdf-reader (2.11.0)
       Ascii85 (~> 1.0)
       afm (~> 0.2.1)
@@ -469,6 +477,7 @@ GEM
       unf_ext
     unf_ext (0.0.8.2)
     unicode-display_width (2.1.0)
+    victor (0.3.4)
     view_component (2.82.0)
       activesupport (>= 5.2.0, < 8.0)
       concurrent-ruby (~> 1.0)
@@ -509,6 +518,7 @@ DEPENDENCIES
   debug
   dotenv-rails (~> 2.8)
   graphql
+  gsl!
   http
   http-form_data
   importmap-rails
@@ -516,6 +526,7 @@ DEPENDENCIES
   matrix
   pagy (~> 6.0)
   parslet!
+  pca
   pdf-reader
   pg
   pkg-config
@@ -543,6 +554,7 @@ DEPENDENCIES
   torchvision
   turbo-rails
   tzinfo-data
+  victor
   view_component (~> 2.82)
   view_component_reflex!
   web-console

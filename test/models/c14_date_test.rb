@@ -5,8 +5,8 @@
 #  id                :bigint           not null, primary key
 #  c14_type          :integer          not null
 #  lab_id            :string
-#  age_bp            :integer          not null
-#  interval          :integer          not null
+#  age_bp            :integer
+#  interval          :integer
 #  material          :integer
 #  calbc_1_sigma_max :float
 #  calbc_1_sigma_min :float
@@ -20,7 +20,7 @@
 #  updated_at        :datetime         not null
 #  bone_id           :bigint
 #
-require "test_helper"
+require 'test_helper'
 
 class C14DateTest < ActiveSupport::TestCase
   # test "the truth" do

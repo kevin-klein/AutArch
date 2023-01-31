@@ -1,0 +1,30 @@
+# == Schema Information
+#
+# Table name: text_items
+#
+#  id         :bigint           not null, primary key
+#  page_id    :bigint           not null
+#  text       :string
+#  x1         :integer
+#  x2         :integer
+#  y1         :integer
+#  y2         :integer
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#
+
+one:
+  page: one
+  text: MyString
+  x1: 1
+  x2: 1
+  y1: 1
+  y2: 1
+
+two:
+  page: two
+  text: MyString
+  x1: 1
+  x2: 1
+  y1: 1
+  y2: 1

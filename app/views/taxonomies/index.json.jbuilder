@@ -1,1 +1,1 @@
-json.array! @taxonomies, partial: "taxonomies/taxonomy", as: :taxonomy
+json.array! @taxonomies, partial: 'taxonomies/taxonomy', as: :taxonomy

@@ -1,1 +1,1 @@
-json.partial! "genetics/genetic", genetic: @genetic
+json.partial! 'genetics/genetic', genetic: @genetic

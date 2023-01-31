@@ -1,1 +1,1 @@
-json.array! @chronologies, partial: "chronologies/chronology", as: :chronology
+json.array! @chronologies, partial: 'chronologies/chronology', as: :chronology

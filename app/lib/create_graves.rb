@@ -25,7 +25,7 @@ class CreateGraves
 
   def handle_grave(grave, figures)
     figures = convert_figures(figures) unless figures.is_a?(Hash)
-    non_grave_figures = figures.values.flatten.select { |figure| !figure.is_a?(Grave) }
+    non_grave_figures = figures.values.flatten.reject { |figure| figure.is_a?(Grave) }
 
     inside_grave = non_grave_figures.select { |figure| grave.collides?(figure) }
 

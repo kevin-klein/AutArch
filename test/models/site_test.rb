@@ -10,7 +10,7 @@
 #  country_code :integer
 #  site_code    :string
 #
-require "test_helper"
+require 'test_helper'
 
 class SiteTest < ActiveSupport::TestCase
   # test "the truth" do

@@ -5,7 +5,7 @@ namespace :import do
 
       # countries = CSV.read(Rails.root.join('assets', 'countries.csv').to_s, headers: true).map(&:to_h)
 
-      table = CSV.parse(File.read("filtered.csv"), headers: true)
+      table = CSV.parse(File.read('filtered.csv'), headers: true)
 
       # sites = table.map do |row|
       #   country_code = countries.filter { _1['name'] == row['Political Entity'] }.first&.[]('alpha-2')

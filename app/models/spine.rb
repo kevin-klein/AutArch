@@ -27,6 +27,21 @@ class Spine < Figure
     y_axis = Vector[0, 1]
     figure_vector = Vector[(x2 - x1).abs, (y1 - y2).abs].normalize
 
+    # 57.29578 = 1 radians
     figure_vector.angle_with(y_axis) * 57.29578
+  end
+
+  def angle_with_arrow(arrow) # rubocop:disable Metrics/AbcSize
+    angle = -arrow.angle % 360
+
+    # simplified rotation matrix for [0, -1] (y axis for images, grows downwards)
+    # becaue y axis points downwards, arrow has to point at -1
+    angle = (angle * Math::PI) / 180
+    x1 = -Math.sin(angle)
+    y1 = -Math.cos(angle)
+    angle = Math.atan2(vector.normalize[1], vector.normalize[0]) - Math.atan2(y1, x1)
+    angle = angle * 180 / Math::PI
+    angle += 360 if angle.negative?
+    angle
   end
 end

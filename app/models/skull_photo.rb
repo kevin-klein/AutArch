@@ -21,5 +21,4 @@
 #  height      :float
 #
 class SkullPhoto < Figure
-
 end

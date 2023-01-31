@@ -9,9 +9,9 @@ class FiguresReflex < ApplicationReflex
       x2: 200
     )
     figures = @grave.figures + [arrow]
-    ap figures
+    Rails.logger.debug figures
     html = render(partial: 'figures/figure_view', locals: { figures: figures, image: @grave.page.image })
     # html = 'some random text'
-    morph "#figure-view", html
+    morph '#figure-view', html
   end
 end

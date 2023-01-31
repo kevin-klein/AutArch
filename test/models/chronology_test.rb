@@ -11,7 +11,7 @@
 #  updated_at   :datetime         not null
 #  period_id    :bigint
 #
-require "test_helper"
+require 'test_helper'
 
 class ChronologyTest < ActiveSupport::TestCase
   # test "the truth" do
