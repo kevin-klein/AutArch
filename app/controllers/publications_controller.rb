@@ -14,8 +14,25 @@ class PublicationsController < ApplicationController
     @skeleton_angles = Spine.all
                             .map { [_1.angle, _1.grave.arrow.angle] }
                             .map { |spine_angle, arrow_angle| (spine_angle + arrow_angle) % 360 }
-                            .map { _1.round(-1) }
+                            .map { Math.sin(_1 * Math::PI / 180).round(2) }
                             .tally
+
+    pca = Rumale::Decomposition::PCA.new(n_components: 2)
+    @graves_pca = pca.fit_transform(
+      Spine.all.map do |spine|
+        grave = spine.grave
+        next if grave.grave_cross_section.nil?
+
+        [
+          grave.width_with_unit[:value],
+          grave.height_with_unit[:value],
+          grave.perimeter_with_unit[:value],
+          grave.area_with_unit[:value],
+          grave.grave_cross_section.height_with_unit[:value],
+          # Math.sin(((spine.angle + grave.arrow.angle) % 360) * Math::PI / 180)
+        ]
+      end.compact
+    ).to_a
   end
 
   # GET /publications/new
@@ -45,10 +62,8 @@ class PublicationsController < ApplicationController
         AnalyzePublicationJob.perform_later(@publication, site_id: publication_params[:site])
 
         format.html { redirect_to publications_path, notice: 'Publication was successfully created.' }
-        format.json { render :show, status: :created, location: @publication }
       else
         format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @publication.errors, status: :unprocessable_entity }
       end
     end
   end

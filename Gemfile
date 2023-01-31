@@ -77,6 +77,7 @@ gem 'csv'
 gem 'ruby-vips'
 gem 'torch-rb'
 gem 'torchvision'
+gem 'rumale'
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
