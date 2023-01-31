@@ -22,5 +22,4 @@
 #
 class Scale < Figure
   belongs_to :grave, foreign_key: 'parent_id', optional: true
-  # delete :page, to: :grave
 end

@@ -17,6 +17,22 @@ class PublicationsController < ApplicationController
       .map { |spine_angle, arrow_angle| (spine_angle + arrow_angle) % 360 }
       .map { _1.round(-1) }
       .tally
+
+    pca = Rumale::Decomposition::PCA.new(n_components: 2)
+    @graves_pca = pca.fit_transform(
+      Spine.all.map do |spine|
+        grave = spine.grave
+        next if grave.grave_cross_section.nil?
+        [
+          grave.width_with_unit[:value], 
+          grave.height_with_unit[:value], 
+          grave.perimeter_with_unit[:value], 
+          grave.area_with_unit[:value],
+          grave.grave_cross_section.height_with_unit[:value],
+          # Math.sin(((spine.angle + grave.arrow.angle) % 360) * Math::PI / 180)
+        ]
+      end.compact
+    ).to_a
   end
 
   # GET /publications/new
