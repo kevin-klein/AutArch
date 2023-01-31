@@ -47,21 +47,10 @@ Mat cropToFigure(VALUE figure, const Mat &image_mat) {
   long x1 = FIX2LONG(rb_funcall(figure, rb_intern("x1"), 0));
   long x2 = FIX2LONG(rb_funcall(figure, rb_intern("x2"), 0));
 
-  if (x1 < 0) {
-    x1 = 0;
-  }
-
-  if (y1 < 0) {
-    y1 = 0;
-  }
-
-  if (x2 < 0) {
-    x2 = 0;
-  }
-
-  if (y2 < 0) {
-    y2 = 0;
-  }
+  x1 = max(0L, x1);
+  y1 = max(0L, y1);
+  x2 = max(0L, x2);
+  y2 = max(0L, y2);
 
   Rect crop(x1, y1, x2 - x1, y2 - y1);
   return image_mat(crop);
@@ -91,11 +80,6 @@ VALUE convertMatToRubyString(const Mat &mat) {
 
 Mat extractContour(const Mat &image, vector<Point> contour) {
   Rect newImageSize = boundingRect(contour);
-
-  // Mat grayScale;
-  // cvtColor(image, grayScale, COLOR_BGR2GRAY);
-  // Mat invertedImage = Scalar(255) - grayScale;
-
   vector<vector<Point>> contourParam = {contour};
   Mat mask = Mat::zeros(image.rows, image.cols, CV_8UC1);
   fillPoly(mask, contourParam, Scalar(255));
@@ -364,12 +348,9 @@ extern "C" void Init_ext() {
   VALUE ImageProcessing = rb_define_module("ImageProcessing");
   rb_define_module_function(ImageProcessing, "getAngle", getAngle, 2);
   rb_define_module_function(ImageProcessing, "getGraveStats", getGraveStats, 2);
-    rb_define_module_function(ImageProcessing, "getCrossSectionStats", getCrossSectionStats, 2);
+  rb_define_module_function(ImageProcessing, "getCrossSectionStats", getCrossSectionStats, 2);
   rb_define_module_function(ImageProcessing, "extractFigure", rb_extractFigure, 2);
   rb_define_module_function(ImageProcessing, "findContours", rb_findContours, 1);
   rb_define_module_function(ImageProcessing, "minAreaRect", rb_minAreaRect, 1);
   rb_define_module_function(ImageProcessing, "imwrite", rb_imwrite, 2);
-
-  // VALUE TesseractAPI = rb_define_module("Tesseract");
-  // rb_define_module_function(TesseractAPI, "init", initTesseract, 0);
 }

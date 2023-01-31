@@ -54,7 +54,7 @@ function Box({onDraggingStart, active, figure: { id, x1, y1, x2, y2, type}}) {
     <circle
       onMouseDown={onMouseDown({ figure: { id, x1, x2, y1, y2 }, point: 1 })}
       className="moveable-point"
-      r='4'
+      r='10'
       cx={x1}
       cy={y1}
       stroke="black"
@@ -62,7 +62,7 @@ function Box({onDraggingStart, active, figure: { id, x1, y1, x2, y2, type}}) {
     <circle
       onMouseDown={onMouseDown({ figure: { id, x1, x2, y1, y2 }, point: 2 })}
       className="moveable-point"
-      r='4'
+      r='10'
       cx={x2}
       cy={y2}
       stroke="black"
