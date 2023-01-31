@@ -1,7 +1,7 @@
 <div class='row'>
     <div class='col-md-6' style='padding: 20px;'>
         <div class="card">
-            <%= pie_chart @skeleton_per_grave_type, class: 'card-img-top' %>
+            <%= pie_chart @skeleton_per_grave_type, xmin: 0, xmax: 400, class: 'card-img-top' %>
             <div class="card-body">
                 <h5 class="card-title">Number of Skeletons per Grave</h5>
                 <div class="card-text">
@@ -35,7 +35,7 @@
 
     <div class='col-md-6' style='padding: 20px;'>
         <div class="card">
-            <%= line_chart @skeleton_angles, class: 'card-img-top' %>
+            <%= scatter_chart @skeleton_angles, class: 'card-img-top' %>
             <div class="card-body">
                 <h5 class="card-title">Grave Orientation</h5>
                 <div class="card-text">
@@ -66,4 +66,6 @@
             </div>
         </div>
     </div>
+
+    <%= scatter_chart @graves_pca, class: 'card-img-top' %>
 </div>
