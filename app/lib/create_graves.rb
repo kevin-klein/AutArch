@@ -1,9 +1,4 @@
 class CreateGraves
-
-  def initialize
-
-  end
-
   def run
     Page.includes(:figures).find_each do |page|
       figures = convert_figures(page.figures)
@@ -29,7 +24,7 @@ class CreateGraves
   end
 
   def handle_grave(grave, figures)
-    figures = convert_figures(figures) if !figures.is_a?(Hash)
+    figures = convert_figures(figures) unless figures.is_a?(Hash)
     non_grave_figures = figures.values.flatten.select { |figure| !figure.is_a?(Grave) }
 
     inside_grave = non_grave_figures.select { |figure| grave.collides?(figure) }
@@ -51,7 +46,6 @@ class CreateGraves
     end
 
     find_closest_item(grave, figures['GraveCrossSection']) do |cross|
-
     end
 
     spines = inside_grave.select { |figure| figure.is_a?(Spine) }
@@ -62,14 +56,9 @@ class CreateGraves
   end
 
   def assign_grave_or_copy(figure, grave)
-    if figure.parent_id.present? && figure.parent_id != grave.id
-      figure = figure.dup
-      figure.grave = grave
-      figure.save!
-    else
-      figure.grave = grave
-      figure.save!
-    end
+    figure = figure.dup if figure.parent_id.present? && figure.parent_id != grave.id
+    figure.grave = grave
+    figure.save!
   end
 
   def find_closest_item(grave, figures)
@@ -85,12 +74,11 @@ class CreateGraves
     skeleton.save!
 
     skulls = figures['Skull']
-    if skulls.present?
-      skull_index = skulls.map { |figure| grave.distance_to(figure) }.each_with_index.min[1]
-      closest_skull = skulls[skull_index]
-      closest_skull.skeleton_figure = skeleton
-      closest_skull.save!
-    end
-  end
+    return unless skulls.empty?
 
+    skull_index = skulls.map { |figure| grave.distance_to(figure) }.each_with_index.min[1]
+    closest_skull = skulls[skull_index]
+    closest_skull.skeleton_figure = skeleton
+    closest_skull.save!
+  end
 end
