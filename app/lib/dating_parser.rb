@@ -1,24 +1,23 @@
 class DatingParser < Parslet::Parser
-
-  def fallback_parse(s)
+  def fallback_parse(text) # rubocop:disable Metrics/MethodLength
     if s.include?('calBCE')
-      bps = s.scan(/([0-9]+)±([0-9]+)BP[\;|\,]?([a-zA-Z0-9\-\/\. \;]*)/)
+      bps = s.scan(%r{([0-9]+)±([0-9]+)BP[;|,]?([a-zA-Z0-9\-/. ;]*)})
       {
         c14: {
-          notes: s,
+          notes: text,
           c14_details: {
             combine: bps.map do |bp_number, uncertainty, labcode|
               {
-                bp_number:,
-                uncertainty:,
-                labcode:
+                bp_number: bp_number,
+                uncertainty: uncertainty,
+                labcode: labcode
               }
             end
           }
         }
       }
     else
-      match_data = s.match(/([0-9]+)\-([0-9]+)/)
+      match_data = text.match(/([0-9]+)-([0-9]+)/)
       {
         context: {
           from: match_data[1],
@@ -28,15 +27,14 @@ class DatingParser < Parslet::Parser
     end
   end
 
-  def self.parse(s)
+  def self.parse(text)
     parser = DatingParser.new
-    s = s.gsub(' ', '')
-    ap s
-    parser.parse(s)
-  rescue Parslet::ParseFailed => failure
-    puts failure.parse_failure_cause.ascii_tree
+    text = text.gsub(' ', '')
+    parser.parse(text)
+  rescue Parslet::ParseFailed => e
+    Rails.logger.debug e.parse_failure_cause.ascii_tree
     # raise failure
-    ap parser.fallback_parse(s)
+    Rails.logger.debug parser.fallback_parse(s)
   end
   root :date
 
@@ -55,7 +53,10 @@ class DatingParser < Parslet::Parser
   end
 
   rule :labcode do
-    match('[a-zA-Z0-9\-\/\. \;]').repeat(1).as(:labcode) >> (str(',') >> (str('marinecalibrated').as(:marine_calibrated) | match('[a-zA-Z0-9\-]').repeat(1).as(:note))).repeat >> mp.maybe
+    match('[a-zA-Z0-9\-\/\. \;]').repeat(1).as(:labcode) >>
+      (str(',') >>
+        (str('marinecalibrated').as(:marine_calibrated) | match('[a-zA-Z0-9\-]').repeat(1).as(:note))).repeat >>
+      mp.maybe
   end
 
   rule :mp do
@@ -83,7 +84,7 @@ class DatingParser < Parslet::Parser
   end
 
   rule :r_combine do
-    str('R_combine') >> str(':') >> (c14_range >> (str(';')|str(','))).repeat(1) >> c14_range
+    str('R_combine') >> str(':') >> (c14_range >> (str(';') | str(','))).repeat(1) >> c14_range
   end
 
   rule :context_date do

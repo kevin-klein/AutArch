@@ -1,5 +1,5 @@
 class PublicationsController < ApplicationController
-  before_action :set_publication, only: %i[ show edit update destroy ]
+  before_action :set_publication, only: %i[show edit update destroy]
 
   # GET /publications or /publications.json
   def index
@@ -7,16 +7,15 @@ class PublicationsController < ApplicationController
   end
 
   # GET /publications/1 or /publications/1.json
-  def show
-  end
+  def show; end
 
   def stats
     @skeleton_per_grave_type = Grave.all.map { _1.skeleton_figures.count }.tally
     @skeleton_angles = Spine.all
-      .map { [_1.angle, _1.grave.arrow.angle] }
-      .map { |spine_angle, arrow_angle| (spine_angle + arrow_angle) % 360 }
-      .map { _1.round(-1) }
-      .tally
+                            .map { [_1.angle, _1.grave.arrow.angle] }
+                            .map { |spine_angle, arrow_angle| (spine_angle + arrow_angle) % 360 }
+                            .map { _1.round(-1) }
+                            .tally
   end
 
   # GET /publications/new
@@ -25,8 +24,7 @@ class PublicationsController < ApplicationController
   end
 
   # GET /publications/1/edit
-  def edit
-  end
+  def edit; end
 
   def analyze
     @publication = Publication.find(params[:id])
@@ -37,16 +35,16 @@ class PublicationsController < ApplicationController
   # POST /publications or /publications.json
   def create
     @publication = Publication.new({
-      author: publication_params[:author],
-      title: publication_params[:title],
-      pdf: publication_params[:pdf].read
-    })
+                                     author: publication_params[:author],
+                                     title: publication_params[:title],
+                                     pdf: publication_params[:pdf].read
+                                   })
 
     respond_to do |format|
       if @publication.save
         AnalyzePublicationJob.perform_later(@publication, site_id: publication_params[:site])
 
-        format.html { redirect_to publications_path, notice: "Publication was successfully created." }
+        format.html { redirect_to publications_path, notice: 'Publication was successfully created.' }
         format.json { render :show, status: :created, location: @publication }
       else
         format.html { render :new, status: :unprocessable_entity }
@@ -59,7 +57,7 @@ class PublicationsController < ApplicationController
   def update
     respond_to do |format|
       if @publication.update(publication_params)
-        format.html { redirect_to publication_url(@publication), notice: "Publication was successfully updated." }
+        format.html { redirect_to publication_url(@publication), notice: 'Publication was successfully updated.' }
         format.json { render :show, status: :ok, location: @publication }
       else
         format.html { render :edit, status: :unprocessable_entity }
@@ -73,19 +71,20 @@ class PublicationsController < ApplicationController
     @publication.destroy
 
     respond_to do |format|
-      format.html { redirect_to publications_url, notice: "Publication was successfully destroyed." }
+      format.html { redirect_to publications_url, notice: 'Publication was successfully destroyed.' }
       format.json { head :no_content }
     end
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_publication
-      @publication = Publication.select(:title, :author, :id).includes(pages: [:image]).find(params[:id])
-    end
 
-    # Only allow a list of trusted parameters through.
-    def publication_params
-      params.require(:publication).permit(:pdf, :author, :title, :site)
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_publication
+    @publication = Publication.select(:title, :author, :id).includes(pages: [:image]).find(params[:id])
+  end
+
+  # Only allow a list of trusted parameters through.
+  def publication_params
+    params.require(:publication).permit(:pdf, :author, :title, :site)
+  end
 end

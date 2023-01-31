@@ -1,0 +1,11 @@
+require: rubocop-rails
+
+Style/Documentation:
+  Enabled: false
+
+Layout/EndOfLine:
+  Enabled: false
+
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
