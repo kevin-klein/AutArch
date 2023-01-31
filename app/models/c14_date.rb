@@ -33,11 +33,11 @@ class C14Date < ApplicationRecord
     human_bone: 1,
     lpp: 2,
     charcoal: 3,
-    animal_bone: 4,
+    animal_bone: 4
   }
 
   enum cal_method: {
     oxcal_4_2_2: 1,
-    int_cal_20: 2,
+    int_cal_20: 2
   }
 end

@@ -24,12 +24,16 @@ class Figure < ApplicationRecord
   belongs_to :page
   extend UnitAccessor
 
-  def width
+  def box_width
     x2 - x1
   end
 
-  def height
+  def box_height
     y2 - y1
+  end
+
+  def vector
+    Vector[box_width, box_height]
   end
 
   def center
@@ -41,17 +45,17 @@ class Figure < ApplicationRecord
 
   def contains?(figure)
     figure.x1.between?(x1, x2) &&
-    figure.x2.between?(x1, x2) &&
-    figure.y1.between?(y1, y2) &&
-    figure.y2.between?(y1, y2)
+      figure.x2.between?(x1, x2) &&
+      figure.y1.between?(y1, y2) &&
+      figure.y2.between?(y1, y2)
   end
 
   def collides?(figure)
     (
-      x1 < figure.x1 + figure.width &&
-      x1 + width > figure.x1 &&
-      y1 < figure.y1 + figure.height &&
-      y1 + height > figure.y1
+      x1 < figure.x1 + figure.box_width &&
+      x1 + box_width > figure.x1 &&
+      y1 < figure.y1 + figure.box_height &&
+      y1 + box_height > figure.y1
     )
   end
 
@@ -59,8 +63,8 @@ class Figure < ApplicationRecord
     center1 = center
     center2 = figure.center
 
-    item1 = (center1[:x] - center2[:x]) ** 2
-    item2 = (center1[:y] - center2[:y]) ** 2
+    item1 = (center1[:x] - center2[:x])**2
+    item2 = (center1[:y] - center2[:y])**2
 
     Math.sqrt(item1 + item2)
   end

@@ -1,18 +1,26 @@
 # == Schema Information
 #
-# Table name: graves
+# Table name: figures
 #
-#  id         :bigint           not null, primary key
-#  location   :string
-#  figure_id  :integer          not null
-#  site_id    :integer
-#  created_at :datetime         not null
-#  updated_at :datetime         not null
-#  arc_length :float
-#  area       :float
-#  kurgan_id  :bigint
+#  id          :bigint           not null, primary key
+#  page_id     :bigint           not null
+#  x1          :integer          not null
+#  x2          :integer          not null
+#  y1          :integer          not null
+#  y2          :integer          not null
+#  type        :string           not null
+#  created_at  :datetime         not null
+#  updated_at  :datetime         not null
+#  area        :float
+#  perimeter   :float
+#  meter_ratio :float
+#  angle       :float
+#  parent_id   :integer
+#  identifier  :string
+#  width       :float
+#  height      :float
 #
-require "test_helper"
+require 'test_helper'
 
 class GraveTest < ActiveSupport::TestCase
   # test "the truth" do

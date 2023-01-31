@@ -1,5 +1,5 @@
 class PageImagesController < ApplicationController
-  before_action :set_page_image, only: %i[ show edit update destroy ]
+  before_action :set_page_image, only: %i[show edit update destroy]
 
   # GET /page_images or /page_images.json
   def index
@@ -7,8 +7,7 @@ class PageImagesController < ApplicationController
   end
 
   # GET /page_images/1 or /page_images/1.json
-  def show
-  end
+  def show; end
 
   # GET /page_images/new
   def new
@@ -16,8 +15,7 @@ class PageImagesController < ApplicationController
   end
 
   # GET /page_images/1/edit
-  def edit
-  end
+  def edit; end
 
   # POST /page_images or /page_images.json
   def create
@@ -25,7 +23,7 @@ class PageImagesController < ApplicationController
 
     respond_to do |format|
       if @page_image.save
-        format.html { redirect_to page_image_url(@page_image), notice: "Page image was successfully created." }
+        format.html { redirect_to page_image_url(@page_image), notice: 'Page image was successfully created.' }
         format.json { render :show, status: :created, location: @page_image }
       else
         format.html { render :new, status: :unprocessable_entity }
@@ -38,7 +36,7 @@ class PageImagesController < ApplicationController
   def update
     respond_to do |format|
       if @page_image.update(page_image_params)
-        format.html { redirect_to page_image_url(@page_image), notice: "Page image was successfully updated." }
+        format.html { redirect_to page_image_url(@page_image), notice: 'Page image was successfully updated.' }
         format.json { render :show, status: :ok, location: @page_image }
       else
         format.html { render :edit, status: :unprocessable_entity }
@@ -52,19 +50,20 @@ class PageImagesController < ApplicationController
     @page_image.destroy
 
     respond_to do |format|
-      format.html { redirect_to page_images_url, notice: "Page image was successfully destroyed." }
+      format.html { redirect_to page_images_url, notice: 'Page image was successfully destroyed.' }
       format.json { head :no_content }
     end
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_page_image
-      @page_image = PageImage.find(params[:id])
-    end
 
-    # Only allow a list of trusted parameters through.
-    def page_image_params
-      params.require(:page_image).permit(:page_id, :data)
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_page_image
+    @page_image = PageImage.find(params[:id])
+  end
+
+  # Only allow a list of trusted parameters through.
+  def page_image_params
+    params.require(:page_image).permit(:page_id, :data)
+  end
 end

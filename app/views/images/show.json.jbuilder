@@ -1,1 +1,1 @@
-json.partial! "images/image", image: @image
+json.partial! 'images/image', image: @image

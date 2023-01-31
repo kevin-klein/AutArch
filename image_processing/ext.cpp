@@ -2,7 +2,6 @@
 #include <cstdint>
 #include <opencv2/opencv.hpp>
 #include <ruby.h>
-// #include <tesseract/baseapi.h>
 
 using namespace cv;
 using namespace std;
@@ -78,32 +77,6 @@ VALUE convertMatToRubyString(const Mat &mat) {
   return rb_str_new(image_string.c_str(), image_string.size());
 }
 
-Mat extractContour(const Mat &image, vector<Point> contour) {
-  Rect newImageSize = boundingRect(contour);
-  vector<vector<Point>> contourParam = {contour};
-  Mat mask = Mat::zeros(image.rows, image.cols, CV_8UC1);
-  fillPoly(mask, contourParam, Scalar(255));
-
-  Mat result;
-
-  bitwise_and(image, mask, result);
-  // imwrite("inverted.jpg", invertedImage);
-
-  Mat croppedImage = result(newImageSize);
-
-  return croppedImage;
-}
-
-double average(std::vector<uint32_t> &vi) {
-  double sum = 0;
-
-  for (int p : vi) {
-    sum = sum + p;
-  }
-
-  return (sum / vi.size());
-}
-
 extern "C" VALUE getCrossSectionStats(VALUE self, VALUE figure, VALUE image_value) {
   Mat image_mat = convertRubyStringToMat(image_value);
   Mat arrow_image = cropToFigure(figure, image_mat);
@@ -135,17 +108,17 @@ extern "C" VALUE getCrossSectionStats(VALUE self, VALUE figure, VALUE image_valu
 
 extern "C" VALUE getGraveStats(VALUE self, VALUE figure, VALUE image_value) {
   Mat image_mat = convertRubyStringToMat(image_value);
-  Mat arrow_image = cropToFigure(figure, image_mat);
-  Mat graveImage = arrow_image;
+  Mat figure_image = cropToFigure(figure, image_mat);
+  Mat graveImage = figure_image;
 
-  cvtColor(arrow_image, arrow_image, COLOR_BGR2GRAY);
-  arrow_image = Scalar(255) - arrow_image;
+  cvtColor(figure_image, figure_image, COLOR_BGR2GRAY);
+  figure_image = Scalar(255) - figure_image;
 
-  threshold(arrow_image, arrow_image, 40, 255, THRESH_BINARY);
+  threshold(figure_image, figure_image, 40, 255, THRESH_BINARY);
 
   vector<vector<Point>> contours;
   vector<Vec4i> hierarchy;
-  findContours(arrow_image, contours, hierarchy, RETR_EXTERNAL,
+  findContours(figure_image, contours, hierarchy, RETR_EXTERNAL,
                CHAIN_APPROX_SIMPLE);
 
   if (contours.size() == 0) {
@@ -157,110 +130,28 @@ extern "C" VALUE getGraveStats(VALUE self, VALUE figure, VALUE image_value) {
   double arc = arcLength(contour, true);
   double area = contourArea(contour);
 
-  vector<vector<Point>> contourInput = {contour};
-  drawContours(graveImage, contourInput, -1, Scalar(0, 0, 255), 3);
-  imwrite("grave.jpg", graveImage);
-
   RotatedRect boundingRectangle = minAreaRect(contour);
   Size2f size = boundingRectangle.size;
 
+  // cv::Point2f vertices2f[4];
+  // boundingRectangle.points(vertices2f);
+
+  // for (int i = 0; i < 4; i++)
+  //   line(graveImage, vertices2f[i], vertices2f[(i+1)%4], Scalar(0, 0, 255), 2);
+
+  // imwrite("grave.jpg", graveImage);
+
   VALUE result = rb_hash_new();
   rb_hash_aset(result, ID2SYM(rb_intern("area")), DBL2NUM(area));
-  rb_hash_aset(result, ID2SYM(rb_intern("arc")), DBL2NUM(arc));
+  rb_hash_aset(result, ID2SYM(rb_intern("perimeter")), DBL2NUM(arc));
 
-  if(size.width > size.height) {
-    rb_hash_aset(result, ID2SYM(rb_intern("width")), DBL2NUM(size.width));
-    rb_hash_aset(result, ID2SYM(rb_intern("height")), DBL2NUM(size.height));
-  }
-  else {
-    rb_hash_aset(result, ID2SYM(rb_intern("width")), DBL2NUM(size.height));
-    rb_hash_aset(result, ID2SYM(rb_intern("height")), DBL2NUM(size.width));
-  }
-
-
+  rb_hash_aset(result, ID2SYM(rb_intern("width")), DBL2NUM(min(size.width, size.height)));
+  rb_hash_aset(result, ID2SYM(rb_intern("length")), DBL2NUM(max(size.width, size.height)));
   return result;
 }
 
-void findArrowTip(vector<Point> points, vector<Point> convexHull) {
-  uint32_t length = points.size();
-}
-
-double getLength(const Point &p1, const Point &p2) {
-  return pow(p1.x - p2.x, 2) + pow(p1.y - p2.y, 0.5);
-}
-
-vector<Point> getMaxDistanceArrowPoint(const vector<Point> &contour) {
-  double maxDistance = 0;
-  vector<Point> maxPoints;
-
-  for (Point p1 : contour) {
-    for (Point p2 : contour) {
-      double distance = getLength(p1, p2);
-
-      if (distance > maxDistance) {
-        maxDistance = distance;
-        maxPoints = {p1, p2};
-      }
-    }
-  }
-
-  return maxPoints;
-}
-
-extern "C" VALUE getAngle(VALUE self, VALUE figure, VALUE image_value) {
-  Mat image_mat = convertRubyStringToMat(image_value);
-  Mat arrow_image = cropToFigure(figure, image_mat);
-
-  cvtColor(arrow_image, arrow_image, COLOR_BGR2GRAY);
-  arrow_image = Scalar(255) - arrow_image;
-
-  threshold(arrow_image, arrow_image, 40, 255, THRESH_BINARY);
-
-  vector<vector<Point>> contours;
-  vector<Vec4i> hierarchy;
-  findContours(arrow_image, contours, hierarchy, RETR_TREE,
-               CHAIN_APPROX_SIMPLE);
-
-  if (hierarchy.size() > 0) {
-    auto thresholdDistance = 1000;
-
-    vector<Point> hull;
-    std::vector<Vec4i> defects;
-
-    for (size_t i = 0; i < contours.size(); i++) {
-      convexHull(contours[i], hull, false);
-
-      convexityDefects(contours[i], hull, defects);
-      cout << defects.size() << endl;
-
-      for (Vec4i defect : defects) {
-        int distance = defect[3];
-
-        if (distance > thresholdDistance) {
-          // vector<Point> points = getMaxDistanceArrowPoint(contour[i]);
-          // double angle =
-        }
-      }
-    }
-  }
-
-  return 0;
-}
-
-// tesseract::TessBaseAPI *api = new tesseract::TessBaseAPI();
-//
-// VALUE initTesseract(VALUE self) {
-//   if (api->Init(NULL, "eng")) {
-//     fprintf(stderr, "Could not initialize tesseract.\n");
-//     exit(1);
-//   }
-//
-//   return Qnil;
-// }
-
 template<typename T>
 VALUE convert_to_ruby(T) {
-  // static_assert(false, NAMEOF_TYPE(T));
   return Qnil;
 }
 
@@ -325,7 +216,6 @@ extern "C" VALUE rb_minAreaRect(VALUE self, VALUE rb_contour) {
 
 
   RotatedRect rect = minAreaRect(contour);
-  // return LONG2FIX(rect.boundingRect().width);
 
   return convert_to_ruby(rect.boundingRect());
 }
@@ -346,7 +236,6 @@ extern "C" VALUE rb_imwrite(VALUE self, VALUE filename, VALUE rb_mat) {
 
 extern "C" void Init_ext() {
   VALUE ImageProcessing = rb_define_module("ImageProcessing");
-  rb_define_module_function(ImageProcessing, "getAngle", getAngle, 2);
   rb_define_module_function(ImageProcessing, "getGraveStats", getGraveStats, 2);
   rb_define_module_function(ImageProcessing, "getCrossSectionStats", getCrossSectionStats, 2);
   rb_define_module_function(ImageProcessing, "extractFigure", rb_extractFigure, 2);

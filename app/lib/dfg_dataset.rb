@@ -1,4 +1,5 @@
-class DfgDataset # < Torch::Utils::Data::Dataset
+# < Torch::Utils::Data::Dataset
+class DfgDataset
   # include TorchVision::Transforms
 
   def initialize(folder, dataset: 'train.txt')
@@ -45,7 +46,6 @@ class DfgDataset # < Torch::Utils::Data::Dataset
     image = load_image(file_name)
 
     annotations = load_annotations(file_name)
-
 
     labels = []
     boxes = []

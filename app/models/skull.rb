@@ -21,5 +21,5 @@
 #  height      :float
 #
 class Skull < Figure
-  belongs_to :skeleton_figure, foreign_key: 'parent_id', optional: true
+  belongs_to :grave, foreign_key: 'parent_id', optional: true, inverse_of: :skulls
 end

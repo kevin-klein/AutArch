@@ -21,5 +21,4 @@
 #  height      :float
 #
 class Artefact < Figure
-
 end

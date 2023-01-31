@@ -1,1 +1,1 @@
-json.partial! "publications/publication", publication: @publication
+json.partial! 'publications/publication', publication: @publication

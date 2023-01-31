@@ -1,5 +1,5 @@
 class CulturesController < ApplicationController
-  before_action :set_culture, only: %i[ show edit update destroy ]
+  before_action :set_culture, only: %i[show edit update destroy]
 
   # GET /cultures or /cultures.json
   def index
@@ -7,8 +7,7 @@ class CulturesController < ApplicationController
   end
 
   # GET /cultures/1 or /cultures/1.json
-  def show
-  end
+  def show; end
 
   # GET /cultures/new
   def new
@@ -16,8 +15,7 @@ class CulturesController < ApplicationController
   end
 
   # GET /cultures/1/edit
-  def edit
-  end
+  def edit; end
 
   # POST /cultures or /cultures.json
   def create
@@ -25,7 +23,7 @@ class CulturesController < ApplicationController
 
     respond_to do |format|
       if @culture.save
-        format.html { redirect_to culture_url(@culture), notice: "Culture was successfully created." }
+        format.html { redirect_to culture_url(@culture), notice: 'Culture was successfully created.' }
         format.json { render :show, status: :created, location: @culture }
       else
         format.html { render :new, status: :unprocessable_entity }
@@ -38,7 +36,7 @@ class CulturesController < ApplicationController
   def update
     respond_to do |format|
       if @culture.update(culture_params)
-        format.html { redirect_to culture_url(@culture), notice: "Culture was successfully updated." }
+        format.html { redirect_to culture_url(@culture), notice: 'Culture was successfully updated.' }
         format.json { render :show, status: :ok, location: @culture }
       else
         format.html { render :edit, status: :unprocessable_entity }
@@ -52,19 +50,20 @@ class CulturesController < ApplicationController
     @culture.destroy
 
     respond_to do |format|
-      format.html { redirect_to cultures_url, notice: "Culture was successfully destroyed." }
+      format.html { redirect_to cultures_url, notice: 'Culture was successfully destroyed.' }
       format.json { head :no_content }
     end
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_culture
-      @culture = Culture.find(params[:id])
-    end
 
-    # Only allow a list of trusted parameters through.
-    def culture_params
-      params.require(:culture).permit(:name)
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_culture
+    @culture = Culture.find(params[:id])
+  end
+
+  # Only allow a list of trusted parameters through.
+  def culture_params
+    params.require(:culture).permit(:name)
+  end
 end

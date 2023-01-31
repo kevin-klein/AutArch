@@ -42,6 +42,6 @@ class Anthropology < ApplicationRecord
   enum age_class: {
     neonate: 1,
     child: 2,
-    young_adult: 3,
+    young_adult: 3
   }, _prefix: true
 end

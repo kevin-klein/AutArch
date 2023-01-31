@@ -9,3 +9,5 @@ Layout/EndOfLine:
 Style/FrozenStringLiteralComment:
   Enabled: false
 
+AllCops:
+  NewCops: enable

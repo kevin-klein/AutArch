@@ -15,8 +15,8 @@ class SkeletonsController < ApplicationController
       @skeleton = Skeleton.find(params[:id])
 
       if @skeleton.update(skeleton_params)
-        format.html { redirect_to edit_skeleton_path(@skeleton), notice: "Stable isotope was successfully updated." }
-    else
+        format.html { redirect_to edit_skeleton_path(@skeleton), notice: 'Stable isotope was successfully updated.' }
+      else
         format.html { render :edit, status: :unprocessable_entity }
       end
     end
@@ -24,9 +24,9 @@ class SkeletonsController < ApplicationController
 
   def skeleton_params
     params.require(:skeleton).permit(
-      chronology: [
-        :context_from,
-        :context_to,
+      chronology: %i[
+        context_from
+        context_to
       ]
     )
   end

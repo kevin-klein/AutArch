@@ -13,8 +13,9 @@
 #  skeleton_id      :bigint
 #  created_at       :datetime         not null
 #  updated_at       :datetime         not null
+#  species          :integer
 #
-require "test_helper"
+require 'test_helper'
 
 class AnthropologyTest < ActiveSupport::TestCase
   # test "the truth" do

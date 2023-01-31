@@ -13,7 +13,7 @@
 #  y_haplogroup_id  :bigint
 #  bone_id          :bigint
 #
-require "test_helper"
+require 'test_helper'
 
 class GeneticTest < ActiveSupport::TestCase
   # test "the truth" do

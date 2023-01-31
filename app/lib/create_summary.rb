@@ -27,11 +27,11 @@ class CreateSummary
   def frequency(text, frequencies)
     text = text.gsub(/[^0-9a-z ]/i, '')
     text = text
-           .split(' ')
+           .split
 
     text
       .filter! do
-        _1.length > 4 && !COMMON_TERMS.include?(_1)
+        _1.length > 4 && COMMON_TERMS.exclude?(_1)
       end
 
     text.tally(frequencies)

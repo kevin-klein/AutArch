@@ -21,5 +21,4 @@
 #  height      :float
 #
 class Oxcal < Figure
-
 end

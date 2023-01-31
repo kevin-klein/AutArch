@@ -119,8 +119,6 @@ export default function BoxEditor({grave, sites, image, page}) {
   const token =
       document.querySelector('[name=csrf-token]').content;
 
-  const angle = Math.abs(360 - arrowAngle);
-
   function currentEditBoxActiveClass(figure) {
     if(figure.id === currentEditBox) {
       return ' active';
@@ -256,7 +254,7 @@ export default function BoxEditor({grave, sites, image, page}) {
 
     arrowView = (<svg width="512" height="200" viewBox={`${arrow.x1} ${arrow.y1} ${arrow.x2 - arrow.x1} ${arrow.y2 - arrow.y1}`}>
       <image width={image.width} height={image.height} href={image.href} />
-      <g transform={`rotate(${angle} ${arrowCenterX} ${arrowCenterY}) translate(${arrowCenterX - 100} ${arrowCenterY - 80})`} stroke="blue" shapeRendering="geometricPrecision">
+      <g transform={`rotate(${arrowAngle} ${arrowCenterX} ${arrowCenterY}) translate(${arrowCenterX - 100} ${arrowCenterY - 80})`} stroke="blue" shapeRendering="geometricPrecision">
         <line x1="100" y1="20" x2="100" y2="150" />
         <line x1="100" x2="110" y1="20" y2="40" />
         <line x1="100" x2="90" y1="20" y2="40" />

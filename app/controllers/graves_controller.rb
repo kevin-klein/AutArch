@@ -1,5 +1,5 @@
 class GravesController < ApplicationController
-  before_action :set_grave, only: %i[ show edit update destroy ]
+  before_action :set_grave, only: %i[show edit update destroy]
 
   # GET /graves or /graves.json
   def index
@@ -7,12 +7,9 @@ class GravesController < ApplicationController
   end
 
   # GET /graves/1 or /graves/1.json
-  def show
-  end
+  def show; end
 
-  def stats
-
-  end
+  def stats; end
 
   # GET /graves/new
   def new
@@ -20,8 +17,7 @@ class GravesController < ApplicationController
   end
 
   # GET /graves/1/edit
-  def edit
-  end
+  def edit; end
 
   # POST /graves or /graves.json
   def create
@@ -29,7 +25,7 @@ class GravesController < ApplicationController
 
     respond_to do |format|
       if @grave.save
-        format.html { redirect_to grafe_url(@grafe), notice: "Grave was successfully created." }
+        format.html { redirect_to grafe_url(@grafe), notice: 'Grave was successfully created.' }
         format.json { render :show, status: :created, location: @grafe }
       else
         format.html { render :new, status: :unprocessable_entity }
@@ -104,19 +100,20 @@ class GravesController < ApplicationController
     @grave.destroy
 
     respond_to do |format|
-      format.html { redirect_to graves_url, notice: "Grave was successfully destroyed." }
+      format.html { redirect_to graves_url, notice: 'Grave was successfully destroyed.' }
       format.json { head :no_content }
     end
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_grave
-      @grave = Grave.find(params[:id])
-    end
 
-    # Only allow a list of trusted parameters through.
-    def grave_params
-      params.require(:grave).permit(:arrowAngle, :site_id, figures: [:id, :type_name, :x1, :x2, :y1, :y2])
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_grave
+    @grave = Grave.find(params[:id])
+  end
+
+  # Only allow a list of trusted parameters through.
+  def grave_params
+    params.require(:grave).permit(:arrowAngle, :site_id, figures: %i[id type_name x1 x2 y1 y2])
+  end
 end

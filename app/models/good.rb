@@ -38,8 +38,8 @@ class Good < Figure
 
     return [] if grave.meter_pixel.nil?
 
-    x = x / grave.meter_pixel
-    y = y / grave.meter_pixel
+    x /= grave.meter_pixel
+    y /= grave.meter_pixel
 
     grave_width, grave_height = grave.width_height
 
