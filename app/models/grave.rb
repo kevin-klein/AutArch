@@ -21,23 +21,26 @@
 #  height      :float
 #
 class Grave < Figure
-  belongs_to :site, required: false
-  has_one :scale, dependent: :destroy, foreign_key: 'parent_id', class_name: 'Scale'
-  has_one :arrow, dependent: :destroy, foreign_key: 'parent_id', class_name: 'Arrow'
-  has_one :grave_cross_section, dependent: :destroy, foreign_key: 'parent_id', class_name: 'GraveCrossSection'
-  has_many :goods, dependent: :destroy, foreign_key: 'parent_id', class_name: 'Good'
-  has_many :spines, dependent: :destroy, foreign_key: 'parent_id', class_name: 'Spine'
-  has_one :cross_section_arrow, dependent: :destroy, foreign_key: 'parent_id', class_name: 'CrossSectionArrow'
-  has_many :skeleton_figures, dependent: :destroy, foreign_key: 'parent_id', class_name: 'SkeletonFigure'
-  has_many :skulls, through: :skeleton_figures, foreign_key: 'parent_id', class_name: 'Skull'
-  has_many :spines, dependent: :destroy, foreign_key: 'parent_id', class_name: 'Spine'
+  belongs_to :site, optional: true
+  has_one :scale, dependent: :destroy, foreign_key: 'parent_id', class_name: 'Scale', inverse_of: :grave
+  has_one :arrow, dependent: :destroy, foreign_key: 'parent_id', class_name: 'Arrow', inverse_of: :grave
+  has_one :grave_cross_section, dependent: :destroy, foreign_key: 'parent_id', class_name: 'GraveCrossSection',
+                                inverse_of: :grave
+  has_many :goods, dependent: :destroy, foreign_key: 'parent_id', class_name: 'Good', inverse_of: :grave
+  has_many :spines, dependent: :destroy, foreign_key: 'parent_id', class_name: 'Spine', inverse_of: :grave
+  has_one :cross_section_arrow, dependent: :destroy, foreign_key: 'parent_id', class_name: 'CrossSectionArrow',
+                                inverse_of: :grave
+  has_many :skeleton_figures, dependent: :destroy, foreign_key: 'parent_id', class_name: 'SkeletonFigure',
+                              inverse_of: :grave
+  has_many :skulls, through: :skeleton_figures, foreign_key: 'parent_id', class_name: 'Skull', inverse_of: :grave
+  has_many :spines, dependent: :destroy, foreign_key: 'parent_id', class_name: 'Spine', inverse_of: :grave
 
   def upwards?
     width < height
   end
 
   def width_height
-    return [] unless scale.present?
+    return [] if scale.blank?
 
     if upwards?
       [height / meter_pixel, width / meter_pixel]
@@ -69,7 +72,7 @@ class Grave < Figure
     Grave
       .all
       .filter { _1.area_with_unit[:unit] == 'm' }
-      .filter { _1.area_with_unit[:value].round(1) > 0 }
+      .filter { _1.area_with_unit[:value].round(1).positive? }
       .group_by { _1.area_with_unit[:value].round(1) }
       .map { |k, v| [k, v.count] }
   end

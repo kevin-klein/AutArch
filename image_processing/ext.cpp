@@ -120,106 +120,6 @@ double average(std::vector<uint32_t> &vi) {
   return (sum / vi.size());
 }
 
-vector<vector<Point>> findGraves(Mat image, vector<vector<Point>> contours) {
-  vector<vector<Point>> graves;
-  int imageSize = image.rows * image.cols;
-
-  static int index = 0;
-  for (vector<Point> contour : contours) {
-    // cout << "Contour: " << index << endl;
-
-    double area = contourArea(contour);
-    if (area / imageSize > 0.01) {
-      Mat part = extractContour(image, contour);
-      // part = Scalar(255) - part;
-      // threshold(part, part, 0, 40, THRESH_BINARY);
-
-      // vector<vector<Point>> partContour;
-      // vector<Vec4i> hierarchy;
-      // findContours(part, partContour, hierarchy, RETR_EXTERNAL,
-      //              CHAIN_APPROX_SIMPLE);
-
-      vector<Point> poly;
-      approxPolyDP(Mat(contour), poly, 3, true);
-      // // Mat output = part.clone();
-      // Mat output = Mat::zeros(part.rows, part.cols, part.type());
-      //
-      // vector<uint32_t> angles(partContour.size());
-
-      // for (size_t i = 2; i < poly.size(); i++) {
-      //   auto p1 = contour[i - 2];
-      //   auto p2 = contour[i - 1];
-      //   auto p3 = contour[i];
-      //
-      //   double x1 = p1.x - p2.x;
-      //   double y1 = p1.y - p2.y;
-      //   Vector2i vector1(static_cast<int>(x1), static_cast<int>(y1));
-      //
-      //   double x2 = p2.x - p3.x;
-      //   double y2 = p2.y - p3.y;
-      //   Vector2i vector2(static_cast<int>(x2), static_cast<int>(y2));
-      //
-      //   uint32_t vectorAngle = angle(vector1, vector2);
-      //   angles.push_back(vectorAngle);
-      //   // cout << "x1: " << x1 << ", y1: " << y1 << ", x2: " << x2
-      //   //      << ", y2: " << y2 << endl;
-      //   // std::cout << vectorAngle << endl;
-      // }
-
-      // int zero = countNonZero(part);
-      //
-      //
-      // vector<vector<Point>> contourInput = {poly};
-      // drawContours(output, contourInput, -1, Scalar(255, 0, 0), 3);
-
-      // double relation = arcLength(poly, true) / area;
-
-      // if (relation > 0.1 && relation < 0.6) {
-      imwrite("pdfs/contours/contour_" + std::to_string(index) + ".jpg", part);
-      // }
-    }
-    index++;
-  }
-
-  return graves;
-}
-
-extern "C" VALUE analyzePage(VALUE self, VALUE image_value) {
-  Mat base_image = convertRubyStringToMat(image_value);
-
-  Mat image_mat;
-  cvtColor(base_image, image_mat, COLOR_BGR2GRAY);
-  image_mat = Scalar(255) - image_mat;
-  Mat grayScale;
-  threshold(image_mat, grayScale, 40, 255, THRESH_BINARY);
-
-  // int morphSize = 1;
-  // Mat element = getStructuringElement(
-  //     MORPH_RECT, Size(2 * morphSize + 1, 2 * morphSize + 1),
-  //     Point(morphSize, morphSize));
-  // morphologyEx(image_mat, image_mat, MORPH_CLOSE, element, Point(-1, -1), 2);
-  // morphologyEx(image_mat, image_mat, MORPH_OPEN, element, Point(-1, -1), 2);
-
-  // int dilation_size = 1;
-  // Mat element = getStructuringElement(
-  //     MORPH_ELLIPSE, Size(2 * dilation_size + 1, 2 * dilation_size + 1),
-  //     Point(dilation_size, dilation_size));
-  // dilate(image_mat, image_mat, element);
-
-  vector<vector<Point>> contours;
-  vector<Vec4i> hierarchy;
-  findContours(grayScale, contours, hierarchy, RETR_EXTERNAL,
-               CHAIN_APPROX_SIMPLE);
-
-  // drawContours(base_image, contours, -1, Scalar(255, 0, 0), 2);
-
-  vector<vector<Point>> graves = findGraves(image_mat, contours);
-
-  // imwrite("page.jpg", base_image);
-
-  return LONG2FIX(contours.size());
-}
-
 extern "C" VALUE getCrossSectionStats(VALUE self, VALUE figure, VALUE image_value) {
   Mat image_mat = convertRubyStringToMat(image_value);
   Mat arrow_image = cropToFigure(figure, image_mat);
@@ -252,6 +152,7 @@ extern "C" VALUE getCrossSectionStats(VALUE self, VALUE figure, VALUE image_valu
 extern "C" VALUE getGraveStats(VALUE self, VALUE figure, VALUE image_value) {
   Mat image_mat = convertRubyStringToMat(image_value);
   Mat arrow_image = cropToFigure(figure, image_mat);
+  Mat graveImage = arrow_image;
 
   cvtColor(arrow_image, arrow_image, COLOR_BGR2GRAY);
   arrow_image = Scalar(255) - arrow_image;
@@ -272,14 +173,26 @@ extern "C" VALUE getGraveStats(VALUE self, VALUE figure, VALUE image_value) {
   double arc = arcLength(contour, true);
   double area = contourArea(contour);
 
+  vector<vector<Point>> contourInput = {contour};
+  drawContours(graveImage, contourInput, -1, Scalar(0, 0, 255), 3);
+  imwrite("grave.jpg", graveImage);
+
   RotatedRect boundingRectangle = minAreaRect(contour);
   Size2f size = boundingRectangle.size;
 
   VALUE result = rb_hash_new();
   rb_hash_aset(result, ID2SYM(rb_intern("area")), DBL2NUM(area));
   rb_hash_aset(result, ID2SYM(rb_intern("arc")), DBL2NUM(arc));
-  rb_hash_aset(result, ID2SYM(rb_intern("width")), DBL2NUM(size.width));
-  rb_hash_aset(result, ID2SYM(rb_intern("height")), DBL2NUM(size.height));
+
+  if(size.width > size.height) {
+    rb_hash_aset(result, ID2SYM(rb_intern("width")), DBL2NUM(size.width));
+    rb_hash_aset(result, ID2SYM(rb_intern("height")), DBL2NUM(size.height));
+  }
+  else {
+    rb_hash_aset(result, ID2SYM(rb_intern("width")), DBL2NUM(size.height));
+    rb_hash_aset(result, ID2SYM(rb_intern("height")), DBL2NUM(size.width));
+  }
+
 
   return result;
 }
@@ -347,63 +260,6 @@ extern "C" VALUE getAngle(VALUE self, VALUE figure, VALUE image_value) {
     }
   }
 
-  // if (contours.size() == 0) {
-  //   std::cout << "contour is empty" << endl;
-  //   return Qnil;
-  // }
-  //
-  // auto contour = findBestArrowContour(contours);
-  //
-  // Moments ms = moments(contour);
-  //
-  // Point2f center(ms.m10 / (ms.m00 + 1e-5), ms.m01 / (ms.m00 + 1e-5));
-  //
-  // std::vector<float> line;
-  //
-  // fitLine(contour, line, DIST_L2, 0, 0.01, 0.01);
-  //
-  // Mat yAxis({1, 2}, {0.0f, 1.0f});
-  // Mat centerLine({1, 2}, {line[0], line[1]});
-  //
-  // double dotProduct = yAxis.dot(centerLine);
-  //
-  // double angleToY = acos(dotProduct);
-  //
-  // RotatedRect box = minAreaRect(contour);
-  // vector<Point2f> boxPts(4);
-  // box.points(boxPts.data());
-  //
-  // Point2f bottomLeft = boxPts[0];
-  // Point2f topLeft = boxPts[1];
-  // Point2f topRight = boxPts[2];
-  // Point2f bottomRight = boxPts[3];
-  //
-  // Point2f topCenter = (topLeft + topRight) / 2;
-  // Point2f leftCenter = (bottomLeft + topLeft) / 2;
-  // Point2f bottomCenter = (bottomLeft + bottomRight) / 2;
-  // Point2f rightCenter = (bottomRight + topRight) / 2;
-  //
-  // double topCenterDistance = norm(center - topCenter);
-  // double leftCenterDistance = norm(center - leftCenter);
-  // double rightCenterDistance = norm(center - rightCenter);
-  // double bottomCenterDistance = norm(center - bottomCenter);
-  //
-  // int angle = static_cast<int>(angleToY * (180.0 / 3.141592653589793238463));
-  // angle = LONG2FIX(angle);
-  //
-  // if (angle >= 270 && leftCenterDistance > rightCenterDistance) {
-  //   angle = (angle + 180) % 360;
-  // } else if (angle >= 180 && angle <= 270 &&
-  //            bottomCenterDistance > topCenterDistance) {
-  //   angle = (angle + 180) % 360;
-  // } else if (angle >= 90 && angle <= 180 &&
-  //            rightCenterDistance > leftCenterDistance) {
-  //   angle = (angle + 180) % 360;
-  // } else if (topCenterDistance > bottomCenterDistance) {
-  //   angle = (angle + 180) % 360;
-  // }
-
-  // return angle;
   return 0;
 }
 
@@ -509,7 +365,6 @@ extern "C" void Init_ext() {
   rb_define_module_function(ImageProcessing, "getAngle", getAngle, 2);
   rb_define_module_function(ImageProcessing, "getGraveStats", getGraveStats, 2);
     rb_define_module_function(ImageProcessing, "getCrossSectionStats", getCrossSectionStats, 2);
-  rb_define_module_function(ImageProcessing, "analyzePage", analyzePage, 1);
   rb_define_module_function(ImageProcessing, "extractFigure", rb_extractFigure, 2);
   rb_define_module_function(ImageProcessing, "findContours", rb_findContours, 1);
   rb_define_module_function(ImageProcessing, "minAreaRect", rb_minAreaRect, 1);
