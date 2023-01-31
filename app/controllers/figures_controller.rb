@@ -1,5 +1,5 @@
 class FiguresController < ApplicationController
-  before_action :set_figure, only: %i[ show edit update destroy ]
+  before_action :set_figure, only: %i[show edit update destroy]
 
   # GET /figures or /figures.json
   def index
@@ -7,8 +7,7 @@ class FiguresController < ApplicationController
   end
 
   # GET /figures/1 or /figures/1.json
-  def show
-  end
+  def show; end
 
   # GET /figures/new
   def new
@@ -16,8 +15,7 @@ class FiguresController < ApplicationController
   end
 
   # GET /figures/1/edit
-  def edit
-  end
+  def edit; end
 
   # POST /figures or /figures.json
   def create
@@ -25,7 +23,7 @@ class FiguresController < ApplicationController
 
     respond_to do |format|
       if @figure.save
-        format.html { redirect_to figure_url(@figure), notice: "Figure was successfully created." }
+        format.html { redirect_to figure_url(@figure), notice: 'Figure was successfully created.' }
         format.json { render json: @figure }
       else
         format.html { render :new, status: :unprocessable_entity }
@@ -38,7 +36,7 @@ class FiguresController < ApplicationController
   def update
     respond_to do |format|
       if @figure.update(figure_params)
-        format.html { redirect_to figure_url(@figure), notice: "Figure was successfully updated." }
+        format.html { redirect_to figure_url(@figure), notice: 'Figure was successfully updated.' }
         format.json { render :show, status: :ok, location: @figure }
       else
         format.html { render :edit, status: :unprocessable_entity }
@@ -52,19 +50,20 @@ class FiguresController < ApplicationController
     @figure.destroy
 
     respond_to do |format|
-      format.html { redirect_to figures_url, notice: "Figure was successfully destroyed." }
+      format.html { redirect_to figures_url, notice: 'Figure was successfully destroyed.' }
       format.json { head :no_content }
     end
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_figure
-      @figure = Figure.find(params[:id])
-    end
 
-    # Only allow a list of trusted parameters through.
-    def figure_params
-      params.require(:figure).permit(:parent_id, :angle, :page_id, :x1, :x2, :y1, :y2, :page_id, :type)
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_figure
+    @figure = Figure.find(params[:id])
+  end
+
+  # Only allow a list of trusted parameters through.
+  def figure_params
+    params.require(:figure).permit(:parent_id, :angle, :page_id, :x1, :x2, :y1, :y2, :page_id, :type)
+  end
 end

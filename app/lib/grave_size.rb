@@ -1,12 +1,14 @@
 class GraveSize
   def run
-    Figure.includes({ page: :image }).find_each do |figure|
-      next if figure.is_a?(Spine)
+    Figure.transaction do
+      Figure.includes({ page: :image }).find_each do |figure|
+        next if figure.is_a?(Spine)
 
-      if figure.is_a?(GraveCrossSection)
-        handle_cross_section(figure)
-      else
-        handle_figure(figure)
+        if figure.is_a?(GraveCrossSection)
+          handle_cross_section(figure)
+        else
+          handle_figure(figure)
+        end
       end
     end
   end
@@ -21,10 +23,10 @@ class GraveSize
   def handle_figure(figure)
     stats = ImageProcessing.getGraveStats(figure, figure.page.image.data)
     figure.assign_attributes(
-      perimeter: stats[:arc],
+      perimeter: stats[:perimeter],
       area: stats[:area],
       width: stats[:width],
-      height: stats[:height]
+      height: stats[:length]
     )
     figure.save!
   end

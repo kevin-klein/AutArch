@@ -13,7 +13,7 @@
 #  updated_at  :datetime         not null
 #  bone_id     :bigint
 #
-require "test_helper"
+require 'test_helper'
 
 class StableIsotopeTest < ActiveSupport::TestCase
   # test "the truth" do

@@ -1,1 +1,1 @@
-json.array! @cultures, partial: "cultures/culture", as: :culture
+json.array! @cultures, partial: 'cultures/culture', as: :culture

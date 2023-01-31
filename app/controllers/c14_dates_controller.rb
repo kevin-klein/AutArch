@@ -1,5 +1,5 @@
 class C14DatesController < ApplicationController
-  before_action :set_c14_date, only: %i[ show edit update destroy ]
+  before_action :set_c14_date, only: %i[show edit update destroy]
 
   # GET /c14_dates or /c14_dates.json
   def index
@@ -7,8 +7,7 @@ class C14DatesController < ApplicationController
   end
 
   # GET /c14_dates/1 or /c14_dates/1.json
-  def show
-  end
+  def show; end
 
   # GET /c14_dates/new
   def new
@@ -16,8 +15,7 @@ class C14DatesController < ApplicationController
   end
 
   # GET /c14_dates/1/edit
-  def edit
-  end
+  def edit; end
 
   # POST /c14_dates or /c14_dates.json
   def create
@@ -25,7 +23,7 @@ class C14DatesController < ApplicationController
 
     respond_to do |format|
       if @c14_date.save
-        format.html { redirect_to c14_date_url(@c14_date), notice: "C14 date was successfully created." }
+        format.html { redirect_to c14_date_url(@c14_date), notice: 'C14 date was successfully created.' }
         format.json { render :show, status: :created, location: @c14_date }
       else
         format.html { render :new, status: :unprocessable_entity }
@@ -38,7 +36,7 @@ class C14DatesController < ApplicationController
   def update
     respond_to do |format|
       if @c14_date.update(c14_date_params)
-        format.html { redirect_to c14_date_url(@c14_date), notice: "C14 date was successfully updated." }
+        format.html { redirect_to c14_date_url(@c14_date), notice: 'C14 date was successfully updated.' }
         format.json { render :show, status: :ok, location: @c14_date }
       else
         format.html { render :edit, status: :unprocessable_entity }
@@ -52,19 +50,21 @@ class C14DatesController < ApplicationController
     @c14_date.destroy
 
     respond_to do |format|
-      format.html { redirect_to c14_dates_url, notice: "C14 date was successfully destroyed." }
+      format.html { redirect_to c14_dates_url, notice: 'C14 date was successfully destroyed.' }
       format.json { head :no_content }
     end
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_c14_date
-      @c14_date = C14Date.find(params[:id])
-    end
 
-    # Only allow a list of trusted parameters through.
-    def c14_date_params
-      params.require(:c14_date).permit(:c14_type, :lab_id, :age_bp, :interval, :material, :calbc_1sigma_max, :calbc_1_sigma_min, :calbc_2sigma_max, :calbc_2sigma_min, :date_note, :cal_method, :ref_14c)
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_c14_date
+    @c14_date = C14Date.find(params[:id])
+  end
+
+  # Only allow a list of trusted parameters through.
+  def c14_date_params
+    params.require(:c14_date).permit(:c14_type, :lab_id, :age_bp, :interval, :material, :calbc_1sigma_max,
+                                     :calbc_1_sigma_min, :calbc_2sigma_max, :calbc_2sigma_min, :date_note, :cal_method, :ref_14c)
+  end
 end

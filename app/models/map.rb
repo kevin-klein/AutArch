@@ -21,5 +21,4 @@
 #  height      :float
 #
 class Map < Figure
-
 end

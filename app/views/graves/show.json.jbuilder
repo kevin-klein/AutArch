@@ -1,1 +1,1 @@
-json.partial! "graves/grafe", grafe: @grafe
+json.partial! 'graves/grafe', grafe: @grafe

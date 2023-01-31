@@ -12,24 +12,28 @@ class PublicationsController < ApplicationController
   def stats
     @skeleton_per_grave_type = Grave.all.map { _1.skeleton_figures.count }.tally
     @skeleton_angles = Spine.all
-                            .map { [_1.angle, _1.grave.arrow.angle] }
-                            .map { |spine_angle, arrow_angle| (spine_angle + arrow_angle) % 360 }
-                            .map { Math.sin(_1 * Math::PI / 180).round(2) }
+                            .map { [_1, _1.grave.arrow] }
+                            .map { |spine, arrow| spine.angle_with_arrow(arrow) }
+                            # .map { Math.sin(_1 * Math::PI / 180).round(2) }
+                            .map { _1.round(-1) }
                             .tally
 
-    pca = Rumale::Decomposition::PCA.new(n_components: 2)
+    pca = PCA.new(n_components: 2, scale_data: true)
     @graves_pca = pca.fit_transform(
       Spine.all.map do |spine|
         grave = spine.grave
         next if grave.grave_cross_section.nil?
+
+        spine_angle = (spine.angle + grave.arrow.angle) % 360
+        spine_angle /= 2
 
         [
           grave.width_with_unit[:value],
           grave.height_with_unit[:value],
           grave.perimeter_with_unit[:value],
           grave.area_with_unit[:value],
-          grave.grave_cross_section.height_with_unit[:value],
-          # Math.sin(((spine.angle + grave.arrow.angle) % 360) * Math::PI / 180)
+          grave.grave_cross_section.height_with_unit[:value]
+          # Math.sin(spine_angle * Math::PI / 180).abs
         ]
       end.compact
     ).to_a
