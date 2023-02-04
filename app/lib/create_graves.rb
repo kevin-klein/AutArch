@@ -1,6 +1,8 @@
 class CreateGraves
-  def run
-    Page.includes(:figures).find_each do |page|
+  def run(pages = nil)
+    pages ||= Page.includes(:figures)
+
+    pages.each do |page|
       figures = convert_figures(page.figures)
 
       grave_figures = figures['Grave']
@@ -23,7 +25,7 @@ class CreateGraves
     result
   end
 
-  def handle_grave(grave, figures)
+  def handle_grave(grave, figures) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
     figures = convert_figures(figures) unless figures.is_a?(Hash)
     non_grave_figures = figures.values.flatten.reject { |figure| figure.is_a?(Grave) }
 
@@ -38,7 +40,7 @@ class CreateGraves
     end
 
     skeletons = inside_grave.select { |figure| figure.is_a?(SkeletonFigure) }
-    skeletons.each { |skeleton| handle_skeleton(skeleton, grave, figures) }
+    skeletons.each { |skeleton| handle_skeleton(skeleton, grave) }
 
     goods = inside_grave.select { |figure| figure.is_a?(Good) }
     goods.each do |good|
@@ -46,12 +48,19 @@ class CreateGraves
     end
 
     find_closest_item(grave, figures['GraveCrossSection']) do |cross|
+      assign_grave_or_copy(cross, grave)
     end
 
     spines = inside_grave.select { |figure| figure.is_a?(Spine) }
     spines.each do |spine|
       spine.grave = grave
       spine.save!
+    end
+
+    skulls = inside_grave.select { |figure| figure.is_a?(Skull) }
+    skulls.each do |skull|
+      skull.grave = grave
+      skull.save!
     end
   end
 
@@ -69,16 +78,8 @@ class CreateGraves
     yield closest_figure
   end
 
-  def handle_skeleton(skeleton, grave, figures)
+  def handle_skeleton(skeleton, grave)
     skeleton.grave = grave
     skeleton.save!
-
-    skulls = figures['Skull']
-    return unless skulls.empty?
-
-    skull_index = skulls.map { |figure| grave.distance_to(figure) }.each_with_index.min[1]
-    closest_skull = skulls[skull_index]
-    closest_skull.skeleton_figure = skeleton
-    closest_skull.save!
   end
 end

@@ -19,6 +19,7 @@
 #  identifier  :string
 #  width       :float
 #  height      :float
+#  text        :string
 #
 class Skull < Figure
   belongs_to :grave, foreign_key: 'parent_id', optional: true, inverse_of: :skulls

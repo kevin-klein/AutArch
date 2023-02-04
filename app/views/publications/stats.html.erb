@@ -1,4 +1,88 @@
 <div class='row'>
+
+    <div class='col-md-12' style='padding: 20px;'>
+        <div class='card'>
+            <div class='card-body'>
+                <div class='card-title'>Compare to other Graves</div>
+                <div class='card-text'>
+                    <%= simple_form_for :compare, url: publication_stats_path(@publication), method: "GET", html: { class: 'form-inline' } do |f| %>
+                        <div class='row'>
+                            <%= f.input :publication_id, collection: Publication.where.not(id: @publication.id).pluck(:title, :id), as: :check_boxes, checked: params.dig(:compare, :publication_id) %>
+                        </div>
+                        <%= f.input :special_mark_graves, as: :text, input_html: { value: params.dig(:compare, :special_mark_graves) } %>
+                        <%= f.submit "Search", class: "btn btn-primary" %>
+                    <% end %>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class='col-md-6' style='padding: 20px;'>
+        <div class="card">
+            <%== Charts::AngledLinesRadarChart.new(@grave_angles, html_class: 'card-img-top').render %>
+            <div class="card-body">
+                <h5 class="card-title">Grave Orientation by Bounding Boxes</h5>
+                <div class="card-text">
+                    <table class='table'>
+                        <thead>
+                            <tr>
+                                <th>Angle (group by 10 degree)</th>
+                                <th>N</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <% @grave_angles.map { _1.round(-1) }.tally.to_a.sort_by { _1[0] }.each do |angle, count| %>
+                                <tr>
+                                    <td>
+                                        <%= angle %>
+                                    </td>
+
+                                    <td>
+                                        <%= count %>
+                                    </td>
+                                </tr>
+                            <% end %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class='col-md-6' style='padding: 20px;'>
+        <div class="card">
+            <%== Charts::ClusterRadarChart.new(@skeleton_angles).render %>
+            <div class="card-body">
+                <h5 class="card-title">Grave Orientation by Skeletons (30 degree groups)</h5>
+                <div class="card-text">
+                    <table class='table'>
+                        <thead>
+                            <tr>
+                                <th>Angle (grouped by 30 degree)</th>
+                                <th>N</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <% @skeleton_angles.sort_by { _1[0] }.each do |skeletons, count| %>
+                                <tr>
+                                    <td>
+                                        <%= skeletons %>
+                                    </td>
+
+                                    <td>
+                                        <%= count %>
+                                    </td>
+                                </tr>
+                            <% end %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class='col-md-6' style='padding: 20px;'>
         <div class="card">
             <%= pie_chart @skeleton_per_grave_type, class: 'card-img-top' %>
@@ -28,45 +112,31 @@
                         </tbody>
                     </table>
                 </div>
-                <a href="#" class="btn btn-primary">Go somewhere</a>
             </div>
         </div>
     </div>
 
-    <div class='col-md-6' style='padding: 20px;'>
+    <div class='col-md-12' style='padding: 20px;'>
         <div class="card">
-            <%= scatter_chart @skeleton_angles, xmin: -1.5, xmax: 1.5, class: 'card-img-top' %>
+            <div class='p-5'>
+                <%== Charts::ScatterChart.new(@graves_pca, html_class: 'card-img-top', link_proc: Proc.new { |item| edit_grave_path(item[:id]) }).render %>
+            </div>
             <div class="card-body">
-                <h5 class="card-title">Grave Orientation</h5>
+                <h5 class="card-title">Grave PCA (width, depth, length, perimeter, area)</h5>
                 <div class="card-text">
                     <table class='table'>
-                        <thead>
-                            <tr>
-                                <th>Angle (degree)</th>
-                                <th>N</th>
-                            </tr>
-                        </thead>
-
                         <tbody>
-                            <% @skeleton_angles.each do |skeletons, count| %>
+                            <% @pca.explained_variance_ratio.to_a.each_with_index do |variance_ratio, index| %>
                                 <tr>
-                                    <td>
-                                        <%= skeletons %>
-                                    </td>
-
-                                    <td>
-                                        <%= count %>
-                                    </td>
+                                    <td>PCA <%= index + 1 %></td>
+                                    <td><%= (variance_ratio * 100).round %>%</td>
                                 </tr>
                             <% end %>
                         </tbody>
                     </table>
                 </div>
-                <a href="#" class="btn btn-primary">Go somewhere</a>
             </div>
         </div>
     </div>
 
-    <%= scatter_chart @graves_pca, class: 'card-img-top' %>
-    <%== render('radar', color: 'red', data: @skeleton_angles) %>
 </div>

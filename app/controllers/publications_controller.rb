@@ -1,42 +1,24 @@
 class PublicationsController < ApplicationController
-  before_action :set_publication, only: %i[show edit update destroy]
+  before_action :set_publication, only: %i[show edit update destroy stats]
 
   # GET /publications or /publications.json
   def index
-    @publications = Publication.all
+    @publications = Publication.select(:id, :title, :author, :year).all
   end
 
   # GET /publications/1 or /publications/1.json
-  def show; end
+  def show
+    @publication
+  end
 
   def stats
-    @skeleton_per_grave_type = Grave.all.map { _1.skeleton_figures.count }.tally
-    @skeleton_angles = Spine.all
-                            .map { [_1, _1.grave.arrow] }
-                            .map { |spine, arrow| spine.angle_with_arrow(arrow) }
-                            # .map { Math.sin(_1 * Math::PI / 180).round(2) }
-                            .map { _1.round(-1) }
-                            .tally
-
-    pca = PCA.new(n_components: 2, scale_data: true)
-    @graves_pca = pca.fit_transform(
-      Spine.all.map do |spine|
-        grave = spine.grave
-        next if grave.grave_cross_section.nil?
-
-        spine_angle = (spine.angle + grave.arrow.angle) % 360
-        spine_angle /= 2
-
-        [
-          grave.width_with_unit[:value],
-          grave.height_with_unit[:value],
-          grave.perimeter_with_unit[:value],
-          grave.area_with_unit[:value],
-          grave.grave_cross_section.height_with_unit[:value]
-          # Math.sin(spine_angle * Math::PI / 180).abs
-        ]
-      end.compact
-    ).to_a
+    graves = @publication.figures.where(type: 'Grave')
+    @skeleton_per_grave_type = graves.includes(:skeleton_figures).map { _1.skeleton_figures.length }.tally
+    @skeleton_angles = Stats.spine_angles(@publication.figures.where(type: 'Spine').includes(grave: :arrow))
+    @grave_angles = Stats.grave_angles(graves.includes(:arrow))
+    set_compare_graves
+    @graves_pca, @pca = Stats.graves_pca(@publication, *@other_publications,
+                                         special_objects: params.dig(:compare, :special_mark_graves)&.split("\n")&.map(&:to_i) || [])
   end
 
   # GET /publications/new
@@ -54,7 +36,7 @@ class PublicationsController < ApplicationController
   end
 
   # POST /publications or /publications.json
-  def create
+  def create # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
     @publication = Publication.new({
                                      author: publication_params[:author],
                                      title: publication_params[:title],
@@ -76,7 +58,7 @@ class PublicationsController < ApplicationController
   def update
     respond_to do |format|
       if @publication.update(publication_params)
-        format.html { redirect_to publication_url(@publication), notice: 'Publication was successfully updated.' }
+        format.html { redirect_to publications_path, notice: 'Publication was successfully updated.' }
         format.json { render :show, status: :ok, location: @publication }
       else
         format.html { render :edit, status: :unprocessable_entity }
@@ -99,11 +81,20 @@ class PublicationsController < ApplicationController
 
   # Use callbacks to share common setup or constraints between actions.
   def set_publication
-    @publication = Publication.select(:title, :author, :id).includes(pages: [:image]).find(params[:id])
+    @publication = Publication
+                   .select(:title, :author, :id, :year)
+                   .find(params[:id] || params[:publication_id])
+  end
+
+  def set_compare_graves
+    @other_publications = params
+                          .dig(:compare, :publication_id)
+      &.map { Publication.find(_1) if _1.present? }
+                          &.compact
   end
 
   # Only allow a list of trusted parameters through.
   def publication_params
-    params.require(:publication).permit(:pdf, :author, :title, :site)
+    params.require(:publication).permit(:pdf, :author, :title, :site, :year)
   end
 end

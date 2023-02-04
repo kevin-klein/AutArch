@@ -10,9 +10,6 @@ application.register('application', ApplicationController);
 import ExampleController from './example_controller';
 application.register('example', ExampleController);
 
-import FigureController from './figure_controller';
-application.register('figure', FigureController);
-
 import StimulusReflex from 'stimulus_reflex';
 import consumer from 'channels/consumer';
 import controller from './application_controller';

@@ -19,6 +19,7 @@
 #  identifier  :string
 #  width       :float
 #  height      :float
+#  text        :string
 #
 class Oxcal < Figure
 end

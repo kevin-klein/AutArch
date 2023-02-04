@@ -21,5 +21,5 @@
 #  height      :float
 #  text        :string
 #
-class Kurgan < Figure
+class ShaftAxe < Figure
 end

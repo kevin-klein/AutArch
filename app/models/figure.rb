@@ -19,10 +19,11 @@
 #  identifier  :string
 #  width       :float
 #  height      :float
+#  text        :string
 #
 class Figure < ApplicationRecord
   belongs_to :page
-  extend UnitAccessor
+  include UnitAccessor
 
   def box_width
     x2 - x1
