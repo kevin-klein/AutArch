@@ -19,7 +19,11 @@
 #  identifier  :string
 #  width       :float
 #  height      :float
+#  text        :string
 #
 class Scale < Figure
-  belongs_to :grave, foreign_key: 'parent_id', optional: true
+  belongs_to :grave, foreign_key: 'parent_id', optional: true, inverse_of: :scale
+  before_save do
+    self.meter_ratio = (text.to_i / 100.0) / width if width&.positive? && text.present?
+  end
 end

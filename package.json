@@ -18,17 +18,13 @@
     "compression-webpack-plugin": "9",
     "css-loader": "^6.7.3",
     "css-minimizer-webpack-plugin": "^4.2.2",
-    "graphql": "^16.6.0",
-    "graphql-hooks": "^6.1.0",
-    "interactjs": "^1.10.17",
     "jquery": "^3.6.3",
     "leaflet": "^1.9.3",
+    "loading-attribute-polyfill": "^2.1.0",
     "mini-css-extract-plugin": "^2.7.2",
     "prop-types": "^15.8.1",
     "react": "^18.2.0",
-    "react-bootstrap": "^2.7.0",
     "react-dom": "^18.2.0",
-    "react-hook-form": "^7.42.1",
     "react-leaflet": "^4.2.0",
     "react-select": "^5.7.0",
     "react_ujs": "^2.6.2",
@@ -43,8 +39,7 @@
     "webpack-assets-manifest": "5",
     "webpack-cli": "4",
     "webpack-dev-server": "^4.11.1",
-    "webpack-merge": "5",
-    "wouter": "^2.10.0-alpha.4"
+    "webpack-merge": "5"
   },
   "version": "0.1.0",
   "babel": {

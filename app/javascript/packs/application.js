@@ -1,4 +1,5 @@
-// Support component names relative to this directory:
+import loadingAttributePolyfill from "loading-attribute-polyfill/dist/loading-attribute-polyfill.module.js";
+
 import 'chartkick/chart.js';
 import bootstrap from 'bootstrap';
 import StimulusReflex from 'stimulus_reflex';

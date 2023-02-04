@@ -19,6 +19,7 @@
 #  identifier  :string
 #  width       :float
 #  height      :float
+#  text        :string
 #
 class Grave < Figure
   belongs_to :site, optional: true
@@ -49,24 +50,6 @@ class Grave < Figure
       angle = Math.atan2(spine.vector[1], spine.vector[0]) - Math.atan2(x1_points[1], x1_points[0])
       angle += Math::PI
       angle * 180 / Math::PI
-
-      ## angle = (arrow.angle * Math::PI) / 180
-
-      # spine_matrix1 = Matrix[[spine.x1, spine.y1]]
-      # spine_matrix2 = Matrix[[spine.x2, spine.y2]]
-      # rotation_matrix = Matrix[[Math.cos(angle), Math.sin(angle)], [-Math.sin(angle), Math.cos(angle)]]
-
-      # x1_points = spine_matrix1 * rotation_matrix
-      # x2_points = spine_matrix2 * rotation_matrix
-
-      # ap x1_points
-
-      # figure_vector = x2_points - x1_points
-      # ap figure_vector
-      # figure_vector = figure_vector.row(0)
-      # y_axis = Vector[[1, 0]]
-
-      # Math.atan2(v2.y, v2.x) - atan2(v1.y, v1.x)
     end
   end
 

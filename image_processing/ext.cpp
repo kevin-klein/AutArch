@@ -100,8 +100,8 @@ extern "C" VALUE getCrossSectionStats(VALUE self, VALUE figure, VALUE image_valu
 
   Rect rect = boundingRect(contour);
   VALUE result = rb_hash_new();
-  rb_hash_aset(result, ID2SYM(rb_intern("width")), LONG2FIX(rect.width));
-  rb_hash_aset(result, ID2SYM(rb_intern("height")), LONG2FIX(rect.height));
+  rb_hash_aset(result, ID2SYM(rb_intern("width")), LONG2FIX(max(rect.height, rect.width)));
+  rb_hash_aset(result, ID2SYM(rb_intern("height")), LONG2FIX(min(rect.height, rect.width)));
 
   return result;
 }
@@ -133,20 +133,25 @@ extern "C" VALUE getGraveStats(VALUE self, VALUE figure, VALUE image_value) {
   RotatedRect boundingRectangle = minAreaRect(contour);
   Size2f size = boundingRectangle.size;
 
-  // cv::Point2f vertices2f[4];
-  // boundingRectangle.points(vertices2f);
+  cv::Point2f vertices2f[4];
+  boundingRectangle.points(vertices2f);
 
-  // for (int i = 0; i < 4; i++)
-  //   line(graveImage, vertices2f[i], vertices2f[(i+1)%4], Scalar(0, 0, 255), 2);
+  for (int i = 0; i < 4; i++)
+    line(graveImage, vertices2f[i], vertices2f[(i+1)%4], Scalar(0, 0, 255), 2);
 
-  // imwrite("grave.jpg", graveImage);
+  imwrite("grave.jpg", graveImage);
 
   VALUE result = rb_hash_new();
-  rb_hash_aset(result, ID2SYM(rb_intern("area")), DBL2NUM(area));
-  rb_hash_aset(result, ID2SYM(rb_intern("perimeter")), DBL2NUM(arc));
+  rb_hash_aset(result, ID2SYM(rb_intern("area")), rb_float_new(area));
+  rb_hash_aset(result, ID2SYM(rb_intern("perimeter")), rb_float_new(arc));
 
-  rb_hash_aset(result, ID2SYM(rb_intern("width")), DBL2NUM(min(size.width, size.height)));
-  rb_hash_aset(result, ID2SYM(rb_intern("length")), DBL2NUM(max(size.width, size.height)));
+  rb_hash_aset(result, ID2SYM(rb_intern("width")), rb_float_new(min(size.width, size.height)));
+  rb_hash_aset(result, ID2SYM(rb_intern("length")), rb_float_new(max(size.width, size.height)));
+  float angle = boundingRectangle.angle;
+  // if(size.width > size.height) {
+  //   angle = static_cast<int>(angle + 90) % 180;
+  // }
+  rb_hash_aset(result, ID2SYM(rb_intern("angle")), rb_float_new(angle));
   return result;
 }
 

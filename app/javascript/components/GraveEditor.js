@@ -144,6 +144,18 @@ export default function BoxEditor({grave, sites, image, page}) {
     }
   }
 
+  function onChangeFigure(id, figure) {
+    setFigures(figures.map((currentFigure) => {
+      if(currentFigure.id === figure.id) {
+        return figure;
+      }
+      else {
+        return currentFigure;
+      }
+    }));
+  }
+
+
   function onDraggingStart(evt, data) {
     const figure = data.figure;
     setCurrentEditBox(figure.id);
@@ -330,7 +342,16 @@ export default function BoxEditor({grave, sites, image, page}) {
                       <div className="row mb-3 mt-3">
                         <label className="col-sm-2 col-form-label">Grave ID</label>
                         <div className="col-sm-10">
-                          <input type="email" className="form-control" />
+                          <input type="text" className="form-control" />
+                        </div>
+                      </div>
+                    </>}
+                    {currentEditBox === figure.id && figure.type === 'Scale' &&
+                    <>
+                      <div className="row mb-3 mt-3">
+                        <label className="col-sm-2 col-form-label">Distance (cm)</label>
+                        <div className="col-sm-10">
+                          <input type="text" className="form-control" value={figure.text} onChange={(evt) => { onChangeFigure(figure.id, { ...figure, text: evt.target.value }) }} />
                         </div>
                       </div>
                     </>}
@@ -364,6 +385,10 @@ export default function BoxEditor({grave, sites, image, page}) {
                     <input type='hidden' name={`figures[${id}][y2]`} value={figure.y2} />
                     {figure.angle &&
                      <input type='hidden' name={`figures[${id}][angle]`} value={figure.angle} />
+                    }
+                    {
+                      figure.text &&
+                      <input type='hidden' name={`figures[${id}][text]`} value={figure.text} />
                     }
                   </React.Fragment>
                 );
