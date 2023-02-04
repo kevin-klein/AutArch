@@ -1,15 +1,20 @@
 class GraveSize
-  def run
+  def run(figures = nil)
     Figure.transaction do
-      Figure.includes({ page: :image }).find_each do |figure|
+      figures ||= Figure.includes({ page: :image })
+      figures.each do |figure|
         next if figure.is_a?(Spine)
 
-        if figure.is_a?(GraveCrossSection)
-          handle_cross_section(figure)
-        else
-          handle_figure(figure)
-        end
+        dispatch_figure(figure)
       end
+    end
+  end
+
+  def dispatch_figure(figure)
+    if figure.is_a?(GraveCrossSection)
+      handle_cross_section(figure)
+    else
+      handle_figure(figure)
     end
   end
 
@@ -28,6 +33,8 @@ class GraveSize
       width: stats[:width],
       height: stats[:length]
     )
+    figure.angle = stats[:angle] if figure.is_a?(Grave)
+
     figure.save!
   end
 end

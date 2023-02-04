@@ -19,6 +19,7 @@
 #  identifier  :string
 #  width       :float
 #  height      :float
+#  text        :string
 #
 class CrossSectionArrow < Figure
   belongs_to :grave, foreign_key: 'parent_id', optional: true
