@@ -14,6 +14,10 @@ class GravesController < ApplicationController
   # GET /graves/1 or /graves/1.json
   def show; end
 
+  def root
+    @no_box = true
+  end
+
   def stats; end
 
   # GET /graves/new
@@ -22,7 +26,9 @@ class GravesController < ApplicationController
   end
 
   # GET /graves/1/edit
-  def edit; end
+  def edit
+    @no_box = true
+  end
 
   # POST /graves or /graves.json
   def create

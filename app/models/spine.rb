@@ -20,6 +20,7 @@
 #  width       :float
 #  height      :float
 #  text        :string
+#  site_id     :bigint
 #
 class Spine < Figure
   belongs_to :grave, foreign_key: 'parent_id', optional: true, inverse_of: :spines

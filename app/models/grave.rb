@@ -20,6 +20,7 @@
 #  width       :float
 #  height      :float
 #  text        :string
+#  site_id     :bigint
 #
 class Grave < Figure
   belongs_to :site, optional: true

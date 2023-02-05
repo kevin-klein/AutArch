@@ -1,0 +1,64 @@
+<!--Main Navigation-->
+<style>
+  .leaflet-container {
+    height: 100%;
+    width: 100%;
+  }
+  div[data-react-class='SiteMap'] {
+    height: 100%;
+    width: 100%;
+  }
+</style>
+
+<header class="mb-10">
+
+  <!-- Section: Split screen -->
+  <section class="">
+
+    <div class="container-fluid px-0">
+      <div class="row g-0">
+
+        <!-- First column -->
+        <div class="col-lg-6 vh-100">
+          <div class="col-lg-6 vh-100 d-flex justify-content-center align-items-center">
+
+            <div class="ms-5">
+              <h2 class="display-4">CO-MOVE</h2>
+              <h1 class="display-2 fw-bold text-uppercase">framework to integrate
+archaeology and genetics</h1>
+            </div>
+
+          </div>
+        </div>
+        <!-- First column -->
+
+        <!-- Second column -->
+        <div class="col-lg-6 d-none d-lg-inline-block vh-100">
+
+          <%= react_component('SiteMap', sites: Site.all.as_json(include: :graves)) %>
+
+        </div>
+        <!-- Second column -->
+
+      </div>
+    </div>
+
+  </section>
+  <!-- Section: Split screen -->
+
+</header>
+<!--Main Navigation-->
+
+<!--Main layout-->
+<main>
+  <div class="container">
+
+  </div>
+</main>
+<!--Main layout-->
+
+<!--Footer-->
+<footer>
+
+</footer>
+<!--Footer-->

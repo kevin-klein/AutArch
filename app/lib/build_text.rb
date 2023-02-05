@@ -13,13 +13,13 @@ class BuildText
     ImageProcessing.imwrite('page.jpg', page.image.data)
 
     tesseract_result = RTesseract.new('page.jpg', lang: 'eng', psm: 11)
-    create_text_blocks(tesseract_result)
-    create_text_items(tesseract_result)
+    create_text_blocks(tesseract_result, page)
+    create_text_items(tesseract_result, page)
   end
 
   private
 
-  def create_text_items(tesseract_result)
+  def create_text_items(tesseract_result, page)
     tesseract_result.to_box.each do |box|
       TextItem.create!(
         page: page,
@@ -32,7 +32,7 @@ class BuildText
     end
   end
 
-  def create_text_blocks(tesseract_result)
+  def create_text_blocks(tesseract_result, page)
     textblock = tesseract_result.to_s.strip
     PageText.create!(
       text: textblock,

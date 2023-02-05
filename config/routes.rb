@@ -1,4 +1,4 @@
-Rails.application.routes.draw do
+Rails.application.routes.draw do # rubocop:disable Metrics/BlockLength
   resources :periods
   resources :bones
   resources :y_haplogroups
@@ -30,5 +30,5 @@ Rails.application.routes.draw do
     get :analyze, on: :member
   end
 
-  root 'graves#index'
+  root 'graves#root'
 end

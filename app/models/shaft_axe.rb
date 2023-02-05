@@ -20,6 +20,7 @@
 #  width       :float
 #  height      :float
 #  text        :string
+#  site_id     :bigint
 #
 class ShaftAxe < Figure
 end
