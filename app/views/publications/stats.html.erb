@@ -1,4 +1,4 @@
-<div class='row'>
+<div class='row mx-3'>
 
     <div class='col-md-12' style='padding: 20px;'>
         <div class='card'>
@@ -10,8 +10,31 @@
                             <%= f.input :publication_id, collection: Publication.where.not(id: @publication.id).pluck(:title, :id), as: :check_boxes, checked: params.dig(:compare, :publication_id) %>
                         </div>
                         <%= f.input :special_mark_graves, as: :text, input_html: { value: params.dig(:compare, :special_mark_graves) } %>
-                        <%= f.submit "Search", class: "btn btn-primary" %>
+                        <%= f.submit "Compare", class: "btn btn-primary" %>
                     <% end %>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class='col-md-12' style='padding: 20px;'>
+        <div class="card">
+            <div class='p-5'>
+                <%== Charts::ScatterChart.new(@graves_pca, html_class: 'card-img-top', link_proc: Proc.new { |item| edit_grave_path(item[:id]) }).render %>
+            </div>
+            <div class="card-body">
+                <h5 class="card-title">Grave PCA (width, depth, length, perimeter, area)</h5>
+                <div class="card-text">
+                    <table class='table'>
+                        <tbody>
+                            <% @pca.explained_variance_ratio.to_a.each_with_index do |variance_ratio, index| %>
+                                <tr>
+                                    <td>PCA <%= index + 1 %></td>
+                                    <td><%= (variance_ratio * 100).round %>%</td>
+                                </tr>
+                            <% end %>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -107,29 +130,6 @@
                                     <td>
                                         <%= count %>
                                     </td>
-                                </tr>
-                            <% end %>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class='col-md-12' style='padding: 20px;'>
-        <div class="card">
-            <div class='p-5'>
-                <%== Charts::ScatterChart.new(@graves_pca, html_class: 'card-img-top', link_proc: Proc.new { |item| edit_grave_path(item[:id]) }).render %>
-            </div>
-            <div class="card-body">
-                <h5 class="card-title">Grave PCA (width, depth, length, perimeter, area)</h5>
-                <div class="card-text">
-                    <table class='table'>
-                        <tbody>
-                            <% @pca.explained_variance_ratio.to_a.each_with_index do |variance_ratio, index| %>
-                                <tr>
-                                    <td>PCA <%= index + 1 %></td>
-                                    <td><%= (variance_ratio * 100).round %>%</td>
                                 </tr>
                             <% end %>
                         </tbody>

@@ -20,6 +20,7 @@
 #  width       :float
 #  height      :float
 #  text        :string
+#  site_id     :bigint
 #
 class CrossSectionArrow < Figure
   belongs_to :grave, foreign_key: 'parent_id', optional: true

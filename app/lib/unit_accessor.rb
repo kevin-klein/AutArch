@@ -19,7 +19,7 @@ module UnitAccessor
 
   def value_unit(square)
     if square
-      'm^2'
+      '&#13217;'
     else
       'm'
     end
