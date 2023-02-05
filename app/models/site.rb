@@ -10,8 +10,8 @@
 #  country_code :integer
 #  site_code    :string
 #
-class Site < ApplicationRecord
-  has_many :graves
+class Site < ApplicationRecord # rubocop:disable Metrics/ClassLength
+  has_many :graves, dependent: :nullify
 
   enum country_code: {
     AF: 4,

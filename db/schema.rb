@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_02_04_122231) do
+ActiveRecord::Schema[7.0].define(version: 2023_02_05_134429) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -93,7 +93,9 @@ ActiveRecord::Schema[7.0].define(version: 2023_02_04_122231) do
     t.float "width"
     t.float "height"
     t.string "text"
+    t.bigint "site_id"
     t.index ["page_id"], name: "index_figures_on_page_id"
+    t.index ["site_id"], name: "index_figures_on_site_id"
   end
 
   create_table "genetics", force: :cascade do |t|

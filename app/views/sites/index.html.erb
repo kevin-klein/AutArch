@@ -1,51 +1,53 @@
-<%
-=begin%>
- <style media="screen">
-  html { height: 100%; }
-  body { height: 100%; overflow: hidden; }
-  #map { height: 100%; }
-  div[data-react-class="SiteMap"] { height: 100%; }
-  .leaflet-container { height: calc(100% - 40px); }
-  .map-overlay { border-radius: 15px; padding: 30px; background-color: white; position: absolute; top: 150px; left: 0; z-index: 99999; }
-</style>
 
-
-<%= react_component('SiteMap', { sites: @sites.as_json(include: [:graves]) }) %>
-<%
-=end%>
-
-<form class="row g-3">
-  <div class="col-auto">
-    <label for="site-name" class="visually-hidden">Site Name</label>
-    <input value="<%= params.dig(:site, :name) %>" type="text" name='site[name]' class="form-control" id="site-name" placeholder="Name">
+<div class='row m-3'>
+  <div class='card col-md-12 mt-2 mb-3'>
+    <div class='card-body'>
+      <h5 class="card-title">Grave PCA (width, depth, length, perimeter, area)</h5>
+      <div class='card-text'>
+        <form class="row g-3">
+          <div class="col-auto">
+            <label for="site-name" class="visually-hidden">Site Name</label>
+            <input value="<%= params.dig(:site, :name) %>" type="text" name='site[name]' class="form-control" id="site-name" placeholder="Name">
+          </div>
+          <div class="col-auto">
+            <button type="submit" class="btn btn-primary mb-3">Search</button>
+          </div>
+        </form>
+      </div>
+    </div>
   </div>
-  <div class="col-auto">
-    <button type="submit" class="btn btn-primary mb-3">Search</button>
+
+  <div class='card'>
+    <div class='card-body'>
+      <div class='card-text'>
+        <table class='table'>
+      <thead>
+          <tr>
+              <th>Locality</th>
+              <th>Name</th>
+              <th>Country Code</th>
+              <th>Lat</th>
+              <th>Lon</th>
+          </tr>
+      </thead>
+
+      <tbody>
+          <% @sites.each do |site| %>
+              <tr>
+                  <td><%= site.locality %></td>
+                  <td><%= site.name %></td>
+                  <td><%= site.country_code %></td>
+                  <td><%= site.lat %></td>
+                  <td><%= site.lon %></td>
+              </tr>
+          <% end %>
+      </tbody>
+  </table>
+
+  <%== pagy_bootstrap_combo_nav_js(@sites_pagy) %>
+      </div>
+    </div>
   </div>
-</form>
+</div>
 
-<table class='table'>
-    <thead>
-        <tr>
-            <th>Locality</th>
-            <th>Name</th>
-            <th>Country Code</th>
-            <th>Lat</th>
-            <th>Lon</th>
-        </tr>
-    </thead>
 
-    <tbody>
-        <% @sites.each do |site| %>
-            <tr>
-                <td><%= site.locality %></td>
-                <td><%= site.name %></td>
-                <td><%= site.country_code %></td>
-                <td><%= site.lat %></td>
-                <td><%= site.lon %></td>
-            </tr>
-        <% end %>
-    </tbody>
-</table>
-
-<%== pagy_bootstrap_combo_nav_js(@sites_pagy) %>

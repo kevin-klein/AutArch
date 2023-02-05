@@ -277,7 +277,7 @@ export default function BoxEditor({grave, sites, image, page}) {
   return (<React.StrictMode>
     {creatingNewFigure && <NewFigureDialog addFigure={addFigure} closeDialog={() => setCreatingNewFigure(false)} />}
     <div className='row'>
-      <div className='col-md-8'>
+      <div className='col-md-8 card'>
         {arrowView}
 
         <div className="form-check">

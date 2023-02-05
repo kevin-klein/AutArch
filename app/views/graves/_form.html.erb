@@ -1,14 +1,18 @@
-<%= link_to('Page', page_path(@grave.page)) %>
-<nav class='nav' aria-label="Page navigation example">
-  <li class="nav-item">
-    <%= button_to "Delete", @grave, method: :delete, class: 'btn btn-warning nav-link' %>
-  </li>
+<div class='p-3'>
+  <nav class='nav' aria-label="Page navigation example">
+    <li class="nav-item">
+        <%= link_to('Page', page_path(@grave.page), class: 'nav-link') %>
+    </li>
+    <li class="nav-item">
+      <%= button_to "Delete", @grave, method: :delete, class: 'btn btn-warning nav-link' %>
+    </li>
 
-  <ul class="pagination">
-    <li class="page-item"><a class="page-link" href="<%= edit_grave_path(Grave.order(:id).where('id < ?', @grave.id).last || @grave.id) %>">Previous</a></li>
-    <li class="page-item"><a class="page-link" href="<%= edit_grave_path(Grave.order(:id).where('id > ?', @grave.id).first || @grave.id) %>">Next</a></li>
-  </ul>
-</nav>
+    <ul class="pagination">
+      <li class="page-item"><a class="page-link" href="<%= edit_grave_path(Grave.order(:id).where('id < ?', @grave.id).last || @grave.id) %>">Previous</a></li>
+      <li class="page-item"><a class="page-link" href="<%= edit_grave_path(Grave.order(:id).where('id > ?', @grave.id).first || @grave.id) %>">Next</a></li>
+    </ul>
+  </nav>
+</div>
 <%= react_component('GraveEditor', {
   image: @grave.page.image.as_json(methods: [:href], only: [:id, :width, :height]),
   grave: @grave.as_json(methods: [:type], include: { figures: { methods: :type} }),

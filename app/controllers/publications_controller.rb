@@ -12,6 +12,7 @@ class PublicationsController < ApplicationController
   end
 
   def stats
+    @no_box = true
     graves = @publication.figures.where(type: 'Grave')
     @skeleton_per_grave_type = graves.includes(:skeleton_figures).map { _1.skeleton_figures.length }.tally
     @skeleton_angles = Stats.spine_angles(@publication.figures.where(type: 'Spine').includes(grave: :arrow))
