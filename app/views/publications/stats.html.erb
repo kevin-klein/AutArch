@@ -33,6 +33,13 @@
                                     <td><%= (variance_ratio * 100).round %>%</td>
                                 </tr>
                             <% end %>
+
+                            <% @variances.each do |variance| %>
+                                <tr>
+                                    <td>Variance <%= variance[:name] %></td>
+                                    <td><%= variance[:variance].round(2) %></td>
+                                </tr>
+                            <% end %>
                         </tbody>
                     </table>
                 </div>

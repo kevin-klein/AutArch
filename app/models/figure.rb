@@ -1,4 +1,5 @@
-# == Schema Information
+# typed: strict
+## == Schema Information
 #
 # Table name: figures
 #
@@ -39,10 +40,10 @@ class Figure < ApplicationRecord
   end
 
   def center
-    {
+    Point.new(
       x: (x1 + x2) / 2,
       y: (y1 + y2) / 2
-    }
+    )
   end
 
   def contains?(figure)
@@ -52,7 +53,7 @@ class Figure < ApplicationRecord
       figure.y2.between?(y1, y2)
   end
 
-  def collides?(figure)
+  def collides?(figure) # rubocop:disable Metrics/AbcSize
     (
       x1 < figure.x1 + figure.box_width &&
       x1 + box_width > figure.x1 &&
@@ -65,8 +66,8 @@ class Figure < ApplicationRecord
     center1 = center
     center2 = figure.center
 
-    item1 = (center1[:x] - center2[:x])**2
-    item2 = (center1[:y] - center2[:y])**2
+    item1 = T.cast((center1.x - center2.x)**2, Integer)
+    item2 = T.cast((center1.y - center2.y)**2, Integer)
 
     Math.sqrt(item1 + item2)
   end
