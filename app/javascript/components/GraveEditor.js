@@ -304,13 +304,13 @@ export default function BoxEditor({grave, sites, image, page}) {
         <div style={{position: 'sticky', top: 60}} className="card">
           <div className="card-body">
             <h5 className="card-title">Edit Grave</h5>
-            <span className="card-text">
-              <div className="input-group mb-3">
-                <span className="input-group-text">Arrow Angle: {arrowAngle} degree</span>
-                <button className='btn btn-info' onClick={() => setArrowAngle((arrowAngle + 180) % 360)}>Flip Angle</button>
-                <input type="range" className="form-range" min="0" max="360" onChange={(evt) => setArrowAngle(evt.target.value || 0)} value={arrowAngle} />
+            <div className="card-text">
+              <button className='btn btn-info' onClick={() => setArrowAngle((arrowAngle + 180) % 360)}>Flip Angle</button>
+              <label className="form-label ms-2" htmlFor="arrow-range-input">Arrow Angle: {arrowAngle}°</label>
+              <div className="range">
+                <input id='arrow-range-input' type="range" className="form-range" min="0" max="360" onChange={(evt) => setArrowAngle(evt.target.value || 0)} value={arrowAngle} />
               </div>
-
+              
               <div className="input-group mb-3">
                 <Select value={siteValue} onChange={onSiteChange} className="form-select" options={siteOptions} />
               </div>
@@ -368,7 +368,7 @@ export default function BoxEditor({grave, sites, image, page}) {
                   </div>
                 </a>
               </ul>
-            </span>
+            </div>
             <form action={`/graves/${grave.id}`} method='post'>
               <input type="hidden" name="_method" value="patch" />
               <input type="hidden" name="authenticity_token" value={token} />
