@@ -10,10 +10,6 @@ module Charts
       @center = size / 2
     end
 
-    def to_partial_path
-      ''
-    end
-
     attr_reader :center, :radius, :size
 
     def render
