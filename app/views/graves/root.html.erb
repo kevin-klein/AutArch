@@ -35,7 +35,7 @@ archaeology and genetics</h1>
         <!-- Second column -->
         <div class="col-lg-6 d-none d-lg-inline-block vh-100">
 
-          <%= react_component('SiteMap', sites: Site.all.as_json(include: :graves)) %>
+          <%= react_component('SiteMap', sites: Site.includes(:graves).all.as_json(include: :graves)) %>
 
         </div>
         <!-- Second column -->
