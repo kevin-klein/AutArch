@@ -90,7 +90,7 @@ class PublicationsController < ApplicationController
   def set_compare_graves
     @other_publications = params
                           .dig(:compare, :publication_id)
-      &.map { Publication.find(_1) if _1.present? }
+      &.map { Publication.includes(:figures).find(_1) if _1.present? }
                           &.compact
   end
 
