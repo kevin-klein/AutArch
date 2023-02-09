@@ -11,15 +11,17 @@ class PublicationsController < ApplicationController
     @publication
   end
 
-  def stats
+  def stats # rubocop:disable Metrics/AbcSize
     @no_box = true
     graves = @publication.figures.where(type: 'Grave')
     @skeleton_per_grave_type = graves.includes(:skeleton_figures).map { _1.skeleton_figures.length }.tally
     @skeleton_angles = Stats.spine_angles(@publication.figures.where(type: 'Spine').includes(grave: :arrow))
     @grave_angles = Stats.grave_angles(graves.includes(:arrow))
     set_compare_graves
-    @graves_pca, @pca = Stats.graves_pca(@publication, *@other_publications,
-                                         special_objects: params.dig(:compare, :special_mark_graves)&.split("\n")&.map(&:to_i) || [])
+    @variances = Stats.pca_variance([@publication, *@other_publications])
+    @graves_pca, @pca = Stats.graves_pca([@publication, *@other_publications],
+                                         special_objects: params.dig(:compare,
+                                                                     :special_mark_graves)&.split("\n")&.map(&:to_i) || [])
   end
 
   # GET /publications/new

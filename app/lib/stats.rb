@@ -2,7 +2,8 @@ module Stats
   extend self
 
   def spine_angles(spines)
-    spines.map { [_1, _1.grave.arrow] }
+    spines.map { [_1, _1.grave&.arrow] }
+          .filter { |_spine, arrow| arrow.present? }
           .map { |spine, arrow| spine.angle_with_arrow(arrow) }
           .map { round_to_nearest(_1, 30) }
           .tally
@@ -10,17 +11,37 @@ module Stats
 
   def grave_angles(graves)
     graves.map { [_1, _1.arrow] }
+          .filter { |_grave, arrow| arrow&.angle.present? }
           .map { |grave, arrow| (grave.angle + arrow.angle) % 180 }
           .map(&:round)
   end
 
-  def graves_pca(*publications, special_objects: [])
-    pca = PCA.new(components: 2, scale_data: true)
+  def graves_pca(publications, special_objects: [], components: 2)
+    pca = PCA.new(components: components, scale_data: true)
     fit_pca(pca, publications)
     [pca_series(pca, publications, special_objects), pca]
   end
 
+  def pca_variance(publications)
+    graves_pca(publications, components: 1)[0].map do |series|
+      mean = pca_mean(series)
+      variance = series_variance(series, mean)
+      {
+        name: series[:name],
+        variance: variance
+      }
+    end
+  end
+
   private
+
+  def pca_mean(series)
+    series[:data].map { _1[:x] }.sum / series[:data].length
+  end
+
+  def series_variance(series, mean)
+    series[:data].map { |item| (item[:x] - mean)**2 }.sum / series[:data].length
+  end
 
   def pca_series(pca, publications, special_objects)
     publications.map do |publication|
@@ -34,17 +55,23 @@ module Stats
     end
   end
 
-  def pca_transform_graves(pca, graves, special_objects) # rubocop:disable Metrics/MethodLength
-    grave_data = pca.fit_transform(convert_graves_to_size(graves)).to_a.map do |x, y|
-      {
-        x: x,
-        y: y
-      }
+  def pca_transform_graves(pca, graves, special_objects)
+    grave_data = pca.fit_transform(convert_graves_to_size(graves)).to_a.map do |pca_item|
+      convert_pca_item_to_polar(pca_item)
     end
     graves = grave_data.zip(graves)
     graves.map do |data, grave|
       data[:mark] = true if special_objects.include?(grave.id)
       data.merge({ id: grave.id, title: grave.id })
+    end
+  end
+
+  def convert_pca_item_to_polar(pca_item)
+    case pca_item.length
+    when 1
+      { x: pca_item[0] }
+    when 2
+      { x: pca_item[0], y: pca_item[1] }
     end
   end
 
