@@ -20,7 +20,7 @@ module Charts
                     stroke: @grey_stroke,
                     stroke_width: 1,
                     # fill: stroke,
-                    fill: @grey_stroke,
+                    fill: 'black',
                     transform: "rotate(#{angle} #{@center} #{@center})" do
           @svg.title count
         end
