@@ -1,4 +1,2 @@
-class Point < T::Struct
-  prop :x, Integer
-  prop :y, Integer
+Point = Struct.new(:x, :y, keyword_init: true) do
 end

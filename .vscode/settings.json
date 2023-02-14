@@ -1,0 +1,7 @@
+{
+  "Codegeex.EnableExtension": false,
+  "files.associations": {
+    "vector": "cpp",
+    "functional": "cpp"
+  }
+}

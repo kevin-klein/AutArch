@@ -22,14 +22,30 @@ module Stats
     [pca_series(pca, publications, special_objects), pca]
   end
 
-  def pca_variance(publications)
-    graves_pca(publications, components: 1)[0].map do |series|
+  def pca_variance(publications, marked: []) # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
+    pcas = graves_pca(publications, components: 1)[0]
+
+    result = pcas.map do |series|
       mean = pca_mean(series)
       variance = series_variance(series, mean)
       {
         name: series[:name],
         variance: variance
       }
+    end
+
+    if marked.empty?
+      result
+    else
+      special = pcas.map { _1[:data] }.flatten.filter { marked.include?(_1[:id]) }
+      marked_series = { data: special }
+      mean = pca_mean(marked_series)
+      marked_items_variance = series_variance(marked_series, mean)
+
+      result + [{
+        name: 'marked items',
+        variance: marked_items_variance
+      }]
     end
   end
 
