@@ -1,0 +1,59 @@
+find_header: checking for rice/rice.hpp in /home/kevin/.rvm/gems/ruby-3.1.2/gems/rice-4.0.4/include... -------------------- yes
+
+LD_LIBRARY_PATH=.:/home/kevin/.rvm/rubies/ruby-3.1.2/lib "g++ -o conftest -I/home/kevin/.rvm/rubies/ruby-3.1.2/include/ruby-3.1.0/x86_64-linux -I/home/kevin/.rvm/rubies/ruby-3.1.2/include/ruby-3.1.0/ruby/backward -I/home/kevin/.rvm/rubies/ruby-3.1.2/include/ruby-3.1.0 -I.     conftest.cc  -L. -L/home/kevin/.rvm/rubies/ruby-3.1.2/lib -Wl,-rpath,/home/kevin/.rvm/rubies/ruby-3.1.2/lib -L. -fstack-protector-strong -rdynamic -Wl,-export-dynamic -Wl,--no-as-needed     -Wl,-rpath,/home/kevin/.rvm/rubies/ruby-3.1.2/lib -L/home/kevin/.rvm/rubies/ruby-3.1.2/lib -lruby  -lm  -ljemalloc -lc"
+checked program was:
+/* begin */
+1: #include "ruby.h"
+2: 
+3: int main(int argc, char **argv)
+4: {
+5:   return !!argv[argc];
+6: }
+/* end */
+
+LD_LIBRARY_PATH=.:/home/kevin/.rvm/rubies/ruby-3.1.2/lib "g++ -I/home/kevin/.rvm/rubies/ruby-3.1.2/include/ruby-3.1.0/x86_64-linux -I/home/kevin/.rvm/rubies/ruby-3.1.2/include/ruby-3.1.0/ruby/backward -I/home/kevin/.rvm/rubies/ruby-3.1.2/include/ruby-3.1.0 -I.     -std=c++17   -c conftest.cc"
+conftest.cc:3:10: fatal error: rice/rice.hpp: No such file or directory
+    3 | #include <rice/rice.hpp>
+      |          ^~~~~~~~~~~~~~~
+compilation terminated.
+checked program was:
+/* begin */
+1: #include "ruby.h"
+2: 
+3: #include <rice/rice.hpp>
+/* end */
+
+LD_LIBRARY_PATH=.:/home/kevin/.rvm/rubies/ruby-3.1.2/lib "g++ -I/home/kevin/.rvm/rubies/ruby-3.1.2/include/ruby-3.1.0/x86_64-linux -I/home/kevin/.rvm/rubies/ruby-3.1.2/include/ruby-3.1.0/ruby/backward -I/home/kevin/.rvm/rubies/ruby-3.1.2/include/ruby-3.1.0 -I.     -std=c++17  -I/home/kevin/.rvm/gems/ruby-3.1.2/gems/rice-4.0.4/include -c conftest.cc"
+checked program was:
+/* begin */
+1: #include "ruby.h"
+2: 
+3: #include <rice/rice.hpp>
+/* end */
+
+--------------------
+
+have_library: checking for -lstdc++... -------------------- yes
+
+LD_LIBRARY_PATH=.:/home/kevin/.rvm/rubies/ruby-3.1.2/lib "g++ -o conftest -I/home/kevin/.rvm/rubies/ruby-3.1.2/include/ruby-3.1.0/x86_64-linux -I/home/kevin/.rvm/rubies/ruby-3.1.2/include/ruby-3.1.0/ruby/backward -I/home/kevin/.rvm/rubies/ruby-3.1.2/include/ruby-3.1.0 -I. -I/home/kevin/.rvm/gems/ruby-3.1.2/gems/rice-4.0.4/include     conftest.cc  -L. -L/home/kevin/.rvm/rubies/ruby-3.1.2/lib -Wl,-rpath,/home/kevin/.rvm/rubies/ruby-3.1.2/lib -L. -fstack-protector-strong -rdynamic -Wl,-export-dynamic -Wl,--no-as-needed     -Wl,-rpath,/home/kevin/.rvm/rubies/ruby-3.1.2/lib -L/home/kevin/.rvm/rubies/ruby-3.1.2/lib -lruby -lstdc++  -lm  -ljemalloc -lc"
+checked program was:
+/* begin */
+ 1: #include "ruby.h"
+ 2: 
+ 3: /*top*/
+ 4: extern int t(void);
+ 5: int main(int argc, char **argv)
+ 6: {
+ 7:   if (argc > 1000000) {
+ 8:     int (* volatile tp)(void)=(int (*)(void))&t;
+ 9:     printf("%d", (*tp)());
+10:   }
+11: 
+12:   return !!argv[argc];
+13: }
+14: 
+15: int t(void) { ; return 0; }
+/* end */
+
+--------------------
+
