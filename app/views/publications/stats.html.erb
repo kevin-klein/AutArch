@@ -19,8 +19,13 @@
 
     <div class='col-md-12' style='padding: 20px;'>
         <div class="card">
-            <div class='p-5'>
-                <%== Charts::ScatterChart.new(@graves_pca, html_class: 'card-img-top', link_proc: Proc.new { |item| edit_grave_path(item[:id]) }).render %>
+            <div class='row'>
+                <div class='p-5 col-md-8'>
+                    <%== Charts::ScatterChart.new(@graves_pca, html_class: 'card-img-top', link_proc: Proc.new { |item| edit_grave_path(item[:id]) }).render %>
+                </div>
+                <div class='p-5 col-md-4'>
+                    <%== column_chart(@variances.map { [_1[:name], _1[:variance]] }.to_h) %>
+                </div>
             </div>
             <div class="card-body">
                 <h5 class="card-title">Grave PCA (width, depth, length, perimeter, area)</h5>

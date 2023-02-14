@@ -66,8 +66,8 @@ class Figure < ApplicationRecord
     center1 = center
     center2 = figure.center
 
-    item1 = T.cast((center1.x - center2.x)**2, Integer)
-    item2 = T.cast((center1.y - center2.y)**2, Integer)
+    item1 = (center1.x - center2.x)**2
+    item2 = (center1.y - center2.y)**2
 
     Math.sqrt(item1 + item2)
   end
