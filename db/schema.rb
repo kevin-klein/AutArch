@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_02_05_134429) do
+ActiveRecord::Schema[7.0].define(version: 2023_03_05_151353) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -94,6 +94,8 @@ ActiveRecord::Schema[7.0].define(version: 2023_02_05_134429) do
     t.float "height"
     t.string "text"
     t.bigint "site_id"
+    t.boolean "verified", default: false, null: false
+    t.boolean "disturbed", default: false, null: false
     t.index ["page_id"], name: "index_figures_on_page_id"
     t.index ["site_id"], name: "index_figures_on_site_id"
   end
@@ -169,6 +171,15 @@ ActiveRecord::Schema[7.0].define(version: 2023_02_05_134429) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "year"
+  end
+
+  create_table "shape_points", force: :cascade do |t|
+    t.bigint "figure_id", null: false
+    t.integer "x"
+    t.integer "y"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["figure_id"], name: "index_shape_points_on_figure_id"
   end
 
   create_table "sites", force: :cascade do |t|
@@ -250,6 +261,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_02_05_134429) do
   add_foreign_key "page_texts", "pages"
   add_foreign_key "pages", "images", on_delete: :cascade
   add_foreign_key "pages", "publications", on_delete: :cascade
+  add_foreign_key "shape_points", "figures"
   add_foreign_key "skeletons", "figures"
   add_foreign_key "stable_isotopes", "skeletons"
   add_foreign_key "text_items", "pages"
