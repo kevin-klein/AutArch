@@ -106,15 +106,29 @@ function NewFigureDialog({ closeDialog, addFigure }) {
   </div>);
 }
 
+function Contour({figure, active}) {
+  const points = figure.shape_points.map(point => `${point.x + figure.x1},${point.y + figure.y1}`).join(' ');
+  return (
+    <polyline
+      points={points}
+      fill='none'
+      stroke={ figure.id === active ? 'red' : 'blue' }
+      strokeWidth={2}
+    />
+  );
+}
+
 export default function BoxEditor({grave, sites, image, page}) {
   const [figures, setFigures] = React.useState(grave.figures);
   const [arrowAngle, setArrowAngle] = React.useState(grave.figures.filter(figure => figure.type === 'Arrow')[0]?.angle || 0);
-  const [showFigures, setShowFigures] = React.useState(true);
+  const [rendering, setRendering] = React.useState('boxes');
   const [draggingState, setDraggingState] = React.useState(null);
   const [creatingNewFigure, setCreatingNewFigure] = React.useState(false);
   const [site, setSite] = React.useState(grave.site_id);
   const canvasRef = React.useRef(null);
   const [currentEditBox, setCurrentEditBox] = React.useState(grave.figures.filter((f) => f.type == 'Grave')[0]?.id);
+  const graveFigure = figures.filter(figure => figure.id === grave.id)[0];
+  console.log(graveFigure);
 
   const token =
       document.querySelector('[name=csrf-token]').content;
@@ -181,6 +195,30 @@ export default function BoxEditor({grave, sites, image, page}) {
       y: svgPoint.y - y,
       data: data,
     });
+  }
+
+  function disturbedChanged(evt) {
+    const checked = evt.target.checked;
+    setFigures(figures.map(figure => {
+      if(figure.id === grave.id) {
+        return {...figure, disturbed: checked};
+      }
+      else {
+        return {...figure};
+      }
+    }));
+  }
+
+  function verifiedChanged(evt) {
+    const checked = evt.target.checked;
+    setFigures(figures.map(figure => {
+      if(figure.id === grave.id) {
+        return {...figure, verified: checked};
+      }
+      else {
+        return {...figure};
+      }
+    }));
   }
 
   async function addFigure(type) {
@@ -281,10 +319,11 @@ export default function BoxEditor({grave, sites, image, page}) {
         {arrowView}
 
         <div className="form-check">
-          <input type="checkbox" checked={showFigures} onChange={() => setShowFigures(!showFigures)} />
-          <label className="form-check-label">
-            show figures?
-          </label>
+          <select value={rendering} onChange={evt => setRendering(evt.target.value)} className="form-select" aria-label="Default select example">
+            <option value='boxes'>Show Bounding Boxes</option>
+            <option value='contours'>Show Contours</option>
+            <option value='nothing'>Show Nothing</option>
+          </select>
         </div>
         <svg
           ref={canvasRef}
@@ -296,7 +335,8 @@ export default function BoxEditor({grave, sites, image, page}) {
           xmlns="http://www.w3.org/2000/svg"
         >
           <image width={image.width} height={image.height} href={image.href} />
-          {showFigures && figures.map(figure => <Box canvas={canvasRef} key={figure.id} onDraggingStart={onDraggingStart} active={currentEditBox} figure={figure} />)}
+          {rendering === 'boxes' && figures.map(figure => <Box canvas={canvasRef} key={figure.id} onDraggingStart={onDraggingStart} active={currentEditBox} figure={figure} />)}
+          {rendering === 'contours' && figures.map(figure => <Contour key={figure.id} active={currentEditBox} figure={figure} />)}
         </svg>
       </div>
 
@@ -310,9 +350,23 @@ export default function BoxEditor({grave, sites, image, page}) {
               <div className="range">
                 <input id='arrow-range-input' type="range" className="form-range" min="0" max="360" onChange={(evt) => setArrowAngle(evt.target.value || 0)} value={arrowAngle} />
               </div>
-              
+
               <div className="input-group mb-3">
                 <Select value={siteValue} onChange={onSiteChange} className="form-select" options={siteOptions} />
+              </div>
+
+              <div className="form-check">
+                <input className="form-check-input" type="checkbox" onChange={disturbedChanged} checked={graveFigure.disturbed} id="disturbed-checkbox" />
+                <label className="form-check-label" htmlFor="disturbed-checkbox">
+                  Disturbed?
+                </label>
+              </div>
+
+              <div className="form-check">
+                <input className="form-check-input" type="checkbox" onChange={verifiedChanged} checked={graveFigure.verified} id="approved-checkbox" />
+                <label className="form-check-label" htmlFor="approved-checkbox">
+                  Verified?
+                </label>
               </div>
 
               <ul className="list-group">
@@ -383,6 +437,9 @@ export default function BoxEditor({grave, sites, image, page}) {
                     <input type='hidden' name={`figures[${id}][x2]`} value={figure.x2} />
                     <input type='hidden' name={`figures[${id}][y1]`} value={figure.y1} />
                     <input type='hidden' name={`figures[${id}][y2]`} value={figure.y2} />
+                    <input type='hidden' name={`figures[${id}][verified]`} value={figure.verified} />
+                    <input type='hidden' name={`figures[${id}][disturbed]`} value={figure.disturbed} />
+
                     {figure.angle &&
                      <input type='hidden' name={`figures[${id}][angle]`} value={figure.angle} />
                     }

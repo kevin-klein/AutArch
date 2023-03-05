@@ -35,7 +35,7 @@ class AnalyzeScales
 
   def assign_contour_width(scale)
     image = ImageProcessing.extractFigure(scale, scale.page.image.data)
-    contours = ImageProcessing.findContours(image)
+    contours = ImageProcessing.findContours(image, 'tree')
     rects = contours.lazy.map { ImageProcessing.minAreaRect _1 }
 
     max_rect = rects.max_by { _1[:width] }

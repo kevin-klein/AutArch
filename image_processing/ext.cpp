@@ -139,25 +139,25 @@ extern "C" VALUE getGraveStats(VALUE self, VALUE figure, VALUE image_value) {
   for (int i = 0; i < 4; i++)
     line(graveImage, vertices2f[i], vertices2f[(i+1)%4], Scalar(0, 0, 255), 2);
 
-  imwrite("grave.jpg", graveImage);
-
   VALUE result = rb_hash_new();
   rb_hash_aset(result, ID2SYM(rb_intern("area")), rb_float_new(area));
   rb_hash_aset(result, ID2SYM(rb_intern("perimeter")), rb_float_new(arc));
 
   rb_hash_aset(result, ID2SYM(rb_intern("width")), rb_float_new(min(size.width, size.height)));
   rb_hash_aset(result, ID2SYM(rb_intern("length")), rb_float_new(max(size.width, size.height)));
-  float angle = boundingRectangle.angle;
-  // if(size.width > size.height) {
-  //   angle = static_cast<int>(angle + 90) % 180;
-  // }
-  rb_hash_aset(result, ID2SYM(rb_intern("angle")), rb_float_new(angle));
+  rb_hash_aset(result, ID2SYM(rb_intern("angle")), rb_float_new(boundingRectangle.angle));
+
   return result;
 }
 
 template<typename T>
 VALUE convert_to_ruby(T) {
   return Qnil;
+}
+
+template<>
+VALUE convert_to_ruby<double>(double d) {
+  return rb_float_new(d);
 }
 
 template<>
@@ -180,6 +180,19 @@ VALUE convert_to_ruby<Rect>(Rect rect) {
   return result;
 }
 
+template<>
+VALUE convert_to_ruby<RotatedRect>(RotatedRect rect) {
+  VALUE result = rb_hash_new();
+
+  rb_hash_aset(result, ID2SYM(rb_intern("x")), rb_float_new(rect.center.x));
+  rb_hash_aset(result, ID2SYM(rb_intern("y")), rb_float_new(rect.center.y));
+
+  rb_hash_aset(result, ID2SYM(rb_intern("width")), rb_float_new(min(rect.size.width, rect.size.height)));
+  rb_hash_aset(result, ID2SYM(rb_intern("height")), rb_float_new(max(rect.size.width, rect.size.height)));
+  rb_hash_aset(result, ID2SYM(rb_intern("angle")), rb_float_new(rect.angle));
+  return result;
+}
+
 template<typename T>
 VALUE convert_to_ruby(vector<T> vec) {
   VALUE result = rb_ary_new2(vec.size());
@@ -192,7 +205,7 @@ VALUE convert_to_ruby(vector<T> vec) {
   return result;
 }
 
-extern "C" VALUE rb_findContours(VALUE self, VALUE rb_mat) {
+extern "C" VALUE rb_findContours(VALUE self, VALUE rb_mat, VALUE rb_retrieve_type) {
   Mat mat = convertRubyStringToMat(rb_mat);
 
   cvtColor(mat, mat, COLOR_BGR2GRAY);
@@ -202,12 +215,18 @@ extern "C" VALUE rb_findContours(VALUE self, VALUE rb_mat) {
 
   vector<vector<Point>> contours;
   vector<Vec4i> hierarchy;
-  findContours(mat, contours, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE);
+  const char *retrieve_type = StringValueCStr(rb_retrieve_type);
+  if(retrieve_type == "external") {
+    findContours(mat, contours, hierarchy, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
+  }
+  else {
+    findContours(mat, contours, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE);
+  }
 
   return convert_to_ruby(contours);
 }
 
-extern "C" VALUE rb_minAreaRect(VALUE self, VALUE rb_contour) {
+vector<Point> rbContourToCV(VALUE rb_contour) {
   vector<Point> contour;
 
   long point_count = RARRAY_LEN(rb_contour);
@@ -218,11 +237,27 @@ extern "C" VALUE rb_minAreaRect(VALUE self, VALUE rb_contour) {
     Point point(x, y);
     contour.push_back(point);
   }
+  return contour;
+}
 
+extern "C" VALUE rb_arcLength(VALUE self, VALUE rb_contour) {
+  auto contour = rbContourToCV(rb_contour);
+
+  return convert_to_ruby(arcLength(contour, true));
+}
+
+extern "C" VALUE rb_contourArea(VALUE self, VALUE rb_contour) {
+  auto contour = rbContourToCV(rb_contour);
+
+  return convert_to_ruby(contourArea(contour));
+}
+
+extern "C" VALUE rb_minAreaRect(VALUE self, VALUE rb_contour) {
+  auto contour = rbContourToCV(rb_contour);
 
   RotatedRect rect = minAreaRect(contour);
 
-  return convert_to_ruby(rect.boundingRect());
+  return convert_to_ruby(rect);
 }
 
 extern "C" VALUE rb_extractFigure(VALUE self, VALUE figure, VALUE rb_mat) {
@@ -244,7 +279,9 @@ extern "C" void Init_ext() {
   rb_define_module_function(ImageProcessing, "getGraveStats", getGraveStats, 2);
   rb_define_module_function(ImageProcessing, "getCrossSectionStats", getCrossSectionStats, 2);
   rb_define_module_function(ImageProcessing, "extractFigure", rb_extractFigure, 2);
-  rb_define_module_function(ImageProcessing, "findContours", rb_findContours, 1);
+  rb_define_module_function(ImageProcessing, "findContours", rb_findContours, 2);
   rb_define_module_function(ImageProcessing, "minAreaRect", rb_minAreaRect, 1);
+  rb_define_module_function(ImageProcessing, "arcLength", rb_arcLength, 1);
+  rb_define_module_function(ImageProcessing, "contourArea", rb_contourArea, 1);
   rb_define_module_function(ImageProcessing, "imwrite", rb_imwrite, 2);
 }
