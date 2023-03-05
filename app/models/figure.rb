@@ -25,6 +25,7 @@
 #
 class Figure < ApplicationRecord
   belongs_to :page
+  has_many :shape_points
   include UnitAccessor
 
   def box_width
