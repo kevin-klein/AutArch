@@ -10,7 +10,7 @@ const genUUID = () =>
 function Box({onDraggingStart, active, figure: { id, x1, y1, x2, y2, type}}) {
   let color = 'black';
   if(active === id) {
-    color = 'red';
+    color = '#F44336';
   }
 
   function onMouseDown(figure) {
@@ -44,7 +44,7 @@ function Box({onDraggingStart, active, figure: { id, x1, y1, x2, y2, type}}) {
     {type !== 'Spine' && <rect
       fill='none'
       stroke={color}
-      strokeWidth="2"
+      strokeWidth="3"
       x={x1}
       y={y1}
       width={x2 - x1}
@@ -107,13 +107,13 @@ function NewFigureDialog({ closeDialog, addFigure }) {
 }
 
 function Contour({figure, active}) {
-  const points = figure.shape_points.map(point => `${point.x + figure.x1},${point.y + figure.y1}`).join(' ');
+  const points = [...figure.contour, figure.contour[0]].map(point => `${point.x + figure.x1},${point.y + figure.y1}`).join(' ');
   return (
     <polyline
       points={points}
-      fill='none'
-      stroke={ figure.id === active ? 'red' : 'blue' }
-      strokeWidth={2}
+      fill={ figure.id === active ? '#F4433699' : '#3F51B5' }
+      stroke={ '#3F51B5' }
+      strokeWidth={5}
     />
   );
 }
@@ -128,7 +128,6 @@ export default function BoxEditor({grave, sites, image, page}) {
   const canvasRef = React.useRef(null);
   const [currentEditBox, setCurrentEditBox] = React.useState(grave.figures.filter((f) => f.type == 'Grave')[0]?.id);
   const graveFigure = figures.filter(figure => figure.id === grave.id)[0];
-  console.log(graveFigure);
 
   const token =
       document.querySelector('[name=csrf-token]').content;
@@ -304,7 +303,7 @@ export default function BoxEditor({grave, sites, image, page}) {
 
     arrowView = (<svg width="512" height="200" viewBox={`${arrow.x1} ${arrow.y1} ${arrow.x2 - arrow.x1} ${arrow.y2 - arrow.y1}`}>
       <image width={image.width} height={image.height} href={image.href} />
-      <g transform={`rotate(${arrowAngle} ${arrowCenterX} ${arrowCenterY}) translate(${arrowCenterX - 100} ${arrowCenterY - 80})`} stroke="blue" shapeRendering="geometricPrecision">
+      <g transform={`rotate(${arrowAngle} ${arrowCenterX} ${arrowCenterY}) translate(${arrowCenterX - 100} ${arrowCenterY - 80})`} stroke="#3F51B5" shapeRendering="geometricPrecision">
         <line x1="100" y1="20" x2="100" y2="150" />
         <line x1="100" x2="110" y1="20" y2="40" />
         <line x1="100" x2="90" y1="20" y2="40" />
@@ -336,7 +335,7 @@ export default function BoxEditor({grave, sites, image, page}) {
         >
           <image width={image.width} height={image.height} href={image.href} />
           {rendering === 'boxes' && figures.map(figure => <Box canvas={canvasRef} key={figure.id} onDraggingStart={onDraggingStart} active={currentEditBox} figure={figure} />)}
-          {rendering === 'contours' && figures.map(figure => <Contour key={figure.id} active={currentEditBox} figure={figure} />)}
+          {rendering === 'contours' && figures.filter(figure => ['Grave', 'Arrow', 'Scale'].indexOf(figure.type) !== -1 ).map(figure => <Contour key={figure.id} active={currentEditBox} figure={figure} />)}
         </svg>
       </div>
 
