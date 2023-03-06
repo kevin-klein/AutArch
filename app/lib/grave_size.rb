@@ -8,6 +8,8 @@ class GraveSize
         dispatch_figure(figure)
       end
     end
+
+    nil
   end
 
   def dispatch_figure(figure)
@@ -31,15 +33,10 @@ class GraveSize
       perimeter: stats[:perimeter],
       area: stats[:area],
       width: stats[:width],
-      height: stats[:length]
+      height: stats[:height],
+      contour: stats[:contour].map { |x, y| ActiveRecord::Point.new(x, y) }
     )
     figure.angle = stats[:angle] if figure.is_a?(Grave)
-    figure.shape_points.destroy_all
-
-    ShapePoint.insert_all( # rubocop:disable Rails/SkipsModelValidations
-      stats[:contour].map { |x, y| { x: x, y: y, figure_id: figure.id } }
-    )
-
     figure.save!
   end
 
@@ -50,6 +47,6 @@ class GraveSize
     arc = ImageProcessing.arcLength(contour)
     area = ImageProcessing.contourArea(contour)
     rect = ImageProcessing.minAreaRect(contour)
-    { contour: contour, arc: arc, area: area, width: rect[:width], height: rect[:height], angle: rect[:angle] }
+    { contour: contour, perimeter: arc, area: area, width: rect[:width], height: rect[:height], angle: rect[:angle] }
   end
 end

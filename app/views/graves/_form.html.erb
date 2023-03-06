@@ -15,7 +15,7 @@
 </div>
 <%= react_component('GraveEditor', {
   image: @grave.page.image.as_json(methods: [:href], only: [:id, :width, :height]),
-  grave: @grave.as_json(methods: [:type], include: { figures: { include: :shape_points, methods: [:type]} }),
+  grave: @grave.as_json(methods: [:type], include: { figures: { methods: [:type]} }),
   sites: Site.all,
   page: @grave.page
 }) %>
