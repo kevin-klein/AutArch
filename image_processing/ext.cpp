@@ -215,7 +215,7 @@ extern "C" VALUE rb_findContours(VALUE self, VALUE rb_mat, VALUE rb_retrieve_typ
 
   vector<vector<Point>> contours;
   vector<Vec4i> hierarchy;
-  const char *retrieve_type = StringValueCStr(rb_retrieve_type);
+  string retrieve_type = StringValueCStr(rb_retrieve_type);
   if(retrieve_type == "external") {
     findContours(mat, contours, hierarchy, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
   }
