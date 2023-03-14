@@ -8,6 +8,8 @@ class GraveSize
         dispatch_figure(figure)
       end
     end
+
+    nil
   end
 
   def dispatch_figure(figure)
@@ -26,15 +28,25 @@ class GraveSize
   end
 
   def handle_figure(figure)
-    stats = ImageProcessing.getGraveStats(figure, figure.page.image.data)
+    stats = grave_stats(figure, figure.page.image.data)
     figure.assign_attributes(
       perimeter: stats[:perimeter],
       area: stats[:area],
       width: stats[:width],
-      height: stats[:length]
+      height: stats[:height],
+      contour: stats[:contour].map { |x, y| ActiveRecord::Point.new(x, y) }
     )
     figure.angle = stats[:angle] if figure.is_a?(Grave)
-
     figure.save!
+  end
+
+  def grave_stats(figure, image)
+    image = ImageProcessing.extractFigure(figure, image)
+    contours = ImageProcessing.findContours(image, 'tree')
+    contour = contours.max_by { ImageProcessing.contourArea _1 }
+    arc = ImageProcessing.arcLength(contour)
+    area = ImageProcessing.contourArea(contour)
+    rect = ImageProcessing.minAreaRect(contour)
+    { contour: contour, perimeter: arc, area: area, width: rect[:width], height: rect[:height], angle: rect[:angle] }
   end
 end
