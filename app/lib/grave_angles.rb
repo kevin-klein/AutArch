@@ -3,7 +3,7 @@ class GraveAngles
     figures ||= Arrow.includes({ page: :image })
     Arrow.includes({ page: :image }).each do |arrow|
       image = ImageProcessing.extractFigure(arrow, arrow.page.image.data)
-      contours = ImageProcessing.findContours(image)
+      contours = ImageProcessing.findContours(image, 'tree')
 
       next if contours.empty?
 
