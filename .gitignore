@@ -14,6 +14,9 @@
 *.sqlite3
 *.o
 *.so
+image_processing/Makefile
+image_processing/*.bundle
+image_processing/*.log
 
 # Ignore all logfiles and tempfiles.
 /log/*
