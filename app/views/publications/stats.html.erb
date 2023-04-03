@@ -10,7 +10,7 @@
                             <%= f.input :publication_id, collection: Publication.where.not(id: @publication.id).pluck(:title, :id), as: :check_boxes, checked: params.dig(:compare, :publication_id) %>
                         </div>
                         <%= f.input :special_mark_graves, as: :text, input_html: { value: params.dig(:compare, :special_mark_graves) } %>
-                        <%= f.submit "Compare", class: "btn btn-primary" %>
+                        <%= f.submit "Update", class: "btn btn-primary" %>
                     <% end %>
                 </div>
             </div>
@@ -20,10 +20,10 @@
     <div class='col-md-12' style='padding: 20px;'>
         <div class="card">
             <div class='row'>
-                <div class='p-5 col-md-8'>
+                <div class='p-5 col-xxl-8 col-md-12'>
                     <%== Charts::ScatterChart.new(@graves_pca, html_class: 'card-img-top', link_proc: Proc.new { |item| edit_grave_path(item[:id]) }).render %>
                 </div>
-                <div class='p-5 col-md-4'>
+                <div class='p-5 col-xxl-4 col-md-12'>
                     <%== column_chart(@variances.map { [_1[:name], _1[:variance]] }.to_h) %>
                 </div>
             </div>
