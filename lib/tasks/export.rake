@@ -11,4 +11,11 @@ namespace :export do
       end
     end
   end
+
+  task skeletons: :environment do
+    SkeletonFigure.find_each do |skeleton|
+      image = ImageProcessing.extractFigure(skeleton, skeleton.page.image.data)
+      ImageProcessing.imwrite(Rails.root.join('skeletons', "#{skeleton.id}.jpg").to_s, image)
+    end
+  end
 end

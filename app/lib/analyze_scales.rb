@@ -29,7 +29,12 @@ class AnalyzeScales
                  m_match.captures[0].to_f
                end
 
-    ratio = distance / scale.width
+    ratio = if scale.text.present?
+      (scale.text.to_f / 100) / scale.width
+    else
+      distance / scale.width
+    end
+
     [distance, ratio]
   end
 
@@ -38,8 +43,8 @@ class AnalyzeScales
     contours = ImageProcessing.findContours(image, 'tree')
     rects = contours.lazy.map { ImageProcessing.minAreaRect _1 }
 
-    max_rect = rects.max_by { _1[:width] }
-    width = max_rect[:width]
+    max_rect = rects.max_by { [_1[:width], _1[:height]].max }
+    width = [max_rect[:width], max_rect[:height]].max
 
     scale.width = width
     scale.save!
