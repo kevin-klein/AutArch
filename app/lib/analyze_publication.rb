@@ -54,21 +54,6 @@ class AnalyzePublication
                          })
 
     response.parse['predictions']
-
-    # image = preprocess_image(image)
-    # prediction = model.predict({ 'images_tensors' => [image] })
-
-    # boxes = prediction['boxes']
-    # labels = prediction['labels']
-    # propabilities = prediction['scores']
-
-    # boxes.zip(labels, propabilities).map do |item|
-    #   box, label, propability = item
-    #   label = model_labels[label.to_s]
-    #   {
-    #     box:, label:, propability:
-    #   }
-    # end
   end
 
   def page_count(path)
