@@ -6,6 +6,8 @@ import torch
 import numpy as np
 import io
 import os
+import torchvision
+from arrow_model import get_arrow_model
 
 labels = torch.load('models/rcnn_labels_large.model')
 labels = {v: k for k, v in labels.items()}
@@ -20,8 +22,9 @@ loaded_model.eval()
 loaded_model.to(device)
 
 app = Bottle()
+arrow_model = get_arrow_model()
 
-def analyse_file(file):
+def analyze_file(file):
     request_object_content = file.read()
     img = Image.open(io.BytesIO(request_object_content))
 
@@ -46,12 +49,35 @@ def analyse_file(file):
                 })
     return result
 
+def analyze_arrow(file):
+    request_object_content = file.read()
+    img = Image.open(io.BytesIO(request_object_content))
+
+    img, _ = PILToTensor()(img)
+    # img = img.to(device)
+    img = torch.stack([img]).to(device)
+
+    # with torch.no_grad():
+    arrow_model.eval()
+    prediction = arrow_model(img)
+    _, prediction = torch.max(prediction, 1)
+
+    return prediction * 10
+
 @app.post('/')
-def uplad():
+def upload():
     upload_file = request.POST['image']
-    result = analyse_file(upload_file.file)
+    result = analyze_file(upload_file.file)
 
     return { 'predictions': result }
+
+@app.post('/arrow')
+def upload_arrow():
+    upload_file = request.POST['image']
+    result = analyze_arrow(upload_file.file)
+
+    return { 'predictions': result.tolist()[0] }
+
 
 if __name__ == '__main__':
     app.run(debug=True, reloader=True)

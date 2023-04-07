@@ -274,6 +274,22 @@ extern "C" VALUE rb_imwrite(VALUE self, VALUE filename, VALUE rb_mat) {
   return Qnil;
 }
 
+extern "C" VALUE rb_rotateNoCutoff(VALUE self, VALUE rb_mat, VALUE rb_angle) {
+    Mat src = convertRubyStringToMat(rb_mat);
+    double angle = RFLOAT_VALUE(rb_angle);
+    Mat dst;
+    // https://stackoverflow.com/questions/22041699/rotate-an-image-without-cropping-in-opencv-in-c
+    // get rotation matrix for rotating the image around its center in pixel coordinates
+    double width = src.size().width;
+    double height = src.size().height;
+    Point2d center = Point2d (width / 2, height / 2);
+    Mat r = getRotationMatrix2D(center, angle, 1.0);      //Mat object for storing after rotation
+    warpAffine(src, dst, r, Size(src.cols, src.rows), INTER_LINEAR, BORDER_CONSTANT, Scalar(255, 255, 255));  ///applie an affine transforation to image.
+
+
+    return convertMatToRubyString(dst);
+}
+
 extern "C" void Init_ext() {
   VALUE ImageProcessing = rb_define_module("ImageProcessing");
   rb_define_module_function(ImageProcessing, "getGraveStats", getGraveStats, 2);
@@ -284,4 +300,5 @@ extern "C" void Init_ext() {
   rb_define_module_function(ImageProcessing, "arcLength", rb_arcLength, 1);
   rb_define_module_function(ImageProcessing, "contourArea", rb_contourArea, 1);
   rb_define_module_function(ImageProcessing, "imwrite", rb_imwrite, 2);
+  rb_define_module_function(ImageProcessing, "rotateNoCutoff", rb_rotateNoCutoff, 2);
 }

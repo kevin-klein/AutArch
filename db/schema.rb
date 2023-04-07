@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_02_15_235752) do
+ActiveRecord::Schema[7.0].define(version: 2023_03_06_115210) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -94,6 +94,9 @@ ActiveRecord::Schema[7.0].define(version: 2023_02_15_235752) do
     t.float "height"
     t.string "text"
     t.bigint "site_id"
+    t.boolean "verified", default: false, null: false
+    t.boolean "disturbed", default: false, null: false
+    t.point "contour", default: [], null: false, array: true
     t.boolean "validated", default: false, null: false
     t.index ["page_id"], name: "index_figures_on_page_id"
     t.index ["site_id"], name: "index_figures_on_site_id"

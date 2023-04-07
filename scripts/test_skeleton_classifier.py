@@ -23,8 +23,7 @@ if __name__ == '__main__':
 
   model = torchvision.models.resnet152(pretrained=True)
   num_ftrs = model.fc.in_features
-  model.fc = nn.Linear(num_ftrs, 2)
-  model.fc = model.fc.cuda()
+  model.fc = nn.Linear(num_ftrs, 2).cuda()
   weights = torchvision.models.ResNet152_Weights.DEFAULT
   preprocess = weights.transforms()
   model.load_state_dict(torch.load('models/skeleton_resnet.model'))
