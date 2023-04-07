@@ -2,6 +2,12 @@
   "Codegeex.EnableExtension": false,
   "files.associations": {
     "vector": "cpp",
-    "functional": "cpp"
+    "functional": "cpp",
+    "array": "cpp",
+    "bitset": "cpp",
+    "string_view": "cpp",
+    "initializer_list": "cpp",
+    "regex": "cpp",
+    "utility": "cpp"
   }
 }
