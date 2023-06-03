@@ -20,10 +20,14 @@ class GraveSize
     end
   end
 
-  def handle_cross_section(figure)
-    stats = ImageProcessing.getCrossSectionStats(figure, figure.page.image.data)
-    figure.width = stats[:width]
-    figure.height = stats[:height]
+  def handle_cross_section(figure)    
+    image = ImageProcessing.extractFigure(figure, image)
+    contours = ImageProcessing.findContours(image, 'tree')
+    contour = contours.max_by { ImageProcessing.contourArea _1 }
+    rect = ImageProcessing.boundingRect(contour)
+    
+    figure.width = rect[:width]
+    figure.height = rect[:height]
     figure.save!
   end
 
