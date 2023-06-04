@@ -78,8 +78,6 @@ gem 'gsl', github: 'SciRuby/rb-gsl'
 gem 'pca'
 gem 'ruby-vips'
 gem 'rumale'
-gem 'torch-rb'
-gem 'torchvision'
 gem 'victor'
 
 group :development, :test do
