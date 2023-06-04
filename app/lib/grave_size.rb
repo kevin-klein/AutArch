@@ -22,6 +22,7 @@ class GraveSize
 
   def handle_cross_section(figure)
     stats = ImageProcessing.getCrossSectionStats(figure, figure.page.image.data)
+    return if stats.nil?
     figure.width = stats[:width]
     figure.height = stats[:height]
     figure.save!
@@ -29,6 +30,7 @@ class GraveSize
 
   def handle_figure(figure)
     stats = grave_stats(figure, figure.page.image.data)
+    return if stats.nil?
     figure.assign_attributes(
       perimeter: stats[:perimeter],
       area: stats[:area],
@@ -44,9 +46,13 @@ class GraveSize
     image = ImageProcessing.extractFigure(figure, image)
     contours = ImageProcessing.findContours(image, 'tree')
     contour = contours.max_by { ImageProcessing.contourArea _1 }
-    arc = ImageProcessing.arcLength(contour)
-    area = ImageProcessing.contourArea(contour)
-    rect = ImageProcessing.minAreaRect(contour)
-    { contour: contour, perimeter: arc, area: area, width: rect[:width], height: rect[:height], angle: rect[:angle] }
+    if contour.nil? || contour.empty?
+      { contour: [], perimeter: 0, area: 0, width: 0, height: 0, angle: 0 }
+    else
+      arc = ImageProcessing.arcLength(contour)
+      area = ImageProcessing.contourArea(contour)
+      rect = ImageProcessing.minAreaRect(contour)
+      { contour: contour, perimeter: arc, area: area, width: rect[:width], height: rect[:height], angle: rect[:angle] }
+    end
   end
 end

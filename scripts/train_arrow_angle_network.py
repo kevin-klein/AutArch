@@ -28,10 +28,6 @@ def get_transform():
     #   transforms.append(T.RandomHorizontalFlip(0.5))
    return T.Compose(transforms)
 
-# https://github.com/d4nst/RotNet/blob/e026c0b1fa8a4a42eebce1d72261064d6147b939/utils.py
-# def angle_error(baseline, predicted):
-
-
 def show(imgs):
     # if not isinstance(imgs, list):
     #     imgs = [imgs]
@@ -52,17 +48,17 @@ if __name__ == '__main__':
         # transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
     ]))
   data_loader = torch.utils.data.DataLoader(
-                dataset, pin_memory=True, batch_size=32, shuffle=True, num_workers=8,)
+                dataset, pin_memory=True, batch_size=8, shuffle=True, num_workers=8,)
 
   device = torch.device('cuda')
 
-  params = [p for p in model.parameters() if p.requires_grad]
-  optimizer = torch.optim.SGD(params, lr=0.0001, momentum=0.9)
-  # optimizer = torch.optim.Adam(params, lr=1e-4)
-  weights = torchvision.models.ResNet18_Weights.DEFAULT
+  # optimizer = torch.optim.SGD(model.parameters(), lr=0.0001, momentum=0.9)
+  optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
+  # optimizer = torch.optim.RMSprop(model.parameters(), lr=0.0001)
+  # weights = torchvision.models.ResNet18_Weights.DEFAULT
   criterion = nn.CrossEntropyLoss()
 
-  num_epochs = 250
+  num_epochs = 1000
   for epoch in range(num_epochs):
       start = time.time()
       optimizer.zero_grad()
@@ -77,7 +73,7 @@ if __name__ == '__main__':
         images = images.to(device)
         angles = [random.randint(0, 359) for _ in images]
         images = [rotate(image, angle, fill=1) for image, angle in zip(images, angles)]
-        angles = torch.tensor([angle // 10 for angle in angles]).cuda()
+        angles = torch.tensor([angle for angle in angles]).cuda()
 
         images = torch.stack(images).to(device)
 
@@ -96,4 +92,4 @@ if __name__ == '__main__':
 
       print(epoch_loss, f'time: {time.time() - start}')
 
-  torch.save(model.state_dict(), 'models/arrow_resnet.model')
+  torch.save(model.state_dict(), 'models/arrow_rotnet.model')

@@ -21,9 +21,9 @@ namespace :export do
 
   task arrows: :environment do
     Arrow.find_each do |arrow|
-      next if arrow.angle.nil?
+      # next if arrow.angle.nil?
       image = ImageProcessing.extractFigure(arrow, arrow.page.image.data)
-      image = ImageProcessing.rotateNoCutoff(image, -arrow.angle)
+      # image = ImageProcessing.rotateNoCutoff(image, -arrow.angle)
 
       ImageProcessing.imwrite(Rails.root.join('arrows', "#{arrow.id}.jpg").to_s, image)
     end

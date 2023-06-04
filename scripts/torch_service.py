@@ -9,13 +9,13 @@ import os
 import torchvision
 from arrow_model import get_arrow_model
 
-labels = torch.load('models/rcnn_labels_large.model')
+labels = torch.load('models/rcnn_labels.model')
 labels = {v: k for k, v in labels.items()}
 
 device = torch.device('cuda')
 
 loaded_model = get_model(num_classes = len(labels.keys()))
-loaded_model.load_state_dict(torch.load('models/rcnn_dfg_large.model'))
+loaded_model.load_state_dict(torch.load('models/ssd_dfg.model'))
 
 loaded_model.eval()
 
@@ -26,12 +26,12 @@ arrow_model = get_arrow_model()
 
 def analyze_file(file):
     request_object_content = file.read()
-    img = Image.open(io.BytesIO(request_object_content))
+    pil_image = Image.open(io.BytesIO(request_object_content))
 
-    img, _ = PILToTensor()(img)
+    img, _ = PILToTensor()(pil_image)
 
     with torch.no_grad():
-            prediction = loaded_model([img.to(device)])
+        prediction = loaded_model([img.to(device)])
 
     result = []
     for element in range(len(prediction[0]["boxes"])):
@@ -47,6 +47,7 @@ def analyze_file(file):
                     'box': boxes,
                     'label': label
                 })
+    del img
     return result
 
 def analyze_arrow(file):
@@ -78,6 +79,12 @@ def upload_arrow():
 
     return { 'predictions': result.tolist()[0] }
 
+@app.post('/skeleton')
+def upload_arrow():
+    upload_file = request.POST['image']
+    result = analyze_skeleton(upload_file.file)
+
+    return { 'predictions': result.tolist()[0] }
 
 if __name__ == '__main__':
     app.run(debug=True, reloader=True)
