@@ -422,8 +422,6 @@ GEM
     sqlite3 (1.6.3-x86_64-darwin)
     sqlite3 (1.6.3-x86_64-linux)
     stemmify (0.0.2)
-    stimulus-rails (1.1.0)
-      railties (>= 6.0.0)
     strscan (3.0.4)
     sync (0.5.0)
     syntax_tree (5.3.0)
@@ -515,7 +513,6 @@ DEPENDENCIES
   sprockets-rails
   sqlite3
   stemmify (~> 0.0.2)
-  stimulus-rails
   turbo-rails
   tzinfo-data
   victor
