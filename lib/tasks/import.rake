@@ -1,4 +1,20 @@
 namespace :import do
+  task pdfs: :environment do
+    Publication.transaction do
+      Dir['pdfs/*.pdf'].each do |file|
+        publication = Publication.create!(
+          title: file,
+          pdf: File.read(file)
+        )
+
+        AnalyzePublication.new.run(publication)
+      rescue PDF::Reader::MalformedPDFError
+        ap "faulty pdf: #{file}"
+        publication.destroy
+      end
+    end
+  end
+
   task sites: :environment do
     Site.transaction do
       # Site.delete_all

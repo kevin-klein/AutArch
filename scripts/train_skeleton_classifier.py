@@ -66,34 +66,37 @@ def show(imgs):
 if __name__ == '__main__':
   dataset = torchvision.datasets.ImageFolder('skeletons', transforms.Compose([
         # transforms.RandomResizedCrop(224),
-        # transforms.RandomHorizontalFlip(),
+        transforms.Resize((224, 224)),
+        transforms.RandomHorizontalFlip(),
         transforms.ToTensor(),
         # transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
     ]))
   data_loader = torch.utils.data.DataLoader(
-                dataset, pin_memory=True, batch_size=4, shuffle=True, num_workers=8,)
+                dataset, pin_memory=True, batch_size=8, shuffle=True, num_workers=8,)
 
-  model = torchvision.models.resnet152(pretrained=True)
-  num_ftrs = model.fc.in_features
-  model.fc = nn.Linear(num_ftrs, 2)
-  model.fc = model.fc.cuda()
+  # model = torchvision.models.vit_b_16(weights=None, num_classes=2)
+  # num_ftrs = model.fc.in_features
+  # model.fc = nn.Linear(num_ftrs, 2).cuda()
+  model = torchvision.models.efficientnet_v2_l(weights=None, num_classes=2)
 
   device = torch.device('cuda')
   model.to(device)
 
   params = [p for p in model.parameters() if p.requires_grad]
   # optimizer = torch.optim.SGD(model.parameters(), lr=0.0001, momentum=0.9)
-  optimizer = torch.optim.Adam(model.fc.parameters(), lr=1e-4)
-  weights = torchvision.models.ResNet152_Weights.DEFAULT
-  preprocess = weights.transforms()
+  # optimizer = torch.optim.AdamW(model.parameters(), lr=1e-4)
+  optimizer = torch.optim.RMSprop(model.parameters(), lr=0.001)
   criterion = nn.CrossEntropyLoss()
 
-  num_epochs = 250
+  num_epochs = 500
   for epoch in range(num_epochs):
       start = time.time()
       optimizer.zero_grad()
 
       model.train()
+
+      torch.save(model.state_dict(), 'models/skeleton_efficient_net_v2.model')
+      torch.save(dataset.classes, 'models/skeleton_efficient_net_v2_labels.model')
 
       i = 0
       epoch_loss = 0
@@ -106,9 +109,9 @@ if __name__ == '__main__':
         targets = targets.to(device)
 
         outputs = model(images)
+        # print(outputs)
         _, preds = torch.max(outputs, 1)
         loss = criterion(outputs, targets)
-
 
         i += 1
 
@@ -118,6 +121,3 @@ if __name__ == '__main__':
         epoch_loss += loss
 
       print(epoch_loss, f'time: {time.time() - start}')
-
-  torch.save(model.state_dict(), 'models/skeleton_resnet.model')
-  torch.save(dataset.classes, 'models/skeleton_resnet_labels.model')

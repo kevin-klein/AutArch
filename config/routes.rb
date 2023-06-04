@@ -28,6 +28,7 @@ Rails.application.routes.draw do # rubocop:disable Metrics/BlockLength
   resources :publications do
     get :stats
     get :analyze, on: :member
+    get :delete, on: :member
   end
 
   root 'graves#root'

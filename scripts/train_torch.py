@@ -11,6 +11,7 @@ import utils
 import transforms as T
 import os
 import xml.etree.ElementTree as ET
+import torchvision.transforms.functional as FT
 
 name_map = {
     'skeleton_left_side': 'skeleton',
@@ -21,10 +22,13 @@ name_map = {
     'arrow_down': 'arrow',
     'skeleton_photo_left_side': 'skeleton_photo',
     'skeleton_photo_right_side': 'skeleton_photo',
-    'compass_right': 'compass',
-    'compass_left': 'compass',
-    'compass_up': 'compass',
-    'compass_down': 'compass'
+    'compass_right': 'arrow',
+    'compass_left': 'arrow',
+    'compass_up': 'arrow',
+    'compass_down': 'arrow',
+    'grave_good': 'good',
+    'stone': 'stone_tool',
+    'skeletonm': 'skeleton'
 }
 
 class DfgDataset(torch.utils.data.Dataset):
@@ -34,6 +38,8 @@ class DfgDataset(torch.utils.data.Dataset):
         self.imgs = [x for x in sorted(os.listdir(root)) if x.endswith('.xml')]
         self.imgs = [os.path.join(self.root, img) for img in self.imgs]
         self.labels = labels
+        # self.labels = torch.load('models/retinanet_labels_large.model')
+        # self.labels = {v: k for k, v in self.labels.items()}
         self.counter = 0
 
         for xml_path in self.imgs:
@@ -60,7 +66,7 @@ class DfgDataset(torch.utils.data.Dataset):
     def __getitem__(self, idx):
         # load images and bounding boxes
         xml_path = self.imgs[idx]
-        img_path = xml_path.replace('.xml', '.jpg')
+        img_path = xml_path.replace('.xml', '.jpg').replace('ý', 'y').replace('š', 's')
         img = Image.open(img_path).convert("RGB")
 
         xml = ET.parse(xml_path)
@@ -81,15 +87,20 @@ class DfgDataset(torch.utils.data.Dataset):
                 for box in bnd_boxes
             ])
 
-        target = {
+        # dims = (512, 362)
+
+        # new_image = FT.resize(img, dims)
+
+        # old_dims = torch.FloatTensor([img.width, img.height, img.width, img.height]).unsqueeze(0)
+        # new_boxes = boxes / old_dims
+
+        # new_dims = torch.FloatTensor([dims[1], dims[0], dims[1], dims[0]]).unsqueeze(0)
+        # new_boxes = new_boxes * new_dims
+
+        return FT.to_tensor(img), {
             'boxes': boxes,
             'labels': labels,
         }
-
-        if self.transforms is not None:
-            img, target = self.transforms(img, target)
-
-        return img, target
 
     def __len__(self):
         return len(self.imgs)
@@ -111,12 +122,14 @@ class DfgDataset(torch.utils.data.Dataset):
 def get_model(num_classes):
     # load an object detection model pre-trained on COCO
     # model = torchvision.models.detection.retinanet_resnet50_fpn_v2(num_classes=num_classes)
-    model = torchvision.models.detection.fasterrcnn_resnet50_fpn_v2(num_classes=num_classes)
-    # model = torchvision.models.detection.ssd300_vgg16(num_classes=num_classes)
+    # model = torchvision.models.detection.fasterrcnn_resnet50_fpn_v2(num_classes=num_classes)
+    model = torchvision.models.detection.ssd300_vgg16(num_classes=num_classes)
     # get the number of input features for the classifier
     #    in_features = model.roi_heads.box_predictor.cls_score.in_features
     # replace the pre-trained head with a new on
     #    model.roi_heads.box_predictor = FastRCNNPredictor(in_features, num_classes)
+
+    # model.load_state_dict(torch.load('models/rcnn_dfg.model'))
     return model
 
 def get_transform(train):
@@ -134,6 +147,9 @@ if __name__ == '__main__':
     dataset_test = DfgDataset(root="pdfs/page_images", transforms = get_transform(train=False), labels=dfg_dataset.labels)
     # split the dataset in train and test set
 
+    torch.save(dfg_dataset.labels, 'models/rcnn_labels.model')
+
+
     print(dfg_dataset.labels)
     torch.manual_seed(1)
     indices = torch.randperm(len(dfg_dataset)).tolist()
@@ -142,14 +158,14 @@ if __name__ == '__main__':
 
 
     data_loader = torch.utils.data.DataLoader(
-                dataset, batch_size=2, shuffle=True, num_workers=8,
+                dataset, batch_size=16, shuffle=True, num_workers=8,
                 collate_fn=utils.collate_fn)
-    data_loader_test = torch.utils.data.DataLoader(
-            dataset_test, batch_size=1, shuffle=False, num_workers=8,
-            collate_fn=utils.collate_fn)
+    # data_loader_test = torch.utils.data.DataLoader(
+    #         dataset_test, batch_size=1, shuffle=False, num_workers=8,
+    #         collate_fn=utils.collate_fn)
     print("We have: {} examples, {} are training and {} testing".format(len(indices), len(dataset), len(dataset_test)))
 
-    device = torch.device('cuda') # if torch.cuda.is_available() else torch.device('cpu')
+    device = torch.device('cuda')
 
     # our dataset has two classes only - raccoon and not racoon
     num_classes = len(dfg_dataset.labels.keys())
@@ -159,8 +175,8 @@ if __name__ == '__main__':
     model.to(device)
     # construct an optimizer
     params = [p for p in model.parameters() if p.requires_grad]
-    # optimizer = torch.optim.SGD(params, lr=0.0001,
-    #                             momentum=0.9, weight_decay=0.0005)
+    # optimizer = torch.optim.SGD(params, lr=1e-4,
+    #                             momentum=0.9, weight_decay=5e-4)
     optimizer = torch.optim.Adam(params, lr=1e-4)
 
     num_epochs = 150
@@ -187,8 +203,7 @@ if __name__ == '__main__':
 
         print(epoch_loss, f'time: {time.time() - start}')
 
-    torch.save(model.state_dict(), 'models/ssd_dfg_large.model')
-    torch.save(dfg_dataset.labels, 'models/ssd_labels_large.model')
+        torch.save(model.state_dict(), 'models/ssd_dfg.model')
 
 # loss retinanet: 4.3512
 # retinanet sgd lr=0.005 momentum=0.9 weight_decay=0.0005
