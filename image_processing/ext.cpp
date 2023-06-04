@@ -6,39 +6,7 @@
 using namespace cv;
 using namespace std;
 
-RNG rng(12345);
-
-class Vector2i {
-
-public:
-  Vector2i(uint32_t x, uint32_t y) : x(x), y(y) {}
-
-  uint32_t x;
-  uint32_t y;
-};
-
 double radiansToDegree(double radians) { return radians * (180 / 3.14159); }
-
-uint32_t angle(const Vector2i &v1, const Vector2i &v2) {
-  double dot = v1.x * v2.x + v1.y * v2.y;
-  double det = v1.x * v2.y - v1.y * v2.x;
-  double radians = atan2(det, dot);
-  return static_cast<uint32_t>(radiansToDegree(radians));
-}
-
-vector<Point> findLargestContour(const vector<vector<Point>> &contours) {
-  vector<double> lengths;
-  std::transform(
-      contours.begin(), contours.end(), std::back_inserter(lengths),
-      [](vector<Point> contour) { return arcLength(contour, true); });
-
-  int minIdx;
-  double minVal;
-  double maxVal;
-  int maxIndex;
-  minMaxLoc(SparseMat(Mat(lengths)), &minVal, &maxVal, &minIdx, &maxIndex);
-  return contours[maxIndex];
-}
 
 Mat cropToFigure(VALUE figure, const Mat &image_mat) {
   long y1 = FIX2LONG(rb_funcall(figure, rb_intern("y1"), 0));
@@ -75,79 +43,6 @@ VALUE convertMatToRubyString(const Mat &mat) {
   std::string image_string(buf.begin(), buf.end());
 
   return rb_str_new(image_string.c_str(), image_string.size());
-}
-
-extern "C" VALUE getCrossSectionStats(VALUE self, VALUE figure, VALUE image_value) {
-  Mat image_mat = convertRubyStringToMat(image_value);
-  Mat arrow_image = cropToFigure(figure, image_mat);
-
-  cvtColor(arrow_image, arrow_image, COLOR_BGR2GRAY);
-  arrow_image = Scalar(255) - arrow_image;
-
-  threshold(arrow_image, arrow_image, 40, 255, THRESH_BINARY);
-
-  vector<vector<Point>> contours;
-  vector<Vec4i> hierarchy;
-  findContours(arrow_image, contours, hierarchy, RETR_EXTERNAL,
-               CHAIN_APPROX_SIMPLE);
-
-  if (contours.size() == 0) {
-    std::cout << "contour is empty" << endl;
-    return Qnil;
-  }
-
-  auto contour = findLargestContour(contours);
-
-  Rect rect = boundingRect(contour);
-  VALUE result = rb_hash_new();
-  rb_hash_aset(result, ID2SYM(rb_intern("width")), LONG2FIX(max(rect.height, rect.width)));
-  rb_hash_aset(result, ID2SYM(rb_intern("height")), LONG2FIX(min(rect.height, rect.width)));
-
-  return result;
-}
-
-extern "C" VALUE getGraveStats(VALUE self, VALUE figure, VALUE image_value) {
-  Mat image_mat = convertRubyStringToMat(image_value);
-  Mat figure_image = cropToFigure(figure, image_mat);
-  Mat graveImage = figure_image;
-
-  cvtColor(figure_image, figure_image, COLOR_BGR2GRAY);
-  figure_image = Scalar(255) - figure_image;
-
-  threshold(figure_image, figure_image, 40, 255, THRESH_BINARY);
-
-  vector<vector<Point>> contours;
-  vector<Vec4i> hierarchy;
-  findContours(figure_image, contours, hierarchy, RETR_EXTERNAL,
-               CHAIN_APPROX_SIMPLE);
-
-  if (contours.size() == 0) {
-    std::cout << "contour is empty" << endl;
-    return Qnil;
-  }
-
-  auto contour = findLargestContour(contours);
-  double arc = arcLength(contour, true);
-  double area = contourArea(contour);
-
-  RotatedRect boundingRectangle = minAreaRect(contour);
-  Size2f size = boundingRectangle.size;
-
-  cv::Point2f vertices2f[4];
-  boundingRectangle.points(vertices2f);
-
-  for (int i = 0; i < 4; i++)
-    line(graveImage, vertices2f[i], vertices2f[(i+1)%4], Scalar(0, 0, 255), 2);
-
-  VALUE result = rb_hash_new();
-  rb_hash_aset(result, ID2SYM(rb_intern("area")), rb_float_new(area));
-  rb_hash_aset(result, ID2SYM(rb_intern("perimeter")), rb_float_new(arc));
-
-  rb_hash_aset(result, ID2SYM(rb_intern("width")), rb_float_new(min(size.width, size.height)));
-  rb_hash_aset(result, ID2SYM(rb_intern("length")), rb_float_new(max(size.width, size.height)));
-  rb_hash_aset(result, ID2SYM(rb_intern("angle")), rb_float_new(boundingRectangle.angle));
-
-  return result;
 }
 
 template<typename T>
@@ -279,6 +174,11 @@ extern "C" VALUE rb_imwrite(VALUE self, VALUE filename, VALUE rb_mat) {
   return Qnil;
 }
 
+extern "C" VALUE rb_boundingRect(VALUE self, VALUE rb_contour) {
+  auto contour = rbContourToCV(rb_contour);
+  return convert_to_ruby(boundingRect(contour));
+}
+
 extern "C" VALUE rb_rotateNoCutoff(VALUE self, VALUE rb_mat, VALUE rb_angle) {
     Mat src = convertRubyStringToMat(rb_mat);
     double angle = RFLOAT_VALUE(rb_angle);
@@ -297,12 +197,11 @@ extern "C" VALUE rb_rotateNoCutoff(VALUE self, VALUE rb_mat, VALUE rb_angle) {
 
 extern "C" void Init_ext() {
   VALUE ImageProcessing = rb_define_module("ImageProcessing");
-  rb_define_module_function(ImageProcessing, "getGraveStats", getGraveStats, 2);
-  rb_define_module_function(ImageProcessing, "getCrossSectionStats", getCrossSectionStats, 2);
   rb_define_module_function(ImageProcessing, "extractFigure", rb_extractFigure, 2);
   rb_define_module_function(ImageProcessing, "findContours", rb_findContours, 2);
   rb_define_module_function(ImageProcessing, "minAreaRect", rb_minAreaRect, 1);
   rb_define_module_function(ImageProcessing, "arcLength", rb_arcLength, 1);
+  rb_define_module_function(ImageProcessing, "boundingRect", rb_boundingRect, 1);
   rb_define_module_function(ImageProcessing, "contourArea", rb_contourArea, 1);
   rb_define_module_function(ImageProcessing, "imwrite", rb_imwrite, 2);
   rb_define_module_function(ImageProcessing, "rotateNoCutoff", rb_rotateNoCutoff, 2);
