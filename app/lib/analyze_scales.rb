@@ -20,8 +20,9 @@ class AnalyzeScales
   end
 
   def calculate_contour_ratio(scale, text)
-    cm_match = text.match(/^([0-9]+)cm$/)
-    m_match = text.match(/^([0-9]+)m$/)
+    return [nil, nil] if text.empty?
+    cm_match = text.match(/([0-9]+)cm$/)
+    m_match = text.match(/([0-9]+)m$/)
 
     distance = if cm_match
                  cm_match.captures[0].to_f / 100
@@ -30,10 +31,10 @@ class AnalyzeScales
                end
 
     ratio = if scale.text.present?
-      (scale.text.to_f / 100) / scale.width
-    else
-      distance / scale.width
-    end
+              (scale.text.to_f / 100) / scale.width
+            elsif distance.present?
+              distance / scale.width
+            end
 
     [distance, ratio]
   end
