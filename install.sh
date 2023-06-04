@@ -9,7 +9,7 @@ rvm install 3.1.2 -C -with-jemalloc
 sudo snap install inkscape
 bundle
 
-wget https://raw.githubusercontent.com/nvm-sh/nvm/master/install.sh -o nvm_install.sh
+curl https://raw.githubusercontent.com/nvm-sh/nvm/master/install.sh > nvm_install.sh
 bash nvm_install.sh
 source ~/.bashrc
 nvm install v18
