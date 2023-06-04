@@ -5,18 +5,18 @@
 #   gem "sqlite3"
 #
 default: &default
-  adapter: postgresql
+  adapter: sqlite3
   encoding: unicode
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 20 } %>
   timeout: 5000
 
-  username: <%= ENV['PG_USER'] %>
-  password: <%= ENV['PG_PASS'] %>
+  # username: <%= ENV['PG_USER'] %>
+  # password: <%= ENV['PG_PASS'] %>
   host: localhost
 
 development:
   <<: *default
-  database: dfgrb_development
+  database: db/development.sqlite3
   variables:
     statement_timeout: <%= ENV["STATEMENT_TIMEOUT"] || "300s" %>
 
@@ -25,7 +25,7 @@ development:
 # Do not set this db to the same as development or production.
 test:
   <<: *default
-  database: dfgrb_test
+  database: db/test.sqlite3
 
 production:
   <<: *default

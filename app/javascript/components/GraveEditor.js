@@ -92,7 +92,6 @@ function NewFigureDialog({ closeDialog, addFigure }) {
                 <option value="GraveCrossSection">Grave Cross Section</option>
                 <option value="Arrow">Arrow</option>
                 <option value="Good">Good</option>
-                <option value="CrossSectionArrow">Cross Section Arrow</option>
               </select>
             </div>
           </form>
@@ -107,7 +106,8 @@ function NewFigureDialog({ closeDialog, addFigure }) {
 }
 
 function Contour({figure, active}) {
-  const points = [...figure.contour, figure.contour[0]].map(point => `${point.x + figure.x1},${point.y + figure.y1}`).join(' ');
+  console.log(figure);
+  const points = [...figure.contour, figure.contour[0]].map(point => `${point[0] + figure.x1},${point[1] + figure.y1}`).join(' ');
   return (
     <polyline
       points={points}
@@ -386,16 +386,32 @@ export default function BoxEditor({grave, sites, image, page}) {
                       </div>
                     </div>
                     {currentEditBox === figure.id && figure.type === 'SkeletonFigure' &&
-                      <>
-                        <Select className='form-select' options={[{value: 0, label: 'supine position' }]} />
-                        <a href={`#/skeletons/${figure.id}`}>Edit</a>
-                      </>}
+                      <div className="row mb-3 mt-3">
+                        <label className="col-sm-2 col-form-label">Position</label>
+                        <div className="col-sm-10">
+                          <select
+                            value={figure.deposition_type}
+                            className="form-select"
+                            aria-label="Default select example"
+                            onChange={(evt) => { onChangeFigure(figure.id, { ...figure, deposition_type: evt.target.value }) }}
+                          >
+                            <option value="unknown">Unknown</option>
+                            <option value="back">Back</option>
+                            <option value="side">Side</option>
+                          </select>
+                        </div>
+                      </div>}
                     {currentEditBox === figure.id && figure.type === 'Grave' &&
                     <>
                       <div className="row mb-3 mt-3">
                         <label className="col-sm-2 col-form-label">Grave ID</label>
                         <div className="col-sm-10">
-                          <input type="text" className="form-control" />
+                          <input
+                            type="text"
+                            className="form-control"
+                            value={figure.publication_id}
+                            onChange={(evt) => { onChangeFigure(figure.id, { ...figure, publication_id: evt.target.value }) }}
+                            />
                         </div>
                       </div>
                     </>}
@@ -417,7 +433,7 @@ export default function BoxEditor({grave, sites, image, page}) {
                   className="list-group-item list-group-item-action d-flex justify-content-between align-items-start"
                 >
                   <div className="ms-2 me-auto">
-                    <div className="fw-bold">New figure</div>
+                    <div className="fw-bold">New Figure</div>
                   </div>
                 </a>
               </ul>
@@ -438,14 +454,10 @@ export default function BoxEditor({grave, sites, image, page}) {
                     <input type='hidden' name={`figures[${id}][y2]`} value={figure.y2} />
                     <input type='hidden' name={`figures[${id}][verified]`} value={figure.verified} />
                     <input type='hidden' name={`figures[${id}][disturbed]`} value={figure.disturbed} />
-
-                    {figure.angle &&
-                     <input type='hidden' name={`figures[${id}][angle]`} value={figure.angle} />
-                    }
-                    {
-                      figure.text &&
-                      <input type='hidden' name={`figures[${id}][text]`} value={figure.text} />
-                    }
+                    <input type='hidden' name={`figures[${id}][deposition_type]`} value={figure.deposition_type} />
+                    <input type='hidden' name={`figures[${id}][publication_id]`} value={figure.publication_id} />
+                    <input type='hidden' name={`figures[${id}][text]`} value={figure.text} />
+                    <input type='hidden' name={`figures[${id}][angle]`} value={figure.angle} />
                   </React.Fragment>
                 );
               })}

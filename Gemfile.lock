@@ -228,7 +228,6 @@ GEM
       hashery (~> 2.0)
       ruby-rc4
       ttfunk
-    pg (1.4.3)
     pkg-config (1.5.1)
     popper_js (2.11.6)
     prettier_print (1.2.0)
@@ -437,6 +436,8 @@ GEM
       actionpack (>= 5.2)
       activesupport (>= 5.2)
       sprockets (>= 3.0.0)
+    sqlite3 (1.6.3-x86_64-darwin)
+    sqlite3 (1.6.3-x86_64-linux)
     stemmify (0.0.2)
     stimulus-rails (1.1.0)
       railties (>= 6.0.0)
@@ -528,7 +529,6 @@ DEPENDENCIES
   parslet!
   pca
   pdf-reader
-  pg
   pkg-config
   puma (~> 5.0)
   rails (~> 7.0.2, >= 7.0.2.3)
@@ -547,6 +547,7 @@ DEPENDENCIES
   sidekiq (~> 6.5)
   simple_form
   sprockets-rails
+  sqlite3
   stemmify (~> 0.0.2)
   stimulus-rails
   stimulus_reflex (>= 3.5.0.pre9)

@@ -26,4 +26,10 @@ class SkeletonFigure < Figure
   belongs_to :grave, foreign_key: 'parent_id', optional: true
 
   has_many :skulls, foreign_key: 'parent_id', class_name: 'Skull'
+
+  enum deposition_type: {
+    unknown: 0,
+    back: 1,
+    side: 2
+  }
 end
