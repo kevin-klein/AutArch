@@ -20,14 +20,14 @@ class AnalyzePublication
           type_name = prediction['label']
           type_name = 'skeleton_figure' if type_name == 'skeleton'
           propability = prediction['score']
-          next if propability < 0.8
+          next if propability < 0.7 || x1.to_i == x2.to_i || y1.to_i == y2.to_i || type_name.camelize.singularize == 'St'
 
           figures << page.figures.create!({ x1: x1, y1: y1, x2: x2, y2: y2, type: type_name.camelize.singularize })
         end
       end
 
       CreateGraves.new.run(publication.pages)
-      GraveAngles.new.run(figures.select { _1.is_a?(Arrow) })
+      # GraveAngles.new.run(figures.select { _1.is_a?(Arrow) })
       GraveSize.new.run(figures)
 
       # publication.graves.update_all(site_id: site_id)

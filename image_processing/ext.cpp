@@ -241,9 +241,14 @@ vector<Point> rbContourToCV(VALUE rb_contour) {
 }
 
 extern "C" VALUE rb_arcLength(VALUE self, VALUE rb_contour) {
-  auto contour = rbContourToCV(rb_contour);
+  try {
+    auto contour = rbContourToCV(rb_contour);
 
-  return convert_to_ruby(arcLength(contour, true));
+    return convert_to_ruby(arcLength(contour, true));
+  }
+  catch( cv::Exception& e ) {
+    return convert_to_ruby(-1);
+  }
 }
 
 extern "C" VALUE rb_contourArea(VALUE self, VALUE rb_contour) {

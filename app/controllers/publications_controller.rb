@@ -1,5 +1,5 @@
 class PublicationsController < ApplicationController
-  before_action :set_publication, only: %i[show edit update destroy stats]
+  before_action :set_publication, only: %i[show edit update delete stats]
 
   # GET /publications or /publications.json
   def index
@@ -70,7 +70,7 @@ class PublicationsController < ApplicationController
   end
 
   # DELETE /publications/1 or /publications/1.json
-  def destroy
+  def delete
     @publication.destroy
 
     respond_to do |format|

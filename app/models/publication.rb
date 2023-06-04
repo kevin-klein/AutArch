@@ -13,7 +13,6 @@
 class Publication < ApplicationRecord
   has_many :pages, dependent: :destroy
   has_many :figures, through: :pages
-  has_many :page_texts, dependent: :destroy
 
   attribute :site, :string
 
