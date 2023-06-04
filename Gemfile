@@ -119,7 +119,4 @@ gem 'stemmify', '~> 0.0.2'
 
 gem 'amatch', '~> 0.4.1'
 
-gem 'stimulus_reflex', '>= 3.5.0.pre9'
-gem 'view_component_reflex', git: 'https://github.com/joshleblanc/view_component_reflex.git'
-
 gem 'view_component', '~> 2.82'
