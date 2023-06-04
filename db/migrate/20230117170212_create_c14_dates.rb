@@ -12,7 +12,7 @@ class CreateC14Dates < ActiveRecord::Migration[7.0]
       t.float :calbc_2sigma_min
       t.string :date_note
       t.integer :cal_method
-      t.string :ref_14c, array: true
+      t.string :ref_14c
       t.references :chronology, null: false
 
       t.timestamps

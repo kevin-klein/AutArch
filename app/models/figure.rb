@@ -26,6 +26,7 @@
 class Figure < ApplicationRecord
   belongs_to :page
   include UnitAccessor
+  serialize :contour, JSON
 
   def box_width
     x2 - x1

@@ -21,7 +21,7 @@ class GraveSize
   end
 
   def handle_cross_section(figure)
-    image = ImageProcessing.extractFigure(figure, image)
+    image = ImageProcessing.extractFigure(figure, figure.page.image.data)
     contours = ImageProcessing.findContours(image, 'tree')
     contour = contours.max_by { ImageProcessing.contourArea _1 }
     rect = ImageProcessing.boundingRect(contour)
@@ -39,7 +39,7 @@ class GraveSize
       area: stats[:area],
       width: stats[:width],
       height: stats[:height],
-      contour: stats[:contour].map { |x, y| ActiveRecord::Point.new(x, y) }
+      contour: stats[:contour].map { |x, y| [x, y] }
     )
     figure.angle = stats[:angle] if figure.is_a?(Grave)
     figure.save!

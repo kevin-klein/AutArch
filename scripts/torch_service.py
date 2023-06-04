@@ -24,6 +24,10 @@ loaded_model.to(device)
 app = Bottle()
 arrow_model = get_arrow_model()
 
+skeleton_model = torchvision.models.efficientnet_v2_l(weights=None, num_classes=2).to(device)
+skeleton_model.load_state_dict(torch.load('models/skeleton_efficient_net_v2.model'))
+skeleton_labels = torch.load('models/skeleton_efficient_net_v2_labels.model')
+
 def analyze_file(file):
     request_object_content = file.read()
     pil_image = Image.open(io.BytesIO(request_object_content))
@@ -58,12 +62,28 @@ def analyze_arrow(file):
     # img = img.to(device)
     img = torch.stack([img]).to(device)
 
-    # with torch.no_grad():
-    arrow_model.eval()
-    prediction = arrow_model(img)
-    _, prediction = torch.max(prediction, 1)
+    with torch.no_grad():
+        arrow_model.eval()
+        prediction = arrow_model(img)
+        _, prediction = torch.max(prediction, 1)
 
     return prediction * 10
+
+def analyze_skeleton(file):
+    request_object_content = file.read()
+    img = Image.open(io.BytesIO(request_object_content))
+
+    img, _ = PILToTensor()(img)
+    # img = img.to(device)
+    img = torch.stack([img]).to(device)
+
+    with torch.no_grad():
+        skeleton_model.eval()
+        prediction = skeleton_model(img)
+        print(prediction)
+        _, prediction = torch.max(prediction, 1)
+
+    return skeleton_labels[prediction]
 
 @app.post('/')
 def upload():
@@ -84,7 +104,7 @@ def upload_arrow():
     upload_file = request.POST['image']
     result = analyze_skeleton(upload_file.file)
 
-    return { 'predictions': result.tolist()[0] }
+    return { 'predictions': result }
 
 if __name__ == '__main__':
     app.run(debug=True, reloader=True)

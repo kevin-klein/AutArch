@@ -7,7 +7,5 @@ class AddSkeletonAttributes < ActiveRecord::Migration[7.0]
     change_table :spines do |t|
       t.references :skeleton
     end
-
-    CreateGraves.new.assign_spines_to_skeletons
   end
 end

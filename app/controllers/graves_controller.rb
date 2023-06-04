@@ -48,7 +48,11 @@ class GravesController < ApplicationController
   # PATCH/PUT /graves/1 or /graves/1.json
   def update
     Grave.transaction do
-      result = Figure.update(params[:figures].keys, params[:figures].values).reject { |p| p.errors.empty? }
+      Figure.update(params[:figures].keys, params[:figures].values).reject { |p| p.errors.empty? }
+
+      figures = Figure.where(id: params[:figures].keys)
+      GraveSize.new.run(figures)
+      AnalyzeScales.new.run(figures)
     end
 
     redirect_to edit_grave_path(@grave)
@@ -59,7 +63,7 @@ class GravesController < ApplicationController
     @grave.destroy
 
     respond_to do |format|
-      format.html { redirect_to graves_url, notice: 'Grave was successfully destroyed.' }
+      format.html { redirect_to edit_grave_path(Grave.order(:id).where('id > ?', @grave.id).first || @grave.last), notice: 'Grave was successfully destroyed.' }
       format.json { head :no_content }
     end
   end

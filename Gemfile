@@ -15,7 +15,7 @@ gem 'bootstrap'
 gem 'graphql'
 gem 'pagy', '~> 6.0' # omit patch digit
 gem 'parslet', git: 'https://github.com/kschiess/parslet'
-gem 'pg'
+gem 'sqlite3'
 gem 'rails-erd', group: :development
 
 gem 'matrix'
