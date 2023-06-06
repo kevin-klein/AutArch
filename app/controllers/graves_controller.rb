@@ -1,5 +1,6 @@
 class GravesController < ApplicationController
   before_action :set_grave, only: %i[show edit update destroy]
+  skip_before_filter :verify_authenticity_token
 
   # GET /graves or /graves.json
   def index
