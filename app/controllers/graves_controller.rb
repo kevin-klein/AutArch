@@ -1,6 +1,5 @@
 class GravesController < ApplicationController
   before_action :set_grave, only: %i[show edit update destroy]
-  skip_forgery_protection
 
   # GET /graves or /graves.json
   def index
