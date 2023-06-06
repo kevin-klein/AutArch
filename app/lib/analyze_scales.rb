@@ -1,5 +1,6 @@
 class AnalyzeScales
   def analyze_scale(scale)
+    return unless scale.is_a?(Scale)
     assign_contour_width(scale)
     text = scale_text(scale)
     distance, ratio = calculate_contour_ratio(scale, text)
