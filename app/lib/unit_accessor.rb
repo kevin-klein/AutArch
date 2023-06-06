@@ -9,6 +9,7 @@ module UnitAccessor
         if scale.present? && scale.meter_ratio&.positive?
           ratio = scale.meter_ratio
           ratio = scale.meter_ratio**2 if square
+          return { value: send(name), unit: 'px' } if ratio.nil?
           { value: send(name) * ratio, unit: value_unit(square) }
         else
           { value: send(name), unit: 'px' }
