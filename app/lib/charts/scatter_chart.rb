@@ -4,7 +4,6 @@ module Charts
       super(width: width, height: height, padding: padding, **kwargs)
       @data = data
       @axis_marker_height = 5
-      @data = data
       @link_proc = link_proc
       calculate_stats
     end

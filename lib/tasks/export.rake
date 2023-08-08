@@ -6,7 +6,6 @@ namespace :export do
         grave = spine.grave
         arrow = grave.arrow
         angle = spine.angle_with_arrow(arrow)
-        ap angle
         csv << [grave.id, angle]
       end
     end
