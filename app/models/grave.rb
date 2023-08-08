@@ -37,6 +37,8 @@ class Grave < Figure
   has_many :skulls, through: :skeleton_figures, foreign_key: 'parent_id', class_name: 'Skull', inverse_of: :grave
   has_many :spines, dependent: :destroy, foreign_key: 'parent_id', class_name: 'Spine', inverse_of: :grave
 
+  accepts_nested_attributes_for :skeleton_figures
+
   def upwards?
     width < height
   end

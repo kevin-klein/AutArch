@@ -1,0 +1,7 @@
+<ol class='stepper'>
+  <% wizard_steps.each do |step| %>
+    <li class="stepper-item <%= step.to_s == params[:id] ? 'active' : '' %>">
+      <h3 class="stepper-title"><%= t(step) %></h3>
+    </li>
+  <% end %>
+</ol>

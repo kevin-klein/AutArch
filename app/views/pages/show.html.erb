@@ -1,11 +1,13 @@
 <nav class='nav' aria-label="Page navigation example">
 
   <ul class="pagination">
-    <li class="page-item"><a class="page-link" href="<%= page_path(Page.order(:id).where('id < ?', @page.id).last || @grave.id) %>">Previous</a></li>
-    <li class="page-item"><a class="page-link" href="<%= page_path(Page.order(:id).where('id > ?', @page.id).first || @grave.id) %>">Next</a></li>
+    <li class="page-item"><a class="page-link" href="<%= publication_page_path(@publication, Page.order(:id).where('id < ?', @page.id).last || @grave.id) %>">Previous</a></li>
+    <li class="page-item"><a class="page-link" href="<%= publication_page_path(@publication, Page.order(:id).where('id > ?', @page.id).first || @grave.id) %>">Next</a></li>
   </ul>
 </nav>
-<%= render(FigureViewComponent.new(
-            figures: @page.figures,
-            image: @page.image
-          )) %>
+<%= react_component('AddFigures', {
+  image: @page.image.as_json(methods: [:href], only: [:id, :width, :height]),
+  pageFigures: @page.figures.as_json(methods: [:type]),
+  page: @page,
+  next_url: publication_page_path(@publication, @page)
+}) %>

@@ -44,6 +44,8 @@ gem 'importmap-rails'
 
 # Hotwire's SPA-like page accelerator [https://turbo.hotwired.dev]
 gem 'turbo-rails'
+gem 'active_median'
+gem 'wicked'
 
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 gem 'jbuilder'
@@ -108,7 +110,7 @@ gem 'pkg-config'
 
 gem 'shakapacker', '= 6.5'
 
-gem 'react-rails', '= 2.6'
+gem 'react-rails'
 
 gem 'rwordnet', '~> 2.0'
 

@@ -14,18 +14,19 @@ Rails.application.routes.draw do # rubocop:disable Metrics/BlockLength
   resources :sites
   resources :maps
   resources :graves do
+    resources :update_grave
     collection do
       get :stats
     end
   end
   resources :figures
-  resources :pages
   resources :images
   resources :skeletons do
     resources :stable_isotopes
   end
   resources :page_images
   resources :publications do
+    resources :pages
     get :stats
     get :analyze, on: :member
     get :delete, on: :member

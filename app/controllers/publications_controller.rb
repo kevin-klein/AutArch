@@ -47,7 +47,7 @@ class PublicationsController < ApplicationController
 
     respond_to do |format|
       if @publication.save
-        # AnalyzePublicationJob.perform_later(@publication, site_id: publication_params[:site])
+        AnalyzePublicationJob.perform_later(@publication, site_id: publication_params[:site])
 
         format.html { redirect_to publications_path, notice: 'Publication was successfully created.' }
       else

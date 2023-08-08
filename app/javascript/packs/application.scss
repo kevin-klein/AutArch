@@ -171,3 +171,50 @@ body {
   border-color: transparent;
   // box-shadow: 0 0 0 3px rgba(255, 255, 255, .25);
 }
+
+:root {
+  --circle-size: clamp(1rem, 4vw, 2rem);
+  --spacing: clamp(0.25rem, 2vw, 0.5rem);
+}
+
+.stepper {
+  display: flex;
+}
+
+.stepper-item {
+  display: flex;
+  gap: var(--spacing);
+  align-items: center;
+
+  &.active:before {
+    background-color: #2c58a0;
+  }
+
+  &:before {
+    content: "";
+    display: block;
+    width: var(--circle-size);
+    height: var(--circle-size);
+    border-radius: 50%;
+    background-color: lightgrey;
+  }
+
+  &:not(:last-child) {
+    flex: 1;
+
+    &:after {
+      content: "";
+      position: relative;
+      z-index: -1;
+      height: 2px;
+      background-color: #e0e0e0;
+      flex: 1;
+      margin-right: 0.5rem;
+    }
+  }
+}
+
+.stepper-title {
+  font-weight: bold;
+  font-size: clamp(1rem, 4vw, 1.25rem);
+}

@@ -1,13 +1,9 @@
-/* eslint-disable react/prop-types */
 import React from 'react';
+import { Wizard, useWizard } from 'react-use-wizard';
 import Select from 'react-select';
+import {useFigureStore} from './store';
 
-const genUUID = () =>
-  ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
-    (c ^ (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (c / 4)))).toString(16)
-  );
-
-function Box({onDraggingStart, active, figure: { id, x1, y1, x2, y2, type}}) {
+export function Box({onDraggingStart, active, figure: { id, x1, y1, x2, y2, type}}) {
   let color = 'black';
   if(active === id) {
     color = '#F44336';
@@ -72,7 +68,7 @@ function Box({onDraggingStart, active, figure: { id, x1, y1, x2, y2, type}}) {
 }
 
 function NewFigureDialog({ closeDialog, addFigure }) {
-  const [type, setType] = React.useState('Spine');
+  const [type, setType] = React.useState('Grave');
 
   return (<div className="modal d-block" aria-hidden="false">
     <div className="modal-dialog">
@@ -85,6 +81,7 @@ function NewFigureDialog({ closeDialog, addFigure }) {
           <form>
             <div className="input-group mb-3">
               <select value={type} onChange={evt => setType(evt.target.value)} className="form-select" aria-label="Default select example">
+                <option value="Grave">Grave</option>
                 <option value="Spine">Spine</option>
                 <option value="Skeleton">Skeleton</option>
                 <option value="Skull">Skull</option>
@@ -106,7 +103,6 @@ function NewFigureDialog({ closeDialog, addFigure }) {
 }
 
 function Contour({figure, active}) {
-  console.log(figure);
   const points = [...figure.contour, figure.contour[0]].map(point => `${point[0] + figure.x1},${point[1] + figure.y1}`).join(' ');
   return (
     <polyline
@@ -118,16 +114,18 @@ function Contour({figure, active}) {
   );
 }
 
-export default function BoxEditor({grave, sites, image, page}) {
-  const [figures, setFigures] = React.useState(grave.figures);
-  const [arrowAngle, setArrowAngle] = React.useState(grave.figures.filter(figure => figure.type === 'Arrow')[0]?.angle || 0);
+export default ({image, pageFigures, page, next_url}) => {
+  const {figures, updateFigure, setFigures, addFigure, removeFigure} = useFigureStore();
+
   const [rendering, setRendering] = React.useState('boxes');
   const [draggingState, setDraggingState] = React.useState(null);
   const [creatingNewFigure, setCreatingNewFigure] = React.useState(false);
-  const [site, setSite] = React.useState(grave.site_id);
   const canvasRef = React.useRef(null);
-  const [currentEditBox, setCurrentEditBox] = React.useState(grave.figures.filter((f) => f.type == 'Grave')[0]?.id);
-  const graveFigure = figures.filter(figure => figure.id === grave.id)[0];
+  const [currentEditBox, setCurrentEditBox] = React.useState(null);
+
+  React.useEffect(() => {
+    setFigures(pageFigures);
+  }, []);
 
   const token =
       document.querySelector('[name=csrf-token]').content;
@@ -151,7 +149,7 @@ export default function BoxEditor({grave, sites, image, page}) {
       }
     });
     if (response.ok) {
-      setFigures(figures.filter((figure) => figure.id !== id));
+      removeFigure(figures[id]);
     } else {
       return Promise.reject(response);
     }
@@ -196,32 +194,8 @@ export default function BoxEditor({grave, sites, image, page}) {
     });
   }
 
-  function disturbedChanged(evt) {
-    const checked = evt.target.checked;
-    setFigures(figures.map(figure => {
-      if(figure.id === grave.id) {
-        return {...figure, disturbed: checked};
-      }
-      else {
-        return {...figure};
-      }
-    }));
-  }
-
-  function verifiedChanged(evt) {
-    const checked = evt.target.checked;
-    setFigures(figures.map(figure => {
-      if(figure.id === grave.id) {
-        return {...figure, verified: checked};
-      }
-      else {
-        return {...figure};
-      }
-    }));
-  }
-
-  async function addFigure(type) {
-    const grave = figures.filter(figure => figure.type === 'Grave')[0];
+  async function createFigure(type) {
+    const grave = Object.values(figures).filter(figure => figure.type === 'Grave')[0];
 
     let newFigure = null;
     if(grave !== undefined) {
@@ -241,14 +215,13 @@ export default function BoxEditor({grave, sites, image, page}) {
 
     const response = await fetch('/figures.json', {
       method: 'POST',
-      body: JSON.stringify({grave_id: grave.id, figure: {
+      body: JSON.stringify({figure: {
         x1: newFigure.x1,
         x2: newFigure.x2,
         y1: newFigure.y1,
         y2: newFigure.y2,
         page_id: newFigure.page_id,
         type: newFigure.type,
-        parent_id: grave.id,
       }}),
       headers: {
         'X-CSRF-Token': token,
@@ -257,7 +230,7 @@ export default function BoxEditor({grave, sites, image, page}) {
     });
     if (response.ok) {
       newFigure = await response.json();
-      setFigures([...figures, {...newFigure, type: type}]);
+      addFigure({...newFigure, type: type});
       setCurrentEditBox(newFigure.id);
     } else {
       return Promise.reject(response);
@@ -270,53 +243,28 @@ export default function BoxEditor({grave, sites, image, page}) {
 
   function onDrag(evt) {
     if(draggingState !== null) {
-      setFigures(figures.map((figure) => {
-        if(figure.id === draggingState.data.figure.id) {
-          draggingState.point.x = evt.clientX;
-          draggingState.point.y = evt.clientY;
-          const cursor = draggingState.point.matrixTransform(canvasRef.current.getScreenCTM().inverse());
+      const figure = figures[draggingState.data.figure.id];
 
-          const x = cursor.x - draggingState.x;
-          const y = cursor.y - draggingState.y;
+      draggingState.point.x = evt.clientX;
+      draggingState.point.y = evt.clientY;
+      const cursor = draggingState.point.matrixTransform(canvasRef.current.getScreenCTM().inverse());
 
-          if(draggingState.data.point === 1) {
-            return { ...figure, x1: x, y1: y };
-          }
-          else {
-            return { ...figure, x2: x, y2: y };
-          }
-        }
-        return figure;
-      }));
+      const x = cursor.x - draggingState.x;
+      const y = cursor.y - draggingState.y;
+
+      if(draggingState.data.point === 1) {
+        updateFigure({ ...figure, x1: x, y1: y });
+      }
+      else {
+        updateFigure({ ...figure, x2: x, y2: y });
+      }
     }
-
   }
 
-  const siteOptions = sites.map((site) => { return { value: site.id, label: site.name }; });
-  const siteValue = siteOptions.filter((option) => option.value === site )[0];
-
-  let arrowView = null;
-  const arrow = grave.figures.filter((f) => f.type == 'Arrow')[0];
-  if(arrow) {
-    const arrowCenterX = (arrow.x1 + arrow.x2) / 2;
-    const arrowCenterY = (arrow.y1 + arrow.y2) / 2;
-
-    arrowView = (<svg width="512" height="200" viewBox={`${arrow.x1} ${arrow.y1} ${arrow.x2 - arrow.x1} ${arrow.y2 - arrow.y1}`}>
-      <image width={image.width} height={image.height} href={image.href} />
-      <g transform={`rotate(${arrowAngle} ${arrowCenterX} ${arrowCenterY}) translate(${arrowCenterX - 100} ${arrowCenterY - 80})`} stroke="#3F51B5" shapeRendering="geometricPrecision">
-        <line x1="100" y1="20" x2="100" y2="150" />
-        <line x1="100" x2="110" y1="20" y2="40" />
-        <line x1="100" x2="90" y1="20" y2="40" />
-      </g>
-    </svg>);
-  }
-
-  return (<React.StrictMode>
-    {creatingNewFigure && <NewFigureDialog addFigure={addFigure} closeDialog={() => setCreatingNewFigure(false)} />}
+  return (<React.Fragment>
+    {creatingNewFigure && <NewFigureDialog addFigure={createFigure} closeDialog={() => setCreatingNewFigure(false)} />}
     <div className='row'>
       <div className='col-md-8 card'>
-        {arrowView}
-
         <div className="form-check">
           <select value={rendering} onChange={evt => setRendering(evt.target.value)} className="form-select" aria-label="Default select example">
             <option value='boxes'>Show Bounding Boxes</option>
@@ -334,7 +282,7 @@ export default function BoxEditor({grave, sites, image, page}) {
           xmlns="http://www.w3.org/2000/svg"
         >
           <image width={image.width} height={image.height} href={image.href} />
-          {rendering === 'boxes' && figures.map(figure => <Box canvas={canvasRef} key={figure.id} onDraggingStart={onDraggingStart} active={currentEditBox} figure={figure} />)}
+          {rendering === 'boxes' && Object.values(figures).map(figure => <Box canvas={canvasRef} key={figure.id} onDraggingStart={onDraggingStart} active={currentEditBox} figure={figure} />)}
           {rendering === 'contours' && figures.filter(figure => ['Grave', 'Arrow', 'Scale'].indexOf(figure.type) !== -1 ).map(figure => <Contour key={figure.id} active={currentEditBox} figure={figure} />)}
         </svg>
       </div>
@@ -342,34 +290,9 @@ export default function BoxEditor({grave, sites, image, page}) {
       <div className='col-md-4'>
         <div style={{position: 'sticky', top: 60}} className="card">
           <div className="card-body">
-            <h5 className="card-title">Edit Grave</h5>
             <div className="card-text">
-              <button className='btn btn-info' onClick={() => setArrowAngle((arrowAngle + 180) % 360)}>Flip Angle</button>
-              <label className="form-label ms-2" htmlFor="arrow-range-input">Arrow Angle: {arrowAngle}°</label>
-              <div className="range">
-                <input id='arrow-range-input' type="range" className="form-range" min="0" max="360" onChange={(evt) => setArrowAngle(evt.target.value || 0)} value={arrowAngle} />
-              </div>
-
-              <div className="input-group mb-3">
-                <Select value={siteValue} onChange={onSiteChange} className="form-select" options={siteOptions} />
-              </div>
-
-              <div className="form-check">
-                <input className="form-check-input" type="checkbox" onChange={disturbedChanged} checked={graveFigure.disturbed} id="disturbed-checkbox" />
-                <label className="form-check-label" htmlFor="disturbed-checkbox">
-                  Disturbed?
-                </label>
-              </div>
-
-              <div className="form-check">
-                <input className="form-check-input" type="checkbox" onChange={verifiedChanged} checked={graveFigure.verified} id="approved-checkbox" />
-                <label className="form-check-label" htmlFor="approved-checkbox">
-                  Verified?
-                </label>
-              </div>
-
               <ul className="list-group">
-                {figures.map(figure =>
+                {Object.values(figures).map(figure =>
                   <React.Fragment key={figure.id}>
                     <div
                       onClick={() => { setCurrentEditBox(figure.id); } }
@@ -401,29 +324,6 @@ export default function BoxEditor({grave, sites, image, page}) {
                           </select>
                         </div>
                       </div>}
-                    {currentEditBox === figure.id && figure.type === 'Grave' &&
-                    <>
-                      <div className="row mb-3 mt-3">
-                        <label className="col-sm-2 col-form-label">Grave ID</label>
-                        <div className="col-sm-10">
-                          <input
-                            type="text"
-                            className="form-control"
-                            value={figure.publication_id}
-                            onChange={(evt) => { onChangeFigure(figure.id, { ...figure, publication_id: evt.target.value }) }}
-                            />
-                        </div>
-                      </div>
-                    </>}
-                    {currentEditBox === figure.id && figure.type === 'Scale' &&
-                    <>
-                      <div className="row mb-3 mt-3">
-                        <label className="col-sm-2 col-form-label">Distance (cm)</label>
-                        <div className="col-sm-10">
-                          <input type="text" className="form-control" value={figure.text} onChange={(evt) => { onChangeFigure(figure.id, { ...figure, text: evt.target.value }) }} />
-                        </div>
-                      </div>
-                    </>}
                   </React.Fragment>
                 )}
 
@@ -438,14 +338,11 @@ export default function BoxEditor({grave, sites, image, page}) {
                 </a>
               </ul>
             </div>
-            <form action={`/graves/${grave.id}`} method='post'>
+            <form action={next_url} method='post'>
               <input type="hidden" name="_method" value="patch" />
               <input type="hidden" name="authenticity_token" value={token} />
-              {figures.map(figure => {
+              {Object.values(figures).map(figure => {
                 const id = figure.id;
-                if(figure.type === 'Arrow') {
-                  figure.angle = arrowAngle;
-                }
                 return (
                   <React.Fragment key={figure.id}>
                     <input type='hidden' name={`figures[${id}][x1]`} value={figure.x1} />
@@ -470,5 +367,5 @@ export default function BoxEditor({grave, sites, image, page}) {
       </div>
 
     </div>
-  </React.StrictMode>);
+  </React.Fragment>);
 }

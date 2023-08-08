@@ -2,20 +2,25 @@
   <image width='<%= @image.width %>' height='<%= @image.height %>' href='<%= @image.href %>' />
 
   <% @figures.each do |figure| %>
-    <rect
-      fill='none'
-      stroke="red"
-      strokeWidth="2"
-      x='<%= figure.x1 %>'
-      y='<%= figure.y1 %>'
-      width='<%= figure.x2 - figure.x1 %>'
-      height='<%= figure.y2 - figure.y1 %>'
-    />
-    <text
-      x='<%= figure.x1 %>'
-      y='<%= figure.y1 %>'
-      >
-      <%= figure.type %>
-    </text>
+    <% if figure.is_a?(Spine) %>
+
+    <% else %>
+      <rect
+        fill='none'
+        stroke="red"
+        strokeWidth="2"
+        x='<%= figure.x1 %>'
+        y='<%= figure.y1 %>'
+        width='<%= figure.x2 - figure.x1 %>'
+        height='<%= figure.y2 - figure.y1 %>'
+      />
+      <text
+        x='<%= figure.x1 %>'
+        y='<%= figure.y1 %>'
+        style='font-size: 36px;'
+        >
+        <%= figure.type %> <%= figure.id %>
+      </text>
+    <% end %>
   <% end %>
 </svg>
