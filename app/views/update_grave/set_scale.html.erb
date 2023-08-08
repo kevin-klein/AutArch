@@ -1,0 +1,27 @@
+<%= render('stepper') %>
+
+<% if @scale.nil? %>
+
+<% else %>
+  <div class="alert alert-primary" role="alert">
+    Verify that the recognized text indicating the scale matches the one in the illustration.
+  </div>
+  <div class='row'>
+    <div class='col-md-6'>
+      <%= react_component('Scale', {
+        image: @grave.page.image.as_json(methods: [:href], only: [:id, :width, :height]),
+        grave: @grave.as_json(methods: [:type], include: { figures: { methods: [:type]} }),
+        sites: Site.all,
+        page: @grave.page,
+        next_url: wizard_path
+      }) %>
+    </div>
+
+    <div class='col-md-6'>
+      <%= simple_form_for(@scale, url: wizard_path) do |f| %>
+        <%= f.input :text %>
+        <%= f.submit('Next', class: 'btn btn-primary') %>
+      <% end %>
+    </div>
+  </div>
+<% end %>
