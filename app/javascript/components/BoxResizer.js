@@ -82,7 +82,7 @@ function NewFigureDialog({ closeDialog, addFigure }) {
             <div className="input-group mb-3">
               <select value={type} onChange={evt => setType(evt.target.value)} className="form-select" aria-label="Default select example">
                 <option value="Spine">Spine</option>
-                <option value="Skeleton">Skeleton</option>
+                <option value="SkeletonFigure">Skeleton</option>
                 <option value="Skull">Skull</option>
                 <option value="Scale">Scale</option>
                 <option value="GraveCrossSection">Grave Cross Section</option>
@@ -175,21 +175,12 @@ export default ({next_url, grave, sites, image, page}) => {
     svgPoint.y = evt.clientY;
     svgPoint = svgPoint.matrixTransform(canvasRef.current.getScreenCTM().inverse());
 
-    let x = 0;
-    let y = 0;
-    if(data.point === 1) {
-      x = figure.x1;
-      y = figure.y1;
-    }
-    else {
-      x = figure.x2;
-      y = figure.y2;
-    }
-
     setDraggingState({
       point: svgPoint,
-      x: svgPoint.x - x,
-      y: svgPoint.y - y,
+      x1: svgPoint.x - figure.x1,
+      y1: svgPoint.y - figure.y1,
+      x2: svgPoint.x - figure.x2,
+      y2: svgPoint.y - figure.y2,
       data: data,
     });
   }
@@ -199,15 +190,28 @@ export default ({next_url, grave, sites, image, page}) => {
 
     let newFigure = null;
     if(grave !== undefined) {
-      const graveWidth = grave.x2 - grave.x1;
-      const graveHeight = grave.y2 - grave.y1;
-      const x1 = grave.x1 + graveWidth * 0.3;
-      const x2 = grave.x1 + graveWidth * 0.6;
+      if(type === 'Spine') {
+        const graveWidth = grave.x2 - grave.x1;
+        const graveHeight = grave.y2 - grave.y1;
+        const x1 = grave.x1 + graveWidth * 0.5;
+        const x2 = grave.x1 + graveWidth * 0.5;
 
-      const y1 = grave.y1 + graveHeight * 0.4;
-      const y2 = grave.y1 + graveHeight * 0.6;
+        const y1 = grave.y1 + graveHeight * 0.6;
+        const y2 = grave.y1 + graveHeight * 0.4;
 
-      newFigure = { ...grave, page_id: page.id, y1: y1, y2: y2, x1: x1, x2: x2, type: type };
+        newFigure = { ...grave, page_id: page.id, y1: y1, y2: y2, x1: x1, x2: x2, type: type };
+      }
+      else {
+        const graveWidth = grave.x2 - grave.x1;
+        const graveHeight = grave.y2 - grave.y1;
+        const x1 = grave.x1 + graveWidth * 0.3;
+        const x2 = grave.x1 + graveWidth * 0.6;
+
+        const y1 = grave.y1 + graveHeight * 0.4;
+        const y2 = grave.y1 + graveHeight * 0.6;
+
+        newFigure = { ...grave, page_id: page.id, y1: y1, y2: y2, x1: x1, x2: x2, type: type };
+      }
     }
     else{
       newFigure = { type: type, page_id: page.id, x1: 0, y1: 0, x2: 100, y2: 100 };
@@ -250,17 +254,46 @@ export default ({next_url, grave, sites, image, page}) => {
       draggingState.point.y = evt.clientY;
       const cursor = draggingState.point.matrixTransform(canvasRef.current.getScreenCTM().inverse());
 
-      const x = cursor.x - draggingState.x;
-      const y = cursor.y - draggingState.y;
+      if(evt.ctrlKey) {
+        const x1 = cursor.x - draggingState.x1;
+        const y1 = cursor.y - draggingState.y1;
 
-      if(draggingState.data.point === 1) {
-        updateFigure({ ...figure, x1: x, y1: y });
+        const x2 = cursor.x - draggingState.x2;
+        const y2 = cursor.y - draggingState.y2;
+        updateFigure({ ...figure, x1: x1, y1: y1, x2: x2, y2: y2 });
       }
       else {
-        updateFigure({ ...figure, x2: x, y2: y });
+        if(draggingState.data.point === 1) {
+          const x = cursor.x - draggingState.x1;
+          const y = cursor.y - draggingState.y1;
+
+          updateFigure({ ...figure, x1: x, y1: y });
+        }
+        else {
+          const x = cursor.x - draggingState.x2;
+          const y = cursor.y - draggingState.y2;
+
+          updateFigure({ ...figure, x2: x, y2: y });
+        }
       }
     }
   }
+
+  const validations = ['Scale', 'Arrow', 'Spine', 'SkeletonFigure', 'GraveCrossSection'].map((item) => {
+    const matchingFigure = Object.values(figures).filter(fig => fig.type === item)[0];
+    if(matchingFigure === undefined) {
+      if(item === 'SkeletonFigure' || item === 'Spine') {
+        return (
+          <li className="list-group-item alert-warning">{item} is missing</li>
+        );
+      }
+      else {
+        return (
+          <li className="list-group-item alert-danger">{item} is missing</li>
+        );
+      }
+    }
+  });
 
   return (<React.Fragment>
     {creatingNewFigure && <NewFigureDialog addFigure={createFigure} closeDialog={() => setCreatingNewFigure(false)} />}
@@ -361,8 +394,12 @@ export default ({next_url, grave, sites, image, page}) => {
                 );
               })}
 
-              <input value='Next' type='submit' className="btn btn-primary card-link" />
+              <input value='Next' type='submit' className="btn btn-primary card-link mt-1" />
             </form>
+
+            <ul className="list-group mt-3">
+              {validations}
+            </ul>
 
           </div>
         </div>

@@ -3,7 +3,7 @@ import * as R from 'ramda';
 
 export let useFigureStore = create((set) => ({
   grave: {},
-  figures: [],
+  figures: {},
   updateFigure: function(figure) {
     set(R.over(R.lensPath(['figures', figure.id]), item => R.mergeRight(item, figure)));
   },

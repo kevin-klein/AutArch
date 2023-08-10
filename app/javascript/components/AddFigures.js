@@ -195,23 +195,13 @@ export default ({image, pageFigures, page, next_url}) => {
   }
 
   async function createFigure(type) {
-    const grave = Object.values(figures).filter(figure => figure.type === 'Grave')[0];
+    const x1 = image.width * 0.3;
+    const x2 = image.width * 0.6;
 
-    let newFigure = null;
-    if(grave !== undefined) {
-      const graveWidth = grave.x2 - grave.x1;
-      const graveHeight = grave.y2 - grave.y1;
-      const x1 = grave.x1 + graveWidth * 0.3;
-      const x2 = grave.x1 + graveWidth * 0.6;
+    const y1 = image.height * 0.4;
+    const y2 = image.height * 0.6;
 
-      const y1 = grave.y1 + graveHeight * 0.4;
-      const y2 = grave.y1 + graveHeight * 0.6;
-
-      newFigure = { ...grave, page_id: page.id, y1: y1, y2: y2, x1: x1, x2: x2, type: type };
-    }
-    else{
-      newFigure = { type: type, page_id: page.id, x1: 0, y1: 0, x2: 100, y2: 100 };
-    }
+    const newFigure = { page_id: page.id, y1: y1, y2: y2, x1: x1, x2: x2, type: type };
 
     const response = await fetch('/figures.json', {
       method: 'POST',
@@ -229,9 +219,9 @@ export default ({image, pageFigures, page, next_url}) => {
       }
     });
     if (response.ok) {
-      newFigure = await response.json();
-      addFigure({...newFigure, type: type});
-      setCurrentEditBox(newFigure.id);
+      const figure = await response.json();
+      addFigure({...figure, type: type});
+      setCurrentEditBox(figure.id);
     } else {
       return Promise.reject(response);
     }
