@@ -26,7 +26,11 @@
         <td><%= number_with_unit grave.width_with_unit %></td>
         <td><%= number_with_unit grave.height_with_unit %></td>
         <td><%= number_with_unit grave.grave_cross_section&.height_with_unit %></td>
-        <td><%#= ((grave.angle.abs.round + grave.arrow.angle) % 180).round  %></td>
+        <td>
+          <% unless grave&.arrow&.angle.nil? %>
+            <%= ((grave.angle.abs.round + grave.arrow.angle) % 180).round  %> deg
+          <% end %>
+        </td>
         <td><%= link_to('Edit', grave_update_grave_path(grave, :resize_boxes)) %></td>
       </tr>
     <% end %>
