@@ -20,12 +20,15 @@ class UpdateGraveController < ApplicationController
     case step
     when :set_skeleton_data
       @grave.update(grave_params)
+    when :set_scale
+      @scale.update(text: params[:scale][:text])
     when :resize_boxes
       Figure.update(params[:figures].keys, params[:figures].values).reject { |p| p.errors.empty? }
 
       figures = Figure.where(id: params[:figures].keys)
       GraveSize.new.run(figures)
       AnalyzeScales.new.run(figures)
+      GraveAngles.new.run(figures.select { _1.is_a?(Arrow) })
     when :set_north_arrow
       arrow = @grave.arrow
       arrow.angle = params[:figures][arrow.id.to_s][:angle]
