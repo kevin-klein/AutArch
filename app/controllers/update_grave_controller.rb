@@ -21,7 +21,11 @@ class UpdateGraveController < ApplicationController
     when :set_skeleton_data
       @grave.update(grave_params)
     when :set_scale
-      @scale.update(text: params[:scale][:text])
+      if params[:scale].present?
+        @scale.update(text: params[:scale][:text])
+      else
+        @grave.update(grave_params)
+      end
     when :resize_boxes
       Figure.update(params[:figures].keys, params[:figures].values).reject { |p| p.errors.empty? }
 
@@ -33,12 +37,16 @@ class UpdateGraveController < ApplicationController
       arrow = @grave.arrow
       arrow.angle = params[:figures][arrow.id.to_s][:angle]
       arrow.save!
+
+      if @grave.skeleton_figures.size == 0
+        skip_step
+      end
     end
 
     render_wizard @grave
   end
 
   def grave_params
-    params.require(:grave).permit(skeleton_figures_attributes: %i[id deposition_type])
+    params.require(:grave).permit(:percentage_scale, :page_size, skeleton_figures_attributes: %i[id deposition_type])
   end
 end

@@ -100,6 +100,40 @@ VALUE convert_to_ruby(vector<T> vec) {
   return result;
 }
 
+Size getKernel(VALUE rb_kernel) {
+  long width = FIX2LONG(RARRAY_AREF(rb_kernel, 0));
+  long height = FIX2LONG(RARRAY_AREF(rb_kernel, 1));
+  return Size(width, height);
+}
+
+extern "C" VALUE rb_gauss(VALUE self, VALUE rb_mat, VALUE rb_kernel) {
+  Mat mat = convertRubyStringToMat(rb_mat);
+
+  Mat result;
+  Size kernel = getKernel(rb_kernel);
+  GaussianBlur(mat, result, kernel, 0);
+
+  return convertMatToRubyString(result);
+}
+
+extern "C" VALUE rb_dilate(VALUE self, VALUE rb_mat, VALUE rb_kernel) {
+  Mat mat = convertRubyStringToMat(rb_mat);
+  Mat result;
+  Size kernel = getKernel(rb_kernel);
+  dilate(mat, result, getStructuringElement(MORPH_RECT, kernel));
+
+  return convertMatToRubyString(result);
+}
+
+extern "C" VALUE rb_erode(VALUE self, VALUE rb_mat, VALUE rb_kernel) {
+  Mat mat = convertRubyStringToMat(rb_mat);
+  Mat result;
+  Size kernel = getKernel(rb_kernel);
+  erode(mat, result, getStructuringElement(MORPH_RECT, kernel));
+
+  return convertMatToRubyString(result);
+}
+
 extern "C" VALUE rb_findContours(VALUE self, VALUE rb_mat, VALUE rb_retrieve_type) {
   Mat mat = convertRubyStringToMat(rb_mat);
 
@@ -205,4 +239,7 @@ extern "C" void Init_ext() {
   rb_define_module_function(ImageProcessing, "contourArea", rb_contourArea, 1);
   rb_define_module_function(ImageProcessing, "imwrite", rb_imwrite, 2);
   rb_define_module_function(ImageProcessing, "rotateNoCutoff", rb_rotateNoCutoff, 2);
+  rb_define_module_function(ImageProcessing, "gauss", rb_gauss, 2);
+  rb_define_module_function(ImageProcessing, "erode", rb_erode, 2);
+  rb_define_module_function(ImageProcessing, "dilate", rb_dilate, 2);
 }
