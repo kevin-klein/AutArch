@@ -3,14 +3,82 @@ import { Wizard, useWizard } from 'react-use-wizard';
 import Select from 'react-select';
 import {useFigureStore} from './store';
 
-export function Box({onDraggingStart, active, figure: { id, x1, y1, x2, y2, type}}) {
+function rotatePoint(x, y, figure) {
+  const centerX = (figure.x2 + figure.x1) / 2;
+  const centerY = (figure.y2 + figure.y1) / 2;
+  let newX = (x - centerX) * Math.cos(-figure.bounding_box_angle) - (y - centerY) * Math.sin(-figure.bounding_box_angle);
+  let newY = (x - centerX) * Math.sin(-figure.bounding_box_angle) + (y - centerY) * Math.cos(-figure.bounding_box_angle);
+  newX = newX + centerX;
+  newY = newY + centerY;
+
+  return {
+    x: newX,
+    y: newY
+  }
+}
+
+function ManualBoundingBox({figure, color, onDraggingStart}) {
+  function onMouseDown(figure) {
+    return function(evt) {
+      evt.preventDefault();
+      onDraggingStart(evt, figure);
+    };
+  }
+
+  return (<React.Fragment>
+    <rect
+      fill='none'
+      stroke={color}
+      strokeWidth="3"
+      x={figure.x1}
+      y={figure.y1}
+      width={figure.x2 - figure.x1}
+      height={figure.y2 - figure.y1}
+      transform={`rotate(${figure.bounding_box_angle} ${figure.bounding_box_center_x}, ${figure.bounding_box_center_y}`}
+    />
+    <circle
+      className="moveable-point"
+      r='10'
+      cx={figure.bounding_box_center_x}
+      cy={figure.bounding_box_center_y}
+      fill="green"
+    />
+    <circle
+      onMouseDown={onMouseDown({ figure: figure, point: 1 })}
+      className="moveable-point"
+      r='10'
+      cx={figure.bounding_box_center_x - figure.bounding_box_width / 2}
+      cy={figure.bounding_box_center_y - figure.bounding_box_height / 2}
+      stroke="black"
+      transform={`rotate(${figure.bounding_box_angle} ${(figure.x2 + figure.x1) / 2}, ${(figure.y2 + figure.y1) / 2})`}
+    />
+    <circle
+      onMouseDown={onMouseDown({ figure: figure, point: 2 })}
+      className="moveable-point"
+      r='10'
+      cx={figure.bounding_box_center_x + figure.bounding_box_width / 2}
+      cy={figure.bounding_box_center_y + figure.bounding_box_height / 2}
+      stroke="black"
+      transform={`rotate(${figure.bounding_box_angle} ${(figure.x2 + figure.x1) / 2}, ${(figure.y2 + figure.y1) / 2})`}
+    />
+  </React.Fragment>);
+}
+
+export function Box({onDraggingStart, active, figure}) {
+  const { id, x1, y1, x2, y2, type } = figure;
+
   let color = 'black';
   if(active === id) {
     color = '#F44336';
   }
 
+  if(figure.manual_bounding_box) {
+    return <ManualBoundingBox onDraggingStart={onDraggingStart} figure={figure} color={color} />;
+  }
+
   function onMouseDown(figure) {
     return function(evt) {
+      console.log(figure);
       evt.preventDefault();
       onDraggingStart(evt, figure);
     };
@@ -83,11 +151,9 @@ function NewFigureDialog({ closeDialog, addFigure }) {
               <select value={type} onChange={evt => setType(evt.target.value)} className="form-select" aria-label="Default select example">
                 <option value="Spine">Spine</option>
                 <option value="SkeletonFigure">Skeleton</option>
-                <option value="Skull">Skull</option>
                 <option value="Scale">Scale</option>
                 <option value="GraveCrossSection">Grave Cross Section</option>
                 <option value="Arrow">Arrow</option>
-                <option value="Good">Good</option>
               </select>
             </div>
           </form>
@@ -156,7 +222,7 @@ export default ({next_url, grave, sites, image, page}) => {
   }
 
   function onChangeFigure(id, figure) {
-    setFigures(figures.map((currentFigure) => {
+    setFigures(Object.values(figures).map((currentFigure) => {
       if(currentFigure.id === figure.id) {
         return figure;
       }
@@ -166,6 +232,27 @@ export default ({next_url, grave, sites, image, page}) => {
     }));
   }
 
+  function setManualBoundingBox(figure, checked) {
+    if(checked && figure.bounding_box_angle === null) {
+      const centerX = (figure.x1 + figure.x2) / 2;
+      const centerY = (figure.y1 + figure.y2) / 2;
+      const angle = 0;
+      const width = figure.x2 - figure.x1;
+      const height = figure.y2 - figure.y1;
+      onChangeFigure(figure.id, {
+        ...figure,
+        manual_bounding_box: checked,
+        bounding_box_center_x: centerX,
+        bounding_box_center_y: centerY,
+        bounding_box_angle: angle,
+        bounding_box_width: width,
+        bounding_box_height: height
+      });
+    }
+    else {
+      onChangeFigure(figure.id, { ...figure, manual_bounding_box: checked });
+    }
+  }
 
   function onDraggingStart(evt, data) {
     const figure = data.figure;
@@ -264,15 +351,25 @@ export default ({next_url, grave, sites, image, page}) => {
       }
       else {
         if(draggingState.data.point === 1) {
-          const x = cursor.x - draggingState.x1;
-          const y = cursor.y - draggingState.y1;
+          let x = cursor.x - draggingState.x1;
+          let y = cursor.y - draggingState.y1;
 
+          if(figure.bounding_box_angle !== null) {
+            const result = rotatePoint(x, y, figure);
+            x = result.x;
+            y = result.y;
+          }
           updateFigure({ ...figure, x1: x, y1: y });
         }
         else {
-          const x = cursor.x - draggingState.x2;
-          const y = cursor.y - draggingState.y2;
+          let x = cursor.x - draggingState.x2;
+          let y = cursor.y - draggingState.y2;
 
+          if(figure.bounding_box_angle !== null) {
+            const result = rotatePoint(x, y, figure);
+            x = result.x;
+            y = result.y;
+          }
           updateFigure({ ...figure, x2: x, y2: y });
         }
       }
@@ -317,7 +414,7 @@ export default ({next_url, grave, sites, image, page}) => {
         >
           <image width={image.width} height={image.height} href={image.href} />
           {rendering === 'boxes' && Object.values(figures).map(figure => <Box canvas={canvasRef} key={figure.id} onDraggingStart={onDraggingStart} active={currentEditBox} figure={figure} />)}
-          {rendering === 'contours' && figures.filter(figure => ['Grave', 'Arrow', 'Scale'].indexOf(figure.type) !== -1 ).map(figure => <Contour key={figure.id} active={currentEditBox} figure={figure} />)}
+          {rendering === 'contours' && Object.values(figures).filter(figure => ['Grave', 'Arrow', 'Scale'].indexOf(figure.type) !== -1 ).map(figure => <Contour key={figure.id} active={currentEditBox} figure={figure} />)}
         </svg>
       </div>
 
@@ -343,6 +440,38 @@ export default ({next_url, grave, sites, image, page}) => {
                           X
                       </div>
                     </div>
+                    {currentEditBox === figure.id && figure.type === 'Grave' &&
+                      <div className="row mb-3 mt-3">
+                        <div className="form-check ms-3">
+                          <input
+                            className="form-check-input"
+                            type="checkbox"
+                            value={figure.manual_bounding_box}
+                            onChange={(evt) => { setManualBoundingBox(figure, evt.target.checked) }}
+                          />
+                          <label className="form-check-label">
+                            manually align bounding box
+                          </label>
+                        </div>
+
+                        {figure.manual_bounding_box && <React.Fragment>
+                          <label className="form-label ms-2" htmlFor="arrow-range-input">Angle: {figure.bounding_box_angle}°</label>
+                          <div className="range">
+                            <input id='arrow-range-input' type="range" className="form-range" min="0" max="360" onChange={(evt) => onChangeFigure(figure.id, { ...figure, bounding_box_angle: evt.target.value })} value={figure.bounding_box_angle} />
+                          </div>
+
+                          <label className="form-label ms-2" htmlFor="arrow-range-input">Width: {figure.bounding_box_width}</label>
+                          <div className="range">
+                            <input id='arrow-range-input' type="range" className="form-range" min="0" max={image.width} onChange={(evt) => onChangeFigure(figure.id, { ...figure, bounding_box_width: evt.target.value })} value={figure.bounding_box_width} />
+                          </div>
+
+                          <label className="form-label ms-2" htmlFor="arrow-range-input">Height: {figure.bounding_box_height}</label>
+                          <div className="range">
+                            <input id='arrow-range-input' type="range" className="form-range" min="0" max={image.height} onChange={(evt) => onChangeFigure(figure.id, { ...figure, bounding_box_height: evt.target.value })} value={figure.bounding_box_height} />
+                          </div>
+                        </React.Fragment>}
+
+                      </div>}
                     {currentEditBox === figure.id && figure.type === 'SkeletonFigure' &&
                       <div className="row mb-3 mt-3">
                         <label className="col-sm-2 col-form-label">Position</label>
