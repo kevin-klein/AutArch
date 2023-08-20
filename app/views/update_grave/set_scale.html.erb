@@ -1,7 +1,19 @@
 <%= render('stepper') %>
 
 <% if @scale.nil? %>
+  <div class='row'>
+    <div class='col-md-6'>
+      <%= render(FigureViewComponent.new(figures: @grave.figures, image: @grave.page.image)) %>
+    </div>
 
+    <div class='col-md-6'>
+      <%= simple_form_for(@grave, url: wizard_path) do |f| %>
+        <%= f.input :percentage_scale %>
+        <%= f.input :page_size %>
+        <%= f.submit('Next', class: 'btn btn-primary') %>
+      <% end %>
+    </div>
+  </div>
 <% else %>
   <div class="alert alert-primary" role="alert">
     Verify that the recognized text indicating the scale matches the one in the illustration.

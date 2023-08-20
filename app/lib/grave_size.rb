@@ -22,6 +22,7 @@ class GraveSize
 
   def handle_cross_section(figure)
     image = ImageProcessing.extractFigure(figure, figure.page.image.data)
+    image = ImageProcessing.gauss(image, [5, 5])
     contours = ImageProcessing.findContours(image, 'tree')
     contour = contours.max_by { ImageProcessing.contourArea _1 }
     rect = ImageProcessing.boundingRect(contour)
@@ -47,6 +48,8 @@ class GraveSize
 
   def grave_stats(figure, image)
     image = ImageProcessing.extractFigure(figure, image)
+    # image = ImageProcessing.dilate(image, [5, 5])
+    image = ImageProcessing.erode(image, [19, 19])
     contours = ImageProcessing.findContours(image, 'tree')
     contour = contours.max_by { ImageProcessing.contourArea _1 }
     if contour.nil? || contour.empty?

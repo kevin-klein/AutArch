@@ -40,3 +40,6 @@ en:
     labels:
       scale:
         text: 'Text (cm)'
+      grave:
+        percentage_scale: 'Percentage of Drawing (eg 1:25)'
+        page_size: 'Page Size (cm)'
