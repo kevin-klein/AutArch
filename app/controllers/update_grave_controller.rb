@@ -1,6 +1,6 @@
 class UpdateGraveController < ApplicationController
   include Wicked::Wizard
-  steps :resize_boxes, :set_scale, :set_north_arrow, :set_skeleton_data
+  steps :resize_boxes, :show_contours, :set_scale, :set_north_arrow, :set_skeleton_data
 
   def show
     @grave = Grave.find(params[:grave_id])
@@ -47,6 +47,10 @@ class UpdateGraveController < ApplicationController
   end
 
   def grave_params
-    params.require(:grave).permit(:percentage_scale, :page_size, skeleton_figures_attributes: %i[id deposition_type])
+    params.require(:grave).permit(
+      :percentage_scale,
+      :page_size,
+      skeleton_figures_attributes: %i[id deposition_type]
+    )
   end
 end

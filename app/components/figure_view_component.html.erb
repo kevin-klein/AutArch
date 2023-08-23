@@ -4,23 +4,57 @@
   <% @figures.each do |figure| %>
     <% if figure.is_a?(Spine) %>
 
-    <% else %>
+    <% elsif figure.manual_bounding_box %>
       <rect
-        fill='none'
-        stroke="red"
-        strokeWidth="2"
-        x='<%= figure.x1 %>'
-        y='<%= figure.y1 %>'
-        width='<%= figure.x2 - figure.x1 %>'
-        height='<%= figure.y2 - figure.y1 %>'
-      />
-      <text
-        x='<%= figure.x1 %>'
-        y='<%= figure.y1 %>'
-        style='font-size: 36px;'
-        >
-        <%= figure.type %> <%= figure.id %>
-      </text>
+          fill='none'
+          stroke="red"
+          strokeWidth="2"
+          x='<%= figure.bounding_box_center_x - (figure.bounding_box_width / 2) %>'
+          y='<%= figure.bounding_box_center_y - (figure.bounding_box_height / 2) %>'
+          width='<%= figure.bounding_box_width %>'
+          height='<%= figure.bounding_box_height %>'
+        />
+        <text
+          x='<%= figure.x1 %>'
+          y='<%= figure.y1 %>'
+          style='font-size: 36px;'
+          >
+          <%= figure.type %> <%= figure.id %>
+        </text>
+    <% else %>
+      <% if @contours%>
+        <polyline
+          points='<%= contour_path(figure) %>'
+          fill='#3F51B5'
+          stroke='#3F51B5'
+          strokeWidth='5'
+          opacity='.5'
+        />
+        <text
+          x='<%= figure.x1 %>'
+          y='<%= figure.y1 %>'
+          style='font-size: 36px;'
+          >
+          <%= figure.type %> <%= figure.id %>
+        </text>
+      <% else %>
+        <rect
+          fill='none'
+          stroke="red"
+          strokeWidth="2"
+          x='<%= figure.x1 %>'
+          y='<%= figure.y1 %>'
+          width='<%= figure.x2 - figure.x1 %>'
+          height='<%= figure.y2 - figure.y1 %>'
+        />
+        <text
+          x='<%= figure.x1 %>'
+          y='<%= figure.y1 %>'
+          style='font-size: 36px;'
+          >
+          <%= figure.type %> <%= figure.id %>
+        </text>
+      <% end %>
     <% end %>
   <% end %>
 </svg>

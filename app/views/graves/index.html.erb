@@ -25,7 +25,7 @@
         <td><%= number_with_unit grave.perimeter_with_unit %></td>
         <td><%= number_with_unit grave.width_with_unit %></td>
         <td><%= number_with_unit grave.height_with_unit %></td>
-        <td><%= number_with_unit grave.grave_cross_section&.height_with_unit %></td>
+        <td><%= number_with_unit grave.grave_cross_section&.depth_with_unit %></td>
         <td>
           <% unless grave&.arrow&.angle.nil? %>
             <%= ((grave.angle.abs.round + grave.arrow.angle) % 180).round  %> deg
