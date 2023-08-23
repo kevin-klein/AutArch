@@ -21,15 +21,21 @@ class GraveSize
   end
 
   def handle_cross_section(figure)
-    image = ImageProcessing.extractFigure(figure, figure.page.image.data)
-    image = ImageProcessing.gauss(image, [5, 5])
-    contours = ImageProcessing.findContours(image, 'tree')
-    contour = contours.max_by { ImageProcessing.contourArea _1 }
-    rect = ImageProcessing.boundingRect(contour)
+    if figure.manual_bounding_box
+      figure.width = figure.bounding_box_width
+      figure.height = figure.bounding_box_height
+      figure.save!
+    else
+      image = ImageProcessing.extractFigure(figure, figure.page.image.data)
+      contours = ImageProcessing.findContours(image, 'tree')
+      contour = contours.max_by { ImageProcessing.contourArea _1 }
+      rect = ImageProcessing.boundingRect(contour)
 
-    figure.width = rect[:width]
-    figure.height = rect[:height]
-    figure.save!
+      figure.contour = contour.map { |x, y| [x, y] }
+      figure.width = rect[:width]
+      figure.height = rect[:height]
+      figure.save!
+    end
   end
 
   def handle_figure(figure)
@@ -47,9 +53,27 @@ class GraveSize
   end
 
   def grave_stats(figure, image)
+    if figure.manual_bounding_box
+      manual_stats(figure, image)
+    else
+      contour_stats(figure, image)
+    end
+  end
+
+  def manual_stats(figure, image)
+    { contour: [],
+      perimeter: nil,
+      area: nil,
+      width: figure.bounding_box_width,
+      height: figure.bounding_box_height,
+      angle: figure.bounding_box_angle
+    }
+  end
+
+  def contour_stats(figure, image)
     image = ImageProcessing.extractFigure(figure, image)
     # image = ImageProcessing.dilate(image, [5, 5])
-    image = ImageProcessing.erode(image, [19, 19])
+    # image = ImageProcessing.erode(image, [19, 19])
     contours = ImageProcessing.findContours(image, 'tree')
     contour = contours.max_by { ImageProcessing.contourArea _1 }
     if contour.nil? || contour.empty?

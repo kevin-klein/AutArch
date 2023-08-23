@@ -116,6 +116,18 @@ extern "C" VALUE rb_gauss(VALUE self, VALUE rb_mat, VALUE rb_kernel) {
   return convertMatToRubyString(result);
 }
 
+// extern "C" rb_rotatedRectStats(VALUE self, VALUE rb_center_x, VALUE rb_center_y, VALUE rb_width, VALUE rb_height, VALUE angle) {
+//   long center_x = FIX2LONG(rb_center_x);
+//   long center_y = FIX2LONG(rb_center_y);
+//   long width = FIX2LONG(rb_width);
+//   long height = FIX2LONG(rb_height);
+//   long angle = FIX2LONG(rb_angle);
+
+//   RotatedRect rRect = RotatedRect(Point2f(center_x, center_y), Size2f(width, height), angle);
+
+
+// }
+
 extern "C" VALUE rb_dilate(VALUE self, VALUE rb_mat, VALUE rb_kernel) {
   Mat mat = convertRubyStringToMat(rb_mat);
   Mat result;

@@ -28,4 +28,9 @@ class GraveCrossSection < Figure
 
   with_unit :width
   with_unit :height
+  with_unit :depth
+
+  def depth
+    [height, width].min
+  end
 end
