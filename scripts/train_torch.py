@@ -3,15 +3,21 @@ import torch
 import torch.utils.data
 from PIL import Image, ImageDraw
 import pandas as pd
-# from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
+import albumentations as A
 import torchvision
 import sys
 import time
-import utils
 import transforms as T
+import torchvision.transforms as TT
 import os
 import xml.etree.ElementTree as ET
 import torchvision.transforms.functional as FT
+from torchvision.ops import box_convert
+from loss import ComputeLoss
+from yolov5.models.yolo import Model as YoloModel
+from torchvision.ops import clip_boxes_to_image
+
+pil_transform = TT.ToPILImage()
 
 name_map = {
     'skeleton_left_side': 'skeleton',
@@ -105,31 +111,40 @@ class DfgDataset(torch.utils.data.Dataset):
     def __len__(self):
         return len(self.imgs)
 
+def collate_fn(batch):
+    return tuple(zip(*batch))
+
 # dfg_dataset = DfgDataset(root="pdfs/page_images")
 # img, target = dfg_dataset[0]
 # # transform = T.ToPILImage()
 # # img = transform(img)
+# transform = TT.ToPILImage()
 
-# draw = ImageDraw.Draw(img)
+# pil_image = transform(img)
+# draw = ImageDraw.Draw(pil_image)
 # for box in target['boxes']:
 #     draw.rectangle([(box[0], box[1]), (box[2], box[3])],
 #         outline ="red", width =3)
 
-# img.save('result.jpg')
+# pil_image.save('result.jpg')
 
 # sys.exit(0)
 
 def get_model(num_classes):
     # load an object detection model pre-trained on COCO
-    # model = torchvision.models.detection.retinanet_resnet50_fpn_v2(num_classes=num_classes)
+    model = torchvision.models.detection.retinanet_resnet50_fpn(num_classes=num_classes)
     # model = torchvision.models.detection.fasterrcnn_resnet50_fpn_v2(num_classes=num_classes)
-    model = torchvision.models.detection.ssd300_vgg16(num_classes=num_classes)
+    # model = torchvision.models.detection.ssd300_vgg16(num_classes=num_classes)
     # get the number of input features for the classifier
     #    in_features = model.roi_heads.box_predictor.cls_score.in_features
     # replace the pre-trained head with a new on
     #    model.roi_heads.box_predictor = FastRCNNPredictor(in_features, num_classes)
 
-    # model.load_state_dict(torch.load('models/rcnn_dfg.model'))
+    model.load_state_dict(torch.load('models/retinanet_dfg.model'))
+
+    # model = torch.hub.load('ultralytics/yolov5', 'yolov5m', autoshape=False, pretrained=False)
+    # model.nc = num_classes
+    # model = YoloModel()
     return model
 
 def get_transform(train):
@@ -147,7 +162,7 @@ if __name__ == '__main__':
     dataset_test = DfgDataset(root="pdfs/page_images", transforms = get_transform(train=False), labels=dfg_dataset.labels)
     # split the dataset in train and test set
 
-    torch.save(dfg_dataset.labels, 'models/rcnn_labels.model')
+    torch.save(dfg_dataset.labels, 'models/retinanet_labels.model')
 
 
     print(dfg_dataset.labels)
@@ -156,13 +171,9 @@ if __name__ == '__main__':
     dataset = torch.utils.data.Subset(dfg_dataset, indices)
     dataset_test = torch.utils.data.Subset(dataset_test, indices[-30:])
 
-
     data_loader = torch.utils.data.DataLoader(
-                dataset, batch_size=16, shuffle=True, num_workers=8,
-                collate_fn=utils.collate_fn)
-    # data_loader_test = torch.utils.data.DataLoader(
-    #         dataset_test, batch_size=1, shuffle=False, num_workers=8,
-    #         collate_fn=utils.collate_fn)
+                dataset, batch_size=6, shuffle=True, num_workers=4,
+                collate_fn=collate_fn)
     print("We have: {} examples, {} are training and {} testing".format(len(indices), len(dataset), len(dataset_test)))
 
     device = torch.device('cuda')
@@ -203,7 +214,7 @@ if __name__ == '__main__':
 
         print(epoch_loss, f'time: {time.time() - start}')
 
-        torch.save(model.state_dict(), 'models/ssd_dfg.model')
+        torch.save(model.state_dict(), 'models/retinanet_dfg.model')
 
 # loss retinanet: 4.3512
 # retinanet sgd lr=0.005 momentum=0.9 weight_decay=0.0005
