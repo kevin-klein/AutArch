@@ -2,8 +2,8 @@
 #
 # Table name: stable_isotopes
 #
-#  id          :bigint           not null, primary key
-#  skeleton_id :bigint           not null
+#  id          :integer          not null, primary key
+#  skeleton_id :integer          not null
 #  iso_id      :string
 #  iso_value   :float
 #  ref_iso     :string
@@ -11,7 +11,7 @@
 #  baseline    :integer
 #  created_at  :datetime         not null
 #  updated_at  :datetime         not null
-#  bone_id     :bigint
+#  bone_id     :integer
 #
 class StableIsotope < ApplicationRecord
   belongs_to :skeleton

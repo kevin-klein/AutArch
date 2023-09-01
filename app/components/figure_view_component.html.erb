@@ -13,6 +13,7 @@
           y='<%= figure.bounding_box_center_y - (figure.bounding_box_height / 2) %>'
           width='<%= figure.bounding_box_width %>'
           height='<%= figure.bounding_box_height %>'
+          transform='rotate(<%= figure.bounding_box_angle %> <%= figure.bounding_box_center_x %> <%= figure.bounding_box_center_y %>)'
         />
         <text
           x='<%= figure.x1 %>'

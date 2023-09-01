@@ -2,7 +2,7 @@
 #
 # Table name: anthropologies
 #
-#  id               :bigint           not null, primary key
+#  id               :integer          not null, primary key
 #  sex_morph        :integer
 #  sex_gen          :integer
 #  sex_consensus    :integer
@@ -10,7 +10,7 @@
 #  age_class        :integer
 #  height           :float
 #  pathologies_type :string
-#  skeleton_id      :bigint
+#  skeleton_id      :integer
 #  created_at       :datetime         not null
 #  updated_at       :datetime         not null
 #  species          :integer
