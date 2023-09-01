@@ -17,6 +17,7 @@ gem 'pagy', '~> 6.0' # omit patch digit
 gem 'parslet', git: 'https://github.com/kschiess/parslet'
 gem 'sqlite3'
 gem 'rails-erd', group: :development
+gem 'message_bus'
 
 gem 'matrix'
 gem 'rice'

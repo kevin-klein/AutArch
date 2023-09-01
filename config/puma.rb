@@ -41,3 +41,7 @@ pidfile ENV.fetch('PIDFILE') { 'tmp/pids/server.pid' }
 
 # Allow puma to be restarted by `bin/rails restart` command.
 plugin :tmp_restart
+
+on_worker_boot do
+  MessageBus.after_fork
+end

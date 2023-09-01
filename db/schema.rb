@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_08_17_094930) do
+ActiveRecord::Schema[7.0].define(version: 2023_08_27_170115) do
   create_table "anthropologies", force: :cascade do |t|
     t.integer "sex_morph"
     t.integer "sex_gen"
@@ -96,7 +96,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_08_17_094930) do
     t.boolean "disturbed", default: false, null: false
     t.text "contour", default: "[]", null: false
     t.integer "deposition_type", default: 0, null: false
-    t.string "publication_id"
+    t.integer "publication_id"
     t.integer "percentage_scale"
     t.integer "page_size"
     t.boolean "manual_bounding_box", default: false

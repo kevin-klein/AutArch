@@ -1,11 +1,17 @@
 class AnalyzePublication
   def run(publication, site_id: nil)
     Page.transaction do
+      MessageBus.publish('/importprogress', 'Converting pdf pages to images')
       images = pdf_to_images(publication.pdf)
 
       page_number = 0
       figures = []
-      images.each do |image|
+      image_count = images.length
+      images.each_with_index do |image, index|
+        MessageBus.publish('/importprogress', {
+          message: 'Analyzing pages',
+          progress: index.to_f / (image_count-1)
+        })
         page = publication.pages.find_or_initialize_by(number: page_number)
         page_number += 1
 
@@ -24,15 +30,19 @@ class AnalyzePublication
             next
           end
 
-          figures << page.figures.create!({ x1: x1, y1: y1, x2: x2, y2: y2, type: type_name.camelize.singularize })
+          figure = page.figures.create!( x1: x1, y1: y1, x2: x2, y2: y2, type: type_name.camelize.singularize, publication: publication)
+          figures << figure
         end
       end
 
+      MessageBus.publish('/importprogress', 'Grouping Figures to Graves')
       CreateGraves.new.run(publication.pages)
+      MessageBus.publish('/importprogress', 'Creating Orientations of Bounding Boxes')
       GraveAngles.new.run(figures.select { _1.is_a?(Arrow) })
+      MessageBus.publish('/importprogress', 'Measuring Sizes')
       GraveSize.new.run(figures)
+      MessageBus.publish('/importprogress', 'Analyzing Scales')
       AnalyzeScales.new.run(figures)
-
       # publication.graves.update_all(site_id: site_id)
     end
   end

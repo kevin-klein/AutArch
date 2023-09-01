@@ -2,14 +2,14 @@
 #
 # Table name: chronologies
 #
-#  id           :bigint           not null, primary key
+#  id           :integer          not null, primary key
 #  context_from :integer
 #  context_to   :integer
-#  skeleton_id  :bigint
-#  grave_id     :bigint
+#  skeleton_id  :integer
+#  grave_id     :integer
 #  created_at   :datetime         not null
 #  updated_at   :datetime         not null
-#  period_id    :bigint
+#  period_id    :integer
 #
 class Chronology < ApplicationRecord
   belongs_to :grave, optional: true

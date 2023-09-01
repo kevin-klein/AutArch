@@ -14,7 +14,7 @@ class GraveAngles
     image = ImageProcessing.extractFigure(arrow, arrow.page.image.data)
     io = StringIO.new(image)
     file = HTTP::FormData::File.new io, filename: 'arrow.jpg'
-    response = HTTP.post('http://localhost:8080/arrow', form: {
+    response = HTTP.post('http://127.0.0.1:8080/arrow', form: {
                            image: file
                          })
 

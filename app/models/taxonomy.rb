@@ -2,13 +2,13 @@
 #
 # Table name: taxonomies
 #
-#  id                :bigint           not null, primary key
-#  skeleton_id       :bigint
+#  id                :integer          not null, primary key
+#  skeleton_id       :integer
 #  culture_note      :string
 #  culture_reference :string
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
-#  culture_id        :bigint
+#  culture_id        :integer
 #
 class Taxonomy < ApplicationRecord
   belongs_to :skeleton

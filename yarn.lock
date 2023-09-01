@@ -1231,6 +1231,11 @@
   resolved "https://registry.yarnpkg.com/@popperjs/core/-/core-2.11.6.tgz#cee20bd55e68a1720bdab363ecf0c821ded4cd45"
   integrity sha512-50/17A98tWUfQ176raKiOGXuYpLyyVMkxxG6oylzL3BPOlA6ADGdK7EYunSa4I064xerltq9TGXs8HmOk5E+vw==
 
+"@rails/ujs@^7.0.7-2":
+  version "7.0.7-2"
+  resolved "https://registry.yarnpkg.com/@rails/ujs/-/ujs-7.0.7-2.tgz#009bbed10e7d2fdc278a26441dc7457615b616d6"
+  integrity sha512-7/qRnEfs1kKAUoRHqUNPfGqcqJ5h3CmC2APP+l4flyK61kaOQmGbNSeiukmDQAAAhCBVqAdYbwFNnkNMTPSsHg==
+
 "@react-leaflet/core@^2.1.0":
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/@react-leaflet/core/-/core-2.1.0.tgz#383acd31259d7c9ae8fb1b02d5e18fe613c2a13d"
@@ -3663,6 +3668,11 @@ merge-stream@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/merge-stream/-/merge-stream-2.0.0.tgz#52823629a14dd00c9770fb6ad47dc6310f2c1f60"
   integrity sha512-abv/qOcuPfk3URPfDzmZU1LKmuw8kT+0nIHvKrKgFrwifol/doWcdA4ZqsWQ8ENrFKkd67Mfpo/LovbIUsbt3w==
+
+message-bus-client@^4.3.8:
+  version "4.3.8"
+  resolved "https://registry.yarnpkg.com/message-bus-client/-/message-bus-client-4.3.8.tgz#5ee23c03236b250b13613034764a87881c350d4e"
+  integrity sha512-Vvrs0tOx5YcKeEoh7l1zATLVKt49FK34Vq/sloRbgDDQUB6VAbSVJPvH8RVxQ/PZGb9ScGzCMJCMnDyVa2p8CQ==
 
 methods@~1.1.2:
   version "1.1.2"

@@ -1,5 +1,5 @@
 class PublicationsController < ApplicationController
-  before_action :set_publication, only: %i[show edit update delete stats]
+  before_action :set_publication, only: %i[progress show edit update delete stats]
 
   # GET /publications or /publications.json
   def index
@@ -49,11 +49,15 @@ class PublicationsController < ApplicationController
       if @publication.save
         AnalyzePublicationJob.perform_later(@publication, site_id: publication_params[:site])
 
-        format.html { redirect_to publications_path, notice: 'Publication was successfully created.' }
+        format.html { redirect_to publication_progress_path(@publication), notice: 'Publication was successfully created.' }
       else
         format.html { render :new, status: :unprocessable_entity }
       end
     end
+  end
+
+  def progress
+
   end
 
   # PATCH/PUT /publications/1 or /publications/1.json

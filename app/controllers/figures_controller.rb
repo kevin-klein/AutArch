@@ -19,7 +19,9 @@ class FiguresController < ApplicationController
 
   # POST /figures or /figures.json
   def create
+    page = Page.find(figure_params[:page_id])
     @figure = Figure.new(figure_params)
+    @figure.publication_id = page.publication_id
 
     respond_to do |format|
       if @figure.save
@@ -50,7 +52,7 @@ class FiguresController < ApplicationController
     @figure.destroy
 
     respond_to do |format|
-      format.html { redirect_to figures_url, notice: 'Figure was successfully destroyed.' }
+      format.html { redirect_to root_path, notice: 'Figure was successfully destroyed.' }
       format.json { head :no_content }
     end
   end

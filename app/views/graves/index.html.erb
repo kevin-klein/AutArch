@@ -31,7 +31,7 @@
             <%= ((grave.angle.abs.round + grave.arrow.angle) % 180).round  %> deg
           <% end %>
         </td>
-        <td><%= link_to('Edit', grave_update_grave_path(grave, :resize_boxes)) %></td>
+        <td><%= link_to('Edit', grave_update_grave_path(grave, :set_grave_data)) %></td>
       </tr>
     <% end %>
   </tbody>
