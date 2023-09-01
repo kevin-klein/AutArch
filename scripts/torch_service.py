@@ -15,7 +15,7 @@ labels = {v: k for k, v in labels.items()}
 device = torch.device('cuda')
 
 loaded_model = get_model(num_classes = len(labels.keys()))
-loaded_model.load_state_dict(torch.load('models/ssd_dfg.model'))
+loaded_model.load_state_dict(torch.load('models/rcnn_dfg.model'))
 
 loaded_model.eval()
 
@@ -107,4 +107,4 @@ def upload_arrow():
     return { 'predictions': result }
 
 if __name__ == '__main__':
-    app.run(debug=True, reloader=True)
+    app.run(debug=True, reloader=True, host='0.0.0.0')
