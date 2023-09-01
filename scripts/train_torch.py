@@ -2,15 +2,15 @@ import numpy as np
 import torch
 import torch.utils.data
 from PIL import Image, ImageDraw
-import pandas as pd
 import torchvision
-import sys
 import time
-import utils
 import transforms as T
+import torchvision.transforms as TT
 import os
 import xml.etree.ElementTree as ET
 import torchvision.transforms.functional as FT
+
+pil_transform = TT.ToPILImage()
 
 name_map = {
     'skeleton_left_side': 'skeleton',
@@ -104,17 +104,22 @@ class DfgDataset(torch.utils.data.Dataset):
     def __len__(self):
         return len(self.imgs)
 
+def collate_fn(batch):
+    return tuple(zip(*batch))
+
 # dfg_dataset = DfgDataset(root="pdfs/page_images")
 # img, target = dfg_dataset[0]
 # # transform = T.ToPILImage()
 # # img = transform(img)
+# transform = TT.ToPILImage()
 
-# draw = ImageDraw.Draw(img)
+# pil_image = transform(img)
+# draw = ImageDraw.Draw(pil_image)
 # for box in target['boxes']:
 #     draw.rectangle([(box[0], box[1]), (box[2], box[3])],
 #         outline ="red", width =3)
 
-# img.save('result.jpg')
+# pil_image.save('result.jpg')
 
 # sys.exit(0)
 
@@ -128,7 +133,6 @@ def get_model(num_classes):
     # replace the pre-trained head with a new on
     #    model.roi_heads.box_predictor = FastRCNNPredictor(in_features, num_classes)
     # model = torch.hub.load('NVIDIA/DeepLearningExamples:torchhub', 'nvidia_ssd')
-
     model.load_state_dict(torch.load('models/rcnn_dfg.model'))
     return model
 
@@ -147,17 +151,16 @@ if __name__ == '__main__':
     dataset_test = DfgDataset(root="pdfs/page_images", transforms = get_transform(train=False), labels=dfg_dataset.labels)
     # split the dataset in train and test set
 
-    torch.save(dfg_dataset.labels, 'models/rcnn_labels.model')
+    torch.save(dfg_dataset.labels, 'models/retinanet_labels.model')
 
     torch.manual_seed(1)
     indices = torch.randperm(len(dfg_dataset)).tolist()
     dataset = torch.utils.data.Subset(dfg_dataset, indices)
     dataset_test = torch.utils.data.Subset(dataset_test, indices[-30:])
 
-
     data_loader = torch.utils.data.DataLoader(
                 dataset, batch_size=8, shuffle=True, num_workers=8,
-                collate_fn=utils.collate_fn)
+                collate_fn=collate_fn)
     # data_loader_test = torch.utils.data.DataLoader(
     #         dataset_test, batch_size=1, shuffle=False, num_workers=8,
     #         collate_fn=utils.collate_fn)
