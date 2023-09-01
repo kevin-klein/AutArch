@@ -2,8 +2,8 @@
 #
 # Table name: page_texts
 #
-#  id         :bigint           not null, primary key
-#  page_id    :bigint           not null
+#  id         :integer          not null, primary key
+#  page_id    :integer          not null
 #  text       :string
 #  created_at :datetime         not null
 #  updated_at :datetime         not null

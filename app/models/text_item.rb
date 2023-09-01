@@ -2,8 +2,8 @@
 #
 # Table name: text_items
 #
-#  id         :bigint           not null, primary key
-#  page_id    :bigint           not null
+#  id         :integer          not null, primary key
+#  page_id    :integer          not null
 #  text       :string
 #  x1         :integer
 #  x2         :integer

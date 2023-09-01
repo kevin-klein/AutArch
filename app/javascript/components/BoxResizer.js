@@ -230,6 +230,7 @@ function NewFigureDialog({ closeDialog, addFigure }) {
                 <option value="Scale">Scale</option>
                 <option value="GraveCrossSection">Grave Cross Section</option>
                 <option value="Arrow">Arrow</option>
+                <option value="Good">Good</option>
               </select>
             </div>
           </form>
@@ -547,11 +548,14 @@ export default ({next_url, grave, sites, image, page}) => {
     <div className='row'>
       <div className='col-md-8 card' ref={divRef}>
         <div className="form-check">
-          <select value={rendering} onChange={evt => setRendering(evt.target.value)} className="form-select" aria-label="Default select example">
-            <option value='boxes'>Show Bounding Boxes</option>
-            <option value='contours'>Show Contours</option>
-            <option value='nothing'>Show Nothing</option>
-          </select>
+          <div className="btn-group" role="group" aria-label="Basic example">
+            <button type="button" style={{backgroundColor: '#F44336'}} className="btn btn-secondary" onClick={() => createFigure('Spine')}>Spine</button>
+            <button type="button" style={{backgroundColor: '#9575CD'}} className="btn btn-secondary" onClick={() => createFigure('SkeletonFigure')}>Skeleton</button>
+            <button type="button" style={{backgroundColor: '#009688'}} className="btn btn-secondary" onClick={() => createFigure('Arrow')}>Arrow</button>
+            <button type="button" style={{backgroundColor: '#26C6DA'}} className="btn btn-secondary" onClick={() => createFigure('GraveCrossSection')}>GraveCrossSection</button>
+            <button type="button" style={{backgroundColor: '#4CAF50'}} className="btn btn-secondary" onClick={() => createFigure('Good')}>Good</button>
+            <button type="button" style={{backgroundColor: '#FF9800'}} className="btn btn-secondary" onClick={() => createFigure('Scale')}>Scale</button>
+          </div>
         </div>
         <Canvas
           setCurrentEditBox={setCurrentEditBox}
@@ -598,22 +602,6 @@ export default ({next_url, grave, sites, image, page}) => {
                           <label className="form-check-label">
                             manual bounding box
                           </label>
-                        </div>
-                      </div>}
-                    {currentEditBox === figure.id && figure.type === 'SkeletonFigure' &&
-                      <div className="row mb-3 mt-3">
-                        <label className="col-sm-2 col-form-label">Position</label>
-                        <div className="col-sm-10">
-                          <select
-                            value={figure.deposition_type}
-                            className="form-select"
-                            aria-label="Default select example"
-                            onChange={(evt) => { onChangeFigure(figure.id, { ...figure, deposition_type: evt.target.value }) }}
-                          >
-                            <option value="unknown">Unknown</option>
-                            <option value="back">Back</option>
-                            <option value="side">Side</option>
-                          </select>
                         </div>
                       </div>}
                   </React.Fragment>

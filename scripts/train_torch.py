@@ -3,7 +3,6 @@ import torch
 import torch.utils.data
 from PIL import Image, ImageDraw
 import pandas as pd
-# from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
 import torchvision
 import sys
 import time
@@ -121,15 +120,16 @@ class DfgDataset(torch.utils.data.Dataset):
 
 def get_model(num_classes):
     # load an object detection model pre-trained on COCO
-    # model = torchvision.models.detection.retinanet_resnet50_fpn_v2(num_classes=num_classes)
+    # model = torchvision.models.detection.retinanet_resnet50_fpn(num_classes=num_classes)
     # model = torchvision.models.detection.fasterrcnn_resnet50_fpn_v2(num_classes=num_classes)
-    model = torchvision.models.detection.ssd300_vgg16(num_classes=num_classes)
+    model = torchvision.models.detection.fasterrcnn_mobilenet_v3_large_fpn(num_classes=num_classes, trainable_backbone_layers=6)
     # get the number of input features for the classifier
     #    in_features = model.roi_heads.box_predictor.cls_score.in_features
     # replace the pre-trained head with a new on
     #    model.roi_heads.box_predictor = FastRCNNPredictor(in_features, num_classes)
+    # model = torch.hub.load('NVIDIA/DeepLearningExamples:torchhub', 'nvidia_ssd')
 
-    # model.load_state_dict(torch.load('models/rcnn_dfg.model'))
+    model.load_state_dict(torch.load('models/rcnn_dfg.model'))
     return model
 
 def get_transform(train):
@@ -149,8 +149,6 @@ if __name__ == '__main__':
 
     torch.save(dfg_dataset.labels, 'models/rcnn_labels.model')
 
-
-    print(dfg_dataset.labels)
     torch.manual_seed(1)
     indices = torch.randperm(len(dfg_dataset)).tolist()
     dataset = torch.utils.data.Subset(dfg_dataset, indices)
@@ -158,7 +156,7 @@ if __name__ == '__main__':
 
 
     data_loader = torch.utils.data.DataLoader(
-                dataset, batch_size=16, shuffle=True, num_workers=8,
+                dataset, batch_size=8, shuffle=True, num_workers=8,
                 collate_fn=utils.collate_fn)
     # data_loader_test = torch.utils.data.DataLoader(
     #         dataset_test, batch_size=1, shuffle=False, num_workers=8,
@@ -179,7 +177,7 @@ if __name__ == '__main__':
     #                             momentum=0.9, weight_decay=5e-4)
     optimizer = torch.optim.Adam(params, lr=1e-4)
 
-    num_epochs = 150
+    num_epochs = 50
     for epoch in range(num_epochs):
         start = time.time()
         model.train()
@@ -203,7 +201,7 @@ if __name__ == '__main__':
 
         print(epoch_loss, f'time: {time.time() - start}')
 
-        torch.save(model.state_dict(), 'models/ssd_dfg.model')
+        torch.save(model.state_dict(), 'models/rcnn_dfg.model')
 
 # loss retinanet: 4.3512
 # retinanet sgd lr=0.005 momentum=0.9 weight_decay=0.0005
