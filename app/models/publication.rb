@@ -14,7 +14,7 @@ class Publication < ApplicationRecord
   has_many :pages, dependent: :destroy
   has_many :figures, through: :pages
 
-  attribute :site, :string
+  # attribute :site, :string
 
   def short_description
     "#{author} #{year}"

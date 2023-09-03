@@ -11,6 +11,27 @@ namespace :export do
     end
   end
 
+  task db: :environment do
+    models = [
+      Publication,
+      Page,
+      Figure,
+      Image
+    ]
+
+    models.each do |model|
+      data = []
+      model.find_each do |item|
+        data << item.attributes.as_json
+      end
+
+      msg_pack_data = data.to_msgpack
+      File.open("#{model.table_name}.msgpack", "wb") do |file|
+        file.write(msg_pack_data)
+      end
+    end
+  end
+
   task skeletons: :environment do
     SkeletonFigure.find_each do |skeleton|
       image = ImageProcessing.extractFigure(skeleton, skeleton.page.image.data)
