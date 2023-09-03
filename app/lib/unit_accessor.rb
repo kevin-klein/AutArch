@@ -18,10 +18,11 @@ module UnitAccessor
           # raise
           real_cm_per_pixel = (cm_on_page / 100.0) * percentage_scale
 
+          ratio = real_cm_per_pixel
           ratio = real_cm_per_pixel**2 if square
           return { value: 0, unit: 'px' } if send(name).nil?
           return { value: send(name), unit: 'px' } if real_cm_per_pixel.nil?
-          { value: send(name) * real_cm_per_pixel, unit: value_unit(square) }
+          { value: send(name) * ratio, unit: value_unit(square) }
         else
           { value: send(name), unit: 'px' }
         end

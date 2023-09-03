@@ -13,6 +13,10 @@ class Image < ApplicationRecord
   include Rails.application.routes.url_helpers
 
   def href
-    image_path(self)
+    "/uploads/images/#{id}.jpg"
+  end
+
+  def data
+    File.binread(Rails.root.join("public/uploads/images/#{id}.jpg").to_s)
   end
 end

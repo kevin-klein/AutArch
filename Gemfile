@@ -10,6 +10,9 @@ gem 'awesome_print'
 
 # The original asset pipeline for Rails [https://github.com/rails/sprockets-rails]
 gem 'sprockets-rails'
+gem 'pg'
+gem 'msgpack'
+gem 'activerecord-import'
 
 gem 'bootstrap'
 gem 'graphql'
@@ -120,3 +123,5 @@ gem 'stemmify', '~> 0.0.2'
 gem 'amatch', '~> 0.4.1'
 
 gem 'view_component', '~> 2.82'
+
+gem 'ruby-progressbar', '~> 1.13'

@@ -2,11 +2,12 @@ class AnalyzePublication
   def run(publication, site_id: nil)
     Page.transaction do
       MessageBus.publish('/importprogress', 'Converting pdf pages to images')
-      images = pdf_to_images(publication.pdf)
+      path = create_temp_file(publication.pdf)
+      images = pdf_to_images(path)
 
       page_number = 0
       figures = []
-      image_count = images.length
+      image_count = page_count(path)
       images.each_with_index do |image, index|
         MessageBus.publish('/importprogress', {
           message: 'Analyzing pages',
@@ -47,14 +48,16 @@ class AnalyzePublication
     end
   end
 
-  def pdf_to_images(pdf)
+  def create_temp_file(pdf)
     @file = Tempfile.new(SecureRandom.hex, binmode: true)
     @file.write(pdf)
     @file.flush
+    @file.path
+  end
 
-    path = @file.path
+  def pdf_to_images(path)
     page_count = page_count(path)
-    (0..page_count - 1).map do |page|
+    (0..page_count - 1).lazy.map do |page|
       Vips::Image.pdfload(path, page: page, dpi: 300).flatten
     end
   end

@@ -20,7 +20,6 @@ Rails.application.routes.draw do # rubocop:disable Metrics/BlockLength
     end
   end
   resources :figures
-  resources :images
   resources :skeletons do
     resources :stable_isotopes
   end

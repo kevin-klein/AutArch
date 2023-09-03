@@ -41,6 +41,7 @@ function ManualContour({figure, color, active, onDraggingStart, setActive, onCha
   return (<React.Fragment>
     <Rect
       fill={null}
+      fillEnabled={false}
       stroke={color}
       strokeWidth={3}
       x={figure.bounding_box_center_x - figure.bounding_box_width / 2}
@@ -166,6 +167,7 @@ export function Box({onChangeFigure, onDraggingStart, active, figure, setActive}
       fill={null}
       ref={shapeRef}
       stroke={color}
+      fillEnabled={false}
       strokeWidth={3}
       x={x1}
       y={y1}
@@ -230,7 +232,7 @@ function NewFigureDialog({ closeDialog, addFigure }) {
                 <option value="Scale">Scale</option>
                 <option value="GraveCrossSection">Grave Cross Section</option>
                 <option value="Arrow">Arrow</option>
-                <option value="Good">Good</option>
+                <option value="Good">Artefact</option>
               </select>
             </div>
           </form>
@@ -581,7 +583,7 @@ export default ({next_url, grave, sites, image, page}) => {
                       className={`list-group-item list-group-item-action d-flex justify-content-between align-items-start ${currentEditBoxActiveClass(figure)}`}
                     >
                       <div className="ms-2 me-auto">
-                        <div className="fw-bold">{figure.type}</div>
+                        <div className="fw-bold">{figure.type === 'Good' ? 'Artefact' : figure.type}</div>
                       </div>
                       <div
                         onClick={() => { removeEditBox(figure.id); } }

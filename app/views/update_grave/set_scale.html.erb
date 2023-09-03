@@ -20,13 +20,7 @@
   </div>
   <div class='row'>
     <div class='col-md-6'>
-      <%= react_component('Scale', {
-        image: @grave.page.image.as_json(methods: [:href], only: [:id, :width, :height]),
-        grave: @grave.as_json(methods: [:type], include: { figures: { methods: [:type]} }),
-        sites: Site.all,
-        page: @grave.page,
-        next_url: wizard_path
-      }) %>
+      <%= render(FigureViewComponent.new(figures: [@grave.scale], image: @grave.page.image)) %>
     </div>
 
     <div class='col-md-6'>

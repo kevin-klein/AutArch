@@ -16,7 +16,6 @@ class UpdateGraveController < ApplicationController
 
     case step
     when :set_grave_data
-      @grave.publication_id = @grave.page.publication_id
       @grave.update(grave_params)
     when :set_skeleton_data
       @grave.update(grave_params)

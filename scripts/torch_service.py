@@ -59,7 +59,6 @@ def analyze_arrow(file):
     img = Image.open(io.BytesIO(request_object_content))
 
     img, _ = PILToTensor()(img)
-    # img = img.to(device)
     img = torch.stack([img]).to(device)
 
     with torch.no_grad():
@@ -74,13 +73,13 @@ def analyze_skeleton(file):
     img = Image.open(io.BytesIO(request_object_content))
 
     img, _ = PILToTensor()(img)
-    # img = img.to(device)
     img = torch.stack([img]).to(device)
 
     with torch.no_grad():
         skeleton_model.eval()
         prediction = skeleton_model(img)
         print(prediction)
+        print(skeleton_labels)
         _, prediction = torch.max(prediction, 1)
 
     return skeleton_labels[prediction]

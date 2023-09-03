@@ -20,7 +20,7 @@
   <tbody>
     <% @graves.each do |grave| %>
       <tr>
-        <td><%= grave.id %></td>
+        <td><%= grave.identifier %></td>
         <td><%= raw number_with_unit grave.area_with_unit %></td>
         <td><%= number_with_unit grave.perimeter_with_unit %></td>
         <td><%= number_with_unit grave.width_with_unit %></td>
