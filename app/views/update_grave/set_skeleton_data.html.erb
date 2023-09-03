@@ -8,7 +8,7 @@
     <%= simple_form_for(@grave, url: wizard_path) do |f| %>
       <%= f.simple_fields_for :skeleton_figures do |ff| %>
         <h4><%= "Skeleton #{ff.object.id.to_s}" %></h4>
-        <%= ff.input :deposition_type, collection: SkeletonFigure.deposition_types.keys, selected: ff.object.deposition_type %>
+        <%= ff.input :deposition_type, collection: [['unknown', 'unknown'], ["supine", 'back'], ["flexed on one side", 'side']], selected: ff.object.deposition_type %>
       <% end %>
 
       <%= f.submit('Next', class: 'btn btn-primary') %>

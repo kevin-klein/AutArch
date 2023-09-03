@@ -10,7 +10,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_08_27_170115) do
+ActiveRecord::Schema[7.0].define(version: 2023_09_03_173624) do
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "plpgsql"
+
   create_table "anthropologies", force: :cascade do |t|
     t.integer "sex_morph"
     t.integer "sex_gen"
@@ -19,7 +22,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_08_27_170115) do
     t.integer "age_class"
     t.float "height"
     t.string "pathologies_type"
-    t.integer "skeleton_id"
+    t.bigint "skeleton_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "species"
@@ -45,10 +48,10 @@ ActiveRecord::Schema[7.0].define(version: 2023_08_27_170115) do
     t.string "date_note"
     t.integer "cal_method"
     t.string "ref_14c"
-    t.integer "chronology_id", null: false
+    t.bigint "chronology_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "bone_id"
+    t.bigint "bone_id"
     t.index ["bone_id"], name: "index_c14_dates_on_bone_id"
     t.index ["chronology_id"], name: "index_c14_dates_on_chronology_id"
   end
@@ -56,11 +59,11 @@ ActiveRecord::Schema[7.0].define(version: 2023_08_27_170115) do
   create_table "chronologies", force: :cascade do |t|
     t.integer "context_from"
     t.integer "context_to"
-    t.integer "skeleton_id"
-    t.integer "grave_id"
+    t.bigint "skeleton_id"
+    t.bigint "grave_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "period_id"
+    t.bigint "period_id"
     t.index ["grave_id"], name: "index_chronologies_on_grave_id"
     t.index ["period_id"], name: "index_chronologies_on_period_id"
     t.index ["skeleton_id"], name: "index_chronologies_on_skeleton_id"
@@ -73,7 +76,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_08_27_170115) do
   end
 
   create_table "figures", force: :cascade do |t|
-    t.integer "page_id", null: false
+    t.bigint "page_id", null: false
     t.integer "x1", null: false
     t.integer "x2", null: false
     t.integer "y1", null: false
@@ -90,7 +93,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_08_27_170115) do
     t.float "width"
     t.float "height"
     t.string "text"
-    t.integer "site_id"
+    t.bigint "site_id"
     t.boolean "validated", default: false, null: false
     t.boolean "verified", default: false, null: false
     t.boolean "disturbed", default: false, null: false
@@ -113,12 +116,12 @@ ActiveRecord::Schema[7.0].define(version: 2023_08_27_170115) do
     t.integer "data_type"
     t.float "endo_content"
     t.string "ref_gen"
-    t.integer "skeleton_id", null: false
+    t.bigint "skeleton_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "mt_haplogroup_id"
-    t.integer "y_haplogroup_id"
-    t.integer "bone_id"
+    t.bigint "mt_haplogroup_id"
+    t.bigint "y_haplogroup_id"
+    t.bigint "bone_id"
     t.index ["bone_id"], name: "index_genetics_on_bone_id"
     t.index ["mt_haplogroup_id"], name: "index_genetics_on_mt_haplogroup_id"
     t.index ["skeleton_id"], name: "index_genetics_on_skeleton_id"
@@ -126,7 +129,6 @@ ActiveRecord::Schema[7.0].define(version: 2023_08_27_170115) do
   end
 
   create_table "images", force: :cascade do |t|
-    t.binary "data"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "width"
@@ -137,7 +139,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_08_27_170115) do
     t.integer "width"
     t.integer "height"
     t.string "name", null: false
-    t.integer "publication_id"
+    t.bigint "publication_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["publication_id"], name: "index_kurgans_on_publication_id"
@@ -150,7 +152,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_08_27_170115) do
   end
 
   create_table "page_texts", force: :cascade do |t|
-    t.integer "page_id", null: false
+    t.bigint "page_id", null: false
     t.string "text"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -158,9 +160,9 @@ ActiveRecord::Schema[7.0].define(version: 2023_08_27_170115) do
   end
 
   create_table "pages", force: :cascade do |t|
-    t.integer "publication_id", null: false
+    t.bigint "publication_id", null: false
     t.integer "number"
-    t.integer "image_id", null: false
+    t.bigint "image_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["image_id"], name: "index_pages_on_image_id"
@@ -174,7 +176,6 @@ ActiveRecord::Schema[7.0].define(version: 2023_08_27_170115) do
   end
 
   create_table "publications", force: :cascade do |t|
-    t.binary "pdf"
     t.string "author"
     t.string "title"
     t.datetime "created_at", null: false
@@ -206,15 +207,15 @@ ActiveRecord::Schema[7.0].define(version: 2023_08_27_170115) do
     t.float "head_facing"
     t.integer "ochre"
     t.integer "ochre_position"
-    t.integer "skeleton_figure_id"
-    t.integer "site_id"
+    t.bigint "skeleton_figure_id"
+    t.bigint "site_id"
     t.index ["figure_id"], name: "index_skeletons_on_figure_id"
     t.index ["site_id"], name: "index_skeletons_on_site_id"
     t.index ["skeleton_figure_id"], name: "index_skeletons_on_skeleton_figure_id"
   end
 
   create_table "stable_isotopes", force: :cascade do |t|
-    t.integer "skeleton_id", null: false
+    t.bigint "skeleton_id", null: false
     t.string "iso_id"
     t.float "iso_value"
     t.string "ref_iso"
@@ -222,24 +223,24 @@ ActiveRecord::Schema[7.0].define(version: 2023_08_27_170115) do
     t.integer "baseline"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "bone_id"
+    t.bigint "bone_id"
     t.index ["bone_id"], name: "index_stable_isotopes_on_bone_id"
     t.index ["skeleton_id"], name: "index_stable_isotopes_on_skeleton_id"
   end
 
   create_table "taxonomies", force: :cascade do |t|
-    t.integer "skeleton_id"
+    t.bigint "skeleton_id"
     t.string "culture_note"
     t.string "culture_reference"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "culture_id"
+    t.bigint "culture_id"
     t.index ["culture_id"], name: "index_taxonomies_on_culture_id"
     t.index ["skeleton_id"], name: "index_taxonomies_on_skeleton_id"
   end
 
   create_table "text_items", force: :cascade do |t|
-    t.integer "page_id", null: false
+    t.bigint "page_id", null: false
     t.string "text"
     t.integer "x1"
     t.integer "x2"

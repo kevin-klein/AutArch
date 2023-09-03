@@ -69,6 +69,8 @@ GEM
     activerecord (7.0.4)
       activemodel (= 7.0.4)
       activesupport (= 7.0.4)
+    activerecord-import (1.5.0)
+      activerecord (>= 4.2)
     activestorage (7.0.4)
       actionpack (= 7.0.4)
       activejob (= 7.0.4)
@@ -215,6 +217,7 @@ GEM
       hashery (~> 2.0)
       ruby-rc4
       ttfunk
+    pg (1.5.4)
     pkg-config (1.5.1)
     popper_js (2.11.6)
     prettier_print (1.2.0)
@@ -298,7 +301,7 @@ GEM
       language_server-protocol (~> 3.17.0)
       sorbet-runtime
       syntax_tree (>= 5.0.0, < 6)
-    ruby-progressbar (1.11.0)
+    ruby-progressbar (1.13.0)
     ruby-rc4 (0.1.5)
     ruby-vips (2.1.4)
       ffi (~> 1.12)
@@ -481,6 +484,7 @@ PLATFORMS
 
 DEPENDENCIES
   active_median
+  activerecord-import
   amatch (~> 0.4.1)
   annotate
   awesome_print
@@ -499,10 +503,12 @@ DEPENDENCIES
   jbuilder
   matrix
   message_bus
+  msgpack
   pagy (~> 6.0)
   parslet!
   pca
   pdf-reader
+  pg
   pkg-config
   puma (~> 5.0)
   rails (~> 7.0.2, >= 7.0.2.3)
@@ -513,6 +519,7 @@ DEPENDENCIES
   rtesseract
   rubocop-rails
   ruby-lsp
+  ruby-progressbar (~> 1.13)
   ruby-vips
   rumale
   rwordnet (~> 2.0)

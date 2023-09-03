@@ -84,8 +84,8 @@ if __name__ == '__main__':
 
   params = [p for p in model.parameters() if p.requires_grad]
   # optimizer = torch.optim.SGD(model.parameters(), lr=0.0001, momentum=0.9)
-  # optimizer = torch.optim.AdamW(model.parameters(), lr=1e-4)
-  optimizer = torch.optim.RMSprop(model.parameters(), lr=0.001)
+  optimizer = torch.optim.AdamW(model.parameters(), lr=1e-4)
+  # optimizer = torch.optim.RMSprop(model.parameters(), lr=0.001)
   criterion = nn.CrossEntropyLoss()
 
   num_epochs = 500

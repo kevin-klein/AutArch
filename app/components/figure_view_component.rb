@@ -9,7 +9,7 @@ class FigureViewComponent < ViewComponent::Base
   end
 
   def contour_path(figure)
-    (figure.contour + figure.contour[0]).map do |point|
+    (figure.contour + [figure.contour[0]]).map do |point|
       "#{point[0] + figure.x1},#{point[1] + figure.y1}"
     end.join(' ')
   end

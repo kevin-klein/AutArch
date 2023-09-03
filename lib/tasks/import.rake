@@ -15,6 +15,33 @@ namespace :import do
     end
   end
 
+  task db: :environment do
+    models = [
+      Publication,
+      Image,
+      Page,
+      Figure,
+    ]
+
+    Publication.transaction do
+      models.each do |model|
+        data = File.binread("#{model.table_name}.msgpack")
+        data = MessagePack.unpack(data)
+        progressbar = ProgressBar.create(title: model.table_name, total: data.length)
+        data.each do |item|
+          model_item = model.new(item)
+          if model == Figure
+            if model_item.publication_id.nil?
+              model_item.publication_id = Page.find(model_item.page_id).publication_id
+            end
+          end
+          model_item.save!
+          progressbar.increment
+        end
+      end
+    end
+  end
+
   task sites: :environment do
     Site.transaction do
       # Site.delete_all
