@@ -40,13 +40,14 @@ loaded_model.eval()
 
 loaded_model.to(device)
 
-image = Image.open('scripts/Dobes & Limbursky_2013_Vlineves-KSK-063.jpg')
+# image = Image.open('scripts/Gazenbeek et al. 2009 Mondelange (figures).pdf-033.png')
+image = Image.open('scripts/Dobes & Limbursky_2013_Vlineves-KSK-053.jpg')
 img, _ = PILToTensor()(image)
 
 with torch.no_grad():
         prediction = loaded_model([img.to(device)])
 
-font = ImageFont.truetype("scripts/Gidole-Regular.ttf", size=15)
+font = ImageFont.truetype("scripts/Gidole-Regular.ttf", size=20)
 
 image = image.convert('RGBA')
 draw = ImageDraw.Draw(image, 'RGBA')
@@ -63,4 +64,4 @@ for element in range(len(prediction[0]["boxes"])):
                 draw.rectangle([(boxes[0], boxes[1] - 30), (boxes[0] + length + 20, boxes[1])], fill=colors[label])
                 draw.text((boxes[0] + 10, boxes[1] -25), text=text, fill='white', font=font)
 
-image.save('object detection example.png')
+image.save('scripts/object detection example.png')

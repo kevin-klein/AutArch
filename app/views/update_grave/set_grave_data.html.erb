@@ -10,7 +10,7 @@
       <%= f.input :identifier %>
       <%= f.submit('Next', class: 'btn btn-primary') %>
     <% end %>
+    <%= link_to('Delete', figure_path(@grave), method: :delete) %>
   </div>
 </div>
 
-<%= link_to('Delete', figure_path(@grave), method: :delete) %>

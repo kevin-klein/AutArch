@@ -21,7 +21,7 @@
         <div class="card">
             <div class='row'>
                 <div class='p-5 col-xxl-8 col-md-12'>
-                    <%== Charts::ScatterChart.new(@graves_pca, html_class: 'card-img-top', link_proc: Proc.new { |item| edit_grave_path(item[:id]) }).render %>
+                    <%== Charts::ScatterChart.new(@graves_pca, html_class: 'card-img-top', link_proc: Proc.new { |item| grave_update_grave_path(item[:id], :set_grave_data) }).render %>
                 </div>
                 <div class='p-5 col-xxl-4 col-md-12'>
                     <%== column_chart(@variances.map { [_1[:name], _1[:variance]] }.to_h) %>

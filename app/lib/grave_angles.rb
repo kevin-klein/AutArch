@@ -3,7 +3,7 @@ class GraveAngles
     Arrow.transaction do
       figures ||= Arrow.includes({ page: :image })
       figures.each do |arrow|
-        arrow.angle = 360 - (arrow_angle(arrow) % 360)
+        arrow.angle = arrow_angle(arrow)
         arrow.save!
       end
     end

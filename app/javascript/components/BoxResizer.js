@@ -555,7 +555,7 @@ export default ({next_url, grave, sites, image, page}) => {
             <button type="button" style={{backgroundColor: '#9575CD'}} className="btn btn-secondary" onClick={() => createFigure('SkeletonFigure')}>Skeleton</button>
             <button type="button" style={{backgroundColor: '#009688'}} className="btn btn-secondary" onClick={() => createFigure('Arrow')}>Arrow</button>
             <button type="button" style={{backgroundColor: '#26C6DA'}} className="btn btn-secondary" onClick={() => createFigure('GraveCrossSection')}>GraveCrossSection</button>
-            <button type="button" style={{backgroundColor: '#4CAF50'}} className="btn btn-secondary" onClick={() => createFigure('Good')}>Good</button>
+            <button type="button" style={{backgroundColor: '#4CAF50'}} className="btn btn-secondary" onClick={() => createFigure('Good')}>Artefact</button>
             <button type="button" style={{backgroundColor: '#FF9800'}} className="btn btn-secondary" onClick={() => createFigure('Scale')}>Scale</button>
           </div>
         </div>

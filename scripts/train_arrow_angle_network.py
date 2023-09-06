@@ -6,7 +6,6 @@ import transforms as T
 from torchvision import datasets, models, transforms
 import time
 import torch.nn as nn
-import utils
 from torchvision.transforms.functional import rotate
 from torchvision.io import read_image, ImageReadMode
 import torch.nn as nn
@@ -40,7 +39,9 @@ def show(imgs):
     plt.show()
 
 if __name__ == '__main__':
-  model = get_arrow_model()
+  # model = get_arrow_model()
+  model = torchvision.models.resnet152(weights=None, num_classes=72)
+  # model.load_state_dict(torch.load('models/arrow_resnet.model'))
   dataset = torchvision.datasets.ImageFolder('arrows', transforms.Compose([
         # transforms.RandomResizedCrop(224),
         # transforms.RandomHorizontalFlip(),
@@ -48,16 +49,18 @@ if __name__ == '__main__':
         # transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
     ]))
   data_loader = torch.utils.data.DataLoader(
-                dataset, pin_memory=True, batch_size=8, shuffle=True, num_workers=8,)
+                dataset, pin_memory=True, batch_size=16, shuffle=True, num_workers=8,)
 
   device = torch.device('cuda')
+  model.to(device)
 
   # optimizer = torch.optim.SGD(model.parameters(), lr=0.0001, momentum=0.9)
-  optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
-  # optimizer = torch.optim.RMSprop(model.parameters(), lr=0.0001)
+  # optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
+  optimizer = torch.optim.RMSprop(model.parameters(), lr=0.001)
   # weights = torchvision.models.ResNet18_Weights.DEFAULT
   criterion = nn.CrossEntropyLoss()
 
+  # 3000
   num_epochs = 1000
   for epoch in range(num_epochs):
       start = time.time()
@@ -71,9 +74,9 @@ if __name__ == '__main__':
         # show(images)
         # images = [preprocess(image) for image in images]
         images = images.to(device)
-        angles = [random.randint(0, 359) for _ in images]
-        images = [rotate(image, angle, fill=1) for image, angle in zip(images, angles)]
-        angles = torch.tensor([angle for angle in angles]).cuda()
+        angles = [random.randint(0, 71) for _ in images]
+        images = [rotate(image, angle * 5, fill=1) for image, angle in zip(images, angles)]
+        angles = torch.tensor(angles).cuda()
 
         images = torch.stack(images).to(device)
 
@@ -92,4 +95,4 @@ if __name__ == '__main__':
 
       print(epoch_loss, f'time: {time.time() - start}')
 
-  torch.save(model.state_dict(), 'models/arrow_rotnet.model')
+  torch.save(model.state_dict(), 'models/arrow_resnet.model')
