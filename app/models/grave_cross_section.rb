@@ -43,8 +43,17 @@ class GraveCrossSection < Figure
   with_unit :width
   with_unit :height
   with_unit :depth
+  with_unit :normalized_depth
 
   def depth
     [height, width].min
+  end
+
+  def normalized_depth
+    if bounding_box_width.present?
+      [bounding_box_width, bounding_box_height].min
+    else
+      depth
+    end
   end
 end

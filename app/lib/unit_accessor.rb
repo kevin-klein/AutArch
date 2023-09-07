@@ -12,11 +12,15 @@ module UnitAccessor
           return { value: 0, unit: 'px' } if send(name).nil?
           return { value: send(name), unit: 'px' } if ratio.nil?
           { value: send(name) * ratio, unit: value_unit(square) }
-        elsif percentage_scale.present?
+        elsif percentage_scale.present? || (self.class.method_defined?(:grave) && grave.percentage_scale.present?)
           value = send(name)
-          cm_on_page = page_size.to_f / page.image.width
-          # raise
-          real_cm_per_pixel = (cm_on_page / 100.0) * percentage_scale
+          if self.class.method_defined?(:grave)
+            cm_on_page = grave.page_size.to_f / grave.page.image.width
+            real_cm_per_pixel = (cm_on_page / 100.0) * grave.percentage_scale
+          else
+            cm_on_page = page_size.to_f / page.image.width
+            real_cm_per_pixel = (cm_on_page / 100.0) * percentage_scale
+          end
 
           ratio = real_cm_per_pixel
           ratio = real_cm_per_pixel**2 if square

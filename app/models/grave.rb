@@ -92,6 +92,25 @@ class Grave < Figure
   with_unit :bounding_box_width
   with_unit :bounding_box_height
 
+  with_unit :normalized_width
+  with_unit :normalized_height
+
+  def normalized_width
+    if bounding_box_width.present?
+      bounding_box_width
+    else
+      width
+    end
+  end
+
+  def normalized_height
+    if bounding_box_height.present?
+      bounding_box_height
+    else
+      height
+    end
+  end
+
   def figures
     ([
       self,
