@@ -1,5 +1,5 @@
 <svg viewBox='<%= "0 0 #{@image.width} #{@image.height}" %>'>
-  <image width='<%= @image.width %>' height='<%= @image.height %>' href='<%= @image.href %>' />
+  <image width='<%= @image.width %>' height='<%= @image.height %>' href='<%= url_for(@image.data) %>' />
 
   <% @figures.each do |figure| %>
     <% if figure.is_a?(Spine) %>

@@ -13,7 +13,7 @@ class AnalyzeScales
   end
 
   def scale_text(scale)
-    image = ImageProcessing.extractFigure(scale, scale.page.image.data)
+    image = ImageProcessing.extractFigure(scale, scale.page.image.data.download)
     ImageProcessing.imwrite('scale.jpg', image)
     t = RTesseract.new('scale.jpg', lang: 'eng')
     result = t.to_s.strip
@@ -41,7 +41,7 @@ class AnalyzeScales
   end
 
   def assign_contour_width(scale)
-    image = ImageProcessing.extractFigure(scale, scale.page.image.data)
+    image = ImageProcessing.extractFigure(scale, scale.page.image.data.download)
     contours = ImageProcessing.findContours(image, 'tree')
     rects = contours.lazy.map { ImageProcessing.minAreaRect _1 }
 

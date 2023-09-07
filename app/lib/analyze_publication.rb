@@ -1,41 +1,43 @@
 class AnalyzePublication
   def run(publication, site_id: nil)
-    Page.transaction do
-      MessageBus.publish('/importprogress', 'Converting pdf pages to images')
-      path = create_temp_file(publication.pdf)
-      images = pdf_to_images(path)
+    sleep(2.seconds)
+    MessageBus.publish('/importprogress', 'Converting pdf pages to images')
+    path = create_temp_file(publication.pdf.download)
+    images = pdf_to_images(path)
 
-      page_number = 0
-      figures = []
-      image_count = page_count(path)
-      images.each_with_index do |image, index|
-        MessageBus.publish('/importprogress', {
-          message: 'Analyzing pages',
-          progress: index.to_f / (image_count-1)
-        })
-        page = publication.pages.find_or_initialize_by(number: page_number)
-        page_number += 1
+    page_number = 0
+    figures = []
+    image_count = page_count(path)
+    images.each_with_index do |image, index|
+      MessageBus.publish('/importprogress', {
+        message: 'Analyzing pages',
+        progress: index.to_f / (image_count-1)
+      })
+      page = publication.pages.find_or_initialize_by(number: page_number)
+      page_number += 1
 
-        image_data = image.write_to_buffer('.jpg')
-        page.image = Image.create!(data: image_data, width: image.width, height: image.height)
-        page.save!
+      image_data = image.write_to_buffer('.jpg')
+      page.image = Image.create!(width: image.width, height: image.height)
+      page.image.data.attach(io: StringIO.new(image_data), content_type: 'image/jpg', filename: "#{publication.title}_#{index}.jpg")
+      page.save!
 
-        predictions = predict_boxes(image_data)
+      predictions = predict_boxes(image_data)
 
-        predictions.each do |prediction|
-          x1, y1, x2, y2 = prediction['box']
-          type_name = prediction['label']
-          type_name = 'skeleton_figure' if type_name == 'skeleton'
-          propability = prediction['score']
-          if propability < 0.7 || x1.to_i == x2.to_i || y1.to_i == y2.to_i || type_name.camelize.singularize == 'St'
-            next
-          end
-
-          figure = page.figures.create!( x1: x1, y1: y1, x2: x2, y2: y2, type: type_name.camelize.singularize, publication: publication)
-          figures << figure
+      predictions.each do |prediction|
+        x1, y1, x2, y2 = prediction['box']
+        type_name = prediction['label']
+        type_name = 'skeleton_figure' if type_name == 'skeleton'
+        propability = prediction['score']
+        if propability < 0.7 || x1.to_i == x2.to_i || y1.to_i == y2.to_i || type_name.camelize.singularize == 'St'
+          next
         end
-      end
 
+        figure = page.figures.create!( x1: x1, y1: y1, x2: x2, y2: y2, type: type_name.camelize.singularize, publication: publication)
+        figures << figure
+      end
+    end
+
+    Page.transaction do
       MessageBus.publish('/importprogress', 'Grouping Figures to Graves')
       CreateGraves.new.run(publication.pages)
       MessageBus.publish('/importprogress', 'Creating Orientations of Bounding Boxes')
@@ -44,6 +46,7 @@ class AnalyzePublication
       GraveSize.new.run(figures)
       MessageBus.publish('/importprogress', 'Analyzing Scales')
       AnalyzeScales.new.run(figures)
+      MessageBus.publish('/importprogress', 'Done. Please proceed to Graves in the NavBar.')
       # publication.graves.update_all(site_id: site_id)
     end
   end

@@ -89,6 +89,8 @@ class Grave < Figure
   with_unit :perimeter
   with_unit :width
   with_unit :height
+  with_unit :bounding_box_width
+  with_unit :bounding_box_height
 
   def figures
     ([

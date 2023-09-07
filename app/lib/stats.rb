@@ -62,6 +62,7 @@ module Stats
   def pca_series(pca, publications, special_objects)
     publications.map do |publication|
       graves = publication.graves
+      graves = filter_graves(graves)
       grave_data = pca_transform_graves(pca, graves, special_objects)
 
       {
@@ -91,9 +92,23 @@ module Stats
     end
   end
 
+  def filter_graves(graves)
+    graves.filter do |grave|
+      (
+        grave.grave_cross_section.present? &&
+        grave.grave_cross_section.height_with_unit[:unit] == 'm' &&
+        grave.width_with_unit[:unit] == 'm' &&
+        grave.height_with_unit[:unit] == 'm' &&
+        grave.perimeter_with_unit[:unit] == 'm' &&
+        grave.area_with_unit[:unit] == '&#13217;'
+      )
+    end
+  end
+
   def fit_pca(pca, publications)
     publications.each do |publication|
       graves = publication.figures.filter { _1.is_a?(Grave) }
+      graves = filter_graves(graves)
       graves = convert_graves_to_size(graves)
       pca.fit(graves)
     end
@@ -101,8 +116,6 @@ module Stats
 
   def convert_graves_to_size(graves)
     graves.map do |grave|
-      next if grave.grave_cross_section.nil?
-
       [
         grave.width_with_unit[:value],
         grave.height_with_unit[:value],

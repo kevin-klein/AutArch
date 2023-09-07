@@ -5,7 +5,7 @@
 </div>
 
 <%= react_component('BoxResizer', {
-  image: @grave.page.image.as_json(methods: [:href], only: [:id, :width, :height]),
+  image: @grave.page.image.as_json.merge(href: url_for(@grave.page.image.data)),
   grave: @grave.as_json(methods: [:type], include: { figures: { methods: [:type]} }),
   sites: Site.all,
   page: @grave.page,
