@@ -96,11 +96,12 @@ module Stats
     graves.filter do |grave|
       (
         grave.grave_cross_section.present? &&
-        grave.grave_cross_section.height_with_unit[:unit] == 'm' &&
-        grave.width_with_unit[:unit] == 'm' &&
-        grave.height_with_unit[:unit] == 'm' &&
+        grave.grave_cross_section.normalized_depth_with_unit[:unit] == 'm' &&
+        grave.normalized_width_with_unit[:unit] == 'm' &&
+        grave.normalized_height_with_unit[:unit] == 'm' &&
         grave.perimeter_with_unit[:unit] == 'm' &&
-        grave.area_with_unit[:unit] == '&#13217;'
+        grave.area_with_unit[:unit] == '&#13217;' &&
+        grave.arrow.present?
       )
     end
   end
@@ -117,11 +118,10 @@ module Stats
   def convert_graves_to_size(graves)
     graves.map do |grave|
       [
-        grave.width_with_unit[:value],
-        grave.height_with_unit[:value],
-        grave.perimeter_with_unit[:value],
-        grave.area_with_unit[:value],
-        grave.grave_cross_section.height_with_unit[:value]
+        grave.normalized_width_with_unit[:value],
+        grave.normalized_height_with_unit[:value],
+        grave.grave_cross_section.normalized_depth_with_unit[:value],
+        ((grave.angle.abs.round + grave.arrow.angle) % 180).round
       ]
     end.compact
   end
