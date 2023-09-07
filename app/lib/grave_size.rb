@@ -26,7 +26,7 @@ class GraveSize
       figure.height = figure.bounding_box_height
       figure.save!
     else
-      image = ImageProcessing.extractFigure(figure, figure.page.image.data)
+      image = ImageProcessing.extractFigure(figure, figure.page.image.data.download)
       contours = ImageProcessing.findContours(image, 'tree')
       contour = contours.max_by { ImageProcessing.contourArea _1 }
       rect = ImageProcessing.boundingRect(contour)
@@ -39,7 +39,7 @@ class GraveSize
   end
 
   def handle_figure(figure)
-    stats = grave_stats(figure, figure.page.image.data)
+    stats = grave_stats(figure, figure.page.image.data.download)
     return if stats.nil?
     figure.assign_attributes(
       perimeter: stats[:perimeter],

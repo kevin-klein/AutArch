@@ -11,7 +11,7 @@ class GraveAngles
   end
 
   def arrow_angle(arrow)
-    image = ImageProcessing.extractFigure(arrow, arrow.page.image.data)
+    image = ImageProcessing.extractFigure(arrow, arrow.page.image.data.download)
     io = StringIO.new(image)
     file = HTTP::FormData::File.new io, filename: 'arrow.jpg'
     response = HTTP.post('http://127.0.0.1:8080/arrow', form: {

@@ -21,10 +21,22 @@
     <% @graves.each do |grave| %>
       <tr>
         <td><%= grave.identifier %></td>
-        <td><%= raw number_with_unit grave.area_with_unit %></td>
-        <td><%= number_with_unit grave.perimeter_with_unit %></td>
-        <td><%= number_with_unit grave.width_with_unit %></td>
-        <td><%= number_with_unit grave.height_with_unit %></td>
+        <td><%= raw number_with_unit grave.area_with_unit if grave.bounding_box_width.blank? %></td>
+        <td><%= number_with_unit grave.perimeter_with_unit  if grave.bounding_box_width.blank? %></td>
+        <td>
+          <% if grave.bounding_box_width.present? %>
+            <%= number_with_unit grave.bounding_box_width_with_unit %>
+          <% else %>
+            <%= number_with_unit grave.width_with_unit %>
+          <% end %>
+        </td>
+        <td>
+          <% if grave.bounding_box_height.present? %>
+            <%= number_with_unit grave.bounding_box_height_with_unit %>
+          <% else %>
+            <%= number_with_unit grave.height_with_unit %>
+          <% end %>
+        </td>
         <td><%= number_with_unit grave.grave_cross_section&.depth_with_unit %></td>
         <td>
           <% unless grave&.arrow&.angle.nil? %>

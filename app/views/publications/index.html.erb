@@ -27,7 +27,7 @@
           <div class="vr mx-1"></div>
           <%= link_to 'Edit', edit_publication_path(publication) %>
           <div class="vr mx-1"></div>
-          <%= link_to 'Delete', delete_publication_path(publication), method: :delete %>
+          <%= link_to 'Delete', publication_path(publication), method: :delete %>
         </td>
       </tr>
     <% end %>

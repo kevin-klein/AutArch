@@ -12,11 +12,5 @@
 class Image < ApplicationRecord
   include Rails.application.routes.url_helpers
 
-  def href
-    "/uploads/images/#{id}.jpg"
-  end
-
-  def data
-    File.binread(Rails.root.join("public/uploads/images/#{id}.jpg").to_s)
-  end
+  has_one_attached :data
 end
