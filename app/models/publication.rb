@@ -15,6 +15,7 @@ class Publication < ApplicationRecord
   has_many :figures, through: :pages
 
   # attribute :site, :string
+  has_one_attached :pdf
 
   def short_description
     "#{author} #{year}"

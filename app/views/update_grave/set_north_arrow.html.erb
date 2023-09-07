@@ -3,6 +3,6 @@
 <%= react_component('NorthArrow',
   arrow: @grave.arrow,
   next_url: wizard_path,
-  image: @grave.page.image.as_json(methods: [:href], only: [:id, :width, :height])
+  image: @grave.page.image.as_json.merge(href: url_for(@grave.page.image.data))
   )
 %>
