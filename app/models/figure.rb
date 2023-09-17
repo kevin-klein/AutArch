@@ -116,4 +116,18 @@ class Figure < ApplicationRecord
 
     Math.sqrt(item1 + item2)
   end
+
+  def size_normalized_contour
+    return [] if contour.length == 0
+    bounding = ImageProcessing.boundingRect(contour)
+    x_scale = 800.0 / bounding[:height]
+    y_scale = 800.0 / bounding[:width]
+    scale = [x_scale, y_scale].min
+    contour.map do |x, y|
+      x = x - bounding[:x]
+      y = y - bounding[:y]
+      raise if x * scale > 1000
+      [x * scale, y * scale]
+    end
+  end
 end

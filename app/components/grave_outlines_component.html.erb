@@ -1,0 +1,16 @@
+<div
+  data-id='figure-view'
+  id='figure-view'
+>
+<svg
+  style='touch-action: none; user-select: none;'
+  data-controller='figure'
+  viewBox='0 0 900 900'
+  preserveAspectRatio="xMidYMid meet"
+  xmlns="http://www.w3.org/2000/svg">
+  <% @graves.filter { !_1.manual_bounding_box }.each do |grave| %>
+    <polyline stroke-opacity='0.2' points="<%= grave.size_normalized_contour.map { |x, y| "#{x},#{y}" }.join(' ') %>" fill="none" stroke="black" />
+  <% end %>
+</svg>
+
+</div>
