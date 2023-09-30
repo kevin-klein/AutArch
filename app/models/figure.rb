@@ -120,6 +120,9 @@ class Figure < ApplicationRecord
   def size_normalized_contour
     return [] if contour.length == 0
     bounding = ImageProcessing.boundingRect(contour)
+
+    center = bounding[:width] - bounding[:x]
+
     x_scale = 800.0 / bounding[:height]
     y_scale = 800.0 / bounding[:width]
     scale = [x_scale, y_scale].min
