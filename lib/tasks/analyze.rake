@@ -58,24 +58,10 @@ namespace :analyze do
       combined_data = baseline_csv.zip(data)
       combined_data = combined_data.filter { |base, user| base.present? && user.present? }
 
-
       total_error = get_error(combined_data)
+
       [file, total_error]
     end.to_h
-
-    # CSV.open('inkscape_error.csv', 'wb') do |csv|
-    #   csv << %w[User Error]
-    #   errors.each do |error|
-    #     csv << [error[0], error[1]]
-    #   end
-    # end
-
-    # CSV.open('inkscape_count.csv', 'wb') do |csv|
-    #   csv << %w[User Graves]
-    #   graves_processed.each do |processsed|
-    #     csv << [processsed[0], processsed[1]]
-    #   end
-    # end
     puts errors.to_json
   end
 
@@ -111,26 +97,17 @@ namespace :analyze do
 
   def get_error(combined_data)
     combined_data.map do |base, user|
-      difference = base.map do |key, _value|
-        if %i[id updated_at].include?(key)
-          nil
-        else
-          base_value = base[key].to_f
-          user_value = user[key].to_f
-          if base_value.zero?
-            if user_value.zero?
-              0
-            else
-              1
-            end
-          else
-            diff = base_value - user_value
-            diff / base_value
-          end
-        end
-      end.compact.map(&:abs)
-      difference.sum(0.0) / difference.size
-    end
+      if user[:length_m] == '#DIV/0!' || user[:width_m] == '#DIV/0!' || user[:depth_m] == '#DIV/0!'
+        nil
+      else
+        difference = [
+          (base[:length_m].to_f - (user[:length_m].to_f / 100)) / base[:length_m].to_f,
+          (base[:width_m].to_f - (user[:width_m].to_f / 100)) / base[:width_m].to_f,
+          (base[:depth_m].to_f - (user[:depth_m].to_f / 100)) / base[:depth_m].to_f
+        ].compact.map(&:abs)
+        difference.sum(0.0) / difference.size
+      end
+    end.compact
   end
 
   task baseline: :environment do
