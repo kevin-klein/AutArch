@@ -40,8 +40,8 @@ loaded_model.eval()
 
 loaded_model.to(device)
 
-image = Image.open('scripts/Ortolf 2014_Lauda-Königshofen.pdf-113.png')
-# image = Image.open('scripts/Dobes & Limbursky_2013_Vlineves-KSK-053.jpg')
+# image = Image.open('scripts/Ortolf 2014_Lauda-Königshofen.pdf-113.png')
+image = Image.open('scripts/Dobes & Limbursky_2013_Vlineves-KSK-053.jpg')
 img, _ = PILToTensor()(image)
 
 with torch.no_grad():
