@@ -10,6 +10,7 @@
                             <%= f.input :publication_id, collection: Publication.where.not(id: @publication.id).pluck(:title, :id), as: :check_boxes, checked: params.dig(:compare, :publication_id) %>
                         </div>
                         <%= f.input :special_mark_graves, as: :text, input_html: { value: params.dig(:compare, :special_mark_graves) } %>
+                        <%= f.input :exclude_graves, as: :text, input_html: { value: params.dig(:compare, :exclude_graves) } %>
                         <%= f.submit "Update", class: "btn btn-primary" %>
                     <% end %>
                 </div>
@@ -150,11 +151,12 @@
             </div>
         </div>
     </div>
-    <div class='col-md-6' style='padding: 20px;'>
+    <div class='col-md-12' style='padding: 20px;'>
         <div class="card">
-            <%= render GraveOutlinesComponent.new(graves: @publication.graves) %>
-            <div class="card-body">
-                <h5 class="card-title">Grave Outlines</h5>
+            <div class='row'>
+                <% @publications.each do |publication| %>
+                    <%= render GraveOutlinesComponent.new(title: publication.title, graves: publication.graves.select { !@excluded_graves.include?(_1.id) }) %>
+                <% end %>
             </div>
         </div>
     </div>

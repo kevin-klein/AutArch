@@ -54,11 +54,11 @@ fig = plt.figure(figsize =(10, 7))
 fig, (ax1, ax2) = plt.subplots(1, 2)
 
 # Creating axes instance
-bp = ax1.boxplot([avg_comove_data, avg_inkscape_data], vert = True)
+bp = ax1.boxplot([avg_inkscape_data, avg_comove_data], vert = True)
 ax1.set_title('Average Error (in %)')
 
 # x-axis labels
-ax1.set_xticklabels(['CoMove', 'Inkscape'])
+ax1.set_xticklabels(['Inkscape', 'CoMove'])
 
 # Removing top axes and right axes
 # ticks

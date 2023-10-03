@@ -120,17 +120,30 @@ class Figure < ApplicationRecord
   def size_normalized_contour
     return [] if contour.length == 0
     bounding = ImageProcessing.boundingRect(contour)
+    # raise
 
-    center = bounding[:width] - bounding[:x]
+    center_x = (bounding[:width] / 2) + bounding[:x]
+    center_y = (bounding[:height] / 2) + bounding[:y]
 
-    x_scale = 800.0 / bounding[:height]
-    y_scale = 800.0 / bounding[:width]
-    scale = [x_scale, y_scale].min
-    contour.map do |x, y|
-      x = x - bounding[:x]
-      y = y - bounding[:y]
-      raise if x * scale > 1000
-      [x * scale, y * scale]
+    rotated_contour = contour.map do |x, y|
+      angle = (arrow.angle * Math::PI) / 180
+
+      radians = angle * Math::PI/180
+      x2 = x - center_x
+      y2 = y - center_y
+      cos = Math.cos(radians)
+      sin = Math.sin(radians)
+      [x2*cos - y2*sin + center_x, x2*sin + y2*cos + center_y]
+    end
+
+    center_x *= scale.meter_ratio
+    center_y *= scale.meter_ratio
+
+    offset_x = center_x - 1.5
+    offset_y = center_y - 1.5
+
+    rotated_contour.map do |x, y|
+      [(x * scale.meter_ratio - offset_x)  * 1000, (y * scale.meter_ratio - offset_y) * 1000]
     end
   end
 end

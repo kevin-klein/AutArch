@@ -16,14 +16,14 @@ module Stats
           .map(&:round)
   end
 
-  def graves_pca(publications, special_objects: [], components: 2)
+  def graves_pca(publications, special_objects: [], components: 2, excluded: [])
     pca = PCA.new(components: components, scale_data: true)
-    fit_pca(pca, publications)
-    [pca_series(pca, publications, special_objects), pca]
+    fit_pca(pca, publications, excluded: excluded)
+    [pca_series(pca, publications, special_objects, excluded: excluded), pca]
   end
 
-  def pca_variance(publications, marked: []) # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
-    pcas = graves_pca(publications, components: 1)[0]
+  def pca_variance(publications, marked: [], excluded: []) # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
+    pcas = graves_pca(publications, components: 1, excluded: excluded)[0]
 
     result = pcas.map do |series|
       mean = pca_mean(series)
@@ -59,10 +59,10 @@ module Stats
     series[:data].map { |item| (item[:x] - mean)**2 }.sum / series[:data].length
   end
 
-  def pca_series(pca, publications, special_objects)
+  def pca_series(pca, publications, special_objects, excluded: [])
     publications.map do |publication|
       graves = publication.graves
-      graves = filter_graves(graves)
+      graves = filter_graves(graves, excluded: excluded)
       grave_data = pca_transform_graves(pca, graves, special_objects)
 
       {
@@ -92,9 +92,10 @@ module Stats
     end
   end
 
-  def filter_graves(graves)
+  def filter_graves(graves, excluded: [])
     graves.filter do |grave|
       (
+        !excluded.include?(grave.id) &&
         grave.grave_cross_section.present? &&
         grave.grave_cross_section.normalized_depth_with_unit[:unit] == 'm' &&
         grave.normalized_width_with_unit[:unit] == 'm' &&
@@ -106,10 +107,10 @@ module Stats
     end
   end
 
-  def fit_pca(pca, publications)
+  def fit_pca(pca, publications, excluded: [])
     publications.each do |publication|
       graves = publication.figures.filter { _1.is_a?(Grave) }
-      graves = filter_graves(graves)
+      graves = filter_graves(graves, excluded: excluded)
       graves = convert_graves_to_size(graves)
       pca.fit(graves)
     end

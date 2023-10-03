@@ -60,7 +60,7 @@ class Grave < Figure
 
   def spine_orientations # rubocop:disable Metrics/AbcSize
     spines.map do |spine|
-      angle = (arrow.angle * Math::PI) / 180
+      angle = -(arrow.angle * Math::PI) / 180
       rotation_matrix = Matrix[[Math.cos(angle), Math.sin(angle)], [-Math.sin(angle), Math.cos(angle)]]
       spine_matrix1 = Matrix[[1, 0]]
       x1_points = spine_matrix1 * rotation_matrix

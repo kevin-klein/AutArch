@@ -1,11 +1,14 @@
 <div
+  class='col-md-6'
   data-id='figure-view'
   id='figure-view'
+  style='padding-top: 20px;'
 >
+<h4 style='text-align: center'><%= @title %></h4>
 <svg
   style='touch-action: none; user-select: none;'
   data-controller='figure'
-  viewBox='0 0 900 900'
+  viewBox='0 0 3000 3000'
   preserveAspectRatio="xMidYMid meet"
   xmlns="http://www.w3.org/2000/svg">
   <% @graves.filter { !_1.manual_bounding_box }.each do |grave| %>
