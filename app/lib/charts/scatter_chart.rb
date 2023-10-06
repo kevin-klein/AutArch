@@ -97,8 +97,8 @@ module Charts
 
     def calculate_stats # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
       data = @data.map { _1[:data] }.flatten
-      @max_x = data.map { _1[:x] }.max * 1.2
-      @max_y = data.map { _1[:y] }.max * 1.2
+      @max_x = data.map { _1[:x] }.max * 1.3
+      @max_y = data.map { _1[:y] }.max * 1.3
       @min_x = data.map { _1[:x] }.min
       @min_y = data.map { _1[:y] }.min
       @min_x += (@min_x * 0.1) if @min_x.negative?
