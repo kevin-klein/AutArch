@@ -17,9 +17,44 @@ module Stats
   end
 
   def graves_pca(publications, special_objects: [], components: 2, excluded: [])
-    pca = PCA.new(components: components, scale_data: true)
+    pca = Pca.new(components: components, scale_data: true)
     fit_pca(pca, publications, excluded: excluded)
     [pca_series(pca, publications, special_objects, excluded: excluded), pca]
+  end
+
+  def outlines_pca(publications, special_objects: [], components: 2, excluded: [])
+    pca = Pca.new(components: components, scale_data: true)
+
+    graves = publications.map do |publication|
+      graves = publication.graves.sort_by { _1.id }
+      filter_graves(graves, excluded: excluded)
+    end.flatten
+
+    contours = graves.map(&:contour)
+    frequencies = contours.map { Efd.elliptic_fourier_descriptors(_1, normalize: true, order: 8).to_a.flatten }
+    pca.fit(frequencies)
+
+    pca_data = publications.map do |publication|
+      graves = publication.graves.sort_by { _1.id }
+      graves = filter_graves(graves, excluded: excluded)
+
+      contours = graves.map(&:contour)
+      frequencies = contours.map { Efd.elliptic_fourier_descriptors(_1, normalize: true, order: 8).to_a.flatten }
+      data = pca.transform(frequencies).to_a.map do |pca_item|
+        convert_pca_item_to_polar(pca_item)
+      end
+      graves = data.zip(graves)
+      data = graves.map do |item, grave|
+        item[:mark] = true if special_objects.include?(grave.id)
+        item.merge({ id: grave.id, title: grave.id })
+      end
+      {
+        name: publication.short_description,
+        data: data.map { _1.merge({ mark: false }) }
+      }
+    end.flatten
+
+    [pca_data, pca]
   end
 
   def pca_variance(publications, marked: [], excluded: []) # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
@@ -73,7 +108,7 @@ module Stats
   end
 
   def pca_transform_graves(pca, graves, special_objects)
-    grave_data = pca.fit_transform(convert_graves_to_size(graves)).to_a.map do |pca_item|
+    grave_data = pca.transform(convert_graves_to_size(graves)).to_a.map do |pca_item|
       convert_pca_item_to_polar(pca_item)
     end
     graves = grave_data.zip(graves)
@@ -108,12 +143,13 @@ module Stats
   end
 
   def fit_pca(pca, publications, excluded: [])
-    publications.each do |publication|
+    graves = publications.map do |publication|
       graves = publication.figures.filter { _1.is_a?(Grave) }
       graves = filter_graves(graves, excluded: excluded)
-      graves = convert_graves_to_size(graves)
-      pca.fit(graves)
-    end
+      convert_graves_to_size(graves)
+    end.flatten(1)
+
+    pca.fit(graves)
   end
 
   def convert_graves_to_size(graves)

@@ -10,6 +10,12 @@ GIT
   specs:
     parslet (2.0.0)
 
+GIT
+  remote: https://github.com/ruby-numo/numo-narray.git
+  revision: 1dd19df10045f992bda6fdca9a696fe85a90aaaf
+  specs:
+    numo-narray (0.9.2.1)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -204,7 +210,6 @@ GEM
       racc (~> 1.4)
     nokogiri (1.15.3-x86_64-linux)
       racc (~> 1.4)
-    numo-narray (0.9.2.1)
     pagy (6.0.1)
     parallel (1.21.0)
     parser (3.0.2.0)
@@ -504,6 +509,7 @@ DEPENDENCIES
   matrix
   message_bus
   msgpack
+  numo-narray!
   pagy (~> 6.0)
   parslet!
   pca

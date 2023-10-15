@@ -9,18 +9,18 @@ gem 'rails', '~> 7.0.2', '>= 7.0.2.3'
 gem 'awesome_print'
 
 # The original asset pipeline for Rails [https://github.com/rails/sprockets-rails]
-gem 'sprockets-rails'
-gem 'pg'
-gem 'msgpack'
 gem 'activerecord-import'
+gem 'msgpack'
+gem 'pg'
+gem 'sprockets-rails'
 
 gem 'bootstrap'
 gem 'graphql'
+gem 'message_bus'
 gem 'pagy', '~> 6.0' # omit patch digit
 gem 'parslet', git: 'https://github.com/kschiess/parslet'
-gem 'sqlite3'
 gem 'rails-erd', group: :development
-gem 'message_bus'
+gem 'sqlite3'
 
 gem 'matrix'
 gem 'rice'
@@ -36,6 +36,7 @@ end
 
 # gem 'pycall', require: ['pycall', 'pycall/import']
 # gem 'numpy'
+gem 'numo-narray', git: 'https://github.com/ruby-numo/numo-narray.git'
 
 gem 'chartkick'
 gem 'pdf-reader'
@@ -47,8 +48,8 @@ gem 'puma', '~> 5.0'
 gem 'importmap-rails'
 
 # Hotwire's SPA-like page accelerator [https://turbo.hotwired.dev]
-gem 'turbo-rails'
 gem 'active_median'
+gem 'turbo-rails'
 gem 'wicked'
 
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
@@ -78,7 +79,6 @@ gem 'simple_form'
 
 gem 'csv'
 gem 'gsl', github: 'SciRuby/rb-gsl'
-gem 'pca'
 gem 'ruby-vips'
 gem 'rumale'
 gem 'victor'
