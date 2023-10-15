@@ -66,7 +66,7 @@ class Figure < ApplicationRecord
   belongs_to :publication
   include UnitAccessor
   serialize :contour, JSON
-  validates_presence_of :publication
+  validates :publication, presence: true
 
   before_save do
     self.publication_id = page.publication_id
@@ -119,6 +119,7 @@ class Figure < ApplicationRecord
 
   def size_normalized_contour
     return [] if contour.length == 0
+
     bounding = ImageProcessing.boundingRect(contour)
     # raise
 
@@ -128,13 +129,14 @@ class Figure < ApplicationRecord
     rotated_contour = contour.map do |x, y|
       angle = (arrow.angle * Math::PI) / 180
 
-      radians = angle * Math::PI/180
+      radians = angle * Math::PI / 180
       x2 = x - center_x
       y2 = y - center_y
       cos = Math.cos(radians)
       sin = Math.sin(radians)
-      [x2*cos - y2*sin + center_x, x2*sin + y2*cos + center_y]
+      [(x2 * cos) - (y2 * sin) + center_x, (x2 * sin) + (y2 * cos) + center_y]
     end
+    rotated_contour += [rotated_contour[0]]
 
     center_x *= scale.meter_ratio
     center_y *= scale.meter_ratio
@@ -143,7 +145,7 @@ class Figure < ApplicationRecord
     offset_y = center_y - 1.5
 
     rotated_contour.map do |x, y|
-      [(x * scale.meter_ratio - offset_x)  * 1000, (y * scale.meter_ratio - offset_y) * 1000]
+      [((x * scale.meter_ratio) - offset_x) * 1000, ((y * scale.meter_ratio) - offset_y) * 1000]
     end
   end
 end

@@ -161,4 +161,30 @@
         </div>
     </div>
 
+    <div class='col-md-12' style='padding: 20px;'>
+        <div class="card">
+            <div class='row'>
+                <div class='p-5 col-xxl-8 col-md-12'>
+                    <%== Charts::ScatterChart.new(@outlines_pca_data, html_class: 'card-img-top').render %>
+                </div>
+                <div class='p-5 col-xxl-4 col-md-12'>
+                        <h5 class="card-title">Grave PCA (width, depth, length, bounding box orientation)</h5>
+                        <div class="card-text">
+                            <table class='table'>
+                                <tbody>
+                                    <% @outline_pca.explained_variance_ratio.to_a.each_with_index do |variance_ratio, index| %>
+                                        <tr>
+                                            <td>PCA <%= index + 1 %></td>
+                                            <td><%= variance_ratio %>%</td>
+                                        </tr>
+                                    <% end %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
