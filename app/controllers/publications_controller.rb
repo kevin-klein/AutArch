@@ -20,9 +20,14 @@ class PublicationsController < ApplicationController
     @skeleton_angles = Stats.spine_angles(@publication.figures.where(type: 'Spine').includes(grave: :arrow))
     @grave_angles = Stats.grave_angles(graves.includes(:arrow))
     set_compare_graves
-    @variances = Stats.pca_variance([@publication, *@other_publications], marked: marked_items, excluded: @excluded_graves)
-    @graves_pca, @pca = Stats.graves_pca([@publication, *@other_publications], special_objects: marked_items, excluded: @excluded_graves)
+
     @publications = [@publication, *@other_publications]
+
+    @outlines_pca_data, @outline_pca = Stats.outlines_pca([@publication, *@other_publications], special_objects: marked_items, excluded: @excluded_graves)
+    @variances = Stats.pca_variance([@publication, *@other_publications], marked: marked_items,
+      excluded: @excluded_graves)
+    @graves_pca, @pca = Stats.graves_pca([@publication, *@other_publications], special_objects: marked_items,
+      excluded: @excluded_graves)
   end
 
   # GET /publications/new
@@ -51,16 +56,16 @@ class PublicationsController < ApplicationController
       if @publication.save
         AnalyzePublicationJob.perform_later(@publication, site_id: publication_params[:site])
 
-        format.html { redirect_to progress_publication_path(@publication), notice: 'Publication was successfully created.' }
+        format.html do
+          redirect_to progress_publication_path(@publication), notice: 'Publication was successfully created.'
+        end
       else
         format.html { render :new, status: :unprocessable_entity }
       end
     end
   end
 
-  def progress
-
-  end
+  def progress; end
 
   # PATCH/PUT /publications/1 or /publications/1.json
   def update

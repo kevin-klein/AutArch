@@ -1,6 +1,6 @@
 module Charts
   class ScatterChart < Chart
-    def initialize(data, padding: 20, height: 400, width: 1200, link_proc: nil, **kwargs) # rubocop:disable Metrics/ParameterLists
+    def initialize(data, padding: 20, height: 400, width: 1200, link_proc: Proc.new {}, **kwargs) # rubocop:disable Metrics/ParameterLists
       super(width: width, height: height, padding: padding, **kwargs)
       @data = data
       @axis_marker_height = 5
