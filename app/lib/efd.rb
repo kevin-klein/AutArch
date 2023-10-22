@@ -29,7 +29,7 @@ module Efd
     coeffs
   end
 
-  def self.normalize_efd(coeffs, size_invariant: true, return_transformation: false)
+  def self.normalize_efd(coeffs, size_invariant: false, return_transformation: false)
     theta_1 = 0.5 * Math.atan2(
       2 * ((coeffs[0, 0] * coeffs[0, 1]) + (coeffs[0, 2] * coeffs[0, 3])),
       (coeffs[0, 0]**2) - (coeffs[0, 1]**2) + (coeffs[0, 2]**2) - (coeffs[0, 3]**2)

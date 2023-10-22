@@ -165,17 +165,17 @@
         <div class="card">
             <div class='row'>
                 <div class='p-5 col-xxl-8 col-md-12'>
-                    <%== Charts::ScatterChart.new(@outlines_pca_data, html_class: 'card-img-top').render %>
+                    <%== Charts::ScatterChart.new(@outlines_pca_data, html_class: 'card-img-top', link_proc: Proc.new { |item| grave_update_grave_path(item[:id], :set_grave_data) }).render %>
                 </div>
                 <div class='p-5 col-xxl-4 col-md-12'>
-                        <h5 class="card-title">Grave PCA (width, depth, length, bounding box orientation)</h5>
+                        <h5 class="card-title">Grave Outline PCA (EFD with 10 harmonics, size normalized)</h5>
                         <div class="card-text">
                             <table class='table'>
                                 <tbody>
-                                    <% @outline_pca.explained_variance_ratio.to_a.each_with_index do |variance_ratio, index| %>
+                                    <% @outline_variance_ratio.each_with_index do |variance_ratio, index| %>
                                         <tr>
                                             <td>PCA <%= index + 1 %></td>
-                                            <td><%= variance_ratio %>%</td>
+                                            <td><%= variance_ratio * 100 %>%</td>
                                         </tr>
                                     <% end %>
                                 </tbody>
