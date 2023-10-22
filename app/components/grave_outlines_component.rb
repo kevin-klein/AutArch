@@ -3,7 +3,7 @@
 class GraveOutlinesComponent < ViewComponent::Base
   def initialize(graves:, title:)
     super
-    @graves = graves
+    @graves = Stats.filter_graves(graves)
     @title = title
   end
 end

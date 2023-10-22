@@ -26,6 +26,7 @@ class PublicationsController < ApplicationController
     @outlines_pca_data, @outline_pca = Stats.outlines_pca([@publication, *@other_publications], special_objects: marked_items, excluded: @excluded_graves)
     @variances = Stats.pca_variance([@publication, *@other_publications], marked: marked_items,
       excluded: @excluded_graves)
+    @outline_variance_ratio = @outline_pca.explained_variance_ratio.to_a
     @graves_pca, @pca = Stats.graves_pca([@publication, *@other_publications], special_objects: marked_items,
       excluded: @excluded_graves)
   end
