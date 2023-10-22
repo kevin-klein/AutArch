@@ -108,13 +108,10 @@ class Figure < ApplicationRecord
   end
 
   def distance_to(figure)
-    center1 = center
-    center2 = figure.center
-
-    item1 = (center1.x - center2.x)**2
-    item2 = (center1.y - center2.y)**2
-
-    Math.sqrt(item1 + item2)
+    Distance.point_distance(
+      { x: center1.x, y: center1.y },
+      { x: center2.x, y: center2.y }
+    )
   end
 
   def size_normalized_contour
@@ -138,14 +135,21 @@ class Figure < ApplicationRecord
     end
     rotated_contour += [rotated_contour[0]]
 
-    center_x *= scale.meter_ratio
-    center_y *= scale.meter_ratio
+    ratio = if scale.present?
+      scale.meter_ratio
+    else
+      cm_on_page = page_size.to_f / page.image.width
+      (cm_on_page / 100.0) * percentage_scale
+    end
+
+    center_x *= ratio
+    center_y *= ratio
 
     offset_x = center_x - 1.5
     offset_y = center_y - 1.5
 
     rotated_contour.map do |x, y|
-      [((x * scale.meter_ratio) - offset_x) * 1000, ((y * scale.meter_ratio) - offset_y) * 1000]
+      [((x * ratio) - offset_x) * 1000, ((y * ratio) - offset_y) * 1000]
     end
   end
 end

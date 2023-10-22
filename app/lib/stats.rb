@@ -30,16 +30,16 @@ module Stats
       filter_graves(graves, excluded: excluded)
     end.flatten
 
-    contours = graves.map(&:contour)
-    frequencies = contours.map { Efd.elliptic_fourier_descriptors(_1, normalize: true, order: 8).to_a.flatten }
+    contours = graves.map(&:size_normalized_contour)
+    frequencies = contours.map { Efd.elliptic_fourier_descriptors(_1, normalize: true, order: 10).to_a.flatten }
     pca.fit(frequencies)
 
     pca_data = publications.map do |publication|
       graves = publication.graves.sort_by { _1.id }
       graves = filter_graves(graves, excluded: excluded)
 
-      contours = graves.map(&:contour)
-      frequencies = contours.map { Efd.elliptic_fourier_descriptors(_1, normalize: true, order: 8).to_a.flatten }
+      contours = graves.map(&:size_normalized_contour)
+      frequencies = contours.map { Efd.elliptic_fourier_descriptors(_1, normalize: true, order: 10).to_a.flatten }
       data = pca.transform(frequencies).to_a.map do |pca_item|
         convert_pca_item_to_polar(pca_item)
       end
@@ -83,8 +83,6 @@ module Stats
       }]
     end
   end
-
-  private
 
   def pca_mean(series)
     series[:data].map { _1[:x] }.sum / series[:data].length
