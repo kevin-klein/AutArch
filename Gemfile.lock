@@ -11,6 +11,12 @@ GIT
     parslet (2.0.0)
 
 GIT
+  remote: https://github.com/mrkn/pycall.rb.git
+  revision: 81360ace1ceb174abb2bba7ebe2dee1a56c364ac
+  specs:
+    pycall (1.5.1)
+
+GIT
   remote: https://github.com/ruby-numo/numo-narray.git
   revision: 1dd19df10045f992bda6fdca9a696fe85a90aaaf
   specs:
@@ -210,12 +216,12 @@ GEM
       racc (~> 1.4)
     nokogiri (1.15.3-x86_64-linux)
       racc (~> 1.4)
+    numpy (0.4.0)
+      pycall (>= 1.2.0.beta1)
     pagy (6.0.1)
     parallel (1.21.0)
     parser (3.0.2.0)
       ast (~> 2.4.1)
-    pca (0.5.0)
-      gsl (~> 2.1)
     pdf-reader (2.11.0)
       Ascii85 (~> 1.0)
       afm (~> 0.2.1)
@@ -510,13 +516,14 @@ DEPENDENCIES
   message_bus
   msgpack
   numo-narray!
+  numpy
   pagy (~> 6.0)
   parslet!
-  pca
   pdf-reader
   pg
   pkg-config
   puma (~> 5.0)
+  pycall!
   rails (~> 7.0.2, >= 7.0.2.3)
   rails-erd
   react-rails
