@@ -24,11 +24,20 @@ class PublicationsController < ApplicationController
     @publications = [@publication, *@other_publications]
 
     @outlines_pca_data, @outline_pca = Stats.outlines_pca([@publication, *@other_publications], special_objects: marked_items, excluded: @excluded_graves)
-    @variances = Stats.pca_variance([@publication, *@other_publications], marked: marked_items,
-      excluded: @excluded_graves)
+    @variances = Stats.pca_variance([@publication, *@other_publications], marked: marked_items, excluded: @excluded_graves)
     @outline_variance_ratio = @outline_pca.explained_variance_ratio.to_a
     @graves_pca, @pca = Stats.graves_pca([@publication, *@other_publications], special_objects: marked_items,
       excluded: @excluded_graves)
+
+    @clustering_result = Upgma.cluster(@outlines_pca_data.map do |item|
+      item[:data].map { [_1[:x], _1[:y]] }
+    end.flatten(1).map { [_1] }, 10).map do |cluster|
+      {
+        data: cluster.map { { x: _1[0], y: _1[1] } }
+      }
+    end
+
+    ap @clustering_result
   end
 
   # GET /publications/new

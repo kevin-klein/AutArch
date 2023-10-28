@@ -34,8 +34,8 @@ group :development do
   gem 'ruby-lsp', require: false
 end
 
-# gem 'pycall', require: ['pycall', 'pycall/import']
-# gem 'numpy'
+gem 'pycall', require: ['pycall', 'pycall/import'], git: 'https://github.com/mrkn/pycall.rb.git'
+gem 'numpy'
 gem 'numo-narray', git: 'https://github.com/ruby-numo/numo-narray.git'
 
 gem 'chartkick'

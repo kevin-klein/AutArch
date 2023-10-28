@@ -64,6 +64,7 @@ ax1.set_xticklabels(['Inkscape', 'CoMove'])
 # ticks
 ax1.get_xaxis().tick_bottom()
 ax1.get_yaxis().tick_left()
+ax1.set_ylim(0)
 
 ax2.set_title('Average Processed Graves')
 ax2.bar(['Inkscape', 'CoMove'], [statistics.mean(inkscape_count_data['Graves']), statistics.mean(comove_count_data['Graves'])])

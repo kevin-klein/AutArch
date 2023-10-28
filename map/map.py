@@ -75,6 +75,30 @@ ARICESTI = {
 	'name': 'Ariceștii Rahtivani'
 }
 
+Ciulnita = {
+	'lat': 44.5373408,
+	'lon': 27.3290492,
+	'name': 'Ciulniţa'
+}
+
+Ploiesti = {
+	'lat': 44.9322345,
+	'lon': 25.9686931,
+	'name': 'Ploiești'
+}
+
+Rast = {
+	'lat': 43.8871136,
+	'lon': 23.2735062,
+	'name': 'Rast'
+}
+
+Gurbanesti = {
+	'lat': 44.3792834,
+	'lon': 26.681199,
+	'name': 'Gurbănești'
+}
+
 KOSTYLEVA_UTKIN_RECTANGLE = {
 	'left_bottom': {
 		'lat': 58.27543554276217,
@@ -194,6 +218,107 @@ IVANOVA_TOSHCHEV = {
 	'name': 'Ivanova & Toshchev'
 }
 
+LOUGAS_2016 = {
+	'left_top': {
+		'lat': 59.76703651770406,
+		'lon': 21.6013758030299
+	},
+	'right_top': {
+		'lat': 59.76703651770406,
+		'lon': 27.50023158104496
+	},
+	'left_bottom': {
+		'lat': 57.239364088889104,
+		'lon': 21.6013758030299
+	},
+	'right_bottom': {
+		'lat': 57.239364088889104,
+		'lon': 27.50023158104496
+	},
+	'name': 'Lougas et al 2016'
+}
+
+Gadzyatskaya_2016 = {
+	'left_top': {
+		'lat': 58.104821370702204,
+		'lon': 37.8562392180725
+	},
+	'right_top': {
+		'lat': 58.104821370702204,
+		'lon': 47.63966569928308
+	},
+	'left_bottom': {
+		'lat': 54.61221373386977,
+		'lon': 37.8562392180725
+	},
+	'right_bottom': {
+		'lat': 54.61221373386977,
+		'lon': 47.63966569928308
+	},
+	'name': 'Gadzyatskaya 1976'
+}
+
+Shtintsa_1987 = {
+	'left_top': {
+		'lat': 48.41733033467862,
+		'lon': 27.947938855929397
+	},
+	'right_top': {
+		'lat': 48.41733033467862,
+		'lon': 29.45041596439392
+	},
+	'left_bottom': {
+		'lat': 45.94486828285594,
+		'lon': 27.947938855929397
+	},
+	'right_bottom': {
+		'lat': 45.94486828285594,
+		'lon': 29.45041596439392
+	},
+	'name': 'Gadzyatskaya 1976'
+}
+
+Krainov_1963 = {
+	'left_top': {
+		'lat': 56.57242189778502,
+		'lon': 36.151626620253325
+	},
+	'right_top': {
+		'lat': 56.57242189778502,
+		'lon': 39.11353142737622
+	},
+	'left_bottom': {
+		'lat': 54.36300312740703,
+		'lon': 36.151626620253325
+	},
+	'right_bottom': {
+		'lat': 54.36300312740703,
+		'lon': 39.11353142737622
+	},
+	'name': 'Krainov 1963'
+}
+
+Krainov_1964 = {
+	'left_top': {
+		'lat': 57.22313603869134,
+		'lon': 37.499534552379245
+	},
+	'right_top': {
+		'lat': 57.22313603869134,
+		'lon': 40.43452022589467
+	},
+	'left_bottom': {
+		'lat': 56.17501721104373,
+		'lon': 37.499534552379245
+	},
+	'right_bottom': {
+		'lat': 56.17501721104373,
+		'lon': 40.43452022589467
+	},
+	'name': 'Krainov 1964'
+}
+
+
 for place in [
 	VILKLETICE,
 	VLINEVES,
@@ -202,6 +327,10 @@ for place in [
 	SMEENI,
 	BLEJOI,
 	MOARA_VLASIEI,
+	Ciulnita,
+	Ploiesti,
+	Rast,
+	Gurbanesti,
 	ARICESTI]:
 	pl.scatter(place['lon'], place['lat'], color='r', marker='.', s=10)
 	text.append(pl.text(place['lon'], place['lat'], place['name'], fontweight='demibold',color='k', fontsize=8, alpha=0.7))
@@ -213,6 +342,11 @@ for rect in [
 	FRINCULEASA_2017_RECTANGLE,
 	KOSTYLEVA_UTKIN_RECTANGLE,
 	IVANOVA_TOSHCHEV,
+	LOUGAS_2016,
+	Gadzyatskaya_2016,
+	Shtintsa_1987,
+	Krainov_1963,
+	Krainov_1964,
 	FRINCULEASA_CHILDREN_OF_THE_STEPPE_RECTANGLE]:
 	poly = Polygon([
 		(rect['left_top']['lon'], rect['left_top']['lat']),
