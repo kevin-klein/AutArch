@@ -11,10 +11,13 @@ import torchvision
 labels = torch.load('models/rcnn_labels.model')
 labels = {v: k for k, v in labels.items()}
 
-device = torch.device('cuda')
+if torch.cuda.is_available():
+    device = torch.device('cuda')
+else:
+    device = torch.device('cpu')
 
-loaded_model = get_model(num_classes = len(labels.keys()))
-loaded_model.load_state_dict(torch.load('models/rcnn_dfg.model'))
+loaded_model = get_model(num_classes = len(labels.keys()), device=device)
+loaded_model.load_state_dict(torch.load('models/rcnn_dfg.model', map_location=device))
 
 loaded_model.eval()
 
@@ -22,11 +25,11 @@ loaded_model.to(device)
 
 app = Bottle()
 arrow_model = torchvision.models.resnet152(weights=None, num_classes=72).to(device)
-arrow_model.load_state_dict(torch.load('models/arrow_resnet.model'))
+arrow_model.load_state_dict(torch.load('models/arrow_resnet.model', map_location=device))
 
 skeleton_model = torchvision.models.resnet152(weights=None, num_classes=2).to(device)
-skeleton_model.load_state_dict(torch.load('models/skeleton_resnet.model'))
-skeleton_labels = torch.load('models/skeleton_resnet_labels.model')
+skeleton_model.load_state_dict(torch.load('models/skeleton_resnet.model', map_location=device))
+skeleton_labels = torch.load('models/skeleton_resnet_labels.model', map_location=device)
 
 def analyze_file(file):
     request_object_content = file.read()
