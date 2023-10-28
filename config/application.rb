@@ -20,3 +20,9 @@ module Dfgrb
     # config.eager_load_paths << Rails.root.join("extras")
   end
 end
+
+require 'pycall/import'
+include PyCall::Import
+
+pyimport 'numpy', as: :np
+pyfrom 'sklearn.decomposition', import: :PCA

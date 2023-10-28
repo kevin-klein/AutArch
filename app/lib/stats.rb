@@ -23,7 +23,7 @@ module Stats
   end
 
   def outlines_pca(publications, special_objects: [], components: 2, excluded: [])
-    pca = Pca.new(components: components, scale_data: true)
+    pca = Pca.new(components: components)
 
     graves = publications.map do |publication|
       graves = publication.graves.sort_by { _1.id }
@@ -31,7 +31,9 @@ module Stats
     end.flatten
 
     contours = graves.map(&:size_normalized_contour)
-    frequencies = contours.map { Efd.elliptic_fourier_descriptors(_1, normalize: true, order: 10).to_a.flatten }
+    frequencies = contours.map { Efd.elliptic_fourier_descriptors(_1, normalize: false, order: 15).to_a.flatten }
+    max = (255.0 / frequencies.flatten.max)
+    frequencies = frequencies.map { |item| item.map { _1 * max }  }
     pca.fit(frequencies)
 
     pca_data = publications.map do |publication|
@@ -39,10 +41,13 @@ module Stats
       graves = filter_graves(graves, excluded: excluded)
 
       contours = graves.map(&:size_normalized_contour)
-      frequencies = contours.map { Efd.elliptic_fourier_descriptors(_1, normalize: true, order: 10).to_a.flatten }
+      frequencies = contours.map { Efd.elliptic_fourier_descriptors(_1, normalize: false, order: 15).to_a.flatten }
+      max = (255.0 / frequencies.flatten.max)
+      frequencies = frequencies.map { |item| item.map { _1 * max }  }
       data = pca.transform(frequencies).to_a.map do |pca_item|
         convert_pca_item_to_polar(pca_item)
       end
+
       graves = data.zip(graves)
       data = graves.map do |item, grave|
         item[:mark] = true if special_objects.include?(grave.id)

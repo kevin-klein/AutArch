@@ -168,7 +168,33 @@
                     <%== Charts::ScatterChart.new(@outlines_pca_data, html_class: 'card-img-top', link_proc: Proc.new { |item| grave_update_grave_path(item[:id], :set_grave_data) }).render %>
                 </div>
                 <div class='p-5 col-xxl-4 col-md-12'>
-                        <h5 class="card-title">Grave Outline PCA (EFD with 10 harmonics, size normalized)</h5>
+                        <h5 class="card-title">Grave Outline PCA (EFD with 15 harmonics, size not normalized)</h5>
+                        <div class="card-text">
+                            <table class='table'>
+                                <tbody>
+                                    <% @outline_variance_ratio.each_with_index do |variance_ratio, index| %>
+                                        <tr>
+                                            <td>PCA <%= index + 1 %></td>
+                                            <td><%= variance_ratio * 100 %>%</td>
+                                        </tr>
+                                    <% end %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class='col-md-12' style='padding: 20px;'>
+        <div class="card">
+            <div class='row'>
+                <div class='p-5 col-xxl-8 col-md-12'>
+                    <%== Charts::ScatterChart.new(@clustering_result, html_class: 'card-img-top', link_proc: Proc.new { |item| '' }).render %>
+                </div>
+                <div class='p-5 col-xxl-4 col-md-12'>
+                        <h5 class="card-title">Grave Outline EFD PCA UPGMA Clustered (EFD with 15 harmonics, size not normalized)</h5>
                         <div class="card-text">
                             <table class='table'>
                                 <tbody>

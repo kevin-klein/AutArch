@@ -29,8 +29,8 @@ module Upgma
       matrix = build_matrix(clusters)
     end
 
-    # clusters
-    groups
+    clusters
+    # groups
   end
 
   def build_tree(groups)
@@ -61,7 +61,7 @@ module Upgma
         data2 =  { x: item2[0], y: item2[1] }
         Distance.point_distance(data1, data2)
       end.sum
-    end.sum / (cluster1.length ** cluster2.length)
+    end.sum / (cluster1.length * cluster2.length)
   end
 
   def build_matrix(clusters)
