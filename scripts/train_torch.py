@@ -123,7 +123,7 @@ def collate_fn(batch):
 
 # sys.exit(0)
 
-def get_model(num_classes):
+def get_model(num_classes, device):
     # load an object detection model pre-trained on COCO
     # model = torchvision.models.detection.retinanet_resnet50_fpn(num_classes=num_classes)
     # model = torchvision.models.detection.fasterrcnn_resnet50_fpn_v2(num_classes=num_classes)
@@ -133,7 +133,7 @@ def get_model(num_classes):
     # replace the pre-trained head with a new on
     #    model.roi_heads.box_predictor = FastRCNNPredictor(in_features, num_classes)
     # model = torch.hub.load('NVIDIA/DeepLearningExamples:torchhub', 'nvidia_ssd')
-    model.load_state_dict(torch.load('models/rcnn_dfg.model'))
+    model.load_state_dict(torch.load('models/rcnn_dfg.model', map_location=device))
     return model
 
 def get_transform(train):
