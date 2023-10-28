@@ -78,9 +78,7 @@ gem 'simple_form'
 # gem 'image_processing', '~> 1.2'
 
 gem 'csv'
-gem 'gsl', github: 'SciRuby/rb-gsl'
 gem 'ruby-vips'
-gem 'rumale'
 gem 'victor'
 
 group :development, :test do
