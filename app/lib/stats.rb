@@ -1,6 +1,44 @@
 module Stats
   extend self
 
+  pyimport 'scipy'
+  pyimport 'io'
+  pyimport 'base64'
+  pyfrom 'matplotlib', import: :pyplot
+
+  def upgma(data)
+    scipy.cluster.hierarchy.linkage(data, 'average')
+  end
+
+  def ward(data)
+    scipy.cluster.hierarchy.linkage(data, 'ward')
+  end
+
+  def upgma_figure(linkage)
+    fig = pyplot.figure(figsize: [25, 10])
+    dn = scipy.cluster.hierarchy.dendrogram(linkage, truncate_mode: 'lastp', p: 10, show_leaf_counts: true)
+
+    my_stringIObytes = io.BytesIO.new
+    pyplot.savefig(my_stringIObytes, format: 'jpg')
+    my_stringIObytes.seek(0)
+    base64.b64encode(my_stringIObytes.read)
+  end
+
+  def cluster_scatter_chart(data, dendro)
+    pyplot.figure(figsize: [10, 8])
+    clusters = scipy.cluster.hierarchy.fcluster(dendro, t: 10, criterion: 'maxclust')
+
+    pca = Pca.new
+    pca.fit(data)
+    data = pca.transform(data)
+
+    my_stringIObytes = io.BytesIO.new
+    pyplot.scatter(data[0..-1, 0], data[0..-1, 1], c: clusters, cmap: 'hsv')
+    pyplot.savefig(my_stringIObytes, format: 'jpg', dpi: 300)
+    my_stringIObytes.seek(0)
+    base64.b64encode(my_stringIObytes.read)
+  end
+
   def spine_angles(spines)
     spines.map { [_1, _1.grave&.arrow] }
           .filter { |_spine, arrow| arrow.present? }
@@ -22,9 +60,7 @@ module Stats
     [pca_series(pca, publications, special_objects, excluded: excluded), pca]
   end
 
-  def outlines_pca(publications, special_objects: [], components: 2, excluded: [])
-    pca = Pca.new(components: components)
-
+  def outlines_efd(publications, excluded: [])
     graves = publications.map do |publication|
       graves = publication.graves.sort_by { _1.id }
       filter_graves(graves, excluded: excluded)
@@ -32,18 +68,22 @@ module Stats
 
     contours = graves.map(&:size_normalized_contour)
     frequencies = contours.map { Efd.elliptic_fourier_descriptors(_1, normalize: false, order: 15).to_a.flatten }
-    max = (255.0 / frequencies.flatten.max)
-    frequencies = frequencies.map { |item| item.map { _1 * max }  }
+    # max = (255.0 / frequencies.flatten.max)
+    # .map { _1 * max }
+    frequencies = frequencies.map { |item| item.each_slice(2).map(&:last)  }
+
+    [frequencies, graves]
+  end
+
+  def outlines_pca(publications, special_objects: [], components: 2, excluded: [])
+    pca = Pca.new(components: components)
+
+    frequencies, graves = outlines_efd(publications, excluded: excluded)
+
     pca.fit(frequencies)
 
     pca_data = publications.map do |publication|
-      graves = publication.graves.sort_by { _1.id }
-      graves = filter_graves(graves, excluded: excluded)
-
-      contours = graves.map(&:size_normalized_contour)
-      frequencies = contours.map { Efd.elliptic_fourier_descriptors(_1, normalize: false, order: 15).to_a.flatten }
-      max = (255.0 / frequencies.flatten.max)
-      frequencies = frequencies.map { |item| item.map { _1 * max }  }
+      frequencies, graves = outlines_efd([publication])
       data = pca.transform(frequencies).to_a.map do |pca_item|
         convert_pca_item_to_polar(pca_item)
       end
@@ -134,8 +174,7 @@ module Stats
     graves.filter do |grave|
       (
         !excluded.include?(grave.id) &&
-        grave.grave_cross_section.present? &&
-        grave.grave_cross_section.normalized_depth_with_unit[:unit] == 'm' &&
+        #grave.grave_cross_section.normalized_depth_with_unit[:unit] == 'm' &&
         grave.normalized_width_with_unit[:unit] == 'm' &&
         grave.normalized_height_with_unit[:unit] == 'm' &&
         grave.perimeter_with_unit[:unit] == 'm' &&
@@ -160,7 +199,7 @@ module Stats
       [
         grave.normalized_width_with_unit[:value],
         grave.normalized_height_with_unit[:value],
-        grave.grave_cross_section.normalized_depth_with_unit[:value],
+        grave.grave_cross_section&.normalized_depth_with_unit.try(:[], :value) || 0,
         ((grave.angle.abs.round + grave.arrow.angle) % 180).round
       ]
     end.compact
