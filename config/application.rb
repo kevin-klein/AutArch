@@ -25,4 +25,6 @@ require 'pycall/import'
 include PyCall::Import
 
 pyimport 'numpy', as: :np
+pyimport 'scipy'
 pyfrom 'sklearn.decomposition', import: :PCA
+# pyfrom 'scipy.cluster.hierarchy', import: [:dendrogram, :linkage]
