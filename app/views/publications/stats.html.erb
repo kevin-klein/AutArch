@@ -161,6 +161,32 @@
         </div>
     </div>
 
+    <div class='col-md-12'>
+        <h2>UPGMA</h2>
+        <div class='row'>
+            <div class='col-md-6'>
+                <%= image_tag "data:image/jpeg;base64,#{@upgma_figure}", class: 'img-fluid' %>
+            </div>
+
+            <div class='col-md-6'>
+                <%= image_tag "data:image/jpeg;base64,#{@cluster_upgma_chart}", class: 'img-fluid' %>
+            </div>
+        </div>
+    </div>
+
+    <div class='col-md-12'>
+        <h2>Ward</h2>
+        <div class='row'>
+            <div class='col-md-6'>
+                <%= image_tag "data:image/jpeg;base64,#{@ward_figure}", class: 'img-fluid' %>
+            </div>
+
+            <div class='col-md-6'>
+                <%= image_tag "data:image/jpeg;base64,#{@cluster_ward_chart}", class: 'img-fluid' %>
+            </div>
+        </div>
+    </div>
+
     <div class='col-md-12' style='padding: 20px;'>
         <div class="card">
             <div class='row'>
@@ -191,7 +217,7 @@
         <div class="card">
             <div class='row'>
                 <div class='p-5 col-xxl-8 col-md-12'>
-                    <%== Charts::ScatterChart.new(@clustering_result, html_class: 'card-img-top', link_proc: Proc.new { |item| '' }).render %>
+                    <%# Charts::ScatterChart.new(@clustering_result, html_class: 'card-img-top', link_proc: Proc.new { |item| '' }).render %>
                 </div>
                 <div class='p-5 col-xxl-4 col-md-12'>
                         <h5 class="card-title">Grave Outline EFD PCA UPGMA Clustered (EFD with 15 harmonics, size not normalized)</h5>

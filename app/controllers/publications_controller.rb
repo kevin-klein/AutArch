@@ -29,13 +29,27 @@ class PublicationsController < ApplicationController
     @graves_pca, @pca = Stats.graves_pca([@publication, *@other_publications], special_objects: marked_items,
       excluded: @excluded_graves)
 
-    @clustering_result = Upgma.cluster(@outlines_pca_data.map do |item|
-      item[:data].map { [_1[:x], _1[:y]] }
-    end.flatten(1).map { [_1] }, 10).map do |cluster|
-      {
-        data: cluster.map { { x: _1[0], y: _1[1] } }
-      }
-    end
+    @outlines_data, _ = Stats.outlines_efd([@publication, *@other_publications], excluded: @excluded_graves)
+
+    upgma_result = Stats.upgma(@outlines_data)
+    @upgma_figure = Stats.upgma_figure(upgma_result)
+
+    @cluster_upgma_chart = Stats.cluster_scatter_chart(@outlines_data, upgma_result)
+
+    ward_result = Stats.ward(@outlines_data)
+    @ward_figure = Stats.upgma_figure(ward_result)
+
+    @cluster_ward_chart = Stats.cluster_scatter_chart(@outlines_data, ward_result)
+
+    # @clustering_result = Upgma.cluster(@outlines_pca_data.map do |item|
+    #   item[:data].map { [_1[:x], _1[:y]] }
+    # end.flatten(1).map { [_1] }, 10).map do |cluster|
+    #   {
+    #     data: cluster.map { { x: _1[0], y: _1[1] } }
+    #   }
+    # end
+
+
 
     ap @clustering_result
   end
