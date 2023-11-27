@@ -28,7 +28,7 @@ module Stats
     pyplot.figure(figsize: [10, 8])
     clusters = scipy.cluster.hierarchy.fcluster(dendro, t: 10, criterion: 'maxclust')
 
-    pca = Pca.new
+    pca = Pca.new(scale_data: true)
     pca.fit(data)
     data = pca.transform(data)
 
@@ -76,7 +76,7 @@ module Stats
   end
 
   def outlines_pca(publications, special_objects: [], components: 2, excluded: [])
-    pca = Pca.new(components: components)
+    pca = Pca.new(components: components, scale_data: true)
 
     frequencies, graves = outlines_efd(publications, excluded: excluded)
 
