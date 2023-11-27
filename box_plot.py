@@ -58,7 +58,7 @@ bp = ax1.boxplot([avg_inkscape_data, avg_comove_data], vert = True)
 ax1.set_title('Average Error (in %)')
 
 # x-axis labels
-ax1.set_xticklabels(['Inkscape', 'CoMove'])
+ax1.set_xticklabels(['Inkscape', 'AutArch'])
 
 # Removing top axes and right axes
 # ticks
@@ -67,6 +67,6 @@ ax1.get_yaxis().tick_left()
 ax1.set_ylim(0)
 
 ax2.set_title('Average Processed Graves')
-ax2.bar(['Inkscape', 'CoMove'], [statistics.mean(inkscape_count_data['Graves']), statistics.mean(comove_count_data['Graves'])])
+ax2.bar(['Inkscape', 'AutArch'], [statistics.mean(inkscape_count_data['Graves']), statistics.mean(comove_count_data['Graves'])])
 
 plt.savefig('box_errors.png')
