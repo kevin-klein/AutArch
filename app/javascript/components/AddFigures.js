@@ -40,6 +40,7 @@ export function Box({onDraggingStart, active, figure: { id, x1, y1, x2, y2, type
     {type !== 'Spine' && <rect
       fill='none'
       stroke={color}
+      strokeOpacity={color == 'black' ? '0.2' : '1'}
       strokeWidth="3"
       x={x1}
       y={y1}
@@ -114,7 +115,7 @@ function Contour({figure, active}) {
   );
 }
 
-export default ({image, pageFigures, page, next_url}) => {
+export default function AddFigure({image, pageFigures, page, next_url}) {
   const {figures, updateFigure, setFigures, addFigure, removeFigure} = useFigureStore();
 
   const [rendering, setRendering] = React.useState('boxes');
@@ -255,6 +256,7 @@ export default ({image, pageFigures, page, next_url}) => {
     {creatingNewFigure && <NewFigureDialog addFigure={createFigure} closeDialog={() => setCreatingNewFigure(false)} />}
     <div className='row'>
       <div className='col-md-8 card'>
+        <h3>Page {page.number}</h3>
         <div className="form-check">
           <select value={rendering} onChange={evt => setRendering(evt.target.value)} className="form-select" aria-label="Default select example">
             <option value='boxes'>Show Bounding Boxes</option>
@@ -306,7 +308,7 @@ export default ({image, pageFigures, page, next_url}) => {
                             value={figure.deposition_type}
                             className="form-select"
                             aria-label="Default select example"
-                            onChange={(evt) => { onChangeFigure(figure.id, { ...figure, deposition_type: evt.target.value }) }}
+                            onChange={(evt) => { onChangeFigure(figure.id, { ...figure, deposition_type: evt.target.value }); }}
                           >
                             <option value="unknown">Unknown</option>
                             <option value="back">Back</option>
