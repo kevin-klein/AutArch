@@ -62,7 +62,7 @@
 #  site_id     :bigint
 #
 class Figure < ApplicationRecord
-  belongs_to :page
+  belongs_to :page, dependent: :destroy
   belongs_to :publication
   include UnitAccessor
   serialize :contour, JSON
@@ -109,8 +109,8 @@ class Figure < ApplicationRecord
 
   def distance_to(figure)
     Distance.point_distance(
-      { x: center1.x, y: center1.y },
-      { x: center2.x, y: center2.y }
+      { x: center.x, y: center.y },
+      { x: figure.center.x, y: figure.center.y }
     )
   end
 
