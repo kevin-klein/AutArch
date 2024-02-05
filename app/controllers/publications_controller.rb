@@ -43,6 +43,11 @@ class PublicationsController < ApplicationController
 
     @cluster_ward_chart = Stats.cluster_scatter_chart(@outlines_data, ward_result)
 
+    angle = 360.0 / @publications.count
+    @colors = @publications.map.with_index do |publication, index|
+      Charts::Helpers.color_by_angle(angle * index)
+    end
+
     # @clustering_result = Upgma.cluster(@outlines_pca_data.map do |item|
     #   item[:data].map { [_1[:x], _1[:y]] }
     # end.flatten(1).map { [_1] }, 10).map do |cluster|
