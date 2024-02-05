@@ -57,7 +57,7 @@
         <div class="card">
             <%== Charts::AngledLinesRadarChart.new(@grave_angles, html_class: 'card-img-top').render %>
             <div class="card-body">
-                <h5 class="card-title">Grave Orientation by Bounding Boxes</h5>
+                <h5 class="card-title">Grave Orientation by Bounding Boxes (n= <%= @grave_angles.length %>)</h5>
                 <div class="card-text">
                     <table class='table'>
                         <thead>
