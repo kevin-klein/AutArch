@@ -4,16 +4,22 @@
   id='figure-view'
   style='padding-top: 20px;'
 >
-<h4 style='text-align: center'><%= @title %></h4>
+<h3 style='text-align: center'><%= @title %> (n = <%= @graves.filter { !_1.manual_bounding_box }.length %>)</h3>
+<h4 style='text-align: center'><%= @subtitle %></h4>
+
 <svg
   style='touch-action: none; user-select: none;'
   data-controller='figure'
-  viewBox='0 0 3000 3000'
+  viewBox='0 0 4000 4000'
   shape-rendering="auto"
   preserveAspectRatio="xMidYMid meet"
   xmlns="http://www.w3.org/2000/svg">
   <% @graves.filter { !_1.manual_bounding_box }.each do |grave| %>
+<<<<<<< HEAD
     <polyline stroke-width='1.8' stroke-opacity='1' points="<%= grave.size_normalized_contour.map { |x, y| "#{x},#{y}" }.join(' ') %>" fill="none" stroke="<%= @color %>" />
+=======
+    <polyline stroke='<%= @color %>' stroke-width='4' stroke-opacity='1' points="<%= grave.size_normalized_contour.map { |x, y| "#{x},#{y}" }.join(' ') %>" fill="none" />
+>>>>>>> 2eb2eb1924035c87a34bcca479163785c2a9aab5
   <% end %>
 </svg>
 
