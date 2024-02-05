@@ -31,17 +31,17 @@ colors = {'text': '#d3d3d3',
          'bone_tool': '#ff1493',
          'skull_photo': '#f0e68c'}
 
-device = torch.device('cuda')
+device = torch.device('cpu')
 
-loaded_model = get_model(num_classes = len(labels.keys()))
-loaded_model.load_state_dict(torch.load('models/rcnn_dfg.model'))
+loaded_model = get_model(num_classes = len(labels.keys()), device=device)
+loaded_model.load_state_dict(torch.load('models/rcnn_dfg.model', map_location=device))
 
 loaded_model.eval()
 
 loaded_model.to(device)
 
 # image = Image.open('scripts/Ortolf 2014_Lauda-Königshofen.pdf-113.png')
-image = Image.open('scripts/Dobes & Limbursky_2013_Vlineves-KSK-053.jpg')
+image = Image.open('scripts/pastedImage.png').convert('RGB')
 img, _ = PILToTensor()(image)
 
 with torch.no_grad():
