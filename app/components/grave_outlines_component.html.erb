@@ -13,7 +13,7 @@
   preserveAspectRatio="xMidYMid meet"
   xmlns="http://www.w3.org/2000/svg">
   <% @graves.filter { !_1.manual_bounding_box }.each do |grave| %>
-    <polyline stroke-width='1.5' stroke-opacity='0.6' points="<%= grave.size_normalized_contour.map { |x, y| "#{x},#{y}" }.join(' ') %>" fill="none" stroke="black" />
+    <polyline stroke-width='1.8' stroke-opacity='1' points="<%= grave.size_normalized_contour.map { |x, y| "#{x},#{y}" }.join(' ') %>" fill="none" stroke="<%= @color %>" />
   <% end %>
 </svg>
 

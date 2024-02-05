@@ -2,6 +2,7 @@ module Stats
   extend self
 
   pyimport 'scipy'
+  pyimport 'numpy'
   pyimport 'io'
   pyimport 'base64'
   pyfrom 'matplotlib', import: :pyplot
@@ -12,6 +13,32 @@ module Stats
 
   def ward(data)
     scipy.cluster.hierarchy.linkage(data, 'ward')
+  end
+
+  def pca_chart(data)
+    colors = numpy.array([
+      [209, 41, 41],
+      [119, 229, 9],
+      [77, 209, 209],
+      [115, 10, 219]
+    ]) / 255.0
+    clusters = []
+    data = data.each_with_index do |publication, index|
+      publication.each do
+        clusters << colors[index]
+      end
+    end
+    # raise
+    data = data.flatten(1)
+
+    my_stringIObytes = io.BytesIO.new
+    fig, ax = pyplot.subplots()
+    pyplot.scatter(data.map(&:first), data.map(&:second), c: clusters, cmap: 'hsv')
+    ax.set_aspect('equal')
+    pyplot.ylim(-50, 50)
+    pyplot.savefig(my_stringIObytes, format: 'jpg', dpi: 300)
+    my_stringIObytes.seek(0)
+    base64.b64encode(my_stringIObytes.read)
   end
 
   def upgma_figure(linkage)
@@ -84,25 +111,28 @@ module Stats
 
     pca_data = publications.map do |publication|
       frequencies, graves = outlines_efd([publication])
-      data = pca.transform(frequencies).to_a.map do |pca_item|
-        convert_pca_item_to_polar(pca_item)
-      end
+      pca.transform(frequencies).to_a
+      
+       #   .map do |pca_item|
+       #     convert_pca_item_to_polar(pca_item)
+       #   end
 
-      graves = data.zip(graves)
-      data = graves.map do |item, grave|
-        item[:mark] = true if special_objects.include?(grave.id)
-        item.merge({ id: grave.id, title: grave.id })
-      end
-      {
-        name: publication.short_description,
-        data: data.map { _1.merge({ mark: false }) }
-      }
-    end.flatten
+#          graves = data.zip(graves)
+#          data = graves.map do |item, grave|
+#            item[:mark] = true if special_objects.include?(grave.id)
+#            item.merge({ id: grave.id, title: grave.id })
+#          end
+#          {
+#            name: publication.short_description,
+#            data: data.map { _1.merge({ mark: false }) }
+#          }
+    end
 
     [pca_data, pca]
   end
 
   def pca_variance(publications, marked: [], excluded: []) # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
+    return []
     pcas = graves_pca(publications, components: 1, excluded: excluded)[0]
 
     result = pcas.map do |series|
@@ -130,10 +160,12 @@ module Stats
   end
 
   def pca_mean(series)
-    series[:data].map { _1[:x] }.sum / series[:data].length
+    []
+    #series[:data].map { _1[:x] }.sum / series[:data].length
   end
 
   def series_variance(series, mean)
+    return 0
     series[:data].map { |item| (item[:x] - mean)**2 }.sum / series[:data].length
   end
 
@@ -143,22 +175,25 @@ module Stats
       graves = filter_graves(graves, excluded: excluded)
       grave_data = pca_transform_graves(pca, graves, special_objects)
 
-      {
-        name: publication.short_description,
-        data: grave_data
-      }
+      # {
+      #   name: publication.short_description,
+      #   data: grave_data
+      # }
+      grave_data
     end
   end
 
   def pca_transform_graves(pca, graves, special_objects)
-    grave_data = pca.transform(convert_graves_to_size(graves)).to_a.map do |pca_item|
-      convert_pca_item_to_polar(pca_item)
-    end
-    graves = grave_data.zip(graves)
-    graves.map do |data, grave|
-      data[:mark] = true if special_objects.include?(grave.id)
-      data.merge({ id: grave.id, title: grave.id })
-    end
+    pca.transform(convert_graves_to_size(graves)).to_a
+    
+    # .map do |pca_item|
+    #   convert_pca_item_to_polar(pca_item)
+    # end
+    # graves = grave_data.zip(graves)
+    # graves.map do |data, grave|
+    #   data[:mark] = true if special_objects.include?(grave.id)
+    #   data.merge({ id: grave.id, title: grave.id })
+    # end
   end
 
   def convert_pca_item_to_polar(pca_item)
