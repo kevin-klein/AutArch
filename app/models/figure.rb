@@ -62,7 +62,7 @@
 #  site_id     :bigint
 #
 class Figure < ApplicationRecord
-  belongs_to :page
+  belongs_to :page, dependent: :destroy
   belongs_to :publication
   include UnitAccessor
   serialize :contour, JSON
@@ -109,12 +109,13 @@ class Figure < ApplicationRecord
 
   def distance_to(figure)
     Distance.point_distance(
-      { x: center1.x, y: center1.y },
-      { x: center2.x, y: center2.y }
+      { x: center.x, y: center.y },
+      { x: figure.center.x, y: figure.center.y }
     )
   end
 
-  def size_normalized_contour
+  # x_width, y_width is in meters
+  def size_normalized_contour(x_width: 2, y_width: 2)
     return [] if contour.length == 0
 
     bounding = ImageProcessing.boundingRect(contour)
@@ -145,8 +146,8 @@ class Figure < ApplicationRecord
     center_x *= ratio
     center_y *= ratio
 
-    offset_x = center_x - 1.5
-    offset_y = center_y - 1.5
+    offset_x = center_x - x_width
+    offset_y = center_y - y_width
 
     rotated_contour.map do |x, y|
       [((x * ratio) - offset_x) * 1000, ((y * ratio) - offset_y) * 1000]

@@ -24,7 +24,13 @@ text = []
 VLINEVES = {
 	'lat': 50.3662076,
 	'lon': 14.4423071,
-	'name': 'Vlinĕves'
+	'name': 'Vlineves'
+}
+
+TOSHCHEV_REDINA = {
+	'lat': 45.60169040802629,
+	'lon': 29.3085223525153,
+	'name': 'Toshchev & Redina (1991)'
 }
 
 VILKLETICE = {
@@ -119,6 +125,65 @@ KOSTYLEVA_UTKIN_RECTANGLE = {
 	'name': 'Kostyleva & Utkin 2010'
 }
 
+FRINCULEASA_CHILDREN_OF_THE_STEPPE_RECTANGLE = {
+	'left_bottom': {
+		'lat' :44.846219,
+		'lon': 25.808062
+	},
+	'right_bottom': {
+		'lat' :44.846219,
+		'lon': 26.092226
+	},
+	'left_top': {
+		'lat' :45.090368,
+		'lon': 25.808062
+	},
+	'right_top': {
+		'lat' :45.090368,
+		'lon': 26.092226
+	},
+	'name': 'Frînculeasa (2013, 2014, 2015,2019)'
+}
+
+FRINCULEASA_2017_RECTANGLE = {
+	'right_bottom': {
+		'lat': 44.077390,
+		'lon': 26.013624
+	},
+	'left_top': {
+		'lat': 43.913002,
+		'lon': 25.559257
+	},
+	'left_bottom': {
+		'lat': 43.913002,
+		'lon': 25.165311
+	},
+	'right_top': {
+		'lat': 44.077390,
+		'lon': 25.559257
+	},
+	'name': 'Frînculeasa 2017'
+}
+
+SOUTHERN_BUG_RECTANGLE = {
+	'left_top': {
+		'lat': 47.9747313,
+		'lon': 30.8916686
+	},
+	'right_top': {
+		'lat': 47.9747313,
+		'lon': 32.4235999
+	},
+	'left_bottom': {
+		'lat': 46.2978464,
+		'lon': 30.8916686
+	},
+	'right_bottom': {
+		'lat': 46.2978464,
+		'lon': 32.4235999
+	},
+	'name': 'Shaposhnikova et al. 1986'
+}
 EARLY_BRONZE_AGE_RECTANGLE = {
 	'left_top': {
 		'lat': 48.5801736,
@@ -136,7 +201,7 @@ EARLY_BRONZE_AGE_RECTANGLE = {
 		'lat': 45.994140,
 		'lon': 44.006422
 	},
-	'name': 'Faifert 2014'
+	'name': 'Fajfert 2014'
 }
 
 IVANOVA_TOSHCHEV = {
@@ -176,7 +241,7 @@ LOUGAS_2016 = {
 		'lat': 57.239364088889104,
 		'lon': 27.50023158104496
 	},
-	'name': 'Lõugas et al. 2016'
+	'name': 'Lougas et al. 2016'
 }
 
 Gadzyatskaya_1976 = {
@@ -196,7 +261,7 @@ Gadzyatskaya_1976 = {
 		'lat': 54.61221373386977,
 		'lon': 47.63966569928308
 	},
-	'name': 'Gadzyackaya 1976'
+	'name': 'Gadzyatskaya 1976'
 }
 
 Krainov_1963 = {
@@ -258,13 +323,16 @@ for place in [
 
 
 for rect in [
+	SOUTHERN_BUG_RECTANGLE,
 	EARLY_BRONZE_AGE_RECTANGLE,
+	FRINCULEASA_2017_RECTANGLE,
 	KOSTYLEVA_UTKIN_RECTANGLE,
 	IVANOVA_TOSHCHEV,
 	LOUGAS_2016,
 	Gadzyatskaya_1976,
 	Krainov_1963,
-	Krainov_1964]:
+	Krainov_1964,
+	FRINCULEASA_CHILDREN_OF_THE_STEPPE_RECTANGLE]:
 	poly = Polygon([
 		(rect['left_top']['lon'], rect['left_top']['lat']),
 		(rect['right_top']['lon'], rect['right_top']['lat']),

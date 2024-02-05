@@ -12,15 +12,15 @@ module Charts
     end
 
     def hsv_to_rgb(hue, saturation, value)
-      red = helper_function(5, hue, saturation, value) * 255
-      green = helper_function(3, hue, saturation, value) * 255
-      blue = helper_function(1, hue, saturation, value) * 255
+      red = helper_function(6, hue, saturation, value) * 255
+      green = helper_function(4, hue, saturation, value) * 255
+      blue = helper_function(2, hue, saturation, value) * 255
 
       [red, green, blue].map(&:to_i)
     end
 
     def color_by_angle(angle)
-      stroke = Helpers.hsv_to_rgb(angle, Random.rand(50..100) / 100.0, Random.rand(80..100) / 100.0)
+      stroke = Helpers.hsv_to_rgb(angle, 1, 0.9)
       "rgb(#{stroke[0]} #{stroke[1]} #{stroke[2]})"
     end
   end

@@ -6,7 +6,7 @@
   </ul>
 </nav>
 <%= react_component('AddFigures', {
-  image: @page.image.as_json(methods: [:href], only: [:id, :width, :height]),
+  image: @page.image.as_json.merge(href: url_for(@page.image.data)),
   pageFigures: @page.figures.as_json(methods: [:type]),
   page: @page,
   next_url: publication_page_path(@publication, @page)

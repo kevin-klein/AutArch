@@ -112,6 +112,15 @@
                                     </td>
                                 </tr>
                             <% end %>
+                            <tr>
+                                <td>
+                                    Total
+                                </td>
+
+                                <td>
+                                    <%= @skeleton_angles.map { _1[1] }.sum %>
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -155,7 +164,7 @@
         <div class="card">
             <div class='row'>
                 <% @publications.each_with_index do |publication, index| %>
-                    <%= render GraveOutlinesComponent.new(color: @colors[index], title: publication.title, graves: publication.graves.select { !@excluded_graves.include?(_1.id) }) %>
+                    <%= render GraveOutlinesComponent.new(color: @colors[index], subtitle: "#{publication.author} #{publication.year}", title: publication.title, graves: publication.graves.select { !@excluded_graves.include?(_1.id) }) %>
                 <% end %>
             </div>
         </div>
@@ -187,11 +196,34 @@
         </div>
     </div>
 
-    <div class='col-md-12'>
-        <h2>UPGMA</h2>
-        <div class='row'>
-            <div class='col-md-12'>
-                <%= image_tag "data:image/jpeg;base64,#{@efd_pca_chart}", class: 'img-fluid' %>
+    <div class='col-md-12' style='padding: 20px;'>
+        <div class="card">
+            <div class='row'>
+                <div class='p-5 col-xxl-8 col-md-12'>
+                    <%== Charts::ScatterChart.new(
+                        @outlines_pca_data,
+                        x_legend: "PC1 (#{(@outline_variance_ratio[0] * 100).round(2)}%)",
+                        y_legend: "PC2 (#{(@outline_variance_ratio[1] * 100).round(2)}%)",
+                        html_class: 'card-img-top',
+                        width: 800,
+                        link_proc: Proc.new { |item| grave_update_grave_path(item[:id], :set_grave_data) }).render %>
+                </div>
+                <div class='p-5 col-xxl-4 col-md-12'>
+                        <h5 class="card-title">Grave Outline PCA (EFD with 15 harmonics, size not normalized)</h5>
+                        <div class="card-text">
+                            <table class='table'>
+                                <tbody>
+                                    <% @outline_variance_ratio.each_with_index do |variance_ratio, index| %>
+                                        <tr>
+                                            <td>PCA <%= index + 1 %></td>
+                                            <td><%= variance_ratio * 100 %>%</td>
+                                        </tr>
+                                    <% end %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
