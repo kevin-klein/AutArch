@@ -29,6 +29,8 @@ class PublicationsController < ApplicationController
     @graves_pca, @pca = Stats.graves_pca([@publication, *@other_publications], special_objects: marked_items,
       excluded: @excluded_graves)
 
+    @graves_pca_chart = Stats.pca_chart(@graves_pca)
+
     @outlines_data, _ = Stats.outlines_efd([@publication, *@other_publications], excluded: @excluded_graves)
 
     upgma_result = Stats.upgma(@outlines_data)
@@ -54,9 +56,13 @@ class PublicationsController < ApplicationController
     #   }
     # end
 
-
-
-    ap @clustering_result
+    @efd_pca_chart = Stats.pca_chart(@outlines_pca_data)
+    @colors = [
+      [209, 41, 41],
+      [129, 239, 19],
+      [77, 209, 209],
+      [115, 10, 219]
+    ]
   end
 
   # GET /publications/new

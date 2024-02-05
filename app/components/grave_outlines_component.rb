@@ -3,9 +3,9 @@
 class GraveOutlinesComponent < ViewComponent::Base
   def initialize(graves:, title:, subtitle:, color:)
     super
-    @color = color
     @graves = Stats.filter_graves(graves)
     @title = title
+    @color = "rgb(#{color.join(' ')})"
     @subtitle = subtitle
   end
 end
