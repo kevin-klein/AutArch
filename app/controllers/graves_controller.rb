@@ -8,7 +8,9 @@ class GravesController < ApplicationController
       graves = Grave.joins(page: :publication).where({ publication: { id: params.dig(:search, :publication_id) } })
     end
 
-    @graves = graves.includes(:scale, :arrow, grave_cross_section: { grave: [:scale] }).order(:id).all
+    @graves = graves.includes(:scale, :arrow, page: :image, grave_cross_section: { grave: [:scale] }).order(:id)
+
+    @graves_pagy, @graves = pagy(@graves.all)
   end
 
   # GET /graves/1 or /graves/1.json
