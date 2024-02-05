@@ -1,4 +1,5 @@
 Rails.application.routes.draw do # rubocop:disable Metrics/BlockLength
+  resources :users
   resources :periods
   resources :bones
   resources :y_haplogroups
