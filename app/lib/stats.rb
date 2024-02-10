@@ -55,7 +55,7 @@ module Stats
     pyplot.figure(figsize: [10, 8])
     clusters = scipy.cluster.hierarchy.fcluster(dendro, t: 10, criterion: 'maxclust')
 
-    pca = Pca.new(scale_data: true)
+    pca = Pca.new
     pca.fit(data)
     data = pca.transform(data)
 
@@ -103,7 +103,7 @@ module Stats
   end
 
   def outlines_pca(publications, special_objects: [], components: 2, excluded: [])
-    pca = Pca.new(components: components, scale_data: true)
+    pca = Pca.new(components: components)
 
     frequencies, graves = outlines_efd(publications, excluded: excluded)
 
@@ -112,7 +112,7 @@ module Stats
     pca_data = publications.map do |publication|
       frequencies, graves = outlines_efd([publication])
       pca.transform(frequencies).to_a
-      
+
        #   .map do |pca_item|
        #     convert_pca_item_to_polar(pca_item)
        #   end
@@ -175,25 +175,22 @@ module Stats
       graves = filter_graves(graves, excluded: excluded)
       grave_data = pca_transform_graves(pca, graves, special_objects)
 
-      # {
-      #   name: publication.short_description,
-      #   data: grave_data
-      # }
-      grave_data
+      {
+        name: publication.short_description,
+        data: grave_data
+      }
     end
   end
 
   def pca_transform_graves(pca, graves, special_objects)
-    pca.transform(convert_graves_to_size(graves)).to_a
-    
-    # .map do |pca_item|
-    #   convert_pca_item_to_polar(pca_item)
-    # end
-    # graves = grave_data.zip(graves)
-    # graves.map do |data, grave|
-    #   data[:mark] = true if special_objects.include?(grave.id)
-    #   data.merge({ id: grave.id, title: grave.id })
-    # end
+    grave_data = pca.transform(convert_graves_to_size(graves)).to_a.map do |pca_item|
+      convert_pca_item_to_polar(pca_item)
+    end
+    graves = grave_data.zip(graves)
+    graves.map do |data, grave|
+      data[:mark] = true if special_objects.include?(grave.id)
+      data.merge({ id: grave.id, title: grave.id })
+    end
   end
 
   def convert_pca_item_to_polar(pca_item)

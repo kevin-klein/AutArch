@@ -29,7 +29,7 @@ class PublicationsController < ApplicationController
     @graves_pca, @pca = Stats.graves_pca([@publication, *@other_publications], special_objects: marked_items,
       excluded: @excluded_graves)
 
-    @graves_pca_chart = Stats.pca_chart(@graves_pca)
+    # @graves_pca_chart = Stats.pca_chart(@graves_pca)
 
     @outlines_data, _ = Stats.outlines_efd([@publication, *@other_publications], excluded: @excluded_graves)
 
@@ -42,11 +42,6 @@ class PublicationsController < ApplicationController
     @ward_figure = Stats.upgma_figure(ward_result)
 
     @cluster_ward_chart = Stats.cluster_scatter_chart(@outlines_data, ward_result)
-
-    angle = 360.0 / @publications.count
-    @colors = @publications.map.with_index do |publication, index|
-      Charts::Helpers.color_by_angle(angle * index)
-    end
 
     # @clustering_result = Upgma.cluster(@outlines_pca_data.map do |item|
     #   item[:data].map { [_1[:x], _1[:y]] }

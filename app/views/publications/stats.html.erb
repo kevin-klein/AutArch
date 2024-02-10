@@ -22,7 +22,7 @@
         <div class="card">
             <div class='row'>
                 <div class='p-5 col-xxl-8 col-md-12'>
-                    <%= image_tag "data:image/jpeg;base64,#{@graves_pca_chart}", class: 'img-fluid' %>
+                    <%== Charts::ScatterChart.new(@graves_pca, html_class: 'card-img-top', link_proc: Proc.new { |item| grave_update_grave_path(item[:id], :set_grave_data) }).render %>
                 </div>
                 <div class='p-5 col-xxl-4 col-md-12'>
                     <%== column_chart(@variances.map { [_1[:name], _1[:variance]] }.to_h) %>
@@ -57,7 +57,7 @@
         <div class="card">
             <%== Charts::AngledLinesRadarChart.new(@grave_angles, html_class: 'card-img-top').render %>
             <div class="card-body">
-                <h5 class="card-title">Grave Orientation by Bounding Boxes (n= <%= @grave_angles.length %>)</h5>
+                <h5 class="card-title">Grave Orientation by Bounding Boxes</h5>
                 <div class="card-text">
                     <table class='table'>
                         <thead>
@@ -200,7 +200,7 @@
         <div class="card">
             <div class='row'>
                 <div class='p-5 col-xxl-8 col-md-12'>
-                    <%== Charts::ScatterChart.new(
+                    <%#== Charts::ScatterChart.new(
                         @outlines_pca_data,
                         x_legend: "PC1 (#{(@outline_variance_ratio[0] * 100).round(2)}%)",
                         y_legend: "PC2 (#{(@outline_variance_ratio[1] * 100).round(2)}%)",
@@ -213,12 +213,12 @@
                         <div class="card-text">
                             <table class='table'>
                                 <tbody>
-                                    <% @outline_variance_ratio.each_with_index do |variance_ratio, index| %>
+                                    <%# @outline_variance_ratio.each_with_index do |variance_ratio, index| %>
                                         <tr>
-                                            <td>PCA <%= index + 1 %></td>
-                                            <td><%= variance_ratio * 100 %>%</td>
+                                            <td>PCA <%#= index + 1 %></td>
+                                            <td><%#= variance_ratio * 100 %>%</td>
                                         </tr>
-                                    <% end %>
+                                    <%# end %>
                                 </tbody>
                             </table>
                         </div>
@@ -227,4 +227,31 @@
             </div>
         </div>
     </div>
+
+    <div class='col-md-12' style='padding: 20px;'>
+        <div class="card">
+            <div class='row'>
+                <div class='p-5 col-xxl-8 col-md-12'>
+                    <%# Charts::ScatterChart.new(@clustering_result, html_class: 'card-img-top', link_proc: Proc.new { |item| '' }).render %>
+                </div>
+                <div class='p-5 col-xxl-4 col-md-12'>
+                        <h5 class="card-title">Grave Outline EFD PCA UPGMA Clustered (EFD with 15 harmonics, size not normalized)</h5>
+                        <div class="card-text">
+                            <table class='table'>
+                                <tbody>
+                                    <%# @outline_variance_ratio.each_with_index do |variance_ratio, index| %>
+                                        <tr>
+                                            <td>PCA <%#= index + 1 %></td>
+                                            <td><%#= variance_ratio * 100 %>%</td>
+                                        </tr>
+                                    <%# end %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
