@@ -63,7 +63,7 @@
 #
 class Figure < ApplicationRecord
   belongs_to :page, dependent: :destroy
-  belongs_to :publication
+  belongs_to :publication, dependent: :destroy
   include UnitAccessor
   serialize :contour, JSON
   validates :publication, presence: true
