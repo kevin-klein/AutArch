@@ -2,8 +2,9 @@ import React from 'react';
 import { Wizard, useWizard } from 'react-use-wizard';
 import Select from 'react-select';
 import {useFigureStore} from './store';
-import { Group, Stage, Layer, Circle, Image, Rect, Line, Transformer, Arrow } from 'react-konva';
+import { Group, Stage, Layer, Circle, Image, Rect, Line, Transformer, Arrow, Shape } from 'react-konva';
 import useImage from 'use-image';
+import ManualContour from './ManualContour_res';
 
 function rotatePoint(x, y, figure) {
   const centerX = (figure.x2 + figure.x1) / 2;
@@ -16,78 +17,7 @@ function rotatePoint(x, y, figure) {
   return {
     x: newX,
     y: newY
-  }
-}
-
-function ManualContour({figure, color, active, onDraggingStart, setActive, onChangeFigure}) {
-  const shapeRef = React.useRef();
-  const trRef = React.useRef();
-  const isSelected = active === figure.id;
-
-  React.useEffect(() => {
-    if (isSelected) {
-      trRef.current.nodes([shapeRef.current]);
-      trRef.current.getLayer().batchDraw();
-    }
-  }, [isSelected]);
-
-  function onMouseDown(figure) {
-    return function(evt) {
-      evt.preventDefault();
-      onDraggingStart(evt, figure);
-    };
-  }
-
-  return (<React.Fragment>
-    <Rect
-      fill={null}
-      fillEnabled={false}
-      stroke={color}
-      strokeWidth={3}
-      x={figure.bounding_box_center_x - figure.bounding_box_width / 2}
-      y={figure.bounding_box_center_y - figure.bounding_box_height / 2}
-      ref={shapeRef}
-      isSelected={true}
-      width={figure.bounding_box_width}
-      height={figure.bounding_box_height}
-      onClick={() => setActive(figure.id)}
-      onTap={() => setActive(figure.id)}
-      rotation={figure.bounding_box_angle}
-      onTransformEnd={(e) => {
-        const node = shapeRef.current;
-        const scaleX = node.scaleX();
-        const scaleY = node.scaleY();
-
-        node.scaleX(1);
-        node.scaleY(1);
-
-        const width = node.width() * scaleX;
-        const height = node.height() * scaleY;
-
-        onChangeFigure(figure.id, {
-          ...figure,
-          bounding_box_center_x: node.x() + width / 2,
-          bounding_box_center_y: node.y() + height / 2,
-          bounding_box_width: width,
-          bounding_box_height: height,
-          bounding_box_angle: node.rotation()
-        });
-      }}
-    />
-    {isSelected && (
-      <Transformer
-        ref={trRef}
-        keepRatio={false}
-        boundBoxFunc={(oldBox, newBox) => {
-          // limit resize
-          if (newBox.width < 5 || newBox.height < 5) {
-            return oldBox;
-          }
-          return newBox;
-        }}
-      />
-    )}
-  </React.Fragment>);
+  };
 }
 
 export function Box({onChangeFigure, onDraggingStart, active, figure, setActive}) {
@@ -145,7 +75,7 @@ export function Box({onChangeFigure, onDraggingStart, active, figure, setActive}
               y1: e.target.y(),
             });
           }}
-         />
+        />
         <Circle
           x={x2}
           y={y2}
@@ -246,18 +176,6 @@ function NewFigureDialog({ closeDialog, addFigure }) {
   </div>);
 }
 
-function Contour({figure, active}) {
-  const points = [...figure.contour, figure.contour[0]].map(point => `${point[0] + figure.x1},${point[1] + figure.y1}`).join(' ');
-  return (
-    <polyline
-      points={points}
-      fill={ figure.id === active ? '#F4433699' : '#3F51B5' }
-      stroke={ '#3F51B5' }
-      strokeWidth={5}
-    />
-  );
-}
-
 function Canvas({divRef, image, figures, onDraggingStart, currentEditBox, setCurrentEditBox, onChangeFigure}) {
   const [dimensions, setDimensions] = React.useState({
     width: 0,
@@ -291,7 +209,7 @@ function Canvas({divRef, image, figures, onDraggingStart, currentEditBox, setCur
     setStageScale(newScale);
     setStageX(-(mousePointTo.x - stage.getPointerPosition().x / newScale) * newScale);
     setStageY(-(mousePointTo.y - stage.getPointerPosition().y / newScale) * newScale);
-  };
+  }
 
   return (
     <Stage
@@ -310,14 +228,14 @@ function Canvas({divRef, image, figures, onDraggingStart, currentEditBox, setCur
           image={imageNode}
           x={0}
           y={0}
-          />
+        />
         {Object.values(figures).map(figure => <Box onChangeFigure={onChangeFigure} canvas={null} key={figure.id} onDraggingStart={onDraggingStart} setActive={setCurrentEditBox} active={currentEditBox} figure={figure} />)}
       </Layer>
     </Stage>
   );
 }
 
-export default ({next_url, grave, sites, image, page}) => {
+function BoxResizer({next_url, grave, sites, image, page}) {
   const {figures, updateFigure, setFigures, addFigure, removeFigure} = useFigureStore();
 
   const [rendering, setRendering] = React.useState('boxes');
@@ -520,30 +438,16 @@ export default ({next_url, grave, sites, image, page}) => {
     if(matchingFigure === undefined) {
       if(item === 'SkeletonFigure' || item === 'Spine') {
         return (
-          <li className="list-group-item alert-warning">{item} is missing</li>
+          <li key={item} className="list-group-item alert-warning">{item} is missing</li>
         );
       }
       else {
         return (
-          <li className="list-group-item alert-danger">{item} is missing</li>
+          <li key={item} className="list-group-item alert-danger">{item} is missing</li>
         );
       }
     }
   });
-
-  // <svg
-  //   ref={canvasRef}
-  //   onMouseMove={onDrag}
-  //   onMouseUp={() => { setDraggingState(null); }}
-  //   onMouseLeave={() => { setDraggingState(null); }}
-  //   viewBox={`0 0 ${image.width} ${image.height}`}
-  //   preserveAspectRatio="xMidYMid meet"
-  //   xmlns="http://www.w3.org/2000/svg"
-  // >
-  //   <image width={image.width} height={image.height} href={image.href} />
-  //   {rendering === 'boxes' && Object.values(figures).map(figure => <Box canvas={canvasRef} key={figure.id} onDraggingStart={onDraggingStart} active={currentEditBox} figure={figure} />)}
-  //   {rendering === 'contours' && Object.values(figures).filter(figure => ['Grave', 'Arrow', 'Scale'].indexOf(figure.type) !== -1 ).map(figure => <Contour key={figure.id} active={currentEditBox} figure={figure} />)}
-  // </svg>
 
   return (<React.Fragment>
     {creatingNewFigure && <NewFigureDialog addFigure={createFigure} closeDialog={() => setCreatingNewFigure(false)} />}
@@ -567,7 +471,7 @@ export default ({next_url, grave, sites, image, page}) => {
           onDraggingStart={onDraggingStart}
           currentEditBox={currentEditBox}
           onChangeFigure={onChangeFigure}
-          />
+        />
       </div>
 
       <div className='col-md-4'>
@@ -599,7 +503,7 @@ export default ({next_url, grave, sites, image, page}) => {
                             className="form-check-input"
                             type="checkbox"
                             checked={figure.manual_bounding_box}
-                            onChange={(evt) => { setManualBoundingBox(figure, evt.target.checked) }}
+                            onChange={(evt) => { setManualBoundingBox(figure, evt.target.checked); }}
                           />
                           <label className="form-check-label">
                             manual bounding box
@@ -662,4 +566,8 @@ export default ({next_url, grave, sites, image, page}) => {
 
     </div>
   </React.Fragment>);
+}
+
+export default function(props, railsContext) {
+  return () => <BoxResizer {...props} />;
 }

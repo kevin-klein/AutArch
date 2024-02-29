@@ -15,6 +15,10 @@ module Stats
     scipy.cluster.hierarchy.linkage(data, 'ward')
   end
 
+  def mannwhitneyu(x, y)
+    scipy.stats.mannwhitneyu(x, y, method: 'exact')
+  end
+
   def pca_chart(data)
     colors = numpy.array([
       [209, 41, 41],
