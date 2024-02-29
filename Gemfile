@@ -58,6 +58,8 @@ gem 'jbuilder'
 # Use Redis adapter to run Action Cable in production
 gem 'redis', '~> 4.0'
 
+gem 'react_on_rails'
+
 # Use Kredis to get higher-level data types in Redis [https://github.com/rails/kredis]
 # gem 'kredis'
 
@@ -110,9 +112,7 @@ gem 'sidekiq', '~> 6.5'
 gem 'dotenv-rails', '~> 2.8'
 gem 'pkg-config'
 
-gem 'shakapacker', '= 6.5'
-
-gem 'react-rails'
+gem 'shakapacker'
 
 gem 'rwordnet', '~> 2.0'
 
