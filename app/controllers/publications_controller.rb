@@ -23,6 +23,20 @@ class PublicationsController < ApplicationController
 
     @publications = [@publication, *@other_publications]
 
+    if @publications.length == 2
+      @all_skeleton_angles = @publications.map do |publication|
+        publication.figures.where(type: 'Spine')
+          .includes(grave: :arrow)
+          # .sample(6)
+          .map { [_1, _1.grave&.arrow] }
+          .filter { |_spine, arrow| arrow.present? }
+          .map { |spine, arrow| spine.angle_with_arrow(arrow) }
+      end
+
+      @u_result = Stats.mannwhitneyu(*@all_skeleton_angles)
+      # raise
+    end
+
     @outlines_pca_data, @outline_pca = Stats.outlines_pca([@publication, *@other_publications], special_objects: marked_items, excluded: @excluded_graves)
     @variances = Stats.pca_variance([@publication, *@other_publications], marked: marked_items, excluded: @excluded_graves)
     @outline_variance_ratio = @outline_pca.explained_variance_ratio.to_a

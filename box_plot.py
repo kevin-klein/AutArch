@@ -69,7 +69,7 @@ ax1.set_ylim(0)
 ax2.set_title('Average Processed Graves')
 ax2.get_yaxis().set_ticks(np.arange(0, 26, 2.0))
 ax2.boxplot([inkscape_count_data['Graves'], comove_count_data['Graves']])
-ax2.set_xticklabels(['Inkscape', 'CoMove'])
+ax2.set_xticklabels(['Inkscape', 'AutArch'])
 # ax2.bar(['Inkscape', 'CoMove'], [statistics.mean(inkscape_count_data['Graves']), statistics.mean(comove_count_data['Graves'])])
 
 plt.savefig('box_errors.png')
