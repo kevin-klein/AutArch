@@ -1,0 +1,10 @@
+rescript = 1
+rule cp
+  command = cp $i $out
+rule touch
+ command = touch $out
+o ManualContour.cmi : cp ../bs/app/javascript/components/ManualContour.cmi
+o ManualContour.cmj : cp ../bs/app/javascript/components/ManualContour.cmj
+o ManualContour.cmt : cp ../bs/app/javascript/components/ManualContour.cmt
+o ManualContour.res : cp ../../app/javascript/components/ManualContour.res
+build install.stamp : touch ManualContour.cmi ManualContour.cmj 

@@ -2,16 +2,16 @@
 #
 # Table name: genetics
 #
-#  id               :integer          not null, primary key
+#  id               :bigint           not null, primary key
 #  data_type        :integer
 #  endo_content     :float
 #  ref_gen          :string
-#  skeleton_id      :integer          not null
+#  skeleton_id      :bigint           not null
 #  created_at       :datetime         not null
 #  updated_at       :datetime         not null
-#  mt_haplogroup_id :integer
-#  y_haplogroup_id  :integer
-#  bone_id          :integer
+#  mt_haplogroup_id :bigint
+#  y_haplogroup_id  :bigint
+#  bone_id          :bigint
 #
 class Genetic < ApplicationRecord
   belongs_to :skeleton

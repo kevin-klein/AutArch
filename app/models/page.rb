@@ -2,10 +2,10 @@
 #
 # Table name: pages
 #
-#  id             :integer          not null, primary key
-#  publication_id :integer          not null
+#  id             :bigint           not null, primary key
+#  publication_id :bigint           not null
 #  number         :integer
-#  image_id       :integer          not null
+#  image_id       :bigint           not null
 #  created_at     :datetime         not null
 #  updated_at     :datetime         not null
 #

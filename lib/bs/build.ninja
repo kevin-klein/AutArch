@@ -1,0 +1,16 @@
+rescript = 1
+g_finger := /home/kevin/dfg/node_modules/@rescript/core/lib/ocaml/install.stamp
+g_finger := /home/kevin/dfg/node_modules/@rescript/react/lib/ocaml/install.stamp
+g_finger := /home/kevin/dfg/node_modules/rescript-webapi/lib/ocaml/install.stamp
+rule astj
+  command = /home/kevin/dfg/node_modules/rescript/linux/bsc.exe  -bs-v 11.0.1 -bs-jsx 4 -uncurried -open RescriptCore -absname -bs-ast -o $out $i
+o app/javascript/components/ManualContour.ast : astj ../../app/javascript/components/ManualContour.res
+rule deps
+  command = /home/kevin/dfg/node_modules/rescript/linux/bsb_helper.exe -hash 72475b993a10a56bd6cab7b2710c54b8 $in
+  restat = 1
+o app/javascript/components/ManualContour.d : deps app/javascript/components/ManualContour.ast
+rule mij
+  command = /home/kevin/dfg/node_modules/rescript/linux/bsc.exe -I app/javascript/components -I app/javascript/channels -I app/javascript/packs -I app/javascript/css -I app/javascript/ -I /home/kevin/dfg/node_modules/@rescript/core/lib/ocaml -I /home/kevin/dfg/node_modules/@rescript/react/lib/ocaml -I /home/kevin/dfg/node_modules/rescript-webapi/lib/ocaml -open RescriptCore  -uncurried -bs-package-name app -bs-package-output es6:$in_d:_res.js -bs-v $g_finger $i
+  dyndep = 1
+  restat = 1
+o app/javascript/components/ManualContour.cmj app/javascript/components/ManualContour.cmi ../../app/javascript/components/ManualContour_res.js : mij app/javascript/components/ManualContour.ast
