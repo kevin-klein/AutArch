@@ -2,8 +2,7 @@
 #
 # Table name: images
 #
-#  id         :integer          not null, primary key
-#  data       :binary
+#  id         :bigint           not null, primary key
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #  width      :integer

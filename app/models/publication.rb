@@ -2,8 +2,7 @@
 #
 # Table name: publications
 #
-#  id         :integer          not null, primary key
-#  pdf        :binary
+#  id         :bigint           not null, primary key
 #  author     :string
 #  title      :string
 #  created_at :datetime         not null

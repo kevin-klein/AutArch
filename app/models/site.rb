@@ -2,7 +2,7 @@
 #
 # Table name: sites
 #
-#  id           :integer          not null, primary key
+#  id           :bigint           not null, primary key
 #  lat          :float
 #  lon          :float
 #  name         :string
