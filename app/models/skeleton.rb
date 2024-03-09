@@ -2,7 +2,7 @@
 #
 # Table name: skeletons
 #
-#  id                     :integer          not null, primary key
+#  id                     :bigint           not null, primary key
 #  figure_id              :integer          not null
 #  angle                  :float
 #  created_at             :datetime         not null
@@ -17,8 +17,8 @@
 #  head_facing            :float
 #  ochre                  :integer
 #  ochre_position         :integer
-#  skeleton_figure_id     :integer
-#  site_id                :integer
+#  skeleton_figure_id     :bigint
+#  site_id                :bigint
 #
 class Skeleton < ApplicationRecord
   belongs_to :skeleton_figure

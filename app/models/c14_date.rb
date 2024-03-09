@@ -2,7 +2,7 @@
 #
 # Table name: c14_dates
 #
-#  id                :integer          not null, primary key
+#  id                :bigint           not null, primary key
 #  c14_type          :integer          not null
 #  lab_id            :string
 #  age_bp            :integer
@@ -15,10 +15,10 @@
 #  date_note         :string
 #  cal_method        :integer
 #  ref_14c           :string
-#  chronology_id     :integer          not null
+#  chronology_id     :bigint           not null
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
-#  bone_id           :integer
+#  bone_id           :bigint
 #
 class C14Date < ApplicationRecord
   belongs_to :chronology
