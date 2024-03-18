@@ -15,9 +15,7 @@ class UpdateGraveController < ApplicationController
     @scale = @grave.scale
 
     case step
-    when :set_grave_data
-      @grave.update(grave_params)
-    when :set_skeleton_data
+    when :set_grave_data, :set_skeleton_data
       @grave.update(grave_params)
     when :set_scale
       if params[:scale].present?
@@ -38,9 +36,7 @@ class UpdateGraveController < ApplicationController
       arrow.angle = params[:figures][arrow.id.to_s][:angle]
       arrow.save!
 
-      if @grave.skeleton_figures.size == 0
-        skip_step
-      end
+      skip_step if @grave.skeleton_figures.empty?
     end
 
     render_wizard @grave

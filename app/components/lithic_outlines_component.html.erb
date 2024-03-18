@@ -1,0 +1,20 @@
+<div
+  class='col-md-6'
+  data-id='figure-view'
+  id='figure-view'
+  style='padding-top: 20px;'
+>
+
+<svg
+  style='touch-action: none; user-select: none;'
+  data-controller='figure'
+  viewBox='0 0 4000 4000'
+  shape-rendering="auto"
+  preserveAspectRatio="xMidYMid meet"
+  xmlns="http://www.w3.org/2000/svg">
+  <% @lithics.each do |lithic| %>
+    <polyline stroke='<%= @color %>' stroke-width='4' stroke-opacity='1' points="<%= lithic.size_normalized_contour.map { |x, y| "#{x},#{y}" }.join(' ') %>" fill="none" />
+  <% end %>
+</svg>
+
+</div>

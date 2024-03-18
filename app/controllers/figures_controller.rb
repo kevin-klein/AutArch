@@ -1,5 +1,5 @@
 class FiguresController < ApplicationController
-  before_action :set_figure, only: %i[show edit update destroy]
+  before_action :set_figure, only: %i[show edit preview update destroy]
 
   # GET /figures or /figures.json
   def index
@@ -12,6 +12,13 @@ class FiguresController < ApplicationController
   # GET /figures/new
   def new
     @figure = Figure.new
+  end
+
+  def preview
+    @image = Vips::Image.new_from_buffer(@figure.page.image.data.download, "")
+    @image = @image.crop(@figure.x1, @figure.y1, @figure.box_width, @figure.box_height)
+
+    send_data @image.write_to_buffer(".jpg[Q=90]"), filename: "#{@figure.id}.jpg"
   end
 
   # GET /figures/1/edit

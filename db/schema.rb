@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_03_09_211609) do
+ActiveRecord::Schema[7.0].define(version: 2024_03_18_121818) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -132,6 +132,8 @@ ActiveRecord::Schema[7.0].define(version: 2024_03_09_211609) do
     t.integer "page_size"
     t.boolean "manual_bounding_box", default: false
     t.integer "bounding_box_angle"
+    t.float "bounding_box_height"
+    t.float "bounding_box_width"
     t.integer "control_point_1_x"
     t.integer "control_point_1_y"
     t.integer "control_point_2_x"
@@ -148,6 +150,8 @@ ActiveRecord::Schema[7.0].define(version: 2024_03_09_211609) do
     t.integer "anchor_point_3_y"
     t.integer "anchor_point_4_x"
     t.integer "anchor_point_4_y"
+    t.float "probability"
+    t.jsonb "contour_info"
     t.index ["page_id"], name: "index_figures_on_page_id"
     t.index ["site_id"], name: "index_figures_on_site_id"
   end

@@ -1,0 +1,21 @@
+<%= render LithicOutlinesComponent.new(lithics: @lithics) %>
+
+<table class='table'>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Preview</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @lithics.each do |stone_tool| %>
+      <tr>
+        <td><%= stone_tool.id %></td>
+        <td>
+          <img class='img img-fluid' src="<%= preview_figure_path(stone_tool) %>">
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

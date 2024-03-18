@@ -1,0 +1,13 @@
+<svg
+  style='touch-action: none; user-select: none;'
+  data-controller='figure'
+  viewBox='0 0 500 500'
+  shape-rendering="auto"
+  preserveAspectRatio="xMidYMid meet"
+  xmlns="http://www.w3.org/2000/svg">
+  <image width='<%= @image.width %>' height='<%= @image.height %>' href='<%= @image_data %>' />
+
+  <% @lithic.contour.each do |contour| %>
+    <polyline stroke='<%= @color %>' stroke-width='4' stroke-opacity='1' points="<%= (contour + [contour[0]]).map { |x, y| "#{x},#{y}" }.join(' ') %>" fill="none" />
+  <% end %>
+</svg>

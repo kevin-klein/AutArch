@@ -3,26 +3,14 @@ class CreateGraves
     pages ||= Page.includes(:figures)
 
     pages.each do |page|
-      figures = convert_figures(page.figures)
+      figures = FigureMapConverter.convert_figures(page.figures)
 
       grave_figures = figures['Grave']
       grave_figures&.each do |grave|
+        next if grave.probability < 0.5
         handle_grave(grave, figures)
       end
     end
-  end
-
-  def convert_figures(figures)
-    result = {}
-
-    figures.each do |figure|
-      arr = result[figure.type]
-      arr ||= []
-      arr << figure
-      result[figure.type] = arr
-    end
-
-    result
   end
 
   def handle_grave(grave, figures) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity

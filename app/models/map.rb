@@ -47,6 +47,7 @@
 #  anchor_point_3_y    :integer
 #  anchor_point_4_x    :integer
 #  anchor_point_4_y    :integer
+#  probability         :float
 #
 class Map < Figure
 end

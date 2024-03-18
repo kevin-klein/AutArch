@@ -88,6 +88,11 @@ VALUE convert_to_ruby<RotatedRect>(RotatedRect rect) {
   return result;
 }
 
+template<>
+VALUE convert_to_ruby(string str) {
+  return rb_str_new(str.c_str(), str.length());
+}
+
 template<typename T>
 VALUE convert_to_ruby(vector<T> vec) {
   VALUE result = rb_ary_new2(vec.size());
@@ -213,6 +218,29 @@ extern "C" VALUE rb_extractFigure(VALUE self, VALUE figure, VALUE rb_mat) {
   return convertMatToRubyString(figure_mat);
 }
 
+extern "C" VALUE rb_imencode(VALUE self, VALUE rb_mat) {
+  Mat mat = convertRubyStringToMat(rb_mat);
+
+  std::vector<int> params;
+  params.resize(9, 0);
+  params[0] = cv::IMWRITE_JPEG_QUALITY;
+  params[1] = 80;
+  params[2] = cv::IMWRITE_JPEG_PROGRESSIVE;
+  params[3] = 0;
+  params[4] = cv::IMWRITE_JPEG_OPTIMIZE;
+  params[5] = 0;
+  params[6] = cv::IMWRITE_JPEG_RST_INTERVAL;
+  params[7] = 0;
+
+  std::vector<uchar> buffer;
+
+  cv::imencode(".jpg", mat, buffer, params);
+
+  std::string string_buffer(buffer.begin(), buffer.end());
+
+  return convert_to_ruby(string_buffer);
+}
+
 extern "C" VALUE rb_imwrite(VALUE self, VALUE filename, VALUE rb_mat) {
   Mat mat = convertRubyStringToMat(rb_mat);
   imwrite(StringValueCStr(filename), mat);
@@ -250,6 +278,7 @@ extern "C" void Init_ext() {
   rb_define_module_function(ImageProcessing, "boundingRect", rb_boundingRect, 1);
   rb_define_module_function(ImageProcessing, "contourArea", rb_contourArea, 1);
   rb_define_module_function(ImageProcessing, "imwrite", rb_imwrite, 2);
+  rb_define_module_function(ImageProcessing, "imencode", rb_imencode, 1);
   rb_define_module_function(ImageProcessing, "rotateNoCutoff", rb_rotateNoCutoff, 2);
   rb_define_module_function(ImageProcessing, "gauss", rb_gauss, 2);
   rb_define_module_function(ImageProcessing, "erode", rb_erode, 2);
