@@ -27,12 +27,12 @@ class AnalyzePublication
         x1, y1, x2, y2 = prediction['box']
         type_name = prediction['label']
         type_name = 'skeleton_figure' if type_name == 'skeleton'
-        propability = prediction['score']
-        if propability < 0.7 || x1.to_i == x2.to_i || y1.to_i == y2.to_i || type_name.camelize.singularize == 'St'
+        probability = prediction['score']
+        if x1.to_i == x2.to_i || y1.to_i == y2.to_i || type_name.camelize.singularize == 'St'
           next
         end
 
-        figure = page.figures.create!( x1: x1, y1: y1, x2: x2, y2: y2, type: type_name.camelize.singularize, publication: publication)
+        figure = page.figures.create!( x1: x1, y1: y1, x2: x2, y2: y2, probability: probability, type: type_name.camelize.singularize, publication: publication)
         figures << figure
       end
     end
@@ -40,6 +40,7 @@ class AnalyzePublication
     Page.transaction do
       MessageBus.publish('/importprogress', 'Grouping Figures to Graves')
       CreateGraves.new.run(publication.pages)
+      CreateLithics.new.run(publication.pages)
       MessageBus.publish('/importprogress', 'Creating Orientations of Bounding Boxes')
       GraveAngles.new.run(figures.select { _1.is_a?(Arrow) })
       MessageBus.publish('/importprogress', 'Measuring Sizes')

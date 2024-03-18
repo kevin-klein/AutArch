@@ -29,6 +29,8 @@ class AnalyzeScales
                  cm_match.captures[0].to_f / 100
                elsif m_match
                  m_match.captures[0].to_f
+               else # assume default cm
+                cm_match.captures[0].to_f / 100
                end
 
     ratio = if scale.text.present?

@@ -1,0 +1,2 @@
+module LithicsHelper
+end

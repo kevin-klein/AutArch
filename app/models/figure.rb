@@ -47,6 +47,7 @@
 #  anchor_point_3_y    :integer
 #  anchor_point_4_x    :integer
 #  anchor_point_4_y    :integer
+#  probability         :float
 #
 class Figure < ApplicationRecord
   belongs_to :page, dependent: :destroy
@@ -86,12 +87,10 @@ class Figure < ApplicationRecord
   end
 
   def collides?(figure) # rubocop:disable Metrics/AbcSize
-    (
-      x1 < figure.x1 + figure.box_width &&
+    x1 < figure.x1 + figure.box_width &&
       x1 + box_width > figure.x1 &&
       y1 < figure.y1 + figure.box_height &&
       y1 + box_height > figure.y1
-    )
   end
 
   def distance_to(figure)
@@ -103,7 +102,7 @@ class Figure < ApplicationRecord
 
   # x_width, y_width is in meters
   def size_normalized_contour(x_width: 2, y_width: 2)
-    return [] if contour.length == 0
+    return [] if contour.empty?
 
     bounding = ImageProcessing.boundingRect(contour)
     # raise
@@ -111,24 +110,33 @@ class Figure < ApplicationRecord
     center_x = (bounding[:width] / 2) + bounding[:x]
     center_y = (bounding[:height] / 2) + bounding[:y]
 
-    rotated_contour = contour.map do |x, y|
-      angle = (arrow.angle * Math::PI) / 180
+    rotated_contour =
+      if respond_to?(:arrow) && arrow.present?
+        contour.map do |x, y|
+          angle = (arrow.angle * Math::PI) / 180
 
-      radians = angle * Math::PI / 180
-      x2 = x - center_x
-      y2 = y - center_y
-      cos = Math.cos(radians)
-      sin = Math.sin(radians)
-      [(x2 * cos) - (y2 * sin) + center_x, (x2 * sin) + (y2 * cos) + center_y]
-    end
+          radians = angle * Math::PI / 180
+          x2 = x - center_x
+          y2 = y - center_y
+          cos = Math.cos(radians)
+          sin = Math.sin(radians)
+          [(x2 * cos) - (y2 * sin) + center_x, (x2 * sin) + (y2 * cos) + center_y]
+        end
+      elsif is_a?(StoneTool)
+        contour.first
+      else
+        contour
+      end
     rotated_contour += [rotated_contour[0]]
 
-    ratio = if scale.present?
-      scale.meter_ratio
-    else
-      cm_on_page = page_size.to_f / page.image.width
-      (cm_on_page / 100.0) * percentage_scale
-    end
+    ratio = if scale&.meter_ratio.present?
+              scale.meter_ratio
+            elsif percentage_scale.present?
+              cm_on_page = page_size.to_f / page.image.width
+              (cm_on_page / 100.0) * percentage_scale
+            else
+              raise
+            end
 
     center_x *= ratio
     center_y *= ratio
@@ -137,7 +145,8 @@ class Figure < ApplicationRecord
     offset_y = center_y - y_width
 
     rotated_contour.map do |x, y|
-      [((x * ratio) - offset_x) * 1000, ((y * ratio) - offset_y) * 1000]
+      # [((x * ratio) - offset_x) * 1000, ((y * ratio) - offset_y) * 1000]
+      [((x * ratio)) * 1000, ((y * ratio)) * 1000]
     end
   end
 end

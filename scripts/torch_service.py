@@ -48,7 +48,7 @@ def analyze_file(file):
 
             label = labels[prediction[0]['labels'][element].cpu().item()]
 
-            if score > 0.8:
+            if score > 0.1:
                 result.append({
                     'score': score.tolist(),
                     'box': boxes,
