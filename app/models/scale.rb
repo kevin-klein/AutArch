@@ -47,9 +47,12 @@
 #  anchor_point_3_y    :integer
 #  anchor_point_4_x    :integer
 #  anchor_point_4_y    :integer
+#  probability         :float
 #
 class Scale < Figure
   belongs_to :grave, foreign_key: 'parent_id', optional: true, inverse_of: :scale
+  belongs_to :stone_tool, foreign_key: 'parent_id', optional: true
+
   before_save do
     self.meter_ratio = (text.to_i / 100.0) / width if width&.positive? && text.present?
   end

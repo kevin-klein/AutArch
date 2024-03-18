@@ -1,10 +1,8 @@
 class UpdateManualContours < ActiveRecord::Migration[7.0]
   def change
     change_table :figures do |t|
-      t.remove :bounding_box_center_x
-      t.remove :bounding_box_center_y
-      t.remove :bounding_box_width
-      t.remove :bounding_box_height
+      t.remove :bounding_box_center_x, type: :float
+      t.remove :bounding_box_center_y, type: :float
 
       t.integer :control_point_1_x
       t.integer :control_point_1_y

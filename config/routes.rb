@@ -11,6 +11,7 @@ Rails.application.routes.draw do # rubocop:disable Metrics/BlockLength
   resources :chronologies do
     resources :c14_dates
   end
+  resources :lithics
   resources :kurgans
   resources :sites
   resources :maps
@@ -20,7 +21,11 @@ Rails.application.routes.draw do # rubocop:disable Metrics/BlockLength
       get :stats
     end
   end
-  resources :figures
+  resources :figures do
+    member do
+      get :preview
+    end
+  end
   resources :skeletons do
     resources :stable_isotopes
   end
