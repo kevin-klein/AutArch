@@ -101,10 +101,24 @@ class Figure < ApplicationRecord
   end
 
   # x_width, y_width is in meters
-  def size_normalized_contour(x_width: 2, y_width: 2)
+  def size_normalized_contour(x_width: 0.2, y_width: 0.2)
     return [] if contour.empty?
 
-    bounding = ImageProcessing.boundingRect(contour)
+    single_contour = if is_a?(StoneTool)
+      contour.max_by do |contour|
+        if contour.size < 10
+          0
+        else
+          ImageProcessing.contourArea(contour)
+        end
+      end
+    else
+      contour
+    end
+
+    return [] if single_contour.nil? || single_contour.size < 5
+
+    bounding = ImageProcessing.boundingRect(single_contour)
     # raise
 
     center_x = (bounding[:width] / 2) + bounding[:x]
@@ -112,7 +126,7 @@ class Figure < ApplicationRecord
 
     rotated_contour =
       if respond_to?(:arrow) && arrow.present?
-        contour.map do |x, y|
+        single_contour.map do |x, y|
           angle = (arrow.angle * Math::PI) / 180
 
           radians = angle * Math::PI / 180
@@ -122,10 +136,8 @@ class Figure < ApplicationRecord
           sin = Math.sin(radians)
           [(x2 * cos) - (y2 * sin) + center_x, (x2 * sin) + (y2 * cos) + center_y]
         end
-      elsif is_a?(StoneTool)
-        contour.first
       else
-        contour
+        single_contour
       end
     rotated_contour += [rotated_contour[0]]
 
@@ -145,8 +157,7 @@ class Figure < ApplicationRecord
     offset_y = center_y - y_width
 
     rotated_contour.map do |x, y|
-      # [((x * ratio) - offset_x) * 1000, ((y * ratio) - offset_y) * 1000]
-      [((x * ratio)) * 1000, ((y * ratio)) * 1000]
+      [((x * ratio) - offset_x) * 1000, ((y * ratio) - offset_y) * 1000]
     end
   end
 end
