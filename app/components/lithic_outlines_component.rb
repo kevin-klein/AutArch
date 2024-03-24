@@ -1,9 +1,10 @@
 # frozen_string_literal: true
 
 class LithicOutlinesComponent < ViewComponent::Base
-  def initialize(lithics:, color: [209, 41, 41])
+  def initialize(contours:, color: [209, 41, 41])
     super
-    @lithics = lithics
+    @contours = contours
+
     @color = "rgb(#{color.join(' ')})"
   end
 end

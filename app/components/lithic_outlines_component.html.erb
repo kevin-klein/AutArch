@@ -8,13 +8,22 @@
 <svg
   style='touch-action: none; user-select: none;'
   data-controller='figure'
-  viewBox='0 0 4000 4000'
+  viewBox='0 0 400 400'
   shape-rendering="auto"
   preserveAspectRatio="xMidYMid meet"
   xmlns="http://www.w3.org/2000/svg">
-  <% @lithics.each do |lithic| %>
-    <polyline stroke='<%= @color %>' stroke-width='4' stroke-opacity='1' points="<%= lithic.size_normalized_contour.map { |x, y| "#{x},#{y}" }.join(' ') %>" fill="none" />
+  <% @contours.each do |contour| %>
+    <polyline stroke='<%= @color %>' stroke-width='0.5' stroke-opacity='1' points="<%= contour.map { |x, y| "#{x},#{y}" }.join(' ') %>" fill="none" />
   <% end %>
+
+  <%= (0..200).step(20) do |index| %>
+    <% color1 = cycle('black', 'white') %>
+    <% color2 = if color1 == 'black' then 'white' else 'black' end %>
+    <rect stroke-width='1' x=<%= index %> y="0" width="20" height="20" fill="<%= color1 %>" stroke="black" />
+    <rect stroke-width='1' x=<%= index %> y="20" width="20" height="20" fill="<%= color2 %>" stroke="black" />
+  <% end %>
+
+  <text x="225" y="20" class="small">400mm</text>
 </svg>
 
 </div>

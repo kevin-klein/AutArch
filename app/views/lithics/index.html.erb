@@ -1,5 +1,6 @@
-<%= render LithicOutlinesComponent.new(lithics: @lithics) %>
+<%= render LithicOutlinesComponent.new(contours: @contours) %>
 
+<%= image_tag "data:image/jpeg;base64,#{@efd_pca_chart}", class: 'img-fluid' %>
 <table class='table'>
   <thead>
     <tr>
@@ -13,7 +14,11 @@
       <tr>
         <td><%= stone_tool.id %></td>
         <td>
-          <img class='img img-fluid' src="<%= preview_figure_path(stone_tool) %>">
+          <%
+=begin%>
+ <img class='img img-fluid' src="<%= preview_figure_path(stone_tool) %>">
+<%
+=end%>
         </td>
       </tr>
     <% end %>
