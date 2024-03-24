@@ -19,8 +19,16 @@ Mat cropToFigure(VALUE figure, const Mat &image_mat) {
   x2 = max(0L, x2);
   y2 = max(0L, y2);
 
-  Rect crop(x1, y1, x2 - x1, y2 - y1);
-  return image_mat(crop);
+  try {
+    Rect crop(x1, y1, x2 - x1, y2 - y1);
+    return image_mat(crop);
+  }
+  catch( cv::Exception& e )
+  {
+      const char* err_msg = e.what();
+      std::cout << "exception caught: " << err_msg << std::endl;
+      return Mat();
+  }
 }
 
 Mat convertRubyStringToMat(VALUE image_value) {
@@ -38,6 +46,10 @@ Mat convertRubyStringToMat(VALUE image_value) {
 
 VALUE convertMatToRubyString(const Mat &mat) {
   std::vector<uchar> buf;
+  if(mat.empty()) {
+    return rb_str_new("", 0);
+  }
+
   cv::imencode(".jpg", mat, buf);
 
   std::string image_string(buf.begin(), buf.end());

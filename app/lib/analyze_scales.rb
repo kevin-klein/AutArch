@@ -1,8 +1,16 @@
 class AnalyzeScales
   def analyze_scale(scale)
     return unless scale.is_a?(Scale)
-    assign_contour_width(scale)
-    text = scale_text(scale)
+    (1.0..2.0).step(0.25).each do |factor|
+      assign_contour_width(scale, factor)
+      break if scale.width > 0
+    end
+
+    text = ''
+    (1.0..2.0).step(0.25).each do |factor|
+      text = scale_text(scale, factor)
+      break unless text&.empty?
+    end
     distance, ratio = calculate_contour_ratio(scale, text)
 
     return if distance.nil?
@@ -12,8 +20,17 @@ class AnalyzeScales
     scale.save!
   end
 
-  def scale_text(scale)
-    image = ImageProcessing.extractFigure(scale, scale.page.image.data.download)
+  def scale_text(scale, factor)
+    test_scale = scale.dup
+    test_scale.x1 /= -factor
+    test_scale.y1 /= -factor
+    test_scale.x2 *= factor
+    test_scale.y2 *= factor
+
+    ap 'extract'
+    image = ImageProcessing.extractFigure(test_scale, scale.page.image.data.download)
+    return '' if image.size == 0
+
     ImageProcessing.imwrite('scale.jpg', image)
     t = RTesseract.new('scale.jpg', lang: 'eng')
     result = t.to_s.strip
@@ -29,8 +46,8 @@ class AnalyzeScales
                  cm_match.captures[0].to_f / 100
                elsif m_match
                  m_match.captures[0].to_f
-               else # assume default cm
-                cm_match.captures[0].to_f / 100
+               else
+                nil
                end
 
     ratio = if scale.text.present?
@@ -42,8 +59,14 @@ class AnalyzeScales
     [distance, ratio]
   end
 
-  def assign_contour_width(scale)
-    image = ImageProcessing.extractFigure(scale, scale.page.image.data.download)
+  def assign_contour_width(scale, factor)
+    test_scale = scale.dup
+    test_scale.x1 /= factor
+    test_scale.y1 /= factor
+    test_scale.x2 *= factor
+    test_scale.y2 *= factor
+
+    image = ImageProcessing.extractFigure(test_scale, scale.page.image.data.download)
     contours = ImageProcessing.findContours(image, 'tree')
     rects = contours.lazy.map { ImageProcessing.minAreaRect _1 }
 
@@ -61,5 +84,7 @@ class AnalyzeScales
         analyze_scale(scale)
       end
     end
+
+    nil
   end
 end

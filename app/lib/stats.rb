@@ -45,6 +45,17 @@ module Stats
     base64.b64encode(my_stringIObytes.read)
   end
 
+  def base_pca_chart(data)
+    my_stringIObytes = io.BytesIO.new
+    fig, ax = pyplot.subplots()
+    pyplot.scatter(data.map(&:first), data.map(&:second), s: data.map { 0.3 })
+    ax.set_aspect('equal')
+    # pyplot.ylim(-50, 50)
+    pyplot.savefig(my_stringIObytes, format: 'jpg', dpi: 300)
+    my_stringIObytes.seek(0)
+    base64.b64encode(my_stringIObytes.read)
+  end
+
   def upgma_figure(linkage)
     fig = pyplot.figure(figsize: [25, 10])
     dn = scipy.cluster.hierarchy.dendrogram(linkage, truncate_mode: 'lastp', p: 10, show_leaf_counts: true)
@@ -104,6 +115,13 @@ module Stats
     frequencies = frequencies.map { |item| item.each_slice(2).map(&:last)  }
 
     [frequencies, graves]
+  end
+
+  def efd_pca(frequencies)
+    pca = Pca.new(components: 2)
+    pca.fit(frequencies)
+
+    pca.transform(frequencies).to_a
   end
 
   def outlines_pca(publications, special_objects: [], components: 2, excluded: [])
