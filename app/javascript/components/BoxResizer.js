@@ -44,7 +44,6 @@ export function Box({onChangeFigure, onDraggingStart, active, figure, setActive}
 
   function onMouseDown(figure) {
     return function(evt) {
-      console.log(figure);
       evt.preventDefault();
       onDraggingStart(evt, figure);
     };
@@ -247,7 +246,12 @@ function BoxResizer({next_url, grave, sites, image, page}) {
   const divRef = React.useRef(null);
 
   React.useEffect(() => {
-    setFigures(grave.figures);
+    setFigures(grave.figures.map(figure => ({
+      anchors: [],
+      controlPoints: [],
+      typeName: figure.type,
+      ...figure
+    })));
   }, []);
 
   const token =
@@ -279,6 +283,7 @@ function BoxResizer({next_url, grave, sites, image, page}) {
   }
 
   function onChangeFigure(id, figure) {
+    console.log(figure)
     setFigures(Object.values(figures).map((currentFigure) => {
       if(currentFigure.id === figure.id) {
         return figure;
@@ -330,7 +335,7 @@ function BoxResizer({next_url, grave, sites, image, page}) {
   }
 
   async function createFigure(type) {
-    const grave = Object.values(figures).filter(figure => figure.type === 'Grave')[0];
+    const grave = Object.values(figures).filter(figure => figure.typeName === 'Grave')[0];
 
     let newFigure = null;
     if(grave !== undefined) {
@@ -434,7 +439,7 @@ function BoxResizer({next_url, grave, sites, image, page}) {
   }
 
   const validations = ['Scale', 'Arrow', 'Spine', 'SkeletonFigure', 'GraveCrossSection'].map((item) => {
-    const matchingFigure = Object.values(figures).filter(fig => fig.type === item)[0];
+    const matchingFigure = Object.values(figures).filter(fig => fig.typeName === item)[0];
     if(matchingFigure === undefined) {
       if(item === 'SkeletonFigure' || item === 'Spine') {
         return (
@@ -487,7 +492,7 @@ function BoxResizer({next_url, grave, sites, image, page}) {
                       className={`list-group-item list-group-item-action d-flex justify-content-between align-items-start ${currentEditBoxActiveClass(figure)}`}
                     >
                       <div className="ms-2 me-auto">
-                        <div className="fw-bold">{figure.type === 'Good' ? 'Artefact' : figure.type}</div>
+                        <div className="fw-bold">{figure.typeName === 'Good' ? 'Artefact' : figure.typeName}</div>
                       </div>
                       <div
                         onClick={() => { removeEditBox(figure.id); } }
@@ -496,7 +501,7 @@ function BoxResizer({next_url, grave, sites, image, page}) {
                           X
                       </div>
                     </div>
-                    {currentEditBox === figure.id && (figure.type === 'Grave' || figure.type === 'GraveCrossSection')&&
+                    {currentEditBox === figure.id && (figure.typeName === 'Grave' || figure.typeName === 'GraveCrossSection')&&
                       <div className="row mb-3 mt-3">
                         <div className="form-check ms-3">
                           <input
@@ -542,12 +547,27 @@ function BoxResizer({next_url, grave, sites, image, page}) {
                     <input type='hidden' name={`figures[${id}][text]`} value={figure.text} />
                     <input type='hidden' name={`figures[${id}][angle]`} value={figure.angle} />
                     {figure.manual_bounding_box && <React.Fragment>
+                      <input type='hidden' name={`figures[${id}][control_point_1_x]`} value={figure.controlPoints[0]?.x} />
+                      <input type='hidden' name={`figures[${id}][control_point_2_x]`} value={figure.controlPoints[1]?.x} />
+                      <input type='hidden' name={`figures[${id}][control_point_3_x]`} value={figure.controlPoints[2]?.x} />
+                      <input type='hidden' name={`figures[${id}][control_point_4_x]`} value={figure.controlPoints[3]?.x} />
+
+                      <input type='hidden' name={`figures[${id}][control_point_1_y]`} value={figure.controlPoints[0]?.y} />
+                      <input type='hidden' name={`figures[${id}][control_point_2_y]`} value={figure.controlPoints[1]?.y} />
+                      <input type='hidden' name={`figures[${id}][control_point_3_y]`} value={figure.controlPoints[2]?.y} />
+                      <input type='hidden' name={`figures[${id}][control_point_4_y]`} value={figure.controlPoints[3]?.y} />
+
+                      <input type='hidden' name={`figures[${id}][anchor_point_1_x]`} value={figure.anchors[0]?.x} />
+                      <input type='hidden' name={`figures[${id}][anchor_point_2_x]`} value={figure.anchors[1]?.x} />
+                      <input type='hidden' name={`figures[${id}][anchor_point_3_x]`} value={figure.anchors[2]?.x} />
+                      <input type='hidden' name={`figures[${id}][anchor_point_4_x]`} value={figure.anchors[3]?.x} />
+
+                      <input type='hidden' name={`figures[${id}][anchor_point_1_y]`} value={figure.anchors[0]?.y} />
+                      <input type='hidden' name={`figures[${id}][anchor_point_2_y]`} value={figure.anchors[1]?.y} />
+                      <input type='hidden' name={`figures[${id}][anchor_point_3_y]`} value={figure.anchors[2]?.y} />
+                      <input type='hidden' name={`figures[${id}][anchor_point_4_y]`} value={figure.anchors[3]?.y} />
+
                       <input type='hidden' name={`figures[${id}][manual_bounding_box]`} value={figure.manual_bounding_box} />
-                      <input type='hidden' name={`figures[${id}][bounding_box_center_x]`} value={figure.bounding_box_center_x} />
-                      <input type='hidden' name={`figures[${id}][bounding_box_center_y]`} value={figure.bounding_box_center_y} />
-                      <input type='hidden' name={`figures[${id}][bounding_box_angle]`} value={figure.bounding_box_angle} />
-                      <input type='hidden' name={`figures[${id}][bounding_box_width]`} value={figure.bounding_box_width} />
-                      <input type='hidden' name={`figures[${id}][bounding_box_height]`} value={figure.bounding_box_height} />
                     </React.Fragment>}
                   </React.Fragment>
                 );

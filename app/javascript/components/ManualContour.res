@@ -1,12 +1,22 @@
 open Webapi.Canvas
 
+type point = {
+  x: int,
+  y: int,
+  id: int
+}
+
 type figure = {
   page_id: int,
   y1: int,
   y2: int,
   x1: int,
   x2: int,
-  id: int
+  id: int,
+  typeName: string,
+  controlPoints: array<point>,
+  anchors: array<point>,
+  manual_bounding_box: bool
 }
 
 type konvaShape
@@ -40,12 +50,6 @@ module Shape = {
   external make: (~sceneFunc: sceneFunc = ?, ~strokeWidth: int, ~stroke: string) => React.element = "Shape"
 }
 
-type point = {
-  x: int,
-  y: int,
-  id: int
-}
-
 let calculateControlPoints = (figure: figure) => {
   let x1Float = figure.x1 :> float
   let y1Float = figure.y1 :> float
@@ -59,7 +63,7 @@ let calculateControlPoints = (figure: figure) => {
 }
 
 @react.component
-let make = (~active, ~figure: figure) => {
+let make = (~active, ~figure: figure, ~onChangeFigure) => {
   let shapeRef = React.useRef();
   let trRef = React.useRef();
   let isSelected = active == figure.id
@@ -72,21 +76,31 @@ let make = (~active, ~figure: figure) => {
   let (controlPoints, setControlPoints) = React.useState(_ => calculateControlPoints(figure));
 
   let anchorElements = anchors->Array.map(point => {
-    <Circle draggable={true} x={point.x} y={point.y} radius={25} fill={"#ddd"} stroke="#666" onDragMove={konvaEvent => {
-      setAnchors(points => {
-        points->Array.map(currentPoint => {
-          if point.id == currentPoint.id {
-            {...currentPoint, x: konvaEvent.target->KonvaTarget.x, y: konvaEvent.target->KonvaTarget.y}
-          }
-          else {
-            currentPoint
-          }
+    <Circle
+      draggable={true}
+      x={point.x}
+      y={point.y}
+      radius={25}
+      fill={"#ddd"}
+      stroke="#666"
+      onDragMove={konvaEvent => {
+        setAnchors(points => {
+          points->Array.map(currentPoint => {
+            if point.id == currentPoint.id {
+              {...currentPoint, x: konvaEvent.target->KonvaTarget.x, y: konvaEvent.target->KonvaTarget.y}
+            }
+            else {
+              currentPoint
+            }
+          })
         })
-      })
+        onChangeFigure(figure.id, {
+          ...figure, controlPoints, anchors
+        })
     }} />
   })
-  let controlPointElements = controlPoints->Array.map(point => {
-    <Circle draggable={true} x={point.x} y={point.y} radius={25} fill={"#ddd"} stroke="#666" onDragMove={konvaEvent => {
+  let controlPointElements = controlPoints->Array.mapWithIndex((point, index) => {
+    <Circle key={Belt.Int.toString(index)} draggable={true} x={point.x} y={point.y} radius={25} fill={"#ddd"} stroke="#666" onDragMove={konvaEvent => {
       setControlPoints(points => {
         points->Array.map(currentPoint => {
           if point.id == currentPoint.id {
@@ -96,6 +110,10 @@ let make = (~active, ~figure: figure) => {
             currentPoint
           }
         })
+      })
+
+      onChangeFigure(figure.id, {
+        ...figure, controlPoints, anchors
       })
     }} />
   })
@@ -128,82 +146,3 @@ let make = (~active, ~figure: figure) => {
   </React.Fragment>
 }
 let default = make
-
-// %%raw(`
-// export default function ManualContour({figure, color, active, onDraggingStart, setActive, onChangeFigure}) {
-//   const shapeRef = React.useRef();
-//   const trRef = React.useRef();
-//   const isSelected = active === figure.id;
-
-//   React.useEffect(() => {
-//     if (isSelected) {
-//       trRef.current.nodes([shapeRef.current]);
-//       trRef.current.getLayer().batchDraw();
-//     }
-//   }, [isSelected]);
-
-//   return (<React.Fragment>
-//     <Circle />
-
-//     <Shape
-//       fill={null}
-//       fillEnabled={false}
-//       stroke={color}
-//       strokeWidth={3}
-//       x={figure.bounding_box_center_x - figure.bounding_box_width / 2}
-//       y={figure.bounding_box_center_y - figure.bounding_box_height / 2}
-//       ref={shapeRef}
-//       isSelected={true}
-//       width={figure.bounding_box_width}
-//       height={figure.bounding_box_height}
-//       onClick={() => setActive(figure.id)}
-//       onTap={() => setActive(figure.id)}
-//       rotation={figure.bounding_box_angle}
-//       sceneFunc={(ctx, shape) => {
-//         ctx.beginPath();
-//         ctx.moveTo(quad.start.x(), quad.start.y());
-//         ctx.quadraticCurveTo(
-//           quad.control.x(),
-//           quad.control.y(),
-//           quad.end.x(),
-//           quad.end.y()
-//         );
-//         ctx.fillStrokeShape(shape);
-//       }}
-//       onTransformEnd={(e) => {
-//         const node = shapeRef.current;
-//         const scaleX = node.scaleX();
-//         const scaleY = node.scaleY();
-
-//         node.scaleX(1);
-//         node.scaleY(1);
-
-//         const width = node.width() * scaleX;
-//         const height = node.height() * scaleY;
-
-//         onChangeFigure(figure.id, {
-//           ...figure,
-//           bounding_box_center_x: node.x() + width / 2,
-//           bounding_box_center_y: node.y() + height / 2,
-//           bounding_box_width: width,
-//           bounding_box_height: height,
-//           bounding_box_angle: node.rotation()
-//         });
-//       }}
-//     />
-//     {isSelected && (
-//       <Transformer
-//         ref={trRef}
-//         keepRatio={false}
-//         boundBoxFunc={(oldBox, newBox) => {
-//           // limit resize
-//           if (newBox.width < 5 || newBox.height < 5) {
-//             return oldBox;
-//           }
-//           return newBox;
-//         }}
-//       />
-//     )}
-//   </React.Fragment>);
-// }
-// `)

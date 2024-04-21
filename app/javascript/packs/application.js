@@ -6,6 +6,7 @@ import bootstrap from 'bootstrap';
 
 import BoxResizer from '../components/BoxResizer';
 import AddFigures from '../components/AddFigures';
+import NorthArrow from '../components/NorthArrow';
 
 import ReactOnRails from 'react-on-rails';
-ReactOnRails.register({ BoxResizer, AddFigures });
+ReactOnRails.register({ BoxResizer, AddFigures, NorthArrow });

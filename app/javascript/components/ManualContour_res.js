@@ -39,6 +39,7 @@ function calculateControlPoints(figure) {
 }
 
 function ManualContour(props) {
+  var onChangeFigure = props.onChangeFigure;
   var figure = props.figure;
   React.useRef();
   React.useRef();
@@ -95,10 +96,22 @@ function ManualContour(props) {
                                           }
                                         });
                             });
+                        onChangeFigure(figure.id, {
+                              page_id: figure.page_id,
+                              y1: figure.y1,
+                              y2: figure.y2,
+                              x1: figure.x1,
+                              x2: figure.x2,
+                              id: figure.id,
+                              typeName: figure.typeName,
+                              controlPoints: controlPoints,
+                              anchors: anchors,
+                              manual_bounding_box: figure.manual_bounding_box
+                            });
                       })
                   });
       });
-  var controlPointElements = controlPoints.map(function (point) {
+  var controlPointElements = controlPoints.map(function (point, index) {
         return JsxRuntime.jsx(ReactKonva.Circle, {
                     draggable: true,
                     x: point.x,
@@ -120,8 +133,20 @@ function ManualContour(props) {
                                           }
                                         });
                             });
+                        onChangeFigure(figure.id, {
+                              page_id: figure.page_id,
+                              y1: figure.y1,
+                              y2: figure.y2,
+                              x1: figure.x1,
+                              x2: figure.x2,
+                              id: figure.id,
+                              typeName: figure.typeName,
+                              controlPoints: controlPoints,
+                              anchors: anchors,
+                              manual_bounding_box: figure.manual_bounding_box
+                            });
                       })
-                  });
+                  }, String(index));
       });
   return JsxRuntime.jsxs(React.Fragment, {
               children: [

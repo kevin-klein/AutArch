@@ -38,6 +38,7 @@ class AnalyzePublication
     end
 
     Page.transaction do
+      BuildText.new.run(publication)
       MessageBus.publish('/importprogress', 'Grouping Figures to Graves')
       CreateGraves.new.run(publication.pages)
       CreateLithics.new.run(publication.pages)

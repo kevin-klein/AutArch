@@ -7,6 +7,7 @@
     <tr>
       <th>Title</th>
       <th>Author</th>
+      <th>Year</th>
       <th></th>
     </tr>
   </thead>
@@ -21,11 +22,16 @@
           <%= publication.author %>
         </td>
         <td>
+          <%= publication.year %>
+        </td>
+        <td>
           <%= link_to "Show this publication", publication_pages_path(publication) %>
           <div class="vr mx-1"></div>
           <%= link_to 'Stats', publication_stats_path(publication) %>
           <div class="vr mx-1"></div>
           <%= link_to 'Edit', edit_publication_path(publication) %>
+          <div class="vr mx-1"></div>
+          <%= link_to 'Summary', summary_publication_path(publication), method: :delete %>
           <div class="vr mx-1"></div>
           <%= link_to 'Delete', publication_path(publication), method: :delete %>
         </td>

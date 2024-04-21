@@ -1,5 +1,5 @@
 <%= simple_form_for :search, url: graves_path, method: "GET", html: { class: 'form-inline' } do |f| %>
-  <%= f.input :publication_id, collection: Publication.pluck(:title, :id), input_html: {value: ""} %>
+  <%= f.input :publication_id, collection: Publication.order(:created_at).pluck(:author, :year, :id).map { |author, year, id| ["#{author} #{year}", id] }, input_html: {value: ""} %>
   <%= f.submit "Search", class: "btn btn-primary" %>
 <% end %>
 

@@ -60,6 +60,85 @@ class Figure < ApplicationRecord
     self.publication_id = page.publication_id
   end
 
+  def manual_contour
+    def bezier_point(anchor1:, anchor2:, control:, t:)
+      (1 - t) * (1 - t) * anchor1 + 2 * (1 - t) * t * control + t * t * anchor2
+    end
+
+    first = (0..1).step(0.1).map do |t|
+      x = bezier_point(
+        t: t,
+        anchor1: anchor_point_1_x,
+        anchor2: anchor_point_2_x,
+        control: control_point_2_x
+      )
+
+      y = bezier_point(
+        t: t,
+        anchor1: anchor_point_1_y,
+        anchor2: anchor_point_2_y,
+        control: control_point_2_y
+      )
+
+      [x, y]
+    end
+
+    second = (0..1).step(0.1).map do |t|
+      x = bezier_point(
+        t: t,
+        anchor1: anchor_point_2_x,
+        anchor2: anchor_point_3_x,
+        control: control_point_3_x
+      )
+
+      y = bezier_point(
+        t: t,
+        anchor1: anchor_point_2_y,
+        anchor2: anchor_point_3_y,
+        control: control_point_3_y
+      )
+
+      [x, y]
+    end
+
+    third = (0..1).step(0.1).map do |t|
+      x = bezier_point(
+        t: t,
+        anchor1: anchor_point_3_x,
+        anchor2: anchor_point_4_x,
+        control: control_point_4_x
+      )
+
+      y = bezier_point(
+        t: t,
+        anchor1: anchor_point_3_y,
+        anchor2: anchor_point_4_y,
+        control: control_point_4_y
+      )
+
+      [x, y]
+    end
+
+    forth = (0..1).step(0.1).map do |t|
+      x = bezier_point(
+        t: t,
+        anchor1: anchor_point_4_x,
+        anchor2: anchor_point_1_x,
+        control: control_point_1_x
+      )
+
+      y = bezier_point(
+        t: t,
+        anchor1: anchor_point_4_y,
+        anchor2: anchor_point_1_y,
+        control: control_point_1_y
+      )
+      [x, y]
+    end
+
+    first + second + third + forth
+  end
+
   def box_width
     x2 - x1
   end
