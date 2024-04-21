@@ -1,14 +1,18 @@
 class PublicationsController < ApplicationController
-  before_action :set_publication, only: %i[progress show edit update destroy stats]
+  before_action :set_publication, only: %i[progress summary show edit update destroy stats]
 
   # GET /publications or /publications.json
   def index
-    @publications = Publication.select(:id, :title, :author, :year).all
+    @publications = Publication.select(:id, :title, :author, :year).order(:created_at)
   end
 
   # GET /publications/1 or /publications/1.json
   def show
     @publication
+  end
+
+  def summary
+    @data = @publication.figures.group(:type).count
   end
 
   def stats # rubocop:disable Metrics/AbcSize
@@ -93,7 +97,8 @@ class PublicationsController < ApplicationController
     @publication = Publication.new({
                                      author: publication_params[:author],
                                      title: publication_params[:title],
-                                     pdf: publication_params[:pdf]
+                                     pdf: publication_params[:pdf],
+                                     year: publication_params[:year]
                                    })
 
     respond_to do |format|

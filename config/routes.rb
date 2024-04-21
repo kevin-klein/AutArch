@@ -35,6 +35,7 @@ Rails.application.routes.draw do # rubocop:disable Metrics/BlockLength
     get :progress, on: :member
     get :stats
     get :analyze, on: :member
+    get :summary, on: :member
     # get :delete, on: :member
   end
 
