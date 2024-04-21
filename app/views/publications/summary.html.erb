@@ -1,0 +1,19 @@
+<%= pie_chart @data %>
+
+<table class='table'>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Count</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @data.sort_by { _1[1] }.reverse.each do |type, count| %>
+      <tr>
+        <td><%= type %></td>
+        <td><%= count %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

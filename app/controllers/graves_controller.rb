@@ -64,7 +64,7 @@ class GravesController < ApplicationController
 
   # DELETE /graves/1 or /graves/1.json
   def destroy
-    @grave.destroy
+    @grave.destroy!
 
     respond_to do |format|
       format.html { redirect_to edit_grave_path(Grave.order(:id).where('id > ?', @grave.id).first || @grave.last), notice: 'Grave was successfully destroyed.' }

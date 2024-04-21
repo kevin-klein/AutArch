@@ -1,8 +1,8 @@
 <%= render('stepper') %>
 
-<%= react_component('NorthArrow',
+<%= react_component('NorthArrow', props: {
   arrow: @grave.arrow,
   next_url: wizard_path,
   image: @grave.page.image.as_json.merge(href: url_for(@grave.page.image.data))
-  )
+  })
 %>
