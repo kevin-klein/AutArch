@@ -174,6 +174,16 @@ extern "C" VALUE rb_findContours(VALUE self, VALUE rb_mat, VALUE rb_retrieve_typ
   vector<vector<Point>> contours;
   vector<Vec4i> hierarchy;
   string retrieve_type = StringValueCStr(rb_retrieve_type);
+
+  int morph_size = 2;
+  Mat element = getStructuringElement(
+        MORPH_RECT, Size(2 * morph_size + 1,
+                         2 * morph_size + 1),
+        Point(morph_size, morph_size));
+
+  dilate(mat, mat, element, Point(-1, -1), 1);
+  erode(mat, mat, element, Point(-1, -1), 1);
+
   if(retrieve_type == "external") {
     findContours(mat, contours, hierarchy, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
   }

@@ -4,7 +4,7 @@ import Select from 'react-select';
 import {useFigureStore} from './store';
 import { Group, Stage, Layer, Circle, Image, Rect, Line, Transformer, Arrow, Shape } from 'react-konva';
 import useImage from 'use-image';
-import ManualContour from './ManualContour_res';
+import ManualContour, {calculateControlPoints} from './ManualContour_res';
 
 function rotatePoint(x, y, figure) {
   const centerX = (figure.x2 + figure.x1) / 2;
@@ -21,7 +21,7 @@ function rotatePoint(x, y, figure) {
 }
 
 export function Box({onChangeFigure, onDraggingStart, active, figure, setActive}) {
-  const { id, x1, y1, x2, y2, type } = figure;
+  const { id, x1, y1, x2, y2, typeName } = figure;
 
   let color = 'black';
   if(active === id) {
@@ -32,7 +32,7 @@ export function Box({onChangeFigure, onDraggingStart, active, figure, setActive}
   const trRef = React.useRef();
 
   React.useEffect(() => {
-    if (isSelected && !figure.manual_bounding_box && type !== 'Spine') {
+    if (isSelected && !figure.manual_bounding_box && typeName !== 'Spine') {
       trRef.current.nodes([shapeRef.current]);
       trRef.current.getLayer().batchDraw();
     }
@@ -51,7 +51,7 @@ export function Box({onChangeFigure, onDraggingStart, active, figure, setActive}
 
 
   return (<React.Fragment>
-    {(type === 'Spine') &&
+    {(typeName === 'Spine') &&
       <React.Fragment>
         <Arrow
           fill={null}
@@ -92,7 +92,7 @@ export function Box({onChangeFigure, onDraggingStart, active, figure, setActive}
       </React.Fragment>
     }
 
-    {type !== 'Spine' && <Rect
+    {typeName !== 'Spine' && <Rect
       fill={null}
       ref={shapeRef}
       stroke={color}
@@ -125,7 +125,7 @@ export function Box({onChangeFigure, onDraggingStart, active, figure, setActive}
       }}
     />}
 
-    {isSelected && type !== 'Spine' && (
+    {isSelected && typeName !== 'Spine' && (
       <Transformer
         ref={trRef}
         rotateEnabled={false}
@@ -246,12 +246,38 @@ function BoxResizer({next_url, grave, sites, image, page}) {
   const divRef = React.useRef(null);
 
   React.useEffect(() => {
-    setFigures(grave.figures.map(figure => ({
-      anchors: [],
-      controlPoints: [],
-      typeName: figure.type,
-      ...figure
-    })));
+    setFigures(grave.figures.map(figure => {
+      if(figure.control_point_1_x === null) {
+        const controlPoints = calculateControlPoints(figure)
+
+        return {
+          typeName: figure.type,
+          ...figure,
+          control_point_1_x: controlPoints[0].x,
+          control_point_1_y: controlPoints[0].y,
+          control_point_2_x: controlPoints[1].x,
+          control_point_2_y: controlPoints[1].y,
+          control_point_3_x: controlPoints[2].x,
+          control_point_3_y: controlPoints[2].y,
+          control_point_4_x: controlPoints[3].x,
+          control_point_4_y: controlPoints[3].y,
+          anchor_point_1_x: figure.x1,
+          anchor_point_1_y: figure.y1,
+          anchor_point_2_x: figure.x2,
+          anchor_point_2_y: figure.y1,
+          anchor_point_3_x: figure.x2,
+          anchor_point_3_y: figure.y2,
+          anchor_point_4_x: figure.x1,
+          anchor_point_4_y: figure.y2,
+        }
+      }
+      else {
+        return {
+          typeName: figure.type,
+          ...figure,
+        }
+      }
+    }))
   }, []);
 
   const token =
@@ -283,7 +309,6 @@ function BoxResizer({next_url, grave, sites, image, page}) {
   }
 
   function onChangeFigure(id, figure) {
-    console.log(figure)
     setFigures(Object.values(figures).map((currentFigure) => {
       if(currentFigure.id === figure.id) {
         return figure;
@@ -348,7 +373,7 @@ function BoxResizer({next_url, grave, sites, image, page}) {
         const y1 = grave.y1 + graveHeight * 0.6;
         const y2 = grave.y1 + graveHeight * 0.4;
 
-        newFigure = { ...grave, page_id: page.id, y1: y1, y2: y2, x1: x1, x2: x2, type: type };
+        newFigure = { ...grave, page_id: page.id, y1: y1, y2: y2, x1: x1, x2: x2, typeName: type };
       }
       else {
         const graveWidth = grave.x2 - grave.x1;
@@ -359,11 +384,11 @@ function BoxResizer({next_url, grave, sites, image, page}) {
         const y1 = grave.y1 + graveHeight * 0.4;
         const y2 = grave.y1 + graveHeight * 0.6;
 
-        newFigure = { ...grave, page_id: page.id, y1: y1, y2: y2, x1: x1, x2: x2, type: type };
+        newFigure = { ...grave, page_id: page.id, y1: y1, y2: y2, x1: x1, x2: x2, typeName: type };
       }
     }
     else{
-      newFigure = { type: type, page_id: page.id, x1: 0, y1: 0, x2: 100, y2: 100 };
+      newFigure = { typeName: type, page_id: page.id, x1: 0, y1: 0, x2: 100, y2: 100 };
     }
 
     const response = await fetch('/figures.json', {
@@ -374,7 +399,7 @@ function BoxResizer({next_url, grave, sites, image, page}) {
         y1: newFigure.y1,
         y2: newFigure.y2,
         page_id: newFigure.page_id,
-        type: newFigure.type,
+        type: newFigure.typeName,
         parent_id: grave.id,
       }}),
       headers: {
@@ -384,7 +409,7 @@ function BoxResizer({next_url, grave, sites, image, page}) {
     });
     if (response.ok) {
       newFigure = await response.json();
-      addFigure({...newFigure, type: type});
+      addFigure({...newFigure, typeName: type});
       setCurrentEditBox(newFigure.id);
     } else {
       return Promise.reject(response);
@@ -547,25 +572,25 @@ function BoxResizer({next_url, grave, sites, image, page}) {
                     <input type='hidden' name={`figures[${id}][text]`} value={figure.text} />
                     <input type='hidden' name={`figures[${id}][angle]`} value={figure.angle} />
                     {figure.manual_bounding_box && <React.Fragment>
-                      <input type='hidden' name={`figures[${id}][control_point_1_x]`} value={figure.controlPoints[0]?.x} />
-                      <input type='hidden' name={`figures[${id}][control_point_2_x]`} value={figure.controlPoints[1]?.x} />
-                      <input type='hidden' name={`figures[${id}][control_point_3_x]`} value={figure.controlPoints[2]?.x} />
-                      <input type='hidden' name={`figures[${id}][control_point_4_x]`} value={figure.controlPoints[3]?.x} />
+                      <input type='hidden' name={`figures[${id}][control_point_1_x]`} value={figure.control_point_1_x} />
+                      <input type='hidden' name={`figures[${id}][control_point_2_x]`} value={figure.control_point_2_x} />
+                      <input type='hidden' name={`figures[${id}][control_point_3_x]`} value={figure.control_point_3_x} />
+                      <input type='hidden' name={`figures[${id}][control_point_4_x]`} value={figure.control_point_4_x} />
 
-                      <input type='hidden' name={`figures[${id}][control_point_1_y]`} value={figure.controlPoints[0]?.y} />
-                      <input type='hidden' name={`figures[${id}][control_point_2_y]`} value={figure.controlPoints[1]?.y} />
-                      <input type='hidden' name={`figures[${id}][control_point_3_y]`} value={figure.controlPoints[2]?.y} />
-                      <input type='hidden' name={`figures[${id}][control_point_4_y]`} value={figure.controlPoints[3]?.y} />
+                      <input type='hidden' name={`figures[${id}][control_point_1_y]`} value={figure.control_point_1_y} />
+                      <input type='hidden' name={`figures[${id}][control_point_2_y]`} value={figure.control_point_2_y} />
+                      <input type='hidden' name={`figures[${id}][control_point_3_y]`} value={figure.control_point_3_y} />
+                      <input type='hidden' name={`figures[${id}][control_point_4_y]`} value={figure.control_point_4_y} />
 
-                      <input type='hidden' name={`figures[${id}][anchor_point_1_x]`} value={figure.anchors[0]?.x} />
-                      <input type='hidden' name={`figures[${id}][anchor_point_2_x]`} value={figure.anchors[1]?.x} />
-                      <input type='hidden' name={`figures[${id}][anchor_point_3_x]`} value={figure.anchors[2]?.x} />
-                      <input type='hidden' name={`figures[${id}][anchor_point_4_x]`} value={figure.anchors[3]?.x} />
+                      <input type='hidden' name={`figures[${id}][anchor_point_1_x]`} value={figure.anchor_point_1_x} />
+                      <input type='hidden' name={`figures[${id}][anchor_point_2_x]`} value={figure.anchor_point_2_x} />
+                      <input type='hidden' name={`figures[${id}][anchor_point_3_x]`} value={figure.anchor_point_3_x} />
+                      <input type='hidden' name={`figures[${id}][anchor_point_4_x]`} value={figure.anchor_point_4_x} />
 
-                      <input type='hidden' name={`figures[${id}][anchor_point_1_y]`} value={figure.anchors[0]?.y} />
-                      <input type='hidden' name={`figures[${id}][anchor_point_2_y]`} value={figure.anchors[1]?.y} />
-                      <input type='hidden' name={`figures[${id}][anchor_point_3_y]`} value={figure.anchors[2]?.y} />
-                      <input type='hidden' name={`figures[${id}][anchor_point_4_y]`} value={figure.anchors[3]?.y} />
+                      <input type='hidden' name={`figures[${id}][anchor_point_1_y]`} value={figure.anchor_point_1_y} />
+                      <input type='hidden' name={`figures[${id}][anchor_point_2_y]`} value={figure.anchor_point_2_y} />
+                      <input type='hidden' name={`figures[${id}][anchor_point_3_y]`} value={figure.anchor_point_3_y} />
+                      <input type='hidden' name={`figures[${id}][anchor_point_4_y]`} value={figure.anchor_point_4_y} />
 
                       <input type='hidden' name={`figures[${id}][manual_bounding_box]`} value={figure.manual_bounding_box} />
                     </React.Fragment>}

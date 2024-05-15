@@ -2,7 +2,7 @@
 <div class='row m-3'>
   <div class='card col-md-12 mt-2 mb-3'>
     <div class='card-body'>
-      <h5 class="card-title">Grave PCA (width, depth, length, perimeter, area)</h5>
+      <h5 class="card-title">Site</h5>
       <div class='card-text'>
         <form class="row g-3">
           <div class="col-auto">
@@ -28,6 +28,7 @@
               <th>Country Code</th>
               <th>Lat</th>
               <th>Lon</th>
+              <th></th>
           </tr>
       </thead>
 
@@ -39,6 +40,7 @@
                   <td><%= site.country_code %></td>
                   <td><%= site.lat %></td>
                   <td><%= site.lon %></td>
+                  <td><%= link_to 'Edit', edit_site_path(site) %></td>
               </tr>
           <% end %>
       </tbody>
@@ -50,4 +52,4 @@
   </div>
 </div>
 
-
+<%= link_to('New Site', new_site_path) %>

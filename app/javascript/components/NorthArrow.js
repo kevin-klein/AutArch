@@ -4,6 +4,11 @@ export default function(props) {
   const {image, next_url} = props;
   const [arrow, setArrow] = React.useState(props.arrow);
   const token = document.querySelector('[name=csrf-token]').content;
+
+  if(arrow === null) {
+    return
+  }
+
   function setArrowAngle(angle) {
     setArrow({...arrow, angle: angle});
   }
