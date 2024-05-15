@@ -61,13 +61,15 @@ class GraveSize
   end
 
   def manual_stats(figure, image)
-    { contour: [],
-      perimeter: nil,
-      area: nil,
-      width: figure.bounding_box_width,
-      height: figure.bounding_box_height,
-      angle: figure.bounding_box_angle
-    }
+    contour = figure.manual_contour
+    if contour.nil? || contour.empty?
+      { contour: [], perimeter: 0, area: 0, width: 0, height: 0, angle: 0 }
+    else
+      arc = ImageProcessing.arcLength(contour)
+      area = ImageProcessing.contourArea(contour)
+      rect = ImageProcessing.minAreaRect(contour)
+      { contour: contour, perimeter: arc, area: area, width: rect[:width], height: rect[:height], angle: rect[:angle] }
+    end
   end
 
   def contour_stats(figure, image)

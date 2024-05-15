@@ -1,0 +1,1 @@
+app/javascript/components/ManualContour.cmj : app/javascript/components/AnchorPoint.cmj app/javascript/components/AnchorPoint.cmi app/javascript/components/AutArch.cmj app/javascript/components/AutArch.cmi app/javascript/components/ControlPoint.cmj app/javascript/components/ControlPoint.cmi app/javascript/components/Konva.cmj app/javascript/components/Konva.cmi

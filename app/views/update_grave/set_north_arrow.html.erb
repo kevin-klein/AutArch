@@ -6,3 +6,7 @@
   image: @grave.page.image.as_json.merge(href: url_for(@grave.page.image.data))
   })
 %>
+
+<% if @grave.arrow.nil? %>
+  <%= link_to('Next', next_wizard_path) %>
+<% end %>

@@ -21,8 +21,8 @@
     <% @graves.each do |grave| %>
       <tr>
         <td><%= grave.identifier %></td>
-        <td><%= raw number_with_unit grave.area_with_unit if grave.bounding_box_width.blank? %></td>
-        <td><%= number_with_unit grave.perimeter_with_unit  if grave.bounding_box_width.blank? %></td>
+        <td><%= raw number_with_unit grave.area_with_unit %></td>
+        <td><%= number_with_unit grave.perimeter_with_unit %></td>
         <td>
           <% if grave.bounding_box_width.present? %>
             <%= number_with_unit grave.bounding_box_width_with_unit %>

@@ -3,8 +3,24 @@ rule cp
   command = cp $i $out
 rule touch
  command = touch $out
+o Konva.cmi : cp ../bs/app/javascript/components/Konva.cmi
+o Konva.cmj : cp ../bs/app/javascript/components/Konva.cmj
+o Konva.cmt : cp ../bs/app/javascript/components/Konva.cmt
+o Konva.res : cp ../../app/javascript/components/Konva.res
+o AutArch.cmi : cp ../bs/app/javascript/components/AutArch.cmi
+o AutArch.cmj : cp ../bs/app/javascript/components/AutArch.cmj
+o AutArch.cmt : cp ../bs/app/javascript/components/AutArch.cmt
+o AutArch.res : cp ../../app/javascript/components/AutArch.res
+o AnchorPoint.cmi : cp ../bs/app/javascript/components/AnchorPoint.cmi
+o AnchorPoint.cmj : cp ../bs/app/javascript/components/AnchorPoint.cmj
+o AnchorPoint.cmt : cp ../bs/app/javascript/components/AnchorPoint.cmt
+o AnchorPoint.res : cp ../../app/javascript/components/AnchorPoint.res
+o ControlPoint.cmi : cp ../bs/app/javascript/components/ControlPoint.cmi
+o ControlPoint.cmj : cp ../bs/app/javascript/components/ControlPoint.cmj
+o ControlPoint.cmt : cp ../bs/app/javascript/components/ControlPoint.cmt
+o ControlPoint.res : cp ../../app/javascript/components/ControlPoint.res
 o ManualContour.cmi : cp ../bs/app/javascript/components/ManualContour.cmi
 o ManualContour.cmj : cp ../bs/app/javascript/components/ManualContour.cmj
 o ManualContour.cmt : cp ../bs/app/javascript/components/ManualContour.cmt
 o ManualContour.res : cp ../../app/javascript/components/ManualContour.res
-build install.stamp : touch ManualContour.cmi ManualContour.cmj 
+build install.stamp : touch Konva.cmi Konva.cmj AutArch.cmi AutArch.cmj AnchorPoint.cmi AnchorPoint.cmj ControlPoint.cmi ControlPoint.cmj ManualContour.cmi ManualContour.cmj 
