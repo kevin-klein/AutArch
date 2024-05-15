@@ -8,7 +8,7 @@ class GravesController < ApplicationController
       graves = Grave.joins(page: :publication).where({ publication: { id: params.dig(:search, :publication_id) } })
     end
 
-    @graves = graves.includes(:scale, :arrow, page: :image, grave_cross_section: { grave: [:scale] }).order(:id)
+    @graves = graves.includes(:scale, :arrow, page: :image, grave_cross_section: { grave: [:scale] }).where('probability > ?', 0.6).order(:id)
 
     @graves_pagy, @graves = pagy(@graves.all)
   end

@@ -10,3 +10,6 @@ import NorthArrow from '../components/NorthArrow';
 
 import ReactOnRails from 'react-on-rails';
 ReactOnRails.register({ BoxResizer, AddFigures, NorthArrow });
+
+import Rails from '@rails/ujs';
+Rails.start();

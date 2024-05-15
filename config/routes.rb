@@ -32,10 +32,14 @@ Rails.application.routes.draw do # rubocop:disable Metrics/BlockLength
   resources :page_images
   resources :publications do
     resources :pages
-    get :progress, on: :member
-    get :stats
-    get :analyze, on: :member
-    get :summary, on: :member
+    member do
+      post :update_site
+      get :assign_site
+      get :progress
+      get :stats
+      get :analyze
+      get :summary
+    end
     # get :delete, on: :member
   end
 

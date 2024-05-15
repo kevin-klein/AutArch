@@ -1,5 +1,5 @@
 class PublicationsController < ApplicationController
-  before_action :set_publication, only: %i[progress summary show edit update destroy stats]
+  before_action :set_publication, only: %i[update_site assign_site progress summary show edit update destroy stats]
 
   # GET /publications or /publications.json
   def index
@@ -9,6 +9,16 @@ class PublicationsController < ApplicationController
   # GET /publications/1 or /publications/1.json
   def show
     @publication
+  end
+
+  def assign_site
+
+  end
+
+  def update_site
+    @publication.figures.update_all(site_id: params[:site][:site_id])
+
+    redirect_to publications_path
   end
 
   def summary

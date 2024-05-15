@@ -1,48 +1,35 @@
-#Start(1708893683718)
+#Start(1715513310564)
 
   Warning number 33
   /home/kevin/dfg/app/javascript/components/ManualContour.res:1:1-18
 
   1 │ open Webapi.Canvas
-  2 │ 
-  3 │ type figure = {
+  2 │ open Js.Array
+  3 │ open Konva
 
   unused open Webapi.Canvas.
 
 
-  Warning number 26
-  /home/kevin/dfg/app/javascript/components/ManualContour.res:63:7-14
+  Warning number 33
+  /home/kevin/dfg/app/javascript/components/ManualContour.res:2:1-13
 
-  61 │ @react.component
-  62 │ let make = (~active, ~figure: figure) => {
-  63 │   let shapeRef = React.useRef();
-  64 │   let trRef = React.useRef();
-  65 │   let isSelected = active == figure.id
+  1 │ open Webapi.Canvas
+  2 │ open Js.Array
+  3 │ open Konva
+  4 │ open AutArch
 
-  unused variable shapeRef.
-
-
-  Warning number 26
-  /home/kevin/dfg/app/javascript/components/ManualContour.res:64:7-11
-
-  62 │ let make = (~active, ~figure: figure) => {
-  63 │   let shapeRef = React.useRef();
-  64 │   let trRef = React.useRef();
-  65 │   let isSelected = active == figure.id
-  66 │   let (anchors, setAnchors) = React.useState(_ => [
-
-  unused variable trRef.
+  unused open Js.Array.
 
 
-  Warning number 26
-  /home/kevin/dfg/app/javascript/components/ManualContour.res:65:7-16
+  Warning number 27
+  /home/kevin/dfg/app/javascript/components/ManualContour.res:19:13-19
 
-  63 ┆ let shapeRef = React.useRef();
-  64 ┆ let trRef = React.useRef();
-  65 ┆ let isSelected = active == figure.id
-  66 ┆ let (anchors, setAnchors) = React.useState(_ => [
-  67 ┆   { x: figure.x1, y: figure.y1, id: 1 },
+  17 │ 
+  18 │ @react.component
+  19 │ let make = (~active, ~figure: figure, ~onChangeFigure) => {
+  20 │   let anchors = [
+  21 │     {x: figure.anchor_point_1_x, y: figure.anchor_point_1_y, id: 1},
 
-  unused variable isSelected.
+  unused variable active.
 
-#Done(1708893683733)
+#Done(1715513310578)
