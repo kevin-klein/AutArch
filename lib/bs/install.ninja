@@ -23,4 +23,8 @@ o ManualContour.cmi : cp ../bs/app/javascript/components/ManualContour.cmi
 o ManualContour.cmj : cp ../bs/app/javascript/components/ManualContour.cmj
 o ManualContour.cmt : cp ../bs/app/javascript/components/ManualContour.cmt
 o ManualContour.res : cp ../../app/javascript/components/ManualContour.res
-build install.stamp : touch Konva.cmi Konva.cmj AutArch.cmi AutArch.cmj AnchorPoint.cmi AnchorPoint.cmj ControlPoint.cmi ControlPoint.cmj ManualContour.cmi ManualContour.cmj 
+o ReactSimpleMaps.cmi : cp ../bs/app/javascript/components/ReactSimpleMaps.cmi
+o ReactSimpleMaps.cmj : cp ../bs/app/javascript/components/ReactSimpleMaps.cmj
+o ReactSimpleMaps.cmt : cp ../bs/app/javascript/components/ReactSimpleMaps.cmt
+o ReactSimpleMaps.res : cp ../../app/javascript/components/ReactSimpleMaps.res
+build install.stamp : touch Konva.cmi Konva.cmj AutArch.cmi AutArch.cmj AnchorPoint.cmi AnchorPoint.cmj ControlPoint.cmi ControlPoint.cmj ManualContour.cmi ManualContour.cmj ReactSimpleMaps.cmi ReactSimpleMaps.cmj 

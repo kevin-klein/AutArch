@@ -1,22 +1,3 @@
-<table class='table'>
-  <thead>
-    <tr>
-      <th>ID</th>
-      <th></th>
-    </tr>
-  </thead>
-
-  <tbody>
-    <% @maps.each do |map| %>
-      <tr>
-        <td><%= map.id %></td>
-        <td>
-          <%= render(MapViewComponent.new(
-            text_items: map.page.text_items,
-            image: map.page.image
-          )) %>
-        </td>
-      </tr>
-    <% end %>
-  </tbody>
-</table>
+<%= react_component('EuropeMap', props: {
+  orientations: @skeleton_angles
+}) %>

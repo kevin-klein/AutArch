@@ -6,7 +6,7 @@ rule astj
   command = /home/kevin/dfg/node_modules/rescript/linux/bsc.exe  -bs-v 11.0.1 -bs-jsx 4 -uncurried -open RescriptCore -absname -bs-ast -o $out $i
 o app/javascript/components/Konva.ast : astj ../../app/javascript/components/Konva.res
 rule deps
-  command = /home/kevin/dfg/node_modules/rescript/linux/bsb_helper.exe -hash 7625bd4a500de98188f14899a5041aa9 $in
+  command = /home/kevin/dfg/node_modules/rescript/linux/bsb_helper.exe -hash 2f393d364e416caca167e2a78191296a $in
   restat = 1
 o app/javascript/components/Konva.d : deps app/javascript/components/Konva.ast
 rule mij
@@ -26,3 +26,6 @@ o app/javascript/components/ControlPoint.cmj app/javascript/components/ControlPo
 o app/javascript/components/ManualContour.ast : astj ../../app/javascript/components/ManualContour.res
 o app/javascript/components/ManualContour.d : deps app/javascript/components/ManualContour.ast
 o app/javascript/components/ManualContour.cmj app/javascript/components/ManualContour.cmi ../../app/javascript/components/ManualContour_res.js : mij app/javascript/components/ManualContour.ast
+o app/javascript/components/ReactSimpleMaps.ast : astj ../../app/javascript/components/ReactSimpleMaps.res
+o app/javascript/components/ReactSimpleMaps.d : deps app/javascript/components/ReactSimpleMaps.ast
+o app/javascript/components/ReactSimpleMaps.cmj app/javascript/components/ReactSimpleMaps.cmi ../../app/javascript/components/ReactSimpleMaps_res.js : mij app/javascript/components/ReactSimpleMaps.ast
