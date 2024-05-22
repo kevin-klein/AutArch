@@ -52,8 +52,8 @@ pdfs
 /yarn-error.log
 yarn-debug.log*
 .yarn-integrity
-skeletons
-arrows
-models
-test_env
+/skeletons
+/arrows
+/models
+/test_env
 scale.jpg
