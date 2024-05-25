@@ -1,1 +1,1 @@
-json.array! @genetics, partial: 'genetics/genetic', as: :genetic
+json.array! @genetics, partial: "genetics/genetic", as: :genetic

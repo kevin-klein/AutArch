@@ -13,15 +13,15 @@ module Charts
       @clusters.each do |angle, count|
         percent_size = (count.to_f / @max_count)
         # stroke = stroke_color(angle)
-        @svg.circle class: 'point',
-                    r: @max_size * percent_size,
-                    cx: @center,
-                    cy: ((1 - percent_size) * @circle_distance) + (@max_size * 2),
-                    stroke: @grey_stroke,
-                    stroke_width: 1,
-                    # fill: stroke,
-                    fill: 'black',
-                    transform: "rotate(#{angle} #{@center} #{@center})" do
+        @svg.circle class: "point",
+          r: @max_size * percent_size,
+          cx: @center,
+          cy: ((1 - percent_size) * @circle_distance) + (@max_size * 2),
+          stroke: @grey_stroke,
+          stroke_width: 1,
+          # fill: stroke,
+          fill: "black",
+          transform: "rotate(#{angle} #{@center} #{@center})" do
           @svg.title count
         end
       end

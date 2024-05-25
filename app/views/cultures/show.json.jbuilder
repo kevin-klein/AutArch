@@ -1,1 +1,1 @@
-json.partial! 'cultures/culture', culture: @culture
+json.partial! "cultures/culture", culture: @culture

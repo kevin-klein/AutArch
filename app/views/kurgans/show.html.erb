@@ -3,7 +3,8 @@
 <%= render @kurgan %>
 
 <div>
-  <%= link_to "Edit this kurgan", edit_kurgan_path(@kurgan) %> |
+  <%= link_to "Edit this kurgan", edit_kurgan_path(@kurgan) %>
+  |
   <%= link_to "Back to kurgans", kurgans_path %>
 
   <%= button_to "Destroy this kurgan", @kurgan, method: :delete %>

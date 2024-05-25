@@ -1,9 +1,9 @@
-class PublicationsController < ApplicationController
+class PublicationsController < AuthorizedController
   before_action :set_publication, only: %i[update_site assign_site progress summary show edit update destroy stats]
 
   # GET /publications or /publications.json
   def index
-    @publications = Publication.select(:id, :title, :author, :year).order(:created_at)
+    @publications = Publication.accessible_by(current_ability).select(:id, :title, :author, :year).order(:created_at)
   end
 
   # GET /publications/1 or /publications/1.json
@@ -12,7 +12,6 @@ class PublicationsController < ApplicationController
   end
 
   def assign_site
-
   end
 
   def update_site
@@ -29,9 +28,9 @@ class PublicationsController < ApplicationController
     marked_items = params.dig(:compare, :special_mark_graves)&.split("\n")&.map(&:to_i) || []
     @excluded_graves = params.dig(:compare, :exclude_graves)&.split("\n")&.map(&:to_i) || []
     @no_box = true
-    graves = @publication.figures.where(type: 'Grave').where.not(id: @excluded_graves)
+    graves = @publication.figures.where(type: "Grave").where.not(id: @excluded_graves)
     @skeleton_per_grave_type = graves.includes(:skeleton_figures).map { _1.skeleton_figures.length }.tally
-    @skeleton_angles = Stats.spine_angles(@publication.figures.where(type: 'Spine').includes(grave: :arrow))
+    @skeleton_angles = Stats.spine_angles(@publication.figures.where(type: "Spine").includes(grave: :arrow))
     @grave_angles = Stats.grave_angles(graves.includes(:arrow))
     set_compare_graves
 
@@ -39,7 +38,7 @@ class PublicationsController < ApplicationController
 
     if @publications.length == 2
       @all_skeleton_angles = @publications.map do |publication|
-        publication.figures.where(type: 'Spine')
+        publication.figures.where(type: "Spine")
           .includes(grave: :arrow)
           # .sample(6)
           .map { [_1, _1.grave&.arrow] }
@@ -94,7 +93,8 @@ class PublicationsController < ApplicationController
   end
 
   # GET /publications/1/edit
-  def edit; end
+  def edit
+  end
 
   def analyze
     @publication = Publication.find(params[:id])
@@ -105,18 +105,18 @@ class PublicationsController < ApplicationController
   # POST /publications or /publications.json
   def create # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
     @publication = Publication.new({
-                                     author: publication_params[:author],
-                                     title: publication_params[:title],
-                                     pdf: publication_params[:pdf],
-                                     year: publication_params[:year]
-                                   })
+      author: publication_params[:author],
+      title: publication_params[:title],
+      pdf: publication_params[:pdf],
+      year: publication_params[:year]
+    })
 
     respond_to do |format|
       if @publication.save
         AnalyzePublicationJob.perform_later(@publication, site_id: publication_params[:site])
 
         format.html do
-          redirect_to progress_publication_path(@publication), notice: 'Publication was successfully created.'
+          redirect_to progress_publication_path(@publication), notice: "Publication was successfully created."
         end
       else
         format.html { render :new, status: :unprocessable_entity }
@@ -124,13 +124,14 @@ class PublicationsController < ApplicationController
     end
   end
 
-  def progress; end
+  def progress
+  end
 
   # PATCH/PUT /publications/1 or /publications/1.json
   def update
     respond_to do |format|
       if @publication.update(publication_params)
-        format.html { redirect_to publications_path, notice: 'Publication was successfully updated.' }
+        format.html { redirect_to publications_path, notice: "Publication was successfully updated." }
         format.json { render :show, status: :ok, location: @publication }
       else
         format.html { render :edit, status: :unprocessable_entity }
@@ -144,7 +145,7 @@ class PublicationsController < ApplicationController
     @publication.destroy
 
     respond_to do |format|
-      format.html { redirect_to publications_url, notice: 'Publication was successfully destroyed.' }
+      format.html { redirect_to publications_url, notice: "Publication was successfully destroyed." }
       format.json { head :no_content }
     end
   end
@@ -154,15 +155,15 @@ class PublicationsController < ApplicationController
   # Use callbacks to share common setup or constraints between actions.
   def set_publication
     @publication = Publication
-                   .select(:title, :author, :id, :year)
-                   .find(params[:id] || params[:publication_id])
+      .select(:title, :author, :id, :year)
+      .find(params[:id] || params[:publication_id])
   end
 
   def set_compare_graves
     @other_publications = params
-                          .dig(:compare, :publication_id)
+      .dig(:compare, :publication_id)
       &.map { Publication.includes(:figures).find(_1) if _1.present? }
-                          &.compact
+      &.compact
   end
 
   # Only allow a list of trusted parameters through.

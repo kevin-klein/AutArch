@@ -7,7 +7,8 @@ class PeriodsController < ApplicationController
   end
 
   # GET /periods/1 or /periods/1.json
-  def show; end
+  def show
+  end
 
   # GET /periods/new
   def new
@@ -15,7 +16,8 @@ class PeriodsController < ApplicationController
   end
 
   # GET /periods/1/edit
-  def edit; end
+  def edit
+  end
 
   # POST /periods or /periods.json
   def create
@@ -23,7 +25,7 @@ class PeriodsController < ApplicationController
 
     respond_to do |format|
       if @period.save
-        format.html { redirect_to period_url(@period), notice: 'Period was successfully created.' }
+        format.html { redirect_to period_url(@period), notice: "Period was successfully created." }
         format.json { render :show, status: :created, location: @period }
       else
         format.html { render :new, status: :unprocessable_entity }
@@ -36,7 +38,7 @@ class PeriodsController < ApplicationController
   def update
     respond_to do |format|
       if @period.update(period_params)
-        format.html { redirect_to period_url(@period), notice: 'Period was successfully updated.' }
+        format.html { redirect_to period_url(@period), notice: "Period was successfully updated." }
         format.json { render :show, status: :ok, location: @period }
       else
         format.html { render :edit, status: :unprocessable_entity }
@@ -50,7 +52,7 @@ class PeriodsController < ApplicationController
     @period.destroy
 
     respond_to do |format|
-      format.html { redirect_to periods_url, notice: 'Period was successfully destroyed.' }
+      format.html { redirect_to periods_url, notice: "Period was successfully destroyed." }
       format.json { head :no_content }
     end
   end

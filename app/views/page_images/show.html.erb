@@ -3,7 +3,8 @@
 <%= render @page_image %>
 
 <div>
-  <%= link_to "Edit this page image", edit_page_image_path(@page_image) %> |
+  <%= link_to "Edit this page image", edit_page_image_path(@page_image) %>
+  |
   <%= link_to "Back to page images", page_images_path %>
 
   <%= button_to "Destroy this page image", @page_image, method: :delete %>

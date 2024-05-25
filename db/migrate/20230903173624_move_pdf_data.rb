@@ -1,15 +1,11 @@
 class MovePdfData < ActiveRecord::Migration[7.0]
   def change
     Publication.find_each do |publication|
-      File.open("#{Rails.root.join('public/uploads/pdfs', publication.id.to_s).to_s}.pdf", "wb") do |file|
-        file.write(publication.pdf)
-      end
+      File.binwrite("#{Rails.root.join("public/uploads/pdfs", publication.id.to_s)}.pdf", publication.pdf)
     end
 
     Image.find_each do |image|
-      File.open("#{Rails.root.join('public/uploads/images', image.id.to_s).to_s}.jpg", "wb") do |file|
-        file.write(image.data)
-      end
+      File.binwrite("#{Rails.root.join("public/uploads/images", image.id.to_s)}.jpg", image.data)
     end
 
     remove_column :images, :data

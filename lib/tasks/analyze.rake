@@ -1,13 +1,13 @@
 namespace :analyze do
   def number_with_unit(n)
-    return '' if n.nil? || n[:value].nil?
+    return "" if n.nil? || n[:value].nil?
 
-    "#{'%.2f' % n[:value]}"
+    "#{"%.2f" % n[:value]}"
   end
 
   def analyze_db(id, db)
     ActiveRecord::Base.establish_connection(
-      adapter: 'sqlite3',
+      adapter: "sqlite3",
       database: db.to_s
     )
 
@@ -26,7 +26,7 @@ namespace :analyze do
     end
 
     return if processsed_graves.length == 0
-    CSV.open("#{id}.csv", 'wb') do |csv|
+    CSV.open("#{id}.csv", "wb") do |csv|
       csv << grave_data.first.keys
       grave_data.each do |grave|
         csv << CSV::Row.new(grave.keys, grave.values)
@@ -35,22 +35,22 @@ namespace :analyze do
   end
 
   task analyze_inkscape_csv: :environment do
-    baseline_csv = CSV.open(Rails.root.join('supplementary', 'experiment', 'inkscape', 'baseline.csv').to_s, headers: true, header_converters: :symbol).to_a.map(&:to_hash)
+    baseline_csv = CSV.open(Rails.root.join("supplementary", "experiment", "inkscape", "baseline.csv").to_s, headers: true, header_converters: :symbol).to_a.map(&:to_hash)
     files = [
-      '0_1_inkscape.csv',
-      '2_0_inkscape.csv',
-      '3_0_inkscape.csv',
-      '3_1_inkscape.csv',
-      '4_0_inkscape.csv',
-      '4_1_inkscape.csv',
-      '6_0_inkscape.csv',
-      '6_1_inkscape.csv',
+      "0_1_inkscape.csv",
+      "2_0_inkscape.csv",
+      "3_0_inkscape.csv",
+      "3_1_inkscape.csv",
+      "4_0_inkscape.csv",
+      "4_1_inkscape.csv",
+      "6_0_inkscape.csv",
+      "6_1_inkscape.csv"
     ]
 
     graves_processed = {}
 
     errors = files.map do |file|
-      data = CSV.open(Rails.root.join('supplementary', 'experiment', 'inkscape', file).to_s, headers: true, header_converters: :symbol).to_a.map(&:to_hash)
+      data = CSV.open(Rails.root.join("supplementary", "experiment", "inkscape", file).to_s, headers: true, header_converters: :symbol).to_a.map(&:to_hash)
 
       grave_count = data.filter { |user| user[:length_px].present? }.count
       graves_processed[file] = grave_count
@@ -66,24 +66,24 @@ namespace :analyze do
   end
 
   task analyze_comove_csv: :environment do
-    base_path = Rails.root.join('supplementary/experiment/comove/baseline.csv').to_s
+    base_path = Rails.root.join("supplementary/experiment/comove/baseline.csv").to_s
     baseline_csv = CSV.open(base_path, headers: true, header_converters: :symbol).to_a.map(&:to_hash)
     files = [
-      '0_1.csv',
-      '2_0.csv',
-      '3_0.csv',
-      '3_1.csv',
-      '4_0.csv',
-      '4_1.csv',
-      '5_0.csv',
-      '5_1.csv',
-      '6_0.csv',
-      '6_1.csv'
+      "0_1.csv",
+      "2_0.csv",
+      "3_0.csv",
+      "3_1.csv",
+      "4_0.csv",
+      "4_1.csv",
+      "5_0.csv",
+      "5_1.csv",
+      "6_0.csv",
+      "6_1.csv"
     ]
     graves_processed = {}
 
     errors = files.map do |file|
-      data = CSV.open(Rails.root.join('supplementary', 'experiment', 'comove', file).to_s, headers: true, header_converters: :symbol).to_a.map(&:to_hash)
+      data = CSV.open(Rails.root.join("supplementary", "experiment", "comove", file).to_s, headers: true, header_converters: :symbol).to_a.map(&:to_hash)
       combined_data = baseline_csv.zip(data)
 
       # grave_count = data.count
@@ -97,7 +97,7 @@ namespace :analyze do
 
   def get_error(combined_data)
     combined_data.map do |base, user|
-      if user[:length_m] == '#DIV/0!' || user[:width_m] == '#DIV/0!' || user[:depth_m] == '#DIV/0!'
+      if user[:length_m] == "#DIV/0!" || user[:width_m] == "#DIV/0!" || user[:depth_m] == "#DIV/0!"
         nil
       else
         difference = [
@@ -111,7 +111,7 @@ namespace :analyze do
   end
 
   task baseline: :environment do
-    processsed_graves = Grave.where('id <= 197')
+    processsed_graves = Grave.where("id <= 197")
     grave_data = processsed_graves.map do |grave|
       {
         id: grave.id,
@@ -124,7 +124,7 @@ namespace :analyze do
       }
     end
 
-    CSV.open('baseline.csv', 'wb') do |csv|
+    CSV.open("baseline.csv", "wb") do |csv|
       csv << grave_data.first.keys
       grave_data.each do |grave|
         csv << CSV::Row.new(grave.keys, grave.values)
@@ -133,14 +133,14 @@ namespace :analyze do
   end
 
   task experiment: :environment do
-    Dir['supplementary/dfg*'].each_with_index do |folder, index|
-      folder1 = File.join(folder, 'development.sqlite3')
-      if File.exists?(folder1)
+    Dir["supplementary/dfg*"].each_with_index do |folder, index|
+      folder1 = File.join(folder, "development.sqlite3")
+      if File.exist?(folder1)
         analyze_db("#{index}_0", folder1)
       end
 
-      folder2 = File.join(folder, 'development1.sqlite3')
-      if File.exists?(folder2)
+      folder2 = File.join(folder, "development1.sqlite3")
+      if File.exist?(folder2)
         analyze_db("#{index}_1", folder2)
       end
     end

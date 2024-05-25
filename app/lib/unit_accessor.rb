@@ -5,13 +5,13 @@ module UnitAccessor
 
   module ClassMethods
     def with_unit(name, square: false)
-      define_method("#{name}_with_unit") do
+      define_method(:"#{name}_with_unit") do
         if scale.present? && scale.meter_ratio&.positive?
           ratio = scale.meter_ratio
           ratio = scale.meter_ratio**2 if square
-          return { value: 0, unit: 'px' } if send(name).nil?
-          return { value: send(name), unit: 'px' } if ratio.nil?
-          { value: send(name) * ratio, unit: value_unit(square) }
+          return {value: 0, unit: "px"} if send(name).nil?
+          return {value: send(name), unit: "px"} if ratio.nil?
+          {value: send(name) * ratio, unit: value_unit(square)}
         elsif percentage_scale.present? || (self.class.method_defined?(:grave) && grave.percentage_scale.present?)
           value = send(name)
           if self.class.method_defined?(:grave)
@@ -24,11 +24,11 @@ module UnitAccessor
 
           ratio = real_cm_per_pixel
           ratio = real_cm_per_pixel**2 if square
-          return { value: 0, unit: 'px' } if send(name).nil?
-          return { value: send(name), unit: 'px' } if real_cm_per_pixel.nil?
-          { value: send(name) * ratio, unit: value_unit(square) }
+          return {value: 0, unit: "px"} if send(name).nil?
+          return {value: send(name), unit: "px"} if real_cm_per_pixel.nil?
+          {value: send(name) * ratio, unit: value_unit(square)}
         else
-          { value: send(name), unit: 'px' }
+          {value: send(name), unit: "px"}
         end
       end
     end
@@ -36,9 +36,9 @@ module UnitAccessor
 
   def value_unit(square)
     if square
-      '&#13217;'
+      "&#13217;"
     else
-      'm'
+      "m"
     end
   end
 end

@@ -1,0 +1,4 @@
+<%= simple_form_for(:login, html: { class: 'form-signin' }) do |f| %>
+  <%= f.input :email, label: false, placeholder: 'E-mail' %>
+  <%= f.submit('Login', class: 'btn btn-block btn-success mt-3') %>
+<% end %>

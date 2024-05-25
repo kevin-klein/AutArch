@@ -1,6 +1,6 @@
-require_relative 'boot'
+require_relative "boot"
 
-require 'rails/all'
+require "rails/all"
 
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
@@ -21,12 +21,12 @@ module Dfgrb
   end
 end
 
-require 'pycall/import'
+require "pycall/import"
 include PyCall::Import
 
-pyimport 'numpy', as: :np
-pyimport 'scipy'
-pyfrom 'sklearn.decomposition', import: :PCA
-pyfrom 'sklearn.preprocessing', import: :StandardScaler
+pyimport "numpy", as: :np
+pyimport "scipy"
+pyfrom "sklearn.decomposition", import: :PCA
+pyfrom "sklearn.preprocessing", import: :StandardScaler
 
 # pyfrom 'scipy.cluster.hierarchy', import: [:dendrogram, :linkage]

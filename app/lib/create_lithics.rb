@@ -5,7 +5,7 @@ class CreateLithics
     pages.each do |page|
       figures = FigureMapConverter.convert_figures(page.figures)
 
-      lithic_figures = figures['StoneTool']
+      lithic_figures = figures["StoneTool"]
       lithic_figures&.each do |lithic|
         next if lithic.probability < 0.3
 
@@ -17,7 +17,7 @@ class CreateLithics
   def handle_lithic(lithic, figures)
     figures = convert_figures(figures) unless figures.is_a?(Hash)
 
-    find_closest_item(lithic, figures['Scale']) do |closest_scale|
+    find_closest_item(lithic, figures["Scale"]) do |closest_scale|
       assign_lithic_or_copy(closest_scale, lithic)
     end
 

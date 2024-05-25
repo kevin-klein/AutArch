@@ -7,7 +7,8 @@ class BonesController < ApplicationController
   end
 
   # GET /bones/1 or /bones/1.json
-  def show; end
+  def show
+  end
 
   # GET /bones/new
   def new
@@ -15,7 +16,8 @@ class BonesController < ApplicationController
   end
 
   # GET /bones/1/edit
-  def edit; end
+  def edit
+  end
 
   # POST /bones or /bones.json
   def create
@@ -23,7 +25,7 @@ class BonesController < ApplicationController
 
     respond_to do |format|
       if @bone.save
-        format.html { redirect_to bone_url(@bone), notice: 'Bone was successfully created.' }
+        format.html { redirect_to bone_url(@bone), notice: "Bone was successfully created." }
         format.json { render :show, status: :created, location: @bone }
       else
         format.html { render :new, status: :unprocessable_entity }
@@ -36,7 +38,7 @@ class BonesController < ApplicationController
   def update
     respond_to do |format|
       if @bone.update(bone_params)
-        format.html { redirect_to bone_url(@bone), notice: 'Bone was successfully updated.' }
+        format.html { redirect_to bone_url(@bone), notice: "Bone was successfully updated." }
         format.json { render :show, status: :ok, location: @bone }
       else
         format.html { render :edit, status: :unprocessable_entity }
@@ -50,7 +52,7 @@ class BonesController < ApplicationController
     @bone.destroy
 
     respond_to do |format|
-      format.html { redirect_to bones_url, notice: 'Bone was successfully destroyed.' }
+      format.html { redirect_to bones_url, notice: "Bone was successfully destroyed." }
       format.json { head :no_content }
     end
   end

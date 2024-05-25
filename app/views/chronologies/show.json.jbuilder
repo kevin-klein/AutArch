@@ -1,1 +1,1 @@
-json.partial! 'chronologies/chronology', chronology: @chronology
+json.partial! "chronologies/chronology", chronology: @chronology

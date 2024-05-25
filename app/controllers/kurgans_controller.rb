@@ -7,7 +7,8 @@ class KurgansController < ApplicationController
   end
 
   # GET /kurgans/1 or /kurgans/1.json
-  def show; end
+  def show
+  end
 
   # GET /kurgans/new
   def new
@@ -15,7 +16,8 @@ class KurgansController < ApplicationController
   end
 
   # GET /kurgans/1/edit
-  def edit; end
+  def edit
+  end
 
   # POST /kurgans or /kurgans.json
   def create
@@ -23,7 +25,7 @@ class KurgansController < ApplicationController
 
     respond_to do |format|
       if @kurgan.save
-        format.html { redirect_to kurgan_url(@kurgan), notice: 'Kurgan was successfully created.' }
+        format.html { redirect_to kurgan_url(@kurgan), notice: "Kurgan was successfully created." }
         format.json { render :show, status: :created, location: @kurgan }
       else
         format.html { render :new, status: :unprocessable_entity }
@@ -36,7 +38,7 @@ class KurgansController < ApplicationController
   def update
     respond_to do |format|
       if @kurgan.update(kurgan_params)
-        format.html { redirect_to kurgan_url(@kurgan), notice: 'Kurgan was successfully updated.' }
+        format.html { redirect_to kurgan_url(@kurgan), notice: "Kurgan was successfully updated." }
         format.json { render :show, status: :ok, location: @kurgan }
       else
         format.html { render :edit, status: :unprocessable_entity }
@@ -50,7 +52,7 @@ class KurgansController < ApplicationController
     @kurgan.destroy
 
     respond_to do |format|
-      format.html { redirect_to kurgans_url, notice: 'Kurgan was successfully destroyed.' }
+      format.html { redirect_to kurgans_url, notice: "Kurgan was successfully destroyed." }
       format.json { head :no_content }
     end
   end

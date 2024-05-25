@@ -1,1 +1,1 @@
-json.array! @periods, partial: 'periods/period', as: :period
+json.array! @periods, partial: "periods/period", as: :period

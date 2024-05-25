@@ -1,1 +1,1 @@
-json.array! @publications, partial: 'publications/publication', as: :publication
+json.array! @publications, partial: "publications/publication", as: :publication

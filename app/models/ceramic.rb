@@ -31,6 +31,8 @@
 #  page_size           :integer
 #  manual_bounding_box :boolean          default(FALSE)
 #  bounding_box_angle  :integer
+#  bounding_box_height :float
+#  bounding_box_width  :float
 #  control_point_1_x   :integer
 #  control_point_1_y   :integer
 #  control_point_2_x   :integer
@@ -48,6 +50,7 @@
 #  anchor_point_4_x    :integer
 #  anchor_point_4_y    :integer
 #  probability         :float
+#  contour_info        :jsonb
 #
 class Ceramic < Figure
 end

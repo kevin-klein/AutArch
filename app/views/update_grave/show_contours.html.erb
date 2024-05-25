@@ -1,12 +1,18 @@
-<%= render('stepper') %>
+<%= render("stepper") %>
 
 <div class='row'>
   <div class='col-md-6'>
-    <%= render(FigureViewComponent.new(figures: @grave.figures, image: @grave.page.image, contours: true)) %>
+    <%= render(
+      FigureViewComponent.new(
+        figures: @grave.figures,
+        image: @grave.page.image,
+        contours: true
+      )
+    ) %>
   </div>
   <div class='col-md-6'>
     <%= simple_form_for(@grave, url: wizard_path) do |f| %>
-      <%= f.submit('Next', class: 'btn btn-primary') %>
+      <%= f.submit("Next", class: "btn btn-primary") %>
     <% end %>
   </div>
 </div>
