@@ -9,7 +9,8 @@ class PagesController < ApplicationController
   end
 
   # GET /pages/1 or /pages/1.json
-  def show; end
+  def show
+  end
 
   # GET /pages/new
   def new
@@ -17,7 +18,8 @@ class PagesController < ApplicationController
   end
 
   # GET /pages/1/edit
-  def edit; end
+  def edit
+  end
 
   # POST /pages or /pages.json
   def create
@@ -25,7 +27,7 @@ class PagesController < ApplicationController
 
     respond_to do |format|
       if @page.save
-        format.html { redirect_to page_url(@page), notice: 'Page was successfully created.' }
+        format.html { redirect_to page_url(@page), notice: "Page was successfully created." }
         format.json { render :show, status: :created, location: @page }
       else
         format.html { render :new, status: :unprocessable_entity }
@@ -40,7 +42,7 @@ class PagesController < ApplicationController
       Figure.update(params[:figures].keys, params[:figures].values).reject { |p| p.errors.empty? }
 
       if Figure.update(params[:figures].keys, params[:figures].values).reject { |p| p.errors.empty? }
-        format.html { redirect_to publication_page_path(@publication, @page), notice: 'Page was successfully updated.' }
+        format.html { redirect_to publication_page_path(@publication, @page), notice: "Page was successfully updated." }
         format.json { render :show, status: :ok, location: @page }
       else
         format.html { render :edit, status: :unprocessable_entity }
@@ -54,7 +56,7 @@ class PagesController < ApplicationController
     @page.destroy
 
     respond_to do |format|
-      format.html { redirect_to pages_url, notice: 'Page was successfully destroyed.' }
+      format.html { redirect_to pages_url, notice: "Page was successfully destroyed." }
       format.json { head :no_content }
     end
   end

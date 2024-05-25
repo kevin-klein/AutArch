@@ -35,7 +35,6 @@ module Upgma
 
   def build_tree(groups)
     groups.each do |pair|
-
     end
   end
 
@@ -51,14 +50,14 @@ module Upgma
       end
     end
 
-    { row: min_row, col: min_col }
+    {row: min_row, col: min_col}
   end
 
   def average_distance(cluster1, cluster2)
     cluster1.map do |item1|
       cluster2.map do |item2|
-        data1 = { x: item1[0], y: item1[1] }
-        data2 =  { x: item2[0], y: item2[1] }
+        data1 = {x: item1[0], y: item1[1]}
+        data2 = {x: item2[0], y: item2[1]}
         Distance.point_distance(data1, data2)
       end.sum
     end.sum / (cluster1.length * cluster2.length)

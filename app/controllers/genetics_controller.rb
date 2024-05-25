@@ -7,7 +7,8 @@ class GeneticsController < ApplicationController
   end
 
   # GET /genetics/1 or /genetics/1.json
-  def show; end
+  def show
+  end
 
   # GET /genetics/new
   def new
@@ -15,7 +16,8 @@ class GeneticsController < ApplicationController
   end
 
   # GET /genetics/1/edit
-  def edit; end
+  def edit
+  end
 
   # POST /genetics or /genetics.json
   def create
@@ -23,7 +25,7 @@ class GeneticsController < ApplicationController
 
     respond_to do |format|
       if @genetic.save
-        format.html { redirect_to genetic_url(@genetic), notice: 'Genetic was successfully created.' }
+        format.html { redirect_to genetic_url(@genetic), notice: "Genetic was successfully created." }
         format.json { render :show, status: :created, location: @genetic }
       else
         format.html { render :new, status: :unprocessable_entity }
@@ -36,7 +38,7 @@ class GeneticsController < ApplicationController
   def update
     respond_to do |format|
       if @genetic.update(genetic_params)
-        format.html { redirect_to genetic_url(@genetic), notice: 'Genetic was successfully updated.' }
+        format.html { redirect_to genetic_url(@genetic), notice: "Genetic was successfully updated." }
         format.json { render :show, status: :ok, location: @genetic }
       else
         format.html { render :edit, status: :unprocessable_entity }
@@ -50,7 +52,7 @@ class GeneticsController < ApplicationController
     @genetic.destroy
 
     respond_to do |format|
-      format.html { redirect_to genetics_url, notice: 'Genetic was successfully destroyed.' }
+      format.html { redirect_to genetics_url, notice: "Genetic was successfully destroyed." }
       format.json { head :no_content }
     end
   end

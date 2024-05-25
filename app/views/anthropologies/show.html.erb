@@ -3,7 +3,8 @@
 <%= render @anthropology %>
 
 <div>
-  <%= link_to "Edit this anthropology", edit_anthropology_path(@anthropology) %> |
+  <%= link_to "Edit this anthropology", edit_anthropology_path(@anthropology) %>
+  |
   <%= link_to "Back to anthropologies", anthropologies_path %>
 
   <%= button_to "Destroy this anthropology", @anthropology, method: :delete %>

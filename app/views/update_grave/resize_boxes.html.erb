@@ -1,13 +1,26 @@
-<%= render('stepper') %>
+<%= render("stepper") %>
 
 <div class="alert alert-primary" role="alert">
-  Resize all bounding boxes where necessary and make figures for (if possible) a cross section, north arrow, scale, skeletons.
+  Resize all bounding boxes where necessary and make figures for (if possible)
+  a cross section, north arrow, scale, skeletons.
 </div>
 
-<%= react_component('BoxResizer', props: {
-  image: @grave.page.image.as_json.merge(href: url_for(@grave.page.image.data)),
-  grave: @grave.as_json(methods: [:type], include: { figures: { methods: [:type]} }),
-  sites: Site.all,
-  page: @grave.page,
-  next_url: wizard_path
-}) %>
+<%= react_component(
+  "BoxResizer",
+  props: {
+    image:
+      @grave.page.image.as_json.merge(href: url_for(@grave.page.image.data)),
+    grave:
+      @grave.as_json(
+        methods: [:type],
+        include: {
+          figures: {
+            methods: [:type]
+          }
+        }
+      ),
+    sites: Site.all,
+    page: @grave.page,
+    next_url: wizard_path
+  }
+) %>

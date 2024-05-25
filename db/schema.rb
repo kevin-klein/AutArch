@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_03_18_121818) do
+ActiveRecord::Schema[7.0].define(version: 2024_05_25_115930) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -225,6 +225,9 @@ ActiveRecord::Schema[7.0].define(version: 2024_03_18_121818) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "year"
+    t.bigint "user_id"
+    t.boolean "public", default: false, null: false
+    t.index ["user_id"], name: "index_publications_on_user_id"
   end
 
   create_table "sites", force: :cascade do |t|

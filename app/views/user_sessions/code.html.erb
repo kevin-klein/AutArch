@@ -1,0 +1,5 @@
+<%= simple_form_for(:login, url: login_code_path, html: { class: 'form-signin' }) do |f| %>
+  <%= f.input :code, label: false, placeholder: 'Login Code' %>
+  <%= f.input :user_id, as: :hidden, input_html: { value: @user.id } %>
+  <%= f.submit('Send', class: 'btn btn-block btn-success mt-3') %>
+<% end %>

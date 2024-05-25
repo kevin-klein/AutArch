@@ -1,38 +1,58 @@
 <%= simple_form_for(@skeleton, wrapper: :left_right_form) do |f| %>
 
-    <h4>Chronology</h4>
-    <%= f.simple_fields_for :chronology do |ff| %>
-        <%= ff.association :period %>
-        <%= ff.input :context_from %>
-        <%= ff.input :context_to %>
-    <% end %>
+  <h4>Chronology</h4>
+  <%= f.simple_fields_for :chronology do |ff| %>
+    <%= ff.association :period %>
+    <%= ff.input :context_from %>
+    <%= ff.input :context_to %>
+  <% end %>
 
-    <hr>
+  <hr>
 
-    <h4>Taxonomy</h4>
-    <%= f.simple_fields_for :taxonomy do |ff| %>
-        <%= ff.association :culture %>
-        <%= ff.input :culture_reference %>
-        <%= ff.input :culture_note %>
-    <% end %>
+  <h4>Taxonomy</h4>
+  <%= f.simple_fields_for :taxonomy do |ff| %>
+    <%= ff.association :culture %>
+    <%= ff.input :culture_reference %>
+    <%= ff.input :culture_note %>
+  <% end %>
 
-    <hr>
+  <hr>
 
-    <h4>Anthropology</h4>
-    <%= f.simple_fields_for :anthropology do |ff| %>
-        <%= ff.input :sex_morph, wrapper: :left_right_select, collection: Anthropology.sex_morphs.keys, default: :no_data, selected: @skeleton.anthropology.sex_morph %>
-        <%= ff.input :sex_gen, wrapper: :left_right_select, collection: Anthropology.sex_gens.keys, default: :no_data, selected: @skeleton.anthropology.sex_gen %>
-        <%= ff.input :sex_consensus, wrapper: :left_right_select, collection: Anthropology.sex_consensus.keys, default: :no_data, selected: @skeleton.anthropology.sex_consensus %>
-        <%= ff.input :age_as_reported %>
-        <%= ff.input :age_class, wrapper: :left_right_select, collection: Anthropology.age_classes.keys, default: :no_data, selected: @skeleton.anthropology.age_class %>
-        <%= ff.input :height %>
-        <%= ff.input :pathologies, wrapper: :left_right_select, collection: Anthropology.pathologies.keys, default: :no_data, selected: @skeleton.anthropology.pathologies %>
-        <%= ff.input :pathologies_type %>
-    <% end %>
+  <h4>Anthropology</h4>
+  <%= f.simple_fields_for :anthropology do |ff| %>
+    <%= ff.input :sex_morph,
+             wrapper: :left_right_select,
+             collection: Anthropology.sex_morphs.keys,
+             default: :no_data,
+             selected: @skeleton.anthropology.sex_morph %>
+    <%= ff.input :sex_gen,
+             wrapper: :left_right_select,
+             collection: Anthropology.sex_gens.keys,
+             default: :no_data,
+             selected: @skeleton.anthropology.sex_gen %>
+    <%= ff.input :sex_consensus,
+             wrapper: :left_right_select,
+             collection: Anthropology.sex_consensus.keys,
+             default: :no_data,
+             selected: @skeleton.anthropology.sex_consensus %>
+    <%= ff.input :age_as_reported %>
+    <%= ff.input :age_class,
+             wrapper: :left_right_select,
+             collection: Anthropology.age_classes.keys,
+             default: :no_data,
+             selected: @skeleton.anthropology.age_class %>
+    <%= ff.input :height %>
+    <%= ff.input :pathologies,
+             wrapper: :left_right_select,
+             collection: Anthropology.pathologies.keys,
+             default: :no_data,
+             selected: @skeleton.anthropology.pathologies %>
+    <%= ff.input :pathologies_type %>
+  <% end %>
 
-    <div>
-        <%= link_to('Stable Isotopes', skeleton_stable_isotopes_path(@skeleton)) %>
-    </div>
+  <div>
+    <%= link_to("Stable Isotopes", skeleton_stable_isotopes_path(@skeleton)) %>
+  </div>
 
-    <%= f.submit class: 'btn btn-primary' %>
+  <%= f.submit class: "btn btn-primary" %>
 <% end %>

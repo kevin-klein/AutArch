@@ -1,1 +1,1 @@
-json.partial! 'bones/bone', bone: @bone
+json.partial! "bones/bone", bone: @bone

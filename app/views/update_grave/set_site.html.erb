@@ -1,6 +1,6 @@
-<%= render('stepper') %>
+<%= render("stepper") %>
 
 <%= simple_form_for(@grave, url: wizard_path) do |f| %>
   <%= f.input :site_id, collection: Site.order(:name).pluck(:name, :id) %>
-  <%= f.submit('Next', class: 'btn btn-primary') %>
+  <%= f.submit("Next", class: "btn btn-primary") %>
 <% end %>

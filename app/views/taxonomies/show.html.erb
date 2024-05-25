@@ -3,7 +3,8 @@
 <%= render @taxonomy %>
 
 <div>
-  <%= link_to "Edit this taxonomy", edit_taxonomy_path(@taxonomy) %> |
+  <%= link_to "Edit this taxonomy", edit_taxonomy_path(@taxonomy) %>
+  |
   <%= link_to "Back to taxonomies", taxonomies_path %>
 
   <%= button_to "Destroy this taxonomy", @taxonomy, method: :delete %>

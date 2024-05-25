@@ -22,14 +22,14 @@ module Charts
     def draw_helpers
       (0..360).step(30).each do |angle|
         @svg.line(x1: @center, x2: @center, y1: 0, y2: 2 * @radius,
-                  transform: "rotate(#{angle} #{@center} #{@center})", stroke: @grey_stroke, stroke_width: 1)
+          transform: "rotate(#{angle} #{@center} #{@center})", stroke: @grey_stroke, stroke_width: 1)
       end
       draw_helpers_text
     end
 
     def draw_circles
       (0.4..1.0).step(0.2).each do |factor|
-        @svg.circle cx: @center, cy: @center, r: @radius * factor, stroke: @grey_stroke, stroke_width: 1, fill: 'none'
+        @svg.circle cx: @center, cy: @center, r: @radius * factor, stroke: @grey_stroke, stroke_width: 1, fill: "none"
       end
     end
 

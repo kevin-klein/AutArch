@@ -1,1 +1,1 @@
-json.partial! 'page_images/page_image', page_image: @page_image
+json.partial! "page_images/page_image", page_image: @page_image

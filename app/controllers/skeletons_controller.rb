@@ -15,7 +15,7 @@ class SkeletonsController < ApplicationController
       @skeleton = Skeleton.find(params[:id])
 
       if @skeleton.update(skeleton_params)
-        format.html { redirect_to edit_skeleton_path(@skeleton), notice: 'Stable isotope was successfully updated.' }
+        format.html { redirect_to edit_skeleton_path(@skeleton), notice: "Stable isotope was successfully updated." }
       else
         format.html { render :edit, status: :unprocessable_entity }
       end

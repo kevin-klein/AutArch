@@ -1,7 +1,7 @@
 class GraveSize
   def run(figures = nil)
     Figure.transaction do
-      figures ||= Figure.includes({ page: :image })
+      figures ||= Figure.includes({page: :image})
       figures.each do |figure|
         next if figure.is_a?(Spine)
 
@@ -27,7 +27,7 @@ class GraveSize
       figure.save!
     else
       image = ImageProcessing.extractFigure(figure, figure.page.image.data.download)
-      contours = ImageProcessing.findContours(image, 'tree')
+      contours = ImageProcessing.findContours(image, "tree")
       contour = contours.max_by { ImageProcessing.contourArea _1 }
       rect = ImageProcessing.boundingRect(contour)
 
@@ -63,12 +63,12 @@ class GraveSize
   def manual_stats(figure, image)
     contour = figure.manual_contour
     if contour.nil? || contour.empty?
-      { contour: [], perimeter: 0, area: 0, width: 0, height: 0, angle: 0 }
+      {contour: [], perimeter: 0, area: 0, width: 0, height: 0, angle: 0}
     else
       arc = ImageProcessing.arcLength(contour)
       area = ImageProcessing.contourArea(contour)
       rect = ImageProcessing.minAreaRect(contour)
-      { contour: contour, perimeter: arc, area: area, width: rect[:width], height: rect[:height], angle: rect[:angle] }
+      {contour: contour, perimeter: arc, area: area, width: rect[:width], height: rect[:height], angle: rect[:angle]}
     end
   end
 
@@ -76,15 +76,15 @@ class GraveSize
     image = ImageProcessing.extractFigure(figure, image)
     # image = ImageProcessing.dilate(image, [5, 5])
     # image = ImageProcessing.erode(image, [19, 19])
-    contours = ImageProcessing.findContours(image, 'tree')
+    contours = ImageProcessing.findContours(image, "tree")
     contour = contours.max_by { ImageProcessing.contourArea _1 }
     if contour.nil? || contour.empty?
-      { contour: [], perimeter: 0, area: 0, width: 0, height: 0, angle: 0 }
+      {contour: [], perimeter: 0, area: 0, width: 0, height: 0, angle: 0}
     else
       arc = ImageProcessing.arcLength(contour)
       area = ImageProcessing.contourArea(contour)
       rect = ImageProcessing.minAreaRect(contour)
-      { contour: contour, perimeter: arc, area: area, width: rect[:width], height: rect[:height], angle: rect[:angle] }
+      {contour: contour, perimeter: arc, area: area, width: rect[:width], height: rect[:height], angle: rect[:angle]}
     end
   end
 end

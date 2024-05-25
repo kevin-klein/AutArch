@@ -1,1 +1,1 @@
-json.array! @anthropologies, partial: 'anthropologies/anthropology', as: :anthropology
+json.array! @anthropologies, partial: "anthropologies/anthropology", as: :anthropology

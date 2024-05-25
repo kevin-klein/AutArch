@@ -1,1 +1,1 @@
-json.partial! 'figures/figure', figure: @figure
+json.partial! "figures/figure", figure: @figure

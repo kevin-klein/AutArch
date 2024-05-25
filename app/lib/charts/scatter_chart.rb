@@ -1,6 +1,6 @@
 module Charts
   class ScatterChart < Chart
-    def initialize(data, x_legend: '', y_legend: '', padding: 50, height: 400, width: 1200, link_proc: Proc.new {}, **kwargs) # rubocop:disable Metrics/ParameterLists
+    def initialize(data, x_legend: "", y_legend: "", padding: 50, height: 400, width: 1200, link_proc: proc {}, **kwargs) # rubocop:disable Metrics/ParameterLists
       super(width: width, height: height, padding: padding, **kwargs)
       @data = data
       @axis_marker_height = 5
@@ -19,27 +19,27 @@ module Charts
 
     private
 
-    def render_standard_series(series, color: 'red')
+    def render_standard_series(series, color: "red")
       series[:data].each do |item|
         render_item(item, color) unless item[:mark]
       end
     end
 
-    def render_marked_series(series, color: 'red')
+    def render_marked_series(series, color: "red")
       series[:data].each do |item|
         render_marked_item(item, color) if item[:mark]
       end
     end
 
-    def render_item(item, color, stroke: 'black')
-      @svg.circle onclick: "window.location='#{@link_proc.call(item)}'", class: 'point', r: 4, fill: color,
-                  cx: x_coordinate(item[:x]), cy: y_coordinate(item[:y]), stroke: stroke do
+    def render_item(item, color, stroke: "black")
+      @svg.circle onclick: "window.location='#{@link_proc.call(item)}'", class: "point", r: 4, fill: color,
+        cx: x_coordinate(item[:x]), cy: y_coordinate(item[:y]), stroke: stroke do
         @svg.title item[:title]
       end
     end
 
     def render_marked_item(item, color)
-      render_item(item, color, stroke: 'black')
+      render_item(item, color, stroke: "black")
       @svg.text item[:title], x: x_coordinate(item[:x]) + 5, y: y_coordinate(item[:y])
     end
 
@@ -65,7 +65,7 @@ module Charts
     def draw_x_y_axis
       @svg.line(x1: @padding, y1: 0, x2: @padding, y2: @height, stroke: @grey_stroke, stroke_width: 1)
       @svg.line(y1: @height - @padding, x1: 0, y2: @height - @padding, x2: @width, stroke: @grey_stroke,
-                stroke_width: 1)
+        stroke_width: 1)
       draw_x_axis_text
       draw_y_axis_text
       draw_axis_legend
@@ -81,10 +81,10 @@ module Charts
       if step == 0
         step = 1
       end
-      ((@min_x.to_i+1)..(@max_x.to_i)).step(step).each do |x_value|
+      ((@min_x.to_i + 1)..(@max_x.to_i)).step(step).each do |x_value|
         @svg.line(x1: x_coordinate(x_value), y1: (@height - @padding) - @axis_marker_height, x2: x_coordinate(x_value),
-                  y2: (@height - @padding) + @axis_marker_height, stroke: @grey_stroke,
-                  stroke_width: 1)
+          y2: (@height - @padding) + @axis_marker_height, stroke: @grey_stroke,
+          stroke_width: 1)
         @svg.text x_value.round(1), x: x_coordinate(x_value) - 10, y: @height - @padding + 20
       end
     end
@@ -94,11 +94,11 @@ module Charts
       if step == 0
         step = 1
       end
-      ((@min_y.to_i+1)..(@max_y.to_i)).step(step).each do |y_value|
+      ((@min_y.to_i + 1)..(@max_y.to_i)).step(step).each do |y_value|
         @svg.line(y1: y_coordinate(y_value), x1: @padding - @axis_marker_height, y2: y_coordinate(y_value),
-                  x2: @padding + @axis_marker_height,
-                  stroke: @grey_stroke,
-                  stroke_width: 1)
+          x2: @padding + @axis_marker_height,
+          stroke: @grey_stroke,
+          stroke_width: 1)
         @svg.text y_value.round(1), y: y_coordinate(y_value) + 5, x: @padding - 20
       end
     end

@@ -7,7 +7,8 @@ class StableIsotopesController < ApplicationController
   end
 
   # GET /stable_isotopes/1 or /stable_isotopes/1.json
-  def show; end
+  def show
+  end
 
   # GET /stable_isotopes/new
   def new
@@ -15,7 +16,8 @@ class StableIsotopesController < ApplicationController
   end
 
   # GET /stable_isotopes/1/edit
-  def edit; end
+  def edit
+  end
 
   # POST /stable_isotopes or /stable_isotopes.json
   def create
@@ -24,7 +26,7 @@ class StableIsotopesController < ApplicationController
     respond_to do |format|
       if @stable_isotope.save
         format.html do
-          redirect_to stable_isotope_url(@stable_isotope), notice: 'Stable isotope was successfully created.'
+          redirect_to stable_isotope_url(@stable_isotope), notice: "Stable isotope was successfully created."
         end
         format.json { render :show, status: :created, location: @stable_isotope }
       else
@@ -39,7 +41,7 @@ class StableIsotopesController < ApplicationController
     respond_to do |format|
       if @stable_isotope.update(stable_isotope_params)
         format.html do
-          redirect_to stable_isotope_url(@stable_isotope), notice: 'Stable isotope was successfully updated.'
+          redirect_to stable_isotope_url(@stable_isotope), notice: "Stable isotope was successfully updated."
         end
         format.json { render :show, status: :ok, location: @stable_isotope }
       else
@@ -54,7 +56,7 @@ class StableIsotopesController < ApplicationController
     @stable_isotope.destroy
 
     respond_to do |format|
-      format.html { redirect_to stable_isotopes_url, notice: 'Stable isotope was successfully destroyed.' }
+      format.html { redirect_to stable_isotopes_url, notice: "Stable isotope was successfully destroyed." }
       format.json { head :no_content }
     end
   end
@@ -69,6 +71,6 @@ class StableIsotopesController < ApplicationController
   # Only allow a list of trusted parameters through.
   def stable_isotope_params
     params.require(:stable_isotope).permit(:skeleton_id, :iso_id, :iso_bone, :iso_value, :ref_iso, :isotope,
-                                           :baseline)
+      :baseline)
   end
 end

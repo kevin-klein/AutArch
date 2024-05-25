@@ -1,1 +1,1 @@
-json.partial! 'anthropologies/anthropology', anthropology: @anthropology
+json.partial! "anthropologies/anthropology", anthropology: @anthropology

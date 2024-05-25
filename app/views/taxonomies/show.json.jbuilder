@@ -1,1 +1,1 @@
-json.partial! 'taxonomies/taxonomy', taxonomy: @taxonomy
+json.partial! "taxonomies/taxonomy", taxonomy: @taxonomy

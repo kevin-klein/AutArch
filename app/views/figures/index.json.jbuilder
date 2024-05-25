@@ -1,1 +1,1 @@
-json.array! @figures, partial: 'figures/figure', as: :figure
+json.array! @figures, partial: "figures/figure", as: :figure
