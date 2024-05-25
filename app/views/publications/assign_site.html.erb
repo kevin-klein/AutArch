@@ -1,4 +1,4 @@
 <%= simple_form_for(:site, url: update_site_publication_path(@publication)) do |f| %>
   <%= f.input :site_id, collection: Site.order(:name).pluck(:name, :id) %>
-  <%= f.submit 'Save', class: 'btn btn-success' %>
+  <%= f.submit "Save", class: "btn btn-success" %>
 <% end %>

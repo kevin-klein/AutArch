@@ -31,6 +31,8 @@
 #  page_size           :integer
 #  manual_bounding_box :boolean          default(FALSE)
 #  bounding_box_angle  :integer
+#  bounding_box_height :float
+#  bounding_box_width  :float
 #  control_point_1_x   :integer
 #  control_point_1_y   :integer
 #  control_point_2_x   :integer
@@ -48,6 +50,7 @@
 #  anchor_point_4_x    :integer
 #  anchor_point_4_y    :integer
 #  probability         :float
+#  contour_info        :jsonb
 #
 class Figure < ApplicationRecord
   belongs_to :page, dependent: :destroy
@@ -174,8 +177,8 @@ class Figure < ApplicationRecord
 
   def distance_to(figure)
     Distance.point_distance(
-      { x: center.x, y: center.y },
-      { x: figure.center.x, y: figure.center.y }
+      {x: center.x, y: center.y},
+      {x: figure.center.x, y: figure.center.y}
     )
   end
 
@@ -221,13 +224,13 @@ class Figure < ApplicationRecord
     rotated_contour += [rotated_contour[0]]
 
     ratio = if scale&.meter_ratio.present?
-              scale.meter_ratio
-            elsif percentage_scale.present?
-              cm_on_page = page_size.to_f / page.image.width
-              (cm_on_page / 100.0) * percentage_scale
-            else
-              raise
-            end
+      scale.meter_ratio
+    elsif percentage_scale.present?
+      cm_on_page = page_size.to_f / page.image.width
+      (cm_on_page / 100.0) * percentage_scale
+    else
+      raise
+    end
 
     center_x *= ratio
     center_y *= ratio

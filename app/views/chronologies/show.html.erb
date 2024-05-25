@@ -3,7 +3,8 @@
 <%= render @chronology %>
 
 <div>
-  <%= link_to "Edit this chronology", edit_chronology_path(@chronology) %> |
+  <%= link_to "Edit this chronology", edit_chronology_path(@chronology) %>
+  |
   <%= link_to "Back to chronologies", chronologies_path %>
 
   <%= button_to "Destroy this chronology", @chronology, method: :delete %>

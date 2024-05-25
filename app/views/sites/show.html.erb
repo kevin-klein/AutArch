@@ -12,13 +12,14 @@
     <div class="card map-overlay" style="width: 18rem;">
       <div class="card-body">
         <h5 class="card-title"><%= @site.name %></h5>
-        <h6 class="card-subtitle mb-2 text-muted">(<%= @site.lat %>, <%= @site.lon %>)</h6>
+        <h6 class="card-subtitle mb-2 text-muted">(<%= @site.lat %>,
+          <%= @site.lon %>)</h6>
         <p class="card-text">
           <table class='table'>
             <thead>
               <tr>
                 <th>ID</th>
-              <tr>
+              </tr>
             </thead>
 
             <tbody>
@@ -38,7 +39,6 @@
   </div>
 </div>
 
-
 <script type="text/javascript">
   var siteData = <%= raw @sites.to_json %>;
 
@@ -46,7 +46,8 @@
 
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
-    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    attribution: '&copy;
+  <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
   }).addTo(map);
 
   const site = <%= raw @site.to_json %>;
@@ -54,4 +55,3 @@
   var marker = L.marker([site.lat, site.lon]).addTo(map);
   marker.bindPopup(`<a href="/sites/${site.id}">${site.name}</a>`).openPopup();
 </script>
-

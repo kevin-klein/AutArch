@@ -31,6 +31,8 @@
 #  page_size           :integer
 #  manual_bounding_box :boolean          default(FALSE)
 #  bounding_box_angle  :integer
+#  bounding_box_height :float
+#  bounding_box_width  :float
 #  control_point_1_x   :integer
 #  control_point_1_y   :integer
 #  control_point_2_x   :integer
@@ -48,24 +50,25 @@
 #  anchor_point_4_x    :integer
 #  anchor_point_4_y    :integer
 #  probability         :float
+#  contour_info        :jsonb
 #
 class Grave < Figure
   belongs_to :site, optional: true
-  has_one :scale, dependent: :destroy, foreign_key: 'parent_id', class_name: 'Scale', inverse_of: :grave
-  has_one :arrow, dependent: :destroy, foreign_key: 'parent_id', class_name: 'Arrow', inverse_of: :grave
-  has_one :grave_cross_section, dependent: :destroy, foreign_key: 'parent_id', class_name: 'GraveCrossSection',
-                                inverse_of: :grave
-  has_many :goods, dependent: :destroy, foreign_key: 'parent_id', class_name: 'Good', inverse_of: :grave
-  has_many :spines, dependent: :destroy, foreign_key: 'parent_id', class_name: 'Spine', inverse_of: :grave
-  has_one :cross_section_arrow, dependent: :destroy, foreign_key: 'parent_id', class_name: 'CrossSectionArrow',
-                                inverse_of: :grave
-  has_many :skeleton_figures, dependent: :destroy, foreign_key: 'parent_id', class_name: 'SkeletonFigure',
-                              inverse_of: :grave
-  has_many :skulls, through: :skeleton_figures, foreign_key: 'parent_id', class_name: 'Skull', inverse_of: :grave
-  has_many :spines, dependent: :destroy, foreign_key: 'parent_id', class_name: 'Spine', inverse_of: :grave
+  has_one :scale, dependent: :destroy, foreign_key: "parent_id", class_name: "Scale", inverse_of: :grave
+  has_one :arrow, dependent: :destroy, foreign_key: "parent_id", class_name: "Arrow", inverse_of: :grave
+  has_one :grave_cross_section, dependent: :destroy, foreign_key: "parent_id", class_name: "GraveCrossSection",
+    inverse_of: :grave
+  has_many :goods, dependent: :destroy, foreign_key: "parent_id", class_name: "Good", inverse_of: :grave
+  has_many :spines, dependent: :destroy, foreign_key: "parent_id", class_name: "Spine", inverse_of: :grave
+  has_one :cross_section_arrow, dependent: :destroy, foreign_key: "parent_id", class_name: "CrossSectionArrow",
+    inverse_of: :grave
+  has_many :skeleton_figures, dependent: :destroy, foreign_key: "parent_id", class_name: "SkeletonFigure",
+    inverse_of: :grave
+  has_many :skulls, through: :skeleton_figures, foreign_key: "parent_id", class_name: "Skull", inverse_of: :grave
+  has_many :spines, dependent: :destroy, foreign_key: "parent_id", class_name: "Spine", inverse_of: :grave
 
   accepts_nested_attributes_for :skeleton_figures
-  validates :identifier, uniqueness: { scope: :publication }, allow_blank: true
+  validates :identifier, uniqueness: {scope: :publication}, allow_blank: true
 
   def upwards?
     width < height
@@ -137,7 +140,7 @@ class Grave < Figure
   def self.area_arc_stats
     Grave
       .all
-      .filter { _1.area_with_unit[:unit] == 'm' }
+      .filter { _1.area_with_unit[:unit] == "m" }
       .filter { _1.area_with_unit[:value].round(1).positive? }
       .group_by { _1.area_with_unit[:value].round(1) }
       .map { |k, v| [k, v.count] }

@@ -3,7 +3,8 @@
 <%= render @figure %>
 
 <div>
-  <%= link_to "Edit this figure", edit_figure_path(@figure) %> |
+  <%= link_to "Edit this figure", edit_figure_path(@figure) %>
+  |
   <%= link_to "Back to figures", figures_path %>
 
   <%= button_to "Destroy this figure", @figure, method: :delete %>

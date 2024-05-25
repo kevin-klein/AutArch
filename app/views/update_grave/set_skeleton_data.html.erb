@@ -1,17 +1,25 @@
-<%= render('stepper') %>
+<%= render("stepper") %>
 
 <div class='row'>
   <div class='col-md-6'>
-    <%= render(FigureViewComponent.new(figures: @grave.figures, image: @grave.page.image)) %>
+    <%= render(
+      FigureViewComponent.new(figures: @grave.figures, image: @grave.page.image)
+    ) %>
   </div>
   <div class='col-md-6'>
     <%= simple_form_for(@grave, url: wizard_path) do |f| %>
       <%= f.simple_fields_for :skeleton_figures do |ff| %>
         <h4><%= "Skeleton #{ff.object.id.to_s}" %></h4>
-        <%= ff.input :deposition_type, collection: [['unknown', 'unknown'], ["supine", 'back'], ["flexed on one side", 'side']], selected: ff.object.deposition_type %>
+        <%= ff.input :deposition_type,
+                 collection: [
+                   %w[unknown unknown],
+                   %w[supine back],
+                   ["flexed on one side", "side"]
+                 ],
+                 selected: ff.object.deposition_type %>
       <% end %>
 
-      <%= f.submit('Next', class: 'btn btn-primary') %>
+      <%= f.submit("Next", class: "btn btn-primary") %>
     <% end %>
   </div>
 </div>

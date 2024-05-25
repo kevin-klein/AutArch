@@ -43,5 +43,10 @@ Rails.application.routes.draw do # rubocop:disable Metrics/BlockLength
     # get :delete, on: :member
   end
 
-  root 'graves#root'
+  get "/login", to: "user_sessions#login"
+  get "/logout", to: "user_sessions#logout"
+  post "/login", to: "user_sessions#code"
+  post "/login_code", to: "user_sessions#login_code"
+
+  root "graves#root"
 end

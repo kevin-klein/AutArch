@@ -10,7 +10,7 @@
     <% @skeletons.each do |skeleton| %>
       <tr>
         <td><%= skeleton.id %></td>
-        <td><%= link_to('Edit', edit_skeleton_path(skeleton)) %></td>
+        <td><%= link_to("Edit", edit_skeleton_path(skeleton)) %></td>
       </tr>
     <% end %>
   </tbody>

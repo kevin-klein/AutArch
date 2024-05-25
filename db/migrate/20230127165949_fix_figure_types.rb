@@ -1,6 +1,6 @@
 class FixFigureTypes < ActiveRecord::Migration[7.0]
   class Figure < ApplicationRecord
-    self.inheritance_column = 'type_id'
+    self.inheritance_column = "type_id"
   end
 
   def up

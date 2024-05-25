@@ -1,1 +1,1 @@
-json.partial! 'periods/period', period: @period
+json.partial! "periods/period", period: @period

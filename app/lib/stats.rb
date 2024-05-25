@@ -1,22 +1,22 @@
 module Stats
   extend self
 
-  pyimport 'scipy'
-  pyimport 'numpy'
-  pyimport 'io'
-  pyimport 'base64'
-  pyfrom 'matplotlib', import: :pyplot
+  pyimport "scipy"
+  pyimport "numpy"
+  pyimport "io"
+  pyimport "base64"
+  pyfrom "matplotlib", import: :pyplot
 
   def upgma(data)
-    scipy.cluster.hierarchy.linkage(data, 'average')
+    scipy.cluster.hierarchy.linkage(data, "average")
   end
 
   def ward(data)
-    scipy.cluster.hierarchy.linkage(data, 'ward')
+    scipy.cluster.hierarchy.linkage(data, "ward")
   end
 
   def mannwhitneyu(x, y)
-    scipy.stats.mannwhitneyu(x, y, method: 'exact')
+    scipy.stats.mannwhitneyu(x, y, method: "exact")
   end
 
   def pca_chart(data)
@@ -36,64 +36,64 @@ module Stats
     data = data.flatten(1)
 
     my_stringIObytes = io.BytesIO.new
-    fig, ax = pyplot.subplots()
-    pyplot.scatter(data.map(&:first), data.map(&:second), c: clusters, cmap: 'hsv')
-    ax.set_aspect('equal')
+    fig, ax = pyplot.subplots
+    pyplot.scatter(data.map(&:first), data.map(&:second), c: clusters, cmap: "hsv")
+    ax.set_aspect("equal")
     pyplot.ylim(-50, 50)
-    pyplot.savefig(my_stringIObytes, format: 'jpg', dpi: 300)
+    pyplot.savefig(my_stringIObytes, format: "jpg", dpi: 300)
     my_stringIObytes.seek(0)
     base64.b64encode(my_stringIObytes.read)
   end
 
   def base_pca_chart(data)
     my_stringIObytes = io.BytesIO.new
-    fig, ax = pyplot.subplots()
+    fig, ax = pyplot.subplots
     pyplot.scatter(data.map(&:first), data.map(&:second), s: data.map { 0.3 })
-    ax.set_aspect('equal')
+    ax.set_aspect("equal")
     # pyplot.ylim(-50, 50)
-    pyplot.savefig(my_stringIObytes, format: 'jpg', dpi: 300)
+    pyplot.savefig(my_stringIObytes, format: "jpg", dpi: 300)
     my_stringIObytes.seek(0)
     base64.b64encode(my_stringIObytes.read)
   end
 
   def upgma_figure(linkage)
     fig = pyplot.figure(figsize: [25, 10])
-    dn = scipy.cluster.hierarchy.dendrogram(linkage, truncate_mode: 'lastp', p: 10, show_leaf_counts: true)
+    dn = scipy.cluster.hierarchy.dendrogram(linkage, truncate_mode: "lastp", p: 10, show_leaf_counts: true)
 
     my_stringIObytes = io.BytesIO.new
-    pyplot.savefig(my_stringIObytes, format: 'jpg')
+    pyplot.savefig(my_stringIObytes, format: "jpg")
     my_stringIObytes.seek(0)
     base64.b64encode(my_stringIObytes.read)
   end
 
   def cluster_scatter_chart(data, dendro)
     pyplot.figure(figsize: [10, 8])
-    clusters = scipy.cluster.hierarchy.fcluster(dendro, t: 10, criterion: 'maxclust')
+    clusters = scipy.cluster.hierarchy.fcluster(dendro, t: 10, criterion: "maxclust")
 
     pca = Pca.new
     pca.fit(data)
     data = pca.transform(data)
 
     my_stringIObytes = io.BytesIO.new
-    pyplot.scatter(data[0..-1, 0], data[0..-1, 1], c: clusters, cmap: 'hsv')
-    pyplot.savefig(my_stringIObytes, format: 'jpg', dpi: 300)
+    pyplot.scatter(data[0..-1, 0], data[0..-1, 1], c: clusters, cmap: "hsv")
+    pyplot.savefig(my_stringIObytes, format: "jpg", dpi: 300)
     my_stringIObytes.seek(0)
     base64.b64encode(my_stringIObytes.read)
   end
 
   def spine_angles(spines)
     spines.map { [_1, _1.grave&.arrow] }
-          .filter { |_spine, arrow| arrow.present? }
-          .map { |spine, arrow| spine.angle_with_arrow(arrow) }
-          .map { round_to_nearest(_1, 30) }
-          .tally
+      .filter { |_spine, arrow| arrow.present? }
+      .map { |spine, arrow| spine.angle_with_arrow(arrow) }
+      .map { round_to_nearest(_1, 30) }
+      .tally
   end
 
   def grave_angles(graves)
     graves.map { [_1, _1.arrow] }
-          .filter { |_grave, arrow| arrow&.angle.present? }
-          .map { |grave, arrow| (grave.angle + arrow.angle) % 180 }
-          .map(&:round)
+      .filter { |_grave, arrow| arrow&.angle.present? }
+      .map { |grave, arrow| (grave.angle + arrow.angle) % 180 }
+      .map(&:round)
   end
 
   def graves_pca(publications, special_objects: [], components: 2, excluded: [])
@@ -112,7 +112,7 @@ module Stats
     frequencies = contours.map { Efd.elliptic_fourier_descriptors(_1, normalize: false, order: 15).to_a.flatten }
     # max = (255.0 / frequencies.flatten.max)
     # .map { _1 * max }
-    frequencies = frequencies.map { |item| item.each_slice(2).map(&:last)  }
+    frequencies = frequencies.map { |item| item.each_slice(2).map(&:last) }
 
     [frequencies, graves]
   end
@@ -135,19 +135,19 @@ module Stats
       frequencies, graves = outlines_efd([publication])
       pca.transform(frequencies).to_a
 
-       #   .map do |pca_item|
-       #     convert_pca_item_to_polar(pca_item)
-       #   end
+      #   .map do |pca_item|
+      #     convert_pca_item_to_polar(pca_item)
+      #   end
 
-#          graves = data.zip(graves)
-#          data = graves.map do |item, grave|
-#            item[:mark] = true if special_objects.include?(grave.id)
-#            item.merge({ id: grave.id, title: grave.id })
-#          end
-#          {
-#            name: publication.short_description,
-#            data: data.map { _1.merge({ mark: false }) }
-#          }
+      #          graves = data.zip(graves)
+      #          data = graves.map do |item, grave|
+      #            item[:mark] = true if special_objects.include?(grave.id)
+      #            item.merge({ id: grave.id, title: grave.id })
+      #          end
+      #          {
+      #            name: publication.short_description,
+      #            data: data.map { _1.merge({ mark: false }) }
+      #          }
     end
 
     [pca_data, pca]
@@ -170,12 +170,12 @@ module Stats
       result
     else
       special = pcas.map { _1[:data] }.flatten.filter { marked.include?(_1[:id]) }
-      marked_series = { data: special }
+      marked_series = {data: special}
       mean = pca_mean(marked_series)
       marked_items_variance = series_variance(marked_series, mean)
 
       result + [{
-        name: 'marked items',
+        name: "marked items",
         variance: marked_items_variance
       }]
     end
@@ -183,7 +183,7 @@ module Stats
 
   def pca_mean(series)
     []
-    #series[:data].map { _1[:x] }.sum / series[:data].length
+    # series[:data].map { _1[:x] }.sum / series[:data].length
   end
 
   def series_variance(series, mean)
@@ -211,39 +211,37 @@ module Stats
     graves = grave_data.zip(graves)
     graves.map do |data, grave|
       data[:mark] = true if special_objects.include?(grave.id)
-      data.merge({ id: grave.id, title: grave.id })
+      data.merge({id: grave.id, title: grave.id})
     end
   end
 
   def convert_pca_item_to_polar(pca_item)
     case pca_item.length
     when 1
-      { x: pca_item[0] }
+      {x: pca_item[0]}
     when 2
-      { x: pca_item[0], y: pca_item[1] }
+      {x: pca_item[0], y: pca_item[1]}
     end
   end
 
   def filter_graves(graves, excluded: [])
     graves.filter do |grave|
-      (
-        !excluded.include?(grave.id) &&
-        #grave.grave_cross_section.normalized_depth_with_unit[:unit] == 'm' &&
-        grave.normalized_width_with_unit[:unit] == 'm' &&
-        grave.normalized_height_with_unit[:unit] == 'm' &&
-        grave.perimeter_with_unit[:unit] == 'm' &&
-        grave.area_with_unit[:unit] == '&#13217;' &&
+      !excluded.include?(grave.id) &&
+        # grave.grave_cross_section.normalized_depth_with_unit[:unit] == 'm' &&
+        grave.normalized_width_with_unit[:unit] == "m" &&
+        grave.normalized_height_with_unit[:unit] == "m" &&
+        grave.perimeter_with_unit[:unit] == "m" &&
+        grave.area_with_unit[:unit] == "&#13217;" &&
         grave.arrow.present?
-      )
     end
   end
 
   def fit_pca(pca, publications, excluded: [])
-    graves = publications.map do |publication|
+    graves = publications.flat_map do |publication|
       graves = publication.figures.filter { _1.is_a?(Grave) }
       graves = filter_graves(graves, excluded: excluded)
       convert_graves_to_size(graves)
-    end.flatten(1)
+    end
 
     pca.fit(graves)
   end

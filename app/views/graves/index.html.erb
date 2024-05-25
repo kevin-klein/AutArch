@@ -1,5 +1,13 @@
 <%= simple_form_for :search, url: graves_path, method: "GET", html: { class: 'form-inline' } do |f| %>
-  <%= f.input :publication_id, collection: Publication.order(:created_at).pluck(:author, :year, :id).map { |author, year, id| ["#{author} #{year}", id] }, input_html: {value: ""} %>
+  <%= f.input :publication_id,
+          collection:
+            Publication
+              .order(:created_at)
+              .pluck(:author, :year, :id)
+              .map { |author, year, id| ["#{author} #{year}", id] },
+          input_html: {
+            value: ""
+          } %>
   <%= f.submit "Search", class: "btn btn-primary" %>
 <% end %>
 
@@ -40,10 +48,11 @@
         <td><%= number_with_unit grave.grave_cross_section&.depth_with_unit %></td>
         <td>
           <% unless grave&.arrow&.angle.nil? %>
-            <%= ((grave.angle.abs.round + grave.arrow.angle) % 180).round  %> deg
+            <%= ((grave.angle.abs.round + grave.arrow.angle) % 180).round %>
+            deg
           <% end %>
         </td>
-        <td><%= link_to('Edit', grave_update_grave_path(grave, :set_grave_data)) %></td>
+        <td><%= link_to("Edit", grave_update_grave_path(grave, :set_grave_data)) %></td>
       </tr>
     <% end %>
   </tbody>

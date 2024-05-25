@@ -31,6 +31,8 @@
 #  page_size           :integer
 #  manual_bounding_box :boolean          default(FALSE)
 #  bounding_box_angle  :integer
+#  bounding_box_height :float
+#  bounding_box_width  :float
 #  control_point_1_x   :integer
 #  control_point_1_y   :integer
 #  control_point_2_x   :integer
@@ -48,9 +50,10 @@
 #  anchor_point_4_x    :integer
 #  anchor_point_4_y    :integer
 #  probability         :float
+#  contour_info        :jsonb
 #
 class StoneTool < Figure
-  belongs_to :grave, foreign_key: 'parent_id', optional: true, inverse_of: :spines
+  belongs_to :grave, foreign_key: "parent_id", optional: true, inverse_of: :spines
 
-  has_one :scale, dependent: :destroy, foreign_key: 'parent_id', class_name: 'Scale', inverse_of: :stone_tool
+  has_one :scale, dependent: :destroy, foreign_key: "parent_id", class_name: "Scale", inverse_of: :stone_tool
 end

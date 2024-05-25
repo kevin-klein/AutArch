@@ -1,4 +1,4 @@
-class MapsController < ApplicationController
+class MapsController < AuthorizedController
   def index
     @skeleton_angles = Site.includes(
       graves: [:spines, :arrow]

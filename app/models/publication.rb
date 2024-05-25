@@ -8,10 +8,12 @@
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #  year       :string
+#  user_id    :bigint
 #
 class Publication < ApplicationRecord
   has_many :pages, dependent: :destroy
   has_many :figures, through: :pages
+  belongs_to :user
 
   # attribute :site, :string
   has_one_attached :pdf

@@ -5,6 +5,6 @@ class LithicOutlinesComponent < ViewComponent::Base
     super
     @contours = contours
 
-    @color = "rgb(#{color.join(' ')})"
+    @color = "rgb(#{color.join(" ")})"
   end
 end

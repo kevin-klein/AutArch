@@ -5,7 +5,7 @@ class CreateGraves
     pages.each do |page|
       figures = FigureMapConverter.convert_figures(page.figures)
 
-      grave_figures = figures['Grave']
+      grave_figures = figures["Grave"]
       grave_figures&.each do |grave|
         next if grave.probability < 0.5
         handle_grave(grave, figures)
@@ -19,11 +19,11 @@ class CreateGraves
 
     inside_grave = non_grave_figures.select { |figure| grave.collides?(figure) }
 
-    find_closest_item(grave, figures['Scale']) do |closest_scale|
+    find_closest_item(grave, figures["Scale"]) do |closest_scale|
       assign_grave_or_copy(closest_scale, grave)
     end
 
-    find_closest_item(grave, figures['Arrow']) do |closest_arrow|
+    find_closest_item(grave, figures["Arrow"]) do |closest_arrow|
       assign_grave_or_copy(closest_arrow, grave)
     end
 
@@ -35,7 +35,7 @@ class CreateGraves
       assign_grave_or_copy(good, grave)
     end
 
-    find_closest_item(grave, figures['GraveCrossSection']) do |cross|
+    find_closest_item(grave, figures["GraveCrossSection"]) do |cross|
       assign_grave_or_copy(cross, grave)
     end
 

@@ -17,9 +17,15 @@ function Radar ({ angles }) {
 
       {Object.keys(angles).map(angle => {
         const count = angles[angle]
+        const intensity = (count / max)
+        const fill = `rgb(${intensity * 255} 0  ${(1 - intensity) * 255})`
 
-        return (<circle cx='50' cy='75' r={(count / max) * 8} key={angle} transform={`rotate(${angle} 50 50)`} />)
+        return (
+          <rect style={{ mixBlendMode: 'plus-darker' }} fill={fill} x='30' y='60' width='18' rx={5} height='30' key={angle} transform={`rotate(${angle} 50 50)`} />
+        )
       })}
+
+      <circle cx='50' cy='50' r='40' stroke='#FFFFFFDD' stroke-width='7' fill='none' />
     </svg>
   )
 }
@@ -37,7 +43,7 @@ export default function EuropeMap ({ orientations }) {
         }}
         position={[orientation.site.lat, orientation.site.lon]}
       >
-        <div style={{ backgroundColor: '#FFFFFFCC' }}>
+        <div>
 
           <Radar
             angles={orientation.angles}

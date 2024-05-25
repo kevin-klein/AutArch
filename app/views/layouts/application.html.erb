@@ -3,7 +3,7 @@
   <head>
     <title>Dfgrb</title>
     <meta charset="utf-8">
-    <meta name="viewport" content="initial-scale=1, width=device-width" />
+    <meta name="viewport" content="initial-scale=1, width=device-width"/>
     <title>Bootstrap demo</title>
 
     <%= csrf_meta_tags %>
@@ -13,85 +13,83 @@
   </head>
 
   <body>
-    <!--
-  <header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
-  <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3 fs-6" href="#">CO-MOVE</a>
-  <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-  <input class="form-control form-control-dark w-100 rounded-0 border-0" type="text" placeholder="Search" aria-label="Search">
-  <div class="navbar-nav">
-    <div class="nav-item text-nowrap">
-      <a class="nav-link px-3" href="#">Sign out</a>
-    </div>
-  </div>
-</header> -->
-
     <!-- Navbar -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-  <!-- Container wrapper -->
-  <div class="container-fluid">
-    <!-- Toggle button -->
-    <button
-      class="navbar-toggler"
-      type="button"
-      data-mdb-toggle="collapse"
-      data-mdb-target="#navbarSupportedContent"
-      aria-controls="navbarSupportedContent"
-      aria-expanded="false"
-      aria-label="Toggle navigation"
-    >
-      <i class="fas fa-bars"></i>
-    </button>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <!-- Container wrapper -->
+      <div class="container-fluid">
+        <!-- Toggle button -->
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-mdb-toggle="collapse"
+          data-mdb-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <i class="fas fa-bars"></i>
+        </button>
+        <!-- Collapsible wrapper -->
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <!-- Navbar brand -->
+          <a class="navbar-brand mt-2 mt-lg-0" href="/">
+            <img src="/static/logo.svg" height="25" alt="MDB Logo" loading="lazy"/>
+          </a>
+          <!-- Left links -->
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link" href="/graves">Graves</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/skeletons">Skeletons</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/publications">Publications</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/sites">Sites</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/maps">Maps</a>
+            </li>
+          </ul>
+          <!-- Left links -->
 
-    <!-- Collapsible wrapper -->
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <!-- Navbar brand -->
-      <a class="navbar-brand mt-2 mt-lg-0" href="/">
-        <img
-          src="/static/logo.svg"
-          height="25"
-          alt="MDB Logo"
-          loading="lazy"
-        />
-      </a>
-      <!-- Left links -->
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <li class="nav-item">
-          <a class="nav-link" href="/graves">Graves</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/skeletons">Skeletons</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/publications">Publications</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/sites">Sites</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/maps">Maps</a>
-        </li>
-      </ul>
-      <!-- Left links -->
-    </div>
-    <!-- Collapsible wrapper -->
-  </div>
-  <!-- Container wrapper -->
-  </nav>
+          <% if current_user %>
+            <ul class="navbar-nav d-flex">
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#"><%= current_user.name %></a>
+
+                <ul class="dropdown-menu">
+                  <li><a class="dropdown-item" href="<%= logout_path %>">Logout</a></li>
+                </ul>
+              </li>
+            </ul>
+          <% end %>
+        </div>
+        <!-- Collapsible wrapper -->
+      </div>
+      <!-- Container wrapper -->
+    </nav>
+
+    <% flash.each do |type, msg| %>
+      <div>
+        <%= msg %>
+      </div>
+    <% end %>
 
     <% if @no_box %>
       <%= yield %>
     <% else %>
-    <div class='mx-4'>
-      <div class="card m-3 shadow-5">
-        <div class="card-body">
-          <div class="card-text">
-            <%= yield %>
+      <div class='mx-4'>
+        <div class="card m-3 shadow-5">
+          <div class="card-body">
+            <div class="card-text">
+              <%= yield %>
+            </div>
           </div>
         </div>
       </div>
-    </div>
     <% end %>
   </body>
 </html>

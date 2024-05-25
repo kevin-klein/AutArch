@@ -1,7 +1,8 @@
 <%= form_with(model: figure) do |form| %>
   <% if figure.errors.any? %>
     <div style="color: red">
-      <h2><%= pluralize(figure.errors.count, "error") %> prohibited this figure from being saved:</h2>
+      <h2><%= pluralize(figure.errors.count, "error") %>
+        prohibited this figure from being saved:</h2>
 
       <ul>
         <% figure.errors.each do |error| %>

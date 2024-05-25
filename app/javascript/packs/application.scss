@@ -7,6 +7,24 @@
 @import '~mdb-ui-kit/css/mdb.min.css';
 @import '~leaflet/dist/leaflet.css';
 
+.login-body {
+  background-color: '#f5f5f5';
+  height: 100%;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+}
+
+html {
+  height: 100%;
+}
+
+.form-signin {
+  width: 100%;
+  max-width: 330px;
+  padding: 15px;
+  margin: 0 auto;
+}
 
 .map-overlay {
   // padding: 10px;

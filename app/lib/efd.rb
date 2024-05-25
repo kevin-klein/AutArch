@@ -41,11 +41,11 @@ module Efd
           [coeffs[n, 0], coeffs[n, 1]],
           [coeffs[n, 2], coeffs[n, 3]]
         ]
-        .dot(
-          Numo::DFloat[
-            [Math.cos((n + 1) * theta_1), -Math.sin((n + 1) * theta_1)],
-            [Math.sin(n + (1 * theta_1)), Math.cos((n + 1) * theta_1)]]
-        ).flatten
+          .dot(
+            Numo::DFloat[
+              [Math.cos((n + 1) * theta_1), -Math.sin((n + 1) * theta_1)],
+              [Math.sin(n + (1 * theta_1)), Math.cos((n + 1) * theta_1)]]
+          ).flatten
     end
 
     psi_1 = Math.atan2(coeffs[0, 2], coeffs[0, 0])

@@ -1,1 +1,1 @@
-json.partial! 'kurgans/kurgan', kurgan: @kurgan
+json.partial! "kurgans/kurgan", kurgan: @kurgan

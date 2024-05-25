@@ -7,7 +7,8 @@ class ChronologiesController < ApplicationController
   end
 
   # GET /chronologies/1 or /chronologies/1.json
-  def show; end
+  def show
+  end
 
   # GET /chronologies/new
   def new
@@ -15,7 +16,8 @@ class ChronologiesController < ApplicationController
   end
 
   # GET /chronologies/1/edit
-  def edit; end
+  def edit
+  end
 
   # POST /chronologies or /chronologies.json
   def create
@@ -23,7 +25,7 @@ class ChronologiesController < ApplicationController
 
     respond_to do |format|
       if @chronology.save
-        format.html { redirect_to chronology_url(@chronology), notice: 'Chronology was successfully created.' }
+        format.html { redirect_to chronology_url(@chronology), notice: "Chronology was successfully created." }
         format.json { render :show, status: :created, location: @chronology }
       else
         format.html { render :new, status: :unprocessable_entity }
@@ -36,7 +38,7 @@ class ChronologiesController < ApplicationController
   def update
     respond_to do |format|
       if @chronology.update(chronology_params)
-        format.html { redirect_to chronology_url(@chronology), notice: 'Chronology was successfully updated.' }
+        format.html { redirect_to chronology_url(@chronology), notice: "Chronology was successfully updated." }
         format.json { render :show, status: :ok, location: @chronology }
       else
         format.html { render :edit, status: :unprocessable_entity }
@@ -50,7 +52,7 @@ class ChronologiesController < ApplicationController
     @chronology.destroy
 
     respond_to do |format|
-      format.html { redirect_to chronologies_url, notice: 'Chronology was successfully destroyed.' }
+      format.html { redirect_to chronologies_url, notice: "Chronology was successfully destroyed." }
       format.json { head :no_content }
     end
   end

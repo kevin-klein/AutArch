@@ -4,9 +4,9 @@ module Charts
       width: 600,
       height: 600,
       padding: 5,
-      html_class: ''
+      html_class: ""
     )
-      @grey_stroke = '#BDBDBD'
+      @grey_stroke = "#BDBDBD"
       @padding = padding
       @width = width
       @height = height
@@ -16,8 +16,8 @@ module Charts
 
     def set_css
       @svg.css = {
-        '.point:hover': {
-          filter: 'brightness(0.7)'
+        ".point:hover": {
+          filter: "brightness(0.7)"
         }
       }
     end

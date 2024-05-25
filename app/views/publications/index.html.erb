@@ -27,15 +27,15 @@
         <td>
           <%= link_to "Pages", publication_pages_path(publication) %>
           <div class="vr mx-1"></div>
-          <%= link_to 'Stats', stats_publication_path(publication) %>
+          <%= link_to "Stats", stats_publication_path(publication) %>
           <div class="vr mx-1"></div>
-          <%= link_to 'Edit', edit_publication_path(publication) %>
+          <%= link_to "Edit", edit_publication_path(publication) %>
           <div class="vr mx-1"></div>
-          <%= link_to 'Site', assign_site_publication_path(publication) %>
+          <%= link_to "Site", assign_site_publication_path(publication) %>
           <div class="vr mx-1"></div>
-          <%= link_to 'Summary', summary_publication_path(publication) %>
+          <%= link_to "Summary", summary_publication_path(publication) %>
           <div class="vr mx-1"></div>
-          <%= link_to 'Delete', publication_path(publication), method: :delete %>
+          <%= link_to "Delete", publication_path(publication), method: :delete %>
         </td>
       </tr>
     <% end %>

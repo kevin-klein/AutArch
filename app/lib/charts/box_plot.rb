@@ -53,16 +53,16 @@ module Charts
     def draw_x_y_axis
       @svg.line(x1: @padding, y1: 0, x2: @padding, y2: @height, stroke: @grey_stroke, stroke_width: 1)
       @svg.line(y1: @height - @padding, x1: 0, y2: @height - @padding, x2: @width, stroke: @grey_stroke,
-                stroke_width: 1)
+        stroke_width: 1)
       draw_x_axis_text
       draw_y_axis_text
     end
 
     def draw_x_axis_text
-      (@min_x..@max_x).step(30).to_a.zip([''] + @data.keys).each do |x_value, text|
+      (@min_x..@max_x).step(30).to_a.zip([""] + @data.keys).each do |x_value, text|
         @svg.line(x1: x_coordinate(x_value), y1: (@height - @padding) - @axis_marker_height, x2: x_coordinate(x_value),
-                  y2: (@height - @padding) + @axis_marker_height, stroke: @grey_stroke,
-                  stroke_width: 1)
+          y2: (@height - @padding) + @axis_marker_height, stroke: @grey_stroke,
+          stroke_width: 1)
         @svg.text text, x: x_coordinate(x_value) - 10, y: @height
       end
     end
@@ -70,9 +70,9 @@ module Charts
     def draw_y_axis_text
       (@min_y..@max_y).step((@max_y - @min_y) / 10).each do |y_value|
         @svg.line(y1: y_coordinate(y_value), x1: @padding - @axis_marker_height, y2: y_coordinate(y_value),
-                  x2: @padding + @axis_marker_height,
-                  stroke: @grey_stroke,
-                  stroke_width: 1)
+          x2: @padding + @axis_marker_height,
+          stroke: @grey_stroke,
+          stroke_width: 1)
         @svg.text y_value.round(1), y: y_coordinate(y_value) + 5, x: 0
       end
     end
@@ -87,7 +87,7 @@ module Charts
 
     def calculate_stats # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
       data = @data.map { |key, value| value }.flatten
-      @max_x = 5 #@data.keys.count * 30
+      @max_x = 5 # @data.keys.count * 30
       @max_y = data.max * 1.1
       @min_x = 0
       @min_y = -1

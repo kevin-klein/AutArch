@@ -1,4 +1,3 @@
-
 <div class='row m-3'>
   <div class='card col-md-12 mt-2 mb-3'>
     <div class='card-body'>
@@ -7,7 +6,14 @@
         <form class="row g-3">
           <div class="col-auto">
             <label for="site-name" class="visually-hidden">Site Name</label>
-            <input value="<%= params.dig(:site, :name) %>" type="text" name='site[name]' class="form-control" id="site-name" placeholder="Name">
+            <input
+              value="<%= params.dig(:site, :name) %>"
+              type="text"
+              name='site[name]'
+              class="form-control"
+              id="site-name"
+              placeholder="Name"
+            >
           </div>
           <div class="col-auto">
             <button type="submit" class="btn btn-primary mb-3">Search</button>
@@ -21,35 +27,35 @@
     <div class='card-body'>
       <div class='card-text'>
         <table class='table'>
-      <thead>
-          <tr>
+          <thead>
+            <tr>
               <th>Locality</th>
               <th>Name</th>
               <th>Country Code</th>
               <th>Lat</th>
               <th>Lon</th>
               <th></th>
-          </tr>
-      </thead>
+            </tr>
+          </thead>
 
-      <tbody>
-          <% @sites.each do |site| %>
+          <tbody>
+            <% @sites.each do |site| %>
               <tr>
-                  <td><%= site.locality %></td>
-                  <td><%= site.name %></td>
-                  <td><%= site.country_code %></td>
-                  <td><%= site.lat %></td>
-                  <td><%= site.lon %></td>
-                  <td><%= link_to 'Edit', edit_site_path(site) %></td>
+                <td><%= site.locality %></td>
+                <td><%= site.name %></td>
+                <td><%= site.country_code %></td>
+                <td><%= site.lat %></td>
+                <td><%= site.lon %></td>
+                <td><%= link_to "Edit", edit_site_path(site) %></td>
               </tr>
-          <% end %>
-      </tbody>
-  </table>
+            <% end %>
+          </tbody>
+        </table>
 
-  <%== pagy_bootstrap_combo_nav_js(@sites_pagy) %>
+        <%== pagy_bootstrap_combo_nav_js(@sites_pagy) %>
       </div>
     </div>
   </div>
 </div>
 
-<%= link_to('New Site', new_site_path) %>
+<%= link_to("New Site", new_site_path) %>

@@ -1,35 +1,42 @@
-<div
-  data-id='figure-view'
-  id='figure-view'
->
-<svg
-
-  style='touch-action: none; user-select: none;'
-  data-controller='figure'
-  viewBox='0 0 <%= image.width %> <%= image.height %>'
-  preserveAspectRatio="xMidYMid meet"
-  xmlns="http://www.w3.org/2000/svg">
-  <image width='<%= image.width %>' height='<%= image.height %>' href='<%= image.svg_href %>' />
-  <defs>
-    <marker id="arrowhead" markerWidth="10" markerHeight="7"
-      refX="0" refY="3.5" orient="auto">
-      <polygon points="0 0, 10 3.5, 0 7" />
-    </marker>
-  </defs>
-  <% figures.map do |figure| %>
-    <% if figure.is_a?(Spine) || figure.is_a?(CrossSectionArrow) %>
-      <line
-        fill='none'
-        stroke={color}
-        strokeWidth="2"
-        x1='<%= figure.x1 %>'
-        y1='<%= figure.y1 %>'
-        x2='<%= figure.x2 %>'
-        y2='<%= figure.y2 %>'
-
-        markerEnd="url(#arrowhead)" />
-    <% else %>
-      <rect
+<div data-id='figure-view' id='figure-view'>
+  <svg
+    style='touch-action: none; user-select: none;'
+    data-controller='figure'
+    viewBox='0 0 <%= image.width %> <%= image.height %>'
+    preserveAspectRatio="xMidYMid meet"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <image
+      width='<%= image.width %>'
+      height='<%= image.height %>'
+      href='<%= image.svg_href %>'
+    />
+    <defs>
+      <marker
+        id="arrowhead"
+        markerWidth="10"
+        markerHeight="7"
+        refX="0"
+        refY="3.5"
+        orient="auto"
+      >
+        <polygon points="0 0, 10 3.5, 0 7"/>
+      </marker>
+    </defs>
+    <% figures.map do |figure| %>
+      <% if figure.is_a?(Spine) || figure.is_a?(CrossSectionArrow) %>
+        <line
+          fill='none'
+          stroke={color}
+          strokeWidth="2"
+          x1='<%= figure.x1 %>'
+          y1='<%= figure.y1 %>'
+          x2='<%= figure.x2 %>'
+          y2='<%= figure.y2 %>'
+          markerEnd="url(#arrowhead)"
+        />
+      <% else %>
+        <rect
           fill='none'
           stroke='red'
           strokeWidth="2"
@@ -41,27 +48,27 @@
           data-x2='<%= figure.x2 %>'
           data-y2='<%= figure.y2 %>'
         />
-    <% end %>
+      <% end %>
 
-    <circle
-      class="moveable-point"
-      r='4'
-      cx='<%= figure.x1 %>'
-      cy='<%= figure.y1 %>'
-      data-rect='<%= dom_id(figure) %>'
-      data-one='1'
-      stroke="black"
-    />
-    <circle
-      class="moveable-point"
-      r='4'
-      cx='<%= figure.x2 %>'
-      cy='<%= figure.y2 %>'
-      data-rect='<%= dom_id(figure) %>'
-      stroke="black"
-      data-one='0'
-    />
-  <% end %>
-</svg>
+      <circle
+        class="moveable-point"
+        r='4'
+        cx='<%= figure.x1 %>'
+        cy='<%= figure.y1 %>'
+        data-rect='<%= dom_id(figure) %>'
+        data-one='1'
+        stroke="black"
+      />
+      <circle
+        class="moveable-point"
+        r='4'
+        cx='<%= figure.x2 %>'
+        cy='<%= figure.y2 %>'
+        data-rect='<%= dom_id(figure) %>'
+        stroke="black"
+        data-one='0'
+      />
+    <% end %>
+  </svg>
 
 </div>
