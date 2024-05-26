@@ -18,6 +18,17 @@ module Dfgrb
     #
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
+
+    config.action_mailer.smtp_settings = {
+      address: "mail.uni-mainz.de",
+      port: 587,
+      user_name: "kkevin",
+      password: "A1n#2u,bis12",
+      authentication: "login",
+      enable_starttls: true,
+      open_timeout: 5,
+      read_timeout: 5
+    }
   end
 end
 
