@@ -11,8 +11,10 @@ default: &default
   timeout: 5000
   host: localhost
 
-  username: <%= ENV['PG_USER'] %>
-  password: <%= ENV['PG_PASS'] %>
+  username: postgres
+  # <%= ENV['PG_USER'] %>
+  password: root110120
+  # <%= ENV['PG_PASS'] %>
   host: localhost
 
 development:
