@@ -31,7 +31,7 @@ set :user, "rails"
 
 set :compiled_asset_path, ["public/assets", "public/packs"]
 set :asset_dirs, ["vendor/assets/", "app/assets/", "app/javascript/"]
-set :shared_dirs, fetch(:shared_dirs, []).push("log", "models", "tmp/cache", "lib/target", *fetch(:compiled_asset_path))
+set :shared_dirs, fetch(:shared_dirs, []).push("storage", "log", "models", "tmp", "lib/target", *fetch(:compiled_asset_path))
 
 # This task is the environment that is loaded for all remote run commands, such as
 # `mina deploy` or `mina rake`.
