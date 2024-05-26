@@ -14,6 +14,7 @@ gem "msgpack"
 gem "pg"
 gem "sprockets-rails"
 gem "cancancan"
+gem "mina"
 
 gem "bootstrap"
 gem "graphql"
