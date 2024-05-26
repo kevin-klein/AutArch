@@ -8,7 +8,7 @@ import io
 import os
 import torchvision
 
-labels = torch.load('models/rcnn_labels.model')
+labels = torch.load('models/retinanet_v2_labels.model')
 labels = {v: k for k, v in labels.items()}
 
 if torch.cuda.is_available():
@@ -17,7 +17,7 @@ else:
     device = torch.device('cpu')
 
 loaded_model = get_model(num_classes = len(labels.keys()), device=device)
-loaded_model.load_state_dict(torch.load('models/rcnn_dfg.model', map_location=device))
+loaded_model.load_state_dict(torch.load('models/retinanet_v2_dfg.model', map_location=device))
 
 loaded_model.eval()
 

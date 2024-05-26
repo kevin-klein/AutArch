@@ -58,6 +58,14 @@ task :compile_ext do
   command "make"
 end
 
+task "yarn:install" do
+  command %(yarn install)
+end
+
+task "res:build" do
+  command %(yarn res:build)
+end
+
 desc "Deploys the current version to the server."
 task :deploy do
   # uncomment this line to make sure you pushed your local branch to the remote origin
@@ -68,6 +76,8 @@ task :deploy do
     invoke :"git:clone"
     invoke :"deploy:link_shared_paths"
     invoke :"bundle:install"
+    invoke :"yarn:install"
+    invoke :"res:build"
     invoke :compile_ext
     invoke :"rails:db_migrate"
     invoke :"rails:assets_precompile"
