@@ -108,7 +108,8 @@ class PublicationsController < AuthorizedController
       author: publication_params[:author],
       title: publication_params[:title],
       pdf: publication_params[:pdf],
-      year: publication_params[:year]
+      year: publication_params[:year],
+      user: current_user
     })
 
     respond_to do |format|
@@ -168,6 +169,6 @@ class PublicationsController < AuthorizedController
 
   # Only allow a list of trusted parameters through.
   def publication_params
-    params.require(:publication).permit(:pdf, :author, :title, :site, :year)
+    params.require(:publication).permit(:pdf, :author, :title, :year)
   end
 end
