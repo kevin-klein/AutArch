@@ -1,0 +1,3 @@
+class Text < Figure
+
+end
