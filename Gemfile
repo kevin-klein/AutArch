@@ -37,8 +37,6 @@ group :development do
   gem "ruby-lsp", require: false
 end
 
-gem "numo-narray", git: "https://github.com/ruby-numo/numo-narray.git"
-
 gem "chartkick"
 gem "pdf-reader"
 
