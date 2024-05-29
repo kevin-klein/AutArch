@@ -32,12 +32,4 @@ module Dfgrb
   end
 end
 
-require "pycall/import"
-include PyCall::Import
-
-pyimport "numpy", as: :np
-pyimport "scipy"
-pyfrom "sklearn.decomposition", import: :PCA
-pyfrom "sklearn.preprocessing", import: :StandardScaler
-
 # pyfrom 'scipy.cluster.hierarchy', import: [:dendrogram, :linkage]

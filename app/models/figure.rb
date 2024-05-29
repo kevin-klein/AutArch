@@ -201,7 +201,6 @@ class Figure < ApplicationRecord
     return [] if single_contour.nil? || single_contour.size < 5
 
     bounding = ImageProcessing.boundingRect(single_contour)
-    # raise
 
     center_x = (bounding[:width] / 2) + bounding[:x]
     center_y = (bounding[:height] / 2) + bounding[:y]
