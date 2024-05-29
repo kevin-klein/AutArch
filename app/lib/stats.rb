@@ -1,12 +1,6 @@
 module Stats
   extend self
 
-  pyimport "scipy"
-  pyimport "numpy"
-  pyimport "io"
-  pyimport "base64"
-  pyfrom "matplotlib", import: :pyplot
-
   def upgma(data)
     scipy.cluster.hierarchy.linkage(data, "average")
   end
@@ -129,6 +123,8 @@ module Stats
 
     frequencies, graves = outlines_efd(publications, excluded: excluded)
 
+    return [] if frequencies.empty?
+
     pca.fit(frequencies)
 
     pca_data = publications.map do |publication|
@@ -195,6 +191,7 @@ module Stats
     publications.map do |publication|
       graves = publication.graves
       graves = filter_graves(graves, excluded: excluded)
+      return [] if graves.size <= 1
       grave_data = pca_transform_graves(pca, graves, special_objects)
 
       {
@@ -242,6 +239,8 @@ module Stats
       graves = filter_graves(graves, excluded: excluded)
       convert_graves_to_size(graves)
     end
+
+    return [] if graves.size <= 1
 
     pca.fit(graves)
   end

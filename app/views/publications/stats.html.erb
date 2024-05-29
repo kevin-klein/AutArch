@@ -34,12 +34,14 @@
     <div class="card">
       <div class='row'>
         <div class='p-5 col-xxl-8 col-md-12'>
-          <%== Charts::ScatterChart.new(
-            @graves_pca,
-            html_class: "card-img-top",
-            link_proc:
-              Proc.new { |item| grave_update_grave_path(item[:id], :set_grave_data) }
-          ).render %>
+          <% unless @graves_pca.empty? %>
+            <%== Charts::ScatterChart.new(
+              @graves_pca,
+              html_class: "card-img-top",
+              link_proc:
+                Proc.new { |item| grave_update_grave_path(item[:id], :set_grave_data) }
+            ).render %>
+          <% end %>
         </div>
         <div class='p-5 col-xxl-4 col-md-12'>
           <%== column_chart(@variances.map { [_1[:name], _1[:variance]] }.to_h) %>
@@ -197,32 +199,6 @@
             graves: publication.graves.select { !@excluded_graves.include?(_1.id) }
           ) %>
         <% end %>
-      </div>
-    </div>
-  </div>
-
-  <div class='col-md-12'>
-    <h2>UPGMA</h2>
-    <div class='row'>
-      <div class='col-md-6'>
-        <%= image_tag "data:image/jpeg;base64,#{@upgma_figure}", class: "img-fluid" %>
-      </div>
-
-      <div class='col-md-6'>
-        <%= image_tag "data:image/jpeg;base64,#{@cluster_upgma_chart}", class: "img-fluid" %>
-      </div>
-    </div>
-  </div>
-
-  <div class='col-md-12'>
-    <h2>Ward</h2>
-    <div class='row'>
-      <div class='col-md-6'>
-        <%= image_tag "data:image/jpeg;base64,#{@ward_figure}", class: "img-fluid" %>
-      </div>
-
-      <div class='col-md-6'>
-        <%= image_tag "data:image/jpeg;base64,#{@cluster_ward_chart}", class: "img-fluid" %>
       </div>
     </div>
   </div>
