@@ -3,7 +3,7 @@ class AnalyzeScales
     return unless scale.is_a?(Scale)
     (1.0..2.0).step(0.25).each do |factor|
       assign_contour_width(scale, factor)
-      break if scale.nil? || scale.width > 0
+      break if scale.width.nil? || scale.width > 0
     end
 
     text = ""
