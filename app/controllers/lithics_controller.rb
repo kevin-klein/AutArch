@@ -1,9 +1,9 @@
 class LithicsController < ApplicationController
-  pyimport "scipy"
-  pyimport "numpy"
-  pyimport "io"
-  pyimport "base64"
-  pyfrom "matplotlib", import: :pyplot
+  # pyimport "scipy"
+  # pyimport "numpy"
+  # pyimport "io"
+  # pyimport "base64"
+  # pyfrom "matplotlib", import: :pyplot
 
   def index
     @lithics = StoneTool
