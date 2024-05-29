@@ -68,6 +68,8 @@ class AnalyzeScales
     contours = ImageProcessing.findContours(image, "tree")
     rects = contours.lazy.map { ImageProcessing.minAreaRect _1 }
 
+    return if rects.empty?
+
     max_rect = rects.max_by { [_1[:width], _1[:height]].max }
     width = [max_rect[:width], max_rect[:height]].max
 
