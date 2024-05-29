@@ -3,7 +3,7 @@ class PublicationsController < AuthorizedController
 
   # GET /publications or /publications.json
   def index
-    @publications = Publication.accessible_by(current_ability).select(:id, :title, :author, :year).order(:created_at)
+    @publications = Publication.accessible_by(current_ability).select(:id, :user_id, :title, :author, :year).order(:created_at)
   end
 
   # GET /publications/1 or /publications/1.json
@@ -52,7 +52,8 @@ class PublicationsController < AuthorizedController
 
     @outlines_pca_data, @outline_pca = Stats.outlines_pca([@publication, *@other_publications], special_objects: marked_items, excluded: @excluded_graves)
     @variances = Stats.pca_variance([@publication, *@other_publications], marked: marked_items, excluded: @excluded_graves)
-    @outline_variance_ratio = @outline_pca.explained_variance_ratio.to_a
+    # @outline_variance_ratio = @outline_pca.explained_variance_ratio.to_a
+    @outline_variance_ratio = []
     @graves_pca, @pca = Stats.graves_pca([@publication, *@other_publications], special_objects: marked_items,
       excluded: @excluded_graves)
 
@@ -60,15 +61,15 @@ class PublicationsController < AuthorizedController
 
     @outlines_data, _ = Stats.outlines_efd([@publication, *@other_publications], excluded: @excluded_graves)
 
-    upgma_result = Stats.upgma(@outlines_data)
-    @upgma_figure = Stats.upgma_figure(upgma_result)
+    # upgma_result = Stats.upgma(@outlines_data)
+    # @upgma_figure = Stats.upgma_figure(upgma_result)
 
-    @cluster_upgma_chart = Stats.cluster_scatter_chart(@outlines_data, upgma_result)
+    # @cluster_upgma_chart = Stats.cluster_scatter_chart(@outlines_data, upgma_result)
 
-    ward_result = Stats.ward(@outlines_data)
-    @ward_figure = Stats.upgma_figure(ward_result)
+    # ward_result = Stats.ward(@outlines_data)
+    # @ward_figure = Stats.upgma_figure(ward_result)
 
-    @cluster_ward_chart = Stats.cluster_scatter_chart(@outlines_data, ward_result)
+    # @cluster_ward_chart = Stats.cluster_scatter_chart(@outlines_data, ward_result)
 
     # @clustering_result = Upgma.cluster(@outlines_pca_data.map do |item|
     #   item[:data].map { [_1[:x], _1[:y]] }
@@ -78,7 +79,7 @@ class PublicationsController < AuthorizedController
     #   }
     # end
 
-    @efd_pca_chart = Stats.pca_chart(@outlines_pca_data)
+    # @efd_pca_chart = Stats.pca_chart(@outlines_pca_data)
     @colors = [
       [209, 41, 41],
       [129, 239, 19],
@@ -156,7 +157,7 @@ class PublicationsController < AuthorizedController
   # Use callbacks to share common setup or constraints between actions.
   def set_publication
     @publication = Publication
-      .select(:title, :author, :id, :year)
+      .select(:title, :author, :id, :year, :user_id)
       .find(params[:id] || params[:publication_id])
   end
 

@@ -37,8 +37,6 @@ group :development do
   gem "ruby-lsp", require: false
 end
 
-gem "pycall", require: ["pycall", "pycall/import"], git: "https://github.com/mrkn/pycall.rb.git"
-gem "numpy"
 gem "numo-narray", git: "https://github.com/ruby-numo/numo-narray.git"
 
 gem "chartkick"
@@ -62,6 +60,7 @@ gem "jbuilder"
 gem "redis", "~> 4.0"
 
 gem "react_on_rails"
+gem "rumale"
 
 # Use Kredis to get higher-level data types in Redis [https://github.com/rails/kredis]
 # gem 'kredis'
