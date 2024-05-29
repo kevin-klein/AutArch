@@ -66,7 +66,7 @@ class AnalyzeScales
 
     image = ImageProcessing.extractFigure(test_scale, scale.page.image.data.download)
     contours = ImageProcessing.findContours(image, "tree")
-    rects = contours.lazy.map { ImageProcessing.minAreaRect _1 }
+    rects = contours.map { ImageProcessing.minAreaRect _1 }
 
     return if rects.empty?
 
