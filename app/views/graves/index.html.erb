@@ -2,6 +2,7 @@
   <%= f.input :publication_id,
           collection:
             Publication
+              .accessible_by(current_ability)
               .order(:created_at)
               .pluck(:author, :year, :id)
               .map { |author, year, id| ["#{author} #{year}", id] },
@@ -14,13 +15,23 @@
 <table class='table'>
   <thead>
     <tr>
-      <th>Publication</th>
+      <th>
+        <%= link_to('Publication', url_for(sort: 'publication')) %>
+      </th>
       <th>Site</th>
       <th>ID</th>
-      <th>Area</th>
-      <th>Perimeter</th>
-      <th>Width</th>
-      <th>Length</th><!-- longer -->
+      <th>
+        <%= link_to('Area', url_for(params.permit!.to_h.merge({ sort: area_sort }))) %>
+      </th>
+      <th>
+        <%= link_to('Perimeter', url_for(params.permit!.to_h.merge({ sort: perimeter_sort }))) %>
+      </th>
+      <th>
+        <%= link_to('Width', url_for(params.permit!.to_h.merge({ sort: width_sort }))) %>
+      </th>
+      <th>
+        <%= link_to('Length', url_for(params.permit!.to_h.merge({ sort: length_sort }))) %>
+      </th><!-- longer -->
       <th>Depth</th>
       <th>Angle by Shape</th>
       <th></th>
