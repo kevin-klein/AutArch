@@ -14,6 +14,7 @@
 <table class='table'>
   <thead>
     <tr>
+      <th>Publication</th>
       <th>ID</th>
       <th>Area</th>
       <th>Perimeter</th>
@@ -28,6 +29,8 @@
   <tbody>
     <% @graves.each do |grave| %>
       <tr>
+        <td><%= grave.publication.author %> <%= grave.publication.year %></td>
+        <td><%= grave.site&.name %></td>
         <td><%= grave.identifier %></td>
         <td><%= raw number_with_unit grave.area_with_unit %></td>
         <td><%= number_with_unit grave.perimeter_with_unit %></td>

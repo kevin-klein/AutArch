@@ -5,10 +5,15 @@ class GravesController < AuthorizedController
   def index
     graves = Grave
     if params.dig(:search, :publication_id).present?
-      graves = Grave.joins(page: :publication).where({publication: {id: params.dig(:search, :publication_id)}})
+      graves = Grave
+        .joins(page: :publication)
+        .where({publication: {id: params.dig(:search, :publication_id)}})
     end
 
-    @graves = graves.includes(:scale, :arrow, page: :image, grave_cross_section: {grave: [:scale]}).where("probability > ?", 0.6).order(:id)
+    @graves = graves
+      .includes(:scale, :arrow, page: :image, grave_cross_section: {grave: [:scale]})
+      .where("probability > ?", 0.6)
+      .order(:id)
 
     @graves_pagy, @graves = pagy(@graves.all)
   end
