@@ -31,6 +31,8 @@ class GraveSize
       contour = contours.max_by { ImageProcessing.contourArea _1 }
       rect = ImageProcessing.boundingRect(contour)
 
+      return if rect == -1
+
       figure.contour = contour.map { |x, y| [x, y] }
       figure.width = rect[:width]
       figure.height = rect[:height]
