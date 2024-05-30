@@ -3,7 +3,7 @@ class PublicationsController < AuthorizedController
 
   # GET /publications or /publications.json
   def index
-    @publications = Publication.accessible_by(current_ability).select(:id, :user_id, :title, :author, :year).order(:created_at)
+    @publications = Publication.accessible_by(current_ability).select(:id, :public, :user_id, :title, :author, :year).order(:created_at)
   end
 
   # GET /publications/1 or /publications/1.json
@@ -157,7 +157,7 @@ class PublicationsController < AuthorizedController
   # Use callbacks to share common setup or constraints between actions.
   def set_publication
     @publication = Publication
-      .select(:title, :author, :id, :year, :user_id)
+      .select(:title, :author, :id, :year, :user_id, :public)
       .find(params[:id] || params[:publication_id])
   end
 
@@ -170,6 +170,6 @@ class PublicationsController < AuthorizedController
 
   # Only allow a list of trusted parameters through.
   def publication_params
-    params.require(:publication).permit(:pdf, :author, :title, :year, :public)
+    params.require(:publication).permit(:pdf, :public, :author, :title, :year, :public)
   end
 end
