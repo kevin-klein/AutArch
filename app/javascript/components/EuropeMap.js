@@ -1,4 +1,4 @@
-import { MapContainer, TileLayer, Marker, Popup, SVGOverlay } from 'react-leaflet'
+import { MapContainer, TileLayer, useMapEvents } from 'react-leaflet'
 import React from 'react'
 // import { Radar } from 'react-chartjs-2'
 import LeafletMarker from './LeafletMarker'
@@ -65,7 +65,15 @@ function Radar ({ angles }) {
   )
 }
 
-export default function EuropeMap ({ orientations }) {
+function Markers ({ orientations }) {
+  const [zoom, setZoom] = React.useState(0)
+
+  useMapEvents({
+    zoomend: (e) => {
+      setZoom(e.target._zoom)
+    }
+  })
+
   const markers = orientations.map(orientation => {
     const site = orientation.site
 
@@ -77,9 +85,14 @@ export default function EuropeMap ({ orientations }) {
           iconAnchor: [50, 50]
         }}
         position={[orientation.site.lat, orientation.site.lon]}
+        eventHandlers={{
+          click: (e) => {
+            window.location.href = `/graves?search[site_id]=${site.id}`
+          }
+        }}
       >
         <div>
-          <h4 style={{ fontSize: 10, color: 'black', fontWeight: 500 }}>{site.name}</h4>
+          {zoom > 9 && <h4 style={{ fontSize: 10, color: 'black', fontWeight: 500 }}>{site.name}</h4>}
           <Radar
             angles={orientation.angles}
           />
@@ -90,13 +103,21 @@ export default function EuropeMap ({ orientations }) {
   })
 
   return (
+    <>
+      {markers}
+    </>
+  )
+}
+
+export default function EuropeMap ({ orientations }) {
+  return (
     <div style={{ height: 800 }}>
       <MapContainer scrollWheelZoom style={{ height: '100%' }} center={[48.505, 16]} zoom={7}>
         <TileLayer
           attribution='Tiles &copy; Esri &mdash; Source: Esri'
           url='https://server.arcgisonline.com/ArcGIS/rest/services/World_Shaded_Relief/MapServer/tile/{z}/{y}/{x}'
         />
-        {markers}
+        <Markers orientations={orientations} />
       </MapContainer>
     </div>
   )

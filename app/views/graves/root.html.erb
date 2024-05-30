@@ -17,26 +17,17 @@
     <div class="container-fluid px-0">
       <div class="row g-0">
         <!-- First column -->
-        <div class="col-lg-6 vh-100">
-          <div class="col-lg-6 vh-100 d-flex justify-content-center align-items-center">
-
-            <div class="ms-5">
-              <h2 class="display-4">CO-MOVE</h2>
-              <h1 class="display-2 fw-bold text-uppercase">framework to integrate archaeology and genetics</h1>
-            </div>
-
-          </div>
+        <div class="col-md-6">
+          <h2 class="display-4 pl-5">AutArch</h2>
         </div>
-        <!-- First column --> <!-- Second column -->
-        <div class="col-lg-6 d-none d-lg-inline-block vh-100">
-
+        <div class="col-md-6 vh-100">
           <%= react_component(
             "SiteMap",
-            sites: Site.includes(:graves).all.as_json(include: :graves)
+            props: {
+              sites: Site.all.as_json(include: :graves)
+            }
           ) %>
-
         </div>
-        <!-- Second column -->
       </div>
     </div>
 

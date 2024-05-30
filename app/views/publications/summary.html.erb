@@ -16,7 +16,17 @@ ArtefactMisc
   <tbody>
     <% @data.sort_by { _1[1] }.reverse.each do |type, count| %>
       <tr>
-        <td><%= type %></td>
+        <td><%=
+          if type == 'Kurgan'
+            'Burial Mound'
+          elsif type == 'Oxcal'
+            'OxCal Diagram'
+          elsif type == 'Arrow'
+            'Orientation Arrow'
+          else
+            type
+          end
+        %></td>
         <td><%= count %></td>
       </tr>
     <% end %>
