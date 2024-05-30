@@ -271,8 +271,13 @@ extern "C" VALUE rb_imwrite(VALUE self, VALUE filename, VALUE rb_mat) {
 }
 
 extern "C" VALUE rb_boundingRect(VALUE self, VALUE rb_contour) {
-  auto contour = rbContourToCV(rb_contour);
-  return convert_to_ruby(boundingRect(contour));
+  try {
+    auto contour = rbContourToCV(rb_contour);
+    return convert_to_ruby(boundingRect(contour));
+  }
+  catch( cv::Exception& e ) {
+    return convert_to_ruby(-1);
+  }
 }
 
 extern "C" VALUE rb_rotateNoCutoff(VALUE self, VALUE rb_mat, VALUE rb_angle) {
