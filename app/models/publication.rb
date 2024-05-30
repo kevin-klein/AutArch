@@ -9,6 +9,7 @@
 #  updated_at :datetime         not null
 #  year       :string
 #  user_id    :bigint
+#  public     :boolean          default(FALSE), not null
 #
 class Publication < ApplicationRecord
   has_many :pages, dependent: :destroy

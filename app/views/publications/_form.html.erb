@@ -4,11 +4,7 @@
     <%= f.input :author %>
     <%= f.input :title %>
     <%= f.input :year %>
-    <%
-=begin%>
- <%= f.input :public %>
-<%
-=end%>
+     <%= f.input :public %>
     <%#= f.input :site, collection: Site.order(:name).pluck(:name, :id) %>
     <%= f.submit(class: "btn btn-primary") %>
   <% end %>

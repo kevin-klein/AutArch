@@ -3,7 +3,7 @@ class GravesController < AuthorizedController
 
   # GET /graves or /graves.json
   def index
-    graves = Grave
+    graves = Grave.where(publication: Publication.accessible_by(current_ability))
     if params.dig(:search, :publication_id).present?
       graves = Grave
         .joins(page: :publication)
@@ -11,9 +11,26 @@ class GravesController < AuthorizedController
     end
 
     @graves = graves
-      .includes(:scale, :arrow, page: :image, grave_cross_section: {grave: [:scale]})
+      .includes(:scale, :site, :publication, :arrow, page: :image, grave_cross_section: {grave: [:scale]})
       .where("probability > ?", 0.6)
-      .order(:id)
+
+    if params[:sort] == "area:desc"
+      @graves = @graves.order("real_world_area DESC NULLS LAST")
+    elsif params[:sort] == "area:asc"
+      @graves = @graves.order("real_world_area ASC NULLS LAST")
+    elsif params[:sort] == "perimeter:asc"
+      @graves = @graves.order("real_world_perimeter ASC NULLS LAST")
+    elsif params[:sort] == "perimeter:desc"
+      @graves = @graves.order("real_world_perimeter DESC NULLS LAST")
+    elsif params[:sort] == "width:desc"
+      @graves = @graves.order("real_world_width DESC NULLS LAST")
+    elsif params[:sort] == "width:asc"
+      @graves = @graves.order("real_world_width ASC NULLS LAST")
+    elsif params[:sort] == "length:asc"
+      @graves = @graves.order("real_world_height ASC NULLS LAST")
+    elsif params[:sort] == "length:desc"
+      @graves = @graves.order("real_world_height DESC NULLS LAST")
+    end
 
     @graves_pagy, @graves = pagy(@graves.all)
   end
