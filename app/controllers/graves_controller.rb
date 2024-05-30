@@ -14,6 +14,10 @@ class GravesController < AuthorizedController
       .includes(:scale, :site, :publication, :arrow, page: :image, grave_cross_section: {grave: [:scale]})
       .where("probability > ?", 0.6)
 
+    if params.dig(:search, :site_id).present?
+      @graves = @graves.where(site_id: params[:search][:site_id])
+    end
+
     if params[:sort] == "area:desc"
       @graves = @graves.order("real_world_area DESC NULLS LAST")
     elsif params[:sort] == "area:asc"

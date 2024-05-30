@@ -9,6 +9,7 @@
           input_html: {
             value: ""
           } %>
+  <%= f.input :site_id, collection: Site.order(:name).pluck(:name, :id), selected: params.dig(:search, :site_id), include_blank: true %>
   <%= f.submit "Search", class: "btn btn-primary" %>
 <% end %>
 

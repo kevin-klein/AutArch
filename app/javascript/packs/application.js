@@ -10,6 +10,7 @@ import AddFigures from '../components/AddFigures'
 import NorthArrow from '../components/NorthArrow'
 import EuropeMap from '../components/EuropeMap'
 import ImportProgress from '../components/ImportProgress'
+import SiteMap from '../components/SiteMap'
 
 import ReactOnRails from 'react-on-rails'
 import { Filler, LineElement, PointElement, RadialLinearScale, Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js'
@@ -22,6 +23,9 @@ ReactOnRails.register({
   ImportProgress,
   AddFigures,
   NorthArrow,
+  SiteMap: function (props, railsContext) {
+    return () => <SiteMap {...props} />
+  },
   EuropeMap: function (props, railsContext) {
     return () => <EuropeMap {...props} />
   }
