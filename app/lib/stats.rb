@@ -129,21 +129,19 @@ module Stats
 
     pca_data = publications.map do |publication|
       frequencies, graves = outlines_efd([publication])
-      pca.transform(frequencies).to_a
+      grave_data = pca.transform(frequencies).to_a.map do |pca_item|
+        convert_pca_item_to_polar(pca_item)
+      end
 
-      #   .map do |pca_item|
-      #     convert_pca_item_to_polar(pca_item)
-      #   end
-
-      #          graves = data.zip(graves)
-      #          data = graves.map do |item, grave|
-      #            item[:mark] = true if special_objects.include?(grave.id)
-      #            item.merge({ id: grave.id, title: grave.id })
-      #          end
-      #          {
-      #            name: publication.short_description,
-      #            data: data.map { _1.merge({ mark: false }) }
-      #          }
+      graves = grave_data.zip(graves)
+      data = graves.map do |item, grave|
+        item[:mark] = true if special_objects.include?(grave.id)
+        item.merge({id: grave.id, title: grave.id})
+      end
+      {
+        name: publication.short_description,
+        data: data.map { _1.merge({mark: false}) }
+      }
     end
 
     [pca_data, pca]

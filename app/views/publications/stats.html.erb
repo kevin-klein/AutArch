@@ -202,4 +202,17 @@
       </div>
     </div>
   </div>
+
+  <div class='col-md-12'>
+    <h4>EFD PCA</h4>
+
+    <% unless @graves_pca.empty? %>
+      <%== Charts::ScatterChart.new(
+        @outlines_pca_data,
+        html_class: "card-img-top",
+        link_proc:
+          Proc.new { |item| grave_update_grave_path(item[:id], :set_grave_data) }
+      ).render %>
+    <% end %>
+  </div>
 </div>

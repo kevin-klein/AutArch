@@ -24,7 +24,6 @@ class GraveSize
     if figure.manual_bounding_box
       figure.width = figure.bounding_box_width
       figure.height = figure.bounding_box_height
-      figure.save!
     else
       image = ImageProcessing.extractFigure(figure, figure.page.image.data.download)
       contours = ImageProcessing.findContours(image, "tree")
@@ -36,8 +35,8 @@ class GraveSize
       figure.contour = contour.map { |x, y| [x, y] }
       figure.width = rect[:width]
       figure.height = rect[:height]
-      figure.save!
     end
+    figure.save!
   end
 
   def handle_figure(figure)
