@@ -14,4 +14,16 @@ module GravesHelper
   def length_sort
     (params[:sort] == "length:desc") ? "length:asc" : "length:desc"
   end
+
+  def id_sort
+    (params[:sort] == "id:desc") ? "id:asc" : "id:desc"
+  end
+
+  def site_sort
+    (params[:sort] == "site:desc") ? "site:asc" : "site:desc"
+  end
+
+  def depth_sort
+    (params[:sort] == "depth:desc") ? "depth:asc" : "depth:desc"
+  end
 end
