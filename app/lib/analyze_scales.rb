@@ -1,16 +1,12 @@
 class AnalyzeScales
   def analyze_scale(scale)
     return unless scale.is_a?(Scale)
-    (1.0..2.0).step(0.25).each do |factor|
-      assign_contour_width(scale, factor)
-      break if scale.width.nil? || scale.width > 0
-    end
-
-    text = ""
     # (1.0..2.0).step(0.25).each do |factor|
-    text = scale_text(scale)
-    #   break unless text&.empty?
+    assign_contour_width(scale)
+    # break if scale.width.nil? || scale.width > 0
     # end
+
+    text = scale_text(scale)
     distance, ratio = calculate_contour_ratio(scale, text)
 
     return if distance.nil?
@@ -21,13 +17,6 @@ class AnalyzeScales
   end
 
   def scale_text(scale)
-    # test_scale = scale.dup
-    # test_scale.x1 /= -factor
-    # test_scale.y1 /= -factor
-    # test_scale.x2 *= factor
-    # test_scale.y2 *= factor
-
-    ap "extract"
     image = ImageProcessing.extractFigure(scale, scale.page.image.data.download)
     return "" if image.size == 0
 
@@ -57,15 +46,12 @@ class AnalyzeScales
     [distance, ratio]
   end
 
-  def assign_contour_width(scale, factor)
-    test_scale = scale.dup
-    test_scale.x1 /= factor
-    test_scale.y1 /= factor
-    test_scale.x2 *= factor
-    test_scale.y2 *= factor
-
-    image = ImageProcessing.extractFigure(test_scale, scale.page.image.data.download)
+  def assign_contour_width(scale)
+    ap "image"
+    image = ImageProcessing.extractFigure(scale, scale.page.image.data.download)
+    ap "contour"
     contours = ImageProcessing.findContours(image, "tree")
+    ap "minAreaRect"
     rects = contours.map { ImageProcessing.minAreaRect _1 }
 
     return if rects.empty?
