@@ -44,13 +44,26 @@ class UpdateGraveController < ApplicationController
     render_wizard @grave
   end
 
+  def finish_wizard_path
+    next_grave = Grave.order(:id).where("id > ?", @grave.id).first
+    if !next_grave.nil?
+      grave_update_grave_path(next_grave, :set_grave_data)
+    else
+      graves_path
+    end
+  end
+
   def grave_params
-    params.require(:grave).permit(
-      :percentage_scale,
-      :page_size,
-      :identifier,
-      :site_id,
-      skeleton_figures_attributes: %i[id deposition_type]
-    )
+    if params[:grave]
+      params.require(:grave).permit(
+        :percentage_scale,
+        :page_size,
+        :identifier,
+        :site_id,
+        skeleton_figures_attributes: %i[id deposition_type]
+      )
+    else
+      {}
+    end
   end
 end

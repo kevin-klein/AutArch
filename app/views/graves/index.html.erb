@@ -6,11 +6,10 @@
               .order(:created_at)
               .pluck(:author, :year, :id)
               .map { |author, year, id| ["#{author} #{year}", id] },
-          input_html: {
-            value: ""
-          } %>
+              include_blank: true,
+              selected: params.dig(:search, :publication_id) %>
   <%= f.input :site_id, collection: Site.order(:name).pluck(:name, :id), selected: params.dig(:search, :site_id), include_blank: true %>
-  <%= f.submit "Search", class: "btn btn-primary" %>
+  <%= f.submit "Filter", class: "btn btn-primary" %>
 <% end %>
 
 <table class='table'>
@@ -19,8 +18,12 @@
       <th>
         <%= link_to('Publication', url_for(sort: 'publication')) %>
       </th>
-      <th>Site</th>
-      <th>ID</th>
+      <th>
+        <%= link_to('Site', url_for(params.permit!.to_h.merge({ sort: site_sort }))) %>
+      </th>
+      <th>
+        <%= link_to('ID', url_for(params.permit!.to_h.merge({ sort: id_sort }))) %>
+      </th>
       <th>
         <%= link_to('Area', url_for(params.permit!.to_h.merge({ sort: area_sort }))) %>
       </th>
@@ -32,8 +35,10 @@
       </th>
       <th>
         <%= link_to('Length', url_for(params.permit!.to_h.merge({ sort: length_sort }))) %>
-      </th><!-- longer -->
-      <th>Depth</th>
+      </th>
+      <th>
+        <%= link_to('Depth', url_for(params.permit!.to_h.merge({ sort: depth_sort }))) %>
+      </th>
       <th>Angle by Shape</th>
       <th></th>
     </tr>

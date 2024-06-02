@@ -18,15 +18,29 @@
       <div class="row g-0">
         <!-- First column -->
         <div class="col-md-6">
-          <h2 class="display-4 pl-5">AutArch</h2>
+          <div class='mx-3'>
+            <h2 class="display-4">AutArch</h2>
+              This software was developed within the framework of the DFG-funded project
+              "CO-MOVE - Cultures on the move? New approaches to the archaeology and genetics
+              of the Yamnaya to Corded Ware burial transition"
+
+              <br>
+
+              (Grant n° 466680522)
+
+              <br>
+
+              Software development: Kevin Klein
+              <br>
+
+              https://gepris.dfg.de/gepris/projekt/466680522?language=en
+              <br>
+
+              The AutArch preprint is available on ArXiv: https://arxiv.org/abs/2311.17978
+          </div>
         </div>
         <div class="col-md-6 vh-100">
-          <%= react_component(
-            "SiteMap",
-            props: {
-              sites: Site.all.as_json(include: :graves)
-            }
-          ) %>
+          <%= react_component("EuropeMap", props: { orientations: @skeleton_angles }) %>
         </div>
       </div>
     </div>

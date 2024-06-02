@@ -8,9 +8,6 @@ class MapsController < AuthorizedController
       end
 
       angles = Stats.spine_angles(spines)
-      # (0..360).step(30).each do |angle|
-      #   angles[angle] ||= 0
-      # end
 
       {
         site: site,

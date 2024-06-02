@@ -12,7 +12,7 @@ class GravesController < AuthorizedController
 
     @graves = graves
       .includes(:scale, :site, :publication, :arrow, page: :image, grave_cross_section: {grave: [:scale]})
-      .where("probability > ?", 0.6)
+      .where("figures.probability > ?", 0.6)
 
     if params.dig(:search, :site_id).present?
       @graves = @graves.where(site_id: params[:search][:site_id])
@@ -34,6 +34,18 @@ class GravesController < AuthorizedController
       @graves = @graves.order("real_world_height ASC NULLS LAST")
     elsif params[:sort] == "length:desc"
       @graves = @graves.order("real_world_height DESC NULLS LAST")
+    elsif params[:sort] == "id:asc"
+      @graves = @graves.order("id ASC NULLS LAST")
+    elsif params[:sort] == "id:desc"
+      @graves = @graves.order("id DESC NULLS LAST")
+    elsif params[:sort] == "depth:desc"
+      @graves = @graves.order("real_world_depth DESC NULLS LAST")
+    elsif params[:sort] == "depth:asc"
+      @graves = @graves.order("real_world_depth DESC NULLS LAST")
+    elsif params[:sort] == "site:asc"
+      @graves = @graves.joins(:site).reorder("sites.name ASC NULLS LAST")
+    elsif params[:sort] == "site:desc"
+      @graves = @graves.joins(:site).reorder("sites.name DESC NULLS LAST")
     end
 
     @graves_pagy, @graves = pagy(@graves.all)
@@ -45,6 +57,23 @@ class GravesController < AuthorizedController
 
   def root
     @no_box = true
+
+    @skeleton_angles = Site.includes(
+      graves: [:spines, :arrow]
+    ).all.to_a.map do |site|
+      spines = site.graves.flat_map do |grave|
+        grave.spines
+      end
+
+      angles = Stats.spine_angles(spines)
+
+      {
+        site: site,
+        angles:
+      }
+    end.filter do |grave_data|
+      grave_data[:angles].values.sum > 0
+    end
   end
 
   def stats
@@ -92,10 +121,10 @@ class GravesController < AuthorizedController
 
   # DELETE /graves/1 or /graves/1.json
   def destroy
-    @grave.destroy!
+    @grave.delete
 
     respond_to do |format|
-      format.html { redirect_to edit_grave_path(Grave.order(:id).where("id > ?", @grave.id).first || @grave.last), notice: "Grave was successfully destroyed." }
+      format.html { redirect_to grave_update_grave_path(Grave.order(:id).where("id > ?", @grave.id).first || @grave.last, :set_grave_data), notice: "Grave was successfully removed." }
       format.json { head :no_content }
     end
   end
