@@ -28,8 +28,8 @@ class GraveSize
       image = ImageProcessing.extractFigure(figure, figure.page.image.data.download)
       contours = ImageProcessing.findContours(image, "tree")
       contour = contours.max_by { ImageProcessing.contourArea _1 }
+      return if contour.nil?
       rect = ImageProcessing.boundingRect(contour)
-
       return if rect == -1
 
       figure.contour = contour.map { |x, y| [x, y] }

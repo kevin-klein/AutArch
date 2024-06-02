@@ -22,6 +22,17 @@ class PublicationsController < AuthorizedController
 
   def summary
     @data = @publication.figures.group(:type).count
+      .map do |type, value|
+        [if type == "Kurgan"
+           "Burial Mound"
+         elsif type == "Oxcal"
+           "OxCal Diagram"
+         elsif type == "Arrow"
+           "Orientation Arrow"
+         else
+           type
+         end, value]
+      end.to_h
   end
 
   def stats # rubocop:disable Metrics/AbcSize
