@@ -144,7 +144,7 @@ class PublicationsController < AuthorizedController
     @publication.destroy
 
     respond_to do |format|
-      format.html { redirect_to publications_url, notice: "Publication was successfully destroyed." }
+      format.html { redirect_to publications_url, notice: "Publication was successfully deleted." }
       format.json { head :no_content }
     end
   end
