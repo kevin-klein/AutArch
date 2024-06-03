@@ -45,7 +45,7 @@ class PublicationsController < AuthorizedController
     @grave_angles = Stats.grave_angles(graves.includes(:arrow))
     set_compare_graves
 
-    @publications = [@publication, *@other_publications]
+    @publications = [@publication, *@other_publications].reverse
 
     @outlines_pca_data, @outline_pca = Stats.outlines_pca([@publication, *@other_publications], special_objects: marked_items, excluded: @excluded_graves)
     @variances = Stats.pca_variance([@publication, *@other_publications], marked: marked_items, excluded: @excluded_graves)
@@ -141,7 +141,7 @@ class PublicationsController < AuthorizedController
 
   # DELETE /publications/1 or /publications/1.json
   def destroy
-    @publication.destroy
+    @publication.destroy!
 
     respond_to do |format|
       format.html { redirect_to publications_url, notice: "Publication was successfully deleted." }
