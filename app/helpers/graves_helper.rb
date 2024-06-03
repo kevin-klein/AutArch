@@ -26,4 +26,8 @@ module GravesHelper
   def depth_sort
     (params[:sort] == "depth:desc") ? "depth:asc" : "depth:desc"
   end
+
+  def publication_sort
+    (params[:sort] == "publication:desc") ? "publication:asc" : "publication:desc"
+  end
 end
