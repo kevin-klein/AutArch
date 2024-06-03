@@ -16,7 +16,7 @@
   <thead>
     <tr>
       <th>
-        <%= link_to('Publication', url_for(sort: 'publication')) %>
+        <%= link_to('Publication', url_for(params.permit!.to_h.merge({ sort: publication_sort }))) %>
       </th>
       <th>
         <%= link_to('Site', url_for(params.permit!.to_h.merge({ sort: site_sort }))) %>
