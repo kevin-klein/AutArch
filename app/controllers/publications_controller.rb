@@ -47,16 +47,16 @@ class PublicationsController < AuthorizedController
 
     @publications = [@publication, *@other_publications].reverse
 
-    @outlines_pca_data, @outline_pca = Stats.outlines_pca([@publication, *@other_publications], special_objects: marked_items, excluded: @excluded_graves)
-    @variances = Stats.pca_variance([@publication, *@other_publications], marked: marked_items, excluded: @excluded_graves)
+    @outlines_pca_data, @outline_pca = Stats.outlines_pca([@publication, *@other_publications].reverse, special_objects: marked_items, excluded: @excluded_graves)
+    @variances = Stats.pca_variance([@publication, *@other_publications].reverse, marked: marked_items, excluded: @excluded_graves)
     # @outline_variance_ratio = @outline_pca.explained_variance_ratio.to_a
     @outline_variance_ratio = []
-    @graves_pca, @pca = Stats.graves_pca([@publication, *@other_publications], special_objects: marked_items,
+    @graves_pca, @pca = Stats.graves_pca([@publication, *@other_publications].reverse, special_objects: marked_items,
       excluded: @excluded_graves)
 
     # @graves_pca_chart = Stats.pca_chart(@graves_pca)
 
-    @outlines_data, _ = Stats.outlines_efd([@publication, *@other_publications], excluded: @excluded_graves)
+    @outlines_data, _ = Stats.outlines_efd([@publication, *@other_publications].reverse, excluded: @excluded_graves)
 
     # upgma_result = Stats.upgma(@outlines_data)
     # @upgma_figure = Stats.upgma_figure(upgma_result)
