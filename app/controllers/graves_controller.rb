@@ -46,6 +46,10 @@ class GravesController < AuthorizedController
       @graves = @graves.joins(:site).reorder("sites.name ASC NULLS LAST")
     elsif params[:sort] == "site:desc"
       @graves = @graves.joins(:site).reorder("sites.name DESC NULLS LAST")
+    elsif params[:sort] == "publication:asc"
+      @graves = @graves.joins(:publication).reorder("publication.author ASC NULLS LAST")
+    elsif params[:sort] == "publication:desc"
+      @graves = @graves.joins(:publication).reorder("publication.author DESC NULLS LAST")
     end
 
     @graves_pagy, @graves = pagy(@graves.all)
