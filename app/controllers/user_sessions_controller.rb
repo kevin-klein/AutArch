@@ -11,13 +11,14 @@ class UserSessionsController < ApplicationController
       session[:user_id] = user.id
       redirect_to "/", notice: "Successfully logged in"
     else
-      raise
+      flash[:notice] = "The code you entered was not correct."
+      redirect_to "/login"
     end
   end
 
   def logout
     session[:user_id] = nil
-    redirect_to '/'
+    redirect_to "/"
   end
 
   def code

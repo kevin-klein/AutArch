@@ -3,7 +3,21 @@ class PublicationsController < AuthorizedController
 
   # GET /publications or /publications.json
   def index
-    @publications = Publication.accessible_by(current_ability).select(:id, :public, :user_id, :title, :author, :year).order(:created_at)
+    @publications = Publication.accessible_by(current_ability).select(:id, :public, :user_id, :title, :author, :year)
+
+    if params[:sort] == "title:asc"
+      @publications = @publications.order("title ASC NULLS LAST")
+    elsif params[:sort] == "title:desc"
+      @publications = @publications.order("title DESC NULLS LAST")
+    elsif params[:sort] == "author:desc"
+      @publications = @publications.order("author DESC NULLS LAST")
+    elsif params[:sort] == "author:asc"
+      @publications = @publications.order("author ASC NULLS LAST")
+    elsif params[:sort] == "year:asc"
+      @publications = @publications.order("year ASC NULLS LAST")
+    elsif params[:sort] == "year:desc"
+      @publications = @publications.order("year DESC NULLS LAST")
+    end
   end
 
   # GET /publications/1 or /publications/1.json

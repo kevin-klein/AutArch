@@ -29,9 +29,7 @@
         <table class='table'>
           <thead>
             <tr>
-              <th>Locality</th>
               <th>Name</th>
-              <th>Country Code</th>
               <th>Lat</th>
               <th>Lon</th>
               <th></th>
@@ -41,9 +39,7 @@
           <tbody>
             <% @sites.each do |site| %>
               <tr>
-                <td><%= site.locality %></td>
                 <td><%= site.name %></td>
-                <td><%= site.country_code %></td>
                 <td><%= site.lat %></td>
                 <td><%= site.lon %></td>
                 <td><%= link_to "Edit", edit_site_path(site) %></td>
