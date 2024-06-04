@@ -25,6 +25,17 @@ class UpdateGraveController < ApplicationController
       else
         @grave.update(grave_params)
       end
+
+      attrs = [:area, :width, :height, :perimeter]
+
+      attrs.each do |attr|
+        value = @grave.send(:"#{attr}_with_unit")
+        if value[:unit] != "px"
+          @grave.send(:"real_world_#{attr}=", value[:value])
+        end
+      end
+
+      @grave.save!
     when :resize_boxes
       Figure.update(params[:figures].keys, params[:figures].values).reject { |p| p.errors.empty? }
 

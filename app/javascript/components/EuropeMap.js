@@ -74,14 +74,26 @@ function Markers ({ orientations }) {
     }
   })
 
+  const sizes = orientations.map(orientation => Object.values(orientation.angles).reduce((a, b) => a + b, 0))
+  const maxSize = Math.max(...sizes)
+
   const markers = orientations.map(orientation => {
     const site = orientation.site
+
+    const currentSize = Object.values(orientation.angles).reduce((a, b) => a + b, 0)
+
+    let size = 50
+    if (currentSize / maxSize < 0.3) {
+      size = 30
+    } else if (currentSize / maxSize < 0.6) {
+      size = 42
+    }
 
     return (
       <LeafletMarker
         key={site.id} iconOptions={{
           className: 'jsx-marker',
-          iconSize: [50, 50],
+          iconSize: [size, size],
           iconAnchor: [50, 50]
         }}
         position={[orientation.site.lat, orientation.site.lon]}

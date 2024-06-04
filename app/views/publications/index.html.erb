@@ -3,9 +3,15 @@
 <table class='table'>
   <thead>
     <tr>
-      <th>Title</th>
-      <th>Author</th>
-      <th>Year</th>
+      <th>
+        <%= link_to('Title', url_for(params.permit!.to_h.merge({ sort: sortable_by('title') }))) %>
+      </th>
+      <th>
+        <%= link_to('Author', url_for(params.permit!.to_h.merge({ sort: sortable_by('author') }))) %>
+      </th>
+      <th>
+        <%= link_to('Year', url_for(params.permit!.to_h.merge({ sort: sortable_by('year') }))) %>
+      </th>
       <th></th>
     </tr>
   </thead>
@@ -36,7 +42,7 @@
           <%= link_to "Summary", summary_publication_path(publication) %>
           <div class="vr mx-1"></div>
           <% if can?(:delete, publication) %>
-            <%= link_to "Delete", publication_path(publication), method: :delete %>
+            <%= link_to "Delete", publication_path(publication), method: :delete, 'data-confirm': 'Are you sure?' %>
           <% end %>
         </td>
       </tr>
