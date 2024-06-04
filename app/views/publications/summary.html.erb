@@ -1,4 +1,4 @@
-<%= pie_chart @data %>
+<%= pie_chart @data, library: { plugins: { legend: { labels: { fontSize: 30 } } } } %>
 
 <div>
   Pages:
@@ -16,7 +16,7 @@ ArtefactMisc
   <tbody>
     <% @data.sort_by { _1[1] }.reverse.each do |type, count| %>
       <tr>
-        <td><%=
+        <td style="font-size: 18px"><%=
           if type == 'Kurgan'
             'Burial Mound'
           elsif type == 'Oxcal'
@@ -27,7 +27,7 @@ ArtefactMisc
             type
           end
         %></td>
-        <td><%= count %></td>
+        <td style="font-size: 18px"><%= count %></td>
       </tr>
     <% end %>
   </tbody>
