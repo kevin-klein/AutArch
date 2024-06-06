@@ -42,8 +42,8 @@ class UpdateGraveController < ApplicationController
       figures = Figure.where(id: params[:figures].keys)
       GraveSize.new.run(figures)
       AnalyzeScales.new.run(figures)
-      # GraveAngles.new.run(figures.select { _1.is_a?(Arrow) })
-      # SkeletonPosition.new.run(figures.select { _1.is_a?(SkeletonFigure) })
+      GraveAngles.new.run(figures.select { _1.is_a?(Arrow) })
+      SkeletonPosition.new.run(figures.select { _1.is_a?(SkeletonFigure) })
     when :set_north_arrow
       arrow = @grave.arrow
       arrow.angle = params[:figures][arrow.id.to_s][:angle]
