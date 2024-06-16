@@ -1,6 +1,6 @@
 module Charts
   class ScatterChart < Chart
-    def initialize(data, x_legend: "", y_legend: "", padding: 50, height: 400, width: 1200, link_proc: proc {}, **kwargs) # rubocop:disable Metrics/ParameterLists
+    def initialize(data, x_legend: "", y_legend: "", padding: 100, height: 400, width: 1200, link_proc: proc {}, **kwargs) # rubocop:disable Metrics/ParameterLists
       super(width: width, height: height, padding: padding, **kwargs)
       @data = data
       @axis_marker_height = 5
@@ -113,9 +113,19 @@ module Charts
 
     def calculate_stats # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
       data = @data.map { _1[:data] }.flatten
-      @max_x = data.map { _1[:x] }.max * 1.3
+      @max_x = data.map { _1[:x] }.max
+      @max_x = if @max_x > 0
+        @max_x * 1.3
+      else
+        @max_x * -1.5
+      end
       @max_y = data.map { _1[:y] }.max * 1.3
-      @min_x = data.map { _1[:x] }.min * 0.7
+      @min_x = data.map { _1[:x] }.min
+      @min_x = if @min_x < 0
+        @min_x * -0.6
+      else
+        @min_x * 0.6
+      end
       @min_y = data.map { _1[:y] }.min
       @min_x += (@min_x * 0.1) if @min_x.negative?
       @min_x -= (@min_x * 0.1) if @min_x.positive?
