@@ -52,6 +52,11 @@
 #  probability         :float
 #  contour_info        :jsonb
 #
+def bezier_point(anchor1:, anchor2:, control:, t:)
+  return 0 if anchor2.nil? || anchor1.nil?
+  ((1 - t) * (1 - t) * anchor1 + 2 * (1 - t) * t * control + t * t * anchor2).to_i
+end
+
 class Figure < ApplicationRecord
   belongs_to :page, dependent: :destroy
   belongs_to :publication, dependent: :destroy
@@ -64,10 +69,6 @@ class Figure < ApplicationRecord
   end
 
   def manual_contour
-    def bezier_point(anchor1:, anchor2:, control:, t:)
-      ((1 - t) * (1 - t) * anchor1 + 2 * (1 - t) * t * control + t * t * anchor2).to_i
-    end
-
     first = (0..1).step(0.1).map do |t|
       x = bezier_point(
         t: t,

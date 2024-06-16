@@ -20,10 +20,13 @@ class AnalyzeScales
     image = ImageProcessing.extractFigure(scale, scale.page.image.data.download)
     return "" if image.size == 0
 
+    begin
     ImageProcessing.imwrite("scale.jpg", image)
     t = RTesseract.new("scale.jpg", lang: "eng")
     result = t.to_s.strip
     result.tr("i", "1")
+    sc
+    end
   end
 
   def calculate_contour_ratio(scale, text)
