@@ -21,11 +21,11 @@ class AnalyzeScales
     return "" if image.size == 0
 
     begin
-    ImageProcessing.imwrite("scale.jpg", image)
-    t = RTesseract.new("scale.jpg", lang: "eng")
-    result = t.to_s.strip
-    result.tr("i", "1")
-    sc
+      ImageProcessing.imwrite("scale.jpg", image)
+      t = RTesseract.new("scale.jpg", lang: "eng")
+      result = t.to_s.strip
+      result.tr("i", "1")
+    rescue
     end
   end
 
