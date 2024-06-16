@@ -34,6 +34,48 @@ namespace :analyze do
     end
   end
 
+  task copy_publication: :environment do
+    Publication.transaction do
+      publication = Publication.find(78)
+
+      User.find_each do |user|
+        next if publication.user_id == user.id
+
+        publication_copy = publication.dup
+        publication_copy.user_id = user.id
+        publication_copy.public = false
+        publication_copy.pdf.attach(publication.pdf.blob)
+        publication_copy.save!
+
+        page_ids = {}
+        publication.pages.find_each do |page|
+          page_copy = page.dup
+          page_copy.publication_id = publication_copy.id
+          page_copy.save!
+
+          page_ids[page.id] = page_copy.id
+        end
+
+        new_ids = {}
+        publication.figures.find_each do |figure|
+          figure_copy = figure.dup
+          figure_copy.parent_id = nil
+          figure_copy.publication_id = publication_copy.id
+          figure_copy.page_id = page_ids[figure.page_id]
+          figure_copy.save!
+        end
+
+        publication_copy = Publication.find(publication_copy.id)
+
+        CreateGraves.new.run(publication_copy.pages)
+        CreateLithics.new.run(publication_copy.pages)
+        GraveAngles.new.run(publication_copy.figures.select { _1.is_a?(Arrow) })
+        GraveSize.new.run(publication_copy.figures)
+        AnalyzeScales.new.run(publication_copy.figures)
+      end
+    end
+  end
+
   task analyze_inkscape_csv: :environment do
     baseline_csv = CSV.open(Rails.root.join("supplementary", "experiment", "inkscape", "baseline.csv").to_s, headers: true, header_converters: :symbol).to_a.map(&:to_hash)
     files = [
