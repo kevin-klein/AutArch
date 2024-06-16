@@ -27,7 +27,7 @@ function Segment ({ index, degrees, size, radius, width, fill }) {
   const start = parseInt(degrees) - 15
   const end = parseInt(degrees) + 15
   const path = segmentPath(center, center, radius, radius - width, start, end)
-  return <path fill={fill} d={path} transform='rotate(-90 50 50)' />
+  return <path fill={fill} d={path} stroke='white' transform='rotate(-90 50 50)' />
 }
 
 function Radar ({ angles }) {
@@ -38,8 +38,8 @@ function Radar ({ angles }) {
       viewBox='0 0 100 100'
       xmlns='<http://www.w3.org/2000/svg>'
     >
-      <path strokeWidth='1' stroke='black' d='M50,0,50,100' />
-      <path strokeWidth='1' stroke='black' d='M0,50,100,50' />
+      {/* <path strokeWidth='1' stroke='black' d='M50,0,50,100' />
+      <path strokeWidth='1' stroke='black' d='M0,50,100,50' /> */}
       <circle cx='50' cy='50' r='27' stroke='blue' strokeWidth='25' fill='none' />
 
       {Object.keys(angles).map(angle => {
@@ -47,9 +47,6 @@ function Radar ({ angles }) {
         const intensity = (count / max)
         const fill = `rgb(${intensity * 255} 0  ${(1 - intensity) * 255})`
 
-        // return (
-        //   <rect style={{ mixBlendMode: 'plus-darker' }} fill={fill} x='30' y='60' width='18' rx={5} height='30' key={angle} transform={`rotate(${angle} 50 50)`} />
-        // )
         return (
           <Segment
             radius={40}
@@ -82,18 +79,18 @@ function Markers ({ orientations }) {
 
     const currentSize = Object.values(orientation.angles).reduce((a, b) => a + b, 0)
 
-    let size = 50
+    let size = 65
     if (currentSize / maxSize < 0.3) {
-      size = 30
+      size = 35
     } else if (currentSize / maxSize < 0.6) {
-      size = 42
+      size = 47
     }
 
     return (
       <LeafletMarker
         key={site.id} iconOptions={{
           className: 'jsx-marker',
-          iconSize: [size, size],
+          iconSize: [size * 2, size],
           iconAnchor: [50, 50]
         }}
         position={[orientation.site.lat, orientation.site.lon]}
@@ -104,10 +101,12 @@ function Markers ({ orientations }) {
         }}
       >
         <div>
-          {zoom > 9 && <h4 style={{ fontSize: 10, color: 'black', fontWeight: 500 }}>{site.name}</h4>}
-          <Radar
-            angles={orientation.angles}
-          />
+          {zoom > 9 && <h4 style={{ fontSize: 10, color: 'black', fontWeight: 600 }}>{site.name}</h4>}
+          <div style={{ width: size, height: size }}>
+            <Radar
+              angles={orientation.angles}
+            />
+          </div>
         </div>
 
       </LeafletMarker>
