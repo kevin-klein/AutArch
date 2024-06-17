@@ -97,6 +97,9 @@ class PublicationsController < AuthorizedController
       [77, 209, 209],
       [115, 10, 219]
     ]
+    @hex_colors = @colors.map do |color|
+      "##{color[0].to_s(16)}#{color[1].to_s(16)}#{color[2].to_s(16)}"
+    end
   end
 
   # GET /publications/new
