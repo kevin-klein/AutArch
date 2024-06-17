@@ -10,7 +10,5 @@ class LithicContoursComponent < ViewComponent::Base
     )
     @image = Vips::Image.new_from_buffer(@image_data, "")
     @image_data = "data:image/jpeg;base64,#{Base64.encode64 @image_data}"
-    # ap @image_data
-    # raise
   end
 end

@@ -91,8 +91,6 @@ class GravesController < AuthorizedController
   # GET /graves/1/edit
   def edit
     @no_box = true
-
-    ap step
   end
 
   # POST /graves or /graves.json

@@ -50,11 +50,8 @@ class AnalyzeScales
   end
 
   def assign_contour_width(scale)
-    ap "image"
     image = ImageProcessing.extractFigure(scale, scale.page.image.data.download)
-    ap "contour"
     contours = ImageProcessing.findContours(image, "tree")
-    ap "minAreaRect"
     rects = contours.map { ImageProcessing.minAreaRect _1 }
 
     return if rects.empty?

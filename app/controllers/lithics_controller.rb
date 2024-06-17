@@ -28,15 +28,12 @@ class LithicsController < ApplicationController
       end
       .first(120)
 
-    ap @lithics.last.page_id
-
     @contours = @lithics.map(&:size_normalized_contour)
     @efd_data = @contours.map { Efd.elliptic_fourier_descriptors(_1, normalize: false, order: 15).to_a.flatten }
     @efd_data = @efd_data.map { |item| item.each_slice(2).map(&:last) }
     @efd_pca_chart = Stats.efd_pca(@efd_data)
 
     @efd_pca_chart = Stats.base_pca_chart(@efd_pca_chart)
-    ap Stats.efd_pca(@efd_data)
 
     # ap @lithics.map(&:scale).map(&:meter_ratio)
     # ap @lithics[10]

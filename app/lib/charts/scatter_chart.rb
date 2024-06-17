@@ -140,6 +140,7 @@ module Charts
 
       @x_factor = [@x_factor, @y_factor].min
       @y_factor = @x_factor
+      @x_value_padding += 4
     end
   end
 end
