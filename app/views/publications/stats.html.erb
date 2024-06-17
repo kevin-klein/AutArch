@@ -33,22 +33,22 @@
   <div class='col-md-12' style='padding: 20px;'>
     <div class="card">
       <div class='row'>
-        <div class='p-5 col-xxl-8 col-md-12'>
+        <div class='p-5 col-md-6'>
+          <h5 class="card-title">Grave PCA (width, depth, length, bounding box orientation)</h5>
           <% unless @graves_pca.empty? %>
-            <%== Charts::ScatterChart.new(
-              @graves_pca,
-              html_class: "card-img-top",
-              link_proc:
-                Proc.new { |item| grave_update_grave_path(item[:id], :set_grave_data) }
-            ).render %>
+            <%= react_component('ScatterChart', props: { colors: @hex_colors, data: @graves_pca }) %>
           <% end %>
         </div>
-        <div class='p-5 col-xxl-4 col-md-12'>
-          <%== column_chart(@variances.map { [_1[:name], _1[:variance]] }.to_h) %>
+
+        <div class='col-md-6 p-5'>
+          <h5 class="card-title">EFD PCA</h5>
+
+          <% unless @graves_pca.empty? %>
+            <%= react_component('ScatterChart', props: { colors: @hex_colors, data: @outlines_pca_data }) %>
+          <% end %>
         </div>
       </div>
       <div class="card-body">
-        <h5 class="card-title">Grave PCA (width, depth, length, bounding box orientation)</h5>
         <div class="card-text">
           <table class='table'>
             <tbody>
@@ -201,18 +201,5 @@
         <% end %>
       </div>
     </div>
-  </div>
-
-  <div class='col-md-12'>
-    <h4>EFD PCA</h4>
-
-    <% unless @graves_pca.empty? %>
-      <%== Charts::ScatterChart.new(
-        @outlines_pca_data,
-        html_class: "card-img-top",
-        link_proc:
-          Proc.new { |item| grave_update_grave_path(item[:id], :set_grave_data) }
-      ).render %>
-    <% end %>
   </div>
 </div>
