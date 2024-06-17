@@ -101,12 +101,12 @@ module Stats
       graves = publication.graves.sort_by { _1.id }
       filter_graves(graves, excluded: excluded)
     end.flatten
+    return [[], []] if graves.empty?
 
     contours = graves.map(&:size_normalized_contour)
     frequencies = contours.map { Efd.elliptic_fourier_descriptors(_1, normalize: false, order: 15).to_a.flatten }
-    # max = (255.0 / frequencies.flatten.max)
-    # .map { _1 * max }
-    frequencies = frequencies.map { |item| item.each_slice(2).map(&:last) }
+    max = (10.0 / frequencies.flatten.max)
+    frequencies = frequencies.map { |item| item.each_slice(2).map(&:last).map { _1 * max } }
 
     [frequencies, graves]
   end
@@ -129,19 +129,27 @@ module Stats
 
     pca_data = publications.map do |publication|
       frequencies, graves = outlines_efd([publication])
-      grave_data = pca.transform(frequencies).to_a.map do |pca_item|
-        convert_pca_item_to_polar(pca_item)
+      
+      if frequencies.empty?
+        {
+          name: publication.short_description,
+          data: []
+        }
+      else
+        grave_data = pca.transform(frequencies).to_a.map do |pca_item|
+          convert_pca_item_to_polar(pca_item)
+        end
+  
+        graves = grave_data.zip(graves)
+        data = graves.map do |item, grave|
+          item[:mark] = true if special_objects.include?(grave.id)
+          item.merge({id: grave.id, title: grave.id})
+        end
+        {
+          name: publication.short_description,
+          data: data.map { _1.merge({mark: false}) }
+        }
       end
-
-      graves = grave_data.zip(graves)
-      data = graves.map do |item, grave|
-        item[:mark] = true if special_objects.include?(grave.id)
-        item.merge({id: grave.id, title: grave.id})
-      end
-      {
-        name: publication.short_description,
-        data: data.map { _1.merge({mark: false}) }
-      }
     end
 
     [pca_data, pca]
