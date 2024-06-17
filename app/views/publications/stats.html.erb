@@ -35,12 +35,17 @@
       <div class='row'>
         <div class='p-5 col-xxl-8 col-md-12'>
           <% unless @graves_pca.empty? %>
-            <%== Charts::ScatterChart.new(
+            <%= react_component('ScatterChart', props: { data: @graves_pca }) %>
+            <%
+=begin%>
+ <%== Charts::ScatterChart.new(
               @graves_pca,
               html_class: "card-img-top",
               link_proc:
                 Proc.new { |item| grave_update_grave_path(item[:id], :set_grave_data) }
             ).render %>
+<%
+=end%>
           <% end %>
         </div>
         <div class='p-5 col-xxl-4 col-md-12'>
