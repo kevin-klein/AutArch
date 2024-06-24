@@ -1,11 +1,13 @@
 <nav class='nav' aria-label="Page navigation example">
 
   <ul class="pagination">
-    <li class="page-item"><a
+    <li class="page-item">
+      <a
         class="page-link"
         href="<%= publication_page_path(@publication, Page.order(:id).where('id < ?', @page.id).last || @grave.id) %>"
       >Previous</a></li>
-    <li class="page-item"><a
+    <li class="page-item">
+      <a
         class="page-link"
         href="<%= publication_page_path(@publication, Page.order(:id).where('id > ?', @page.id).first || @grave.id) %>"
       >Next</a></li>

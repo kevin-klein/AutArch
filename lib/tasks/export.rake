@@ -1,4 +1,16 @@
 namespace :export do
+  task lithics: :environment do
+    publication = Publication.find(32)
+
+    CSV.open("lithics.csv", "w") do |csv|
+      csv << ["Page", "total lithics", "false positives"]
+
+      publication.pages.find_each do |page|
+        csv << [page.number + 1, page.figures.where(type: 'StoneTool').count, '']
+      end
+    end
+  end
+
   task spines: :environment do
     CSV.open("spines.csv", "w") do |csv|
       csv << %w[ID Angle]
