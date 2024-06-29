@@ -5,19 +5,43 @@ import matplotlib.pyplot as pl
 from mpl_toolkits.basemap import Basemap
 from adjustText import adjust_text
 from matplotlib.patches import Polygon
+import geopandas as gpd
+from shapely.geometry import box
+import matplotlib.pyplot as plt
+import contextily as ctx
+from xyzservices import TileProvider
+from cartopy import crs as ccrs
 
 pl.figure(figsize = (16, 8))
 
-m = Basemap(
-	projection='cyl',
-	resolution='h',
-	llcrnrlon=3,
-	urcrnrlon=50,
-	llcrnrlat=35,
-	urcrnrlat=65
+# m = Basemap(
+# 	projection='cyl',
+# 	resolution='h',
+# 	llcrnrlon=3,
+# 	urcrnrlon=50,
+# 	llcrnrlat=35,
+# 	urcrnrlat=65
+# )
+# m.shadedrelief(alpha=0.6)
+# m.drawrivers(color='lightsteelblue', zorder=1)
+tile_provider = TileProvider({
+    "url": 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Shaded_Relief/MapServer/tile/{z}/{y}/{x}',
+    "name": "World_Shaded_Relief",
+    "attribution": "Tiles © Esri — Source: Esri",
+    "cross_origin": "Anonymous"}
 )
-m.shadedrelief(alpha=0.6)
-m.drawrivers(color='lightsteelblue', zorder=1)
+
+bbox = (3, 35, 50, 65)
+bbox_polygon = gpd.GeoDataFrame(geometry=[box(*bbox)], crs="EPSG:4326")
+
+# Create a map with PlateCarree projection
+fig, ax = plt.subplots(subplot_kw={'projection': ccrs.PlateCarree()})
+
+# Add the bounding box polygon to the map
+bbox_polygon.boundary.plot(ax=ax, color='#00000000')
+
+# Add XYZ tiles using contextily and xyzservices.TileProvider
+ctx.add_basemap(ax, source=tile_provider, zoom=7, crs="EPSG:4326")
 
 text = []
 
@@ -254,7 +278,7 @@ for place in [
 	Gurbanesti,
 	ARICESTI]:
 	pl.scatter(place['lon'], place['lat'], color='r', marker='.', s=10)
-	text.append(pl.text(place['lon'], place['lat'], place['name'], fontweight='demibold',color='k', fontsize=8, alpha=0.7))
+	text.append(pl.text(place['lon'], place['lat'], place['name'], fontweight='demibold',color='k', fontsize=6, alpha=0.7))
 
 
 for rect in [
@@ -272,7 +296,7 @@ for rect in [
 		(rect['left_bottom']['lon'], rect['left_bottom']['lat']),
 	], fill=False, edgecolor='red',linewidth=1)
 	pl.gca().add_patch(poly)
-	text.append(pl.text(rect['left_top']['lon'], rect['left_top']['lat'], rect['name'], fontweight='demibold',color='k', fontsize=8, alpha=0.7))
+	text.append(pl.text(rect['left_top']['lon'], rect['left_top']['lat'], rect['name'], fontweight='demibold',color='k', fontsize=6, alpha=0.7))
 
 adjust_text(text, force_text=0.2, arrowprops=dict(arrowstyle='-', alpha=0.8, color='k'))
 pl.savefig('comove_map.png', dpi=300, bbox_inches='tight')
