@@ -36,14 +36,13 @@ export function Box ({ onDraggingStart, active, figure: { id, x1, y1, x2, y2, ty
           y1={y1}
           x2={x2}
           y2={y2}
-
           markerEnd='url(#arrowhead)'
         />}
 
       {type !== 'Spine' && <rect
         fill='none'
         stroke={color}
-        strokeOpacity={color == 'black' ? '0.2' : '1'}
+        strokeOpacity={color === 'black' ? '0.2' : '1'}
         strokeWidth='3'
         x={x1}
         y={y1}
@@ -85,17 +84,19 @@ function NewFigureDialog ({ closeDialog, addFigure }) {
           <div className='modal-body'>
             <form>
               <div className='input-group mb-3'>
-            <select value={type} onChange={evt => setType(evt.target.value)} className='form-select' aria-label='Default select example'>
-                <option value='Grave'>Grave</option>
-                <option value='Spine'>Spine</option>
-                <option value='Skeleton'>Skeleton</option>
-                <option value='Skull'>Skull</option>
-                <option value='Scale'>Scale</option>
-                <option value='GraveCrossSection'>Grave Cross Section</option>
-                <option value='Arrow'>Arrow</option>
-                <option value='Good'>Good</option>
-              </select>
-          </div>
+                <select value={type} onChange={evt => setType(evt.target.value)} className='form-select' aria-label='Default select example'>
+                  <option value='Grave'>Grave</option>
+                  <option value='Spine'>Spine</option>
+                  <option value='Skeleton'>Skeleton</option>
+                  <option value='Skull'>Skull</option>
+                  <option value='Scale'>Scale</option>
+                  <option value='GraveCrossSection'>Grave Cross Section</option>
+                  <option value='Arrow'>Arrow</option>
+                  <option value='Good'>Good</option>
+                  <option value='Map'>Map</option>
+                  <option value='Artefact'>Artefact</option>
+                </select>
+              </div>
             </form>
           </div>
           <div className='modal-footer'>
@@ -232,10 +233,6 @@ export default function AddFigure ({ image, pageFigures, page, next_url }) {
     }
   }
 
-  function onSiteChange (evt) {
-    setSite(evt.value)
-  }
-
   function onDrag (evt) {
     if (draggingState !== null) {
       const figure = figures[draggingState.data.figure.id]
@@ -287,77 +284,77 @@ export default function AddFigure ({ image, pageFigures, page, next_url }) {
           <div style={{ position: 'sticky', top: 60 }} className='card'>
             <div className='card-body'>
               <div className='card-text'>
-              <ul className='list-group'>
-                {Object.values(figures).map(figure =>
-                  <React.Fragment key={figure.id}>
-                    <div
-                      onClick={() => { setCurrentEditBox(figure.id) }}
-                      className={`list-group-item list-group-item-action d-flex justify-content-between align-items-start ${currentEditBoxActiveClass(figure)}`}
-                    >
-                      <div className='ms-2 me-auto'>
-                        <div className='fw-bold'>{figure.type}</div>
-                      </div>
+                <ul className='list-group'>
+                  {Object.values(figures).map(figure =>
+                    <React.Fragment key={figure.id}>
                       <div
-                        onClick={() => { removeEditBox(figure.id) }}
-                        className='btn btn-primary badge bg-primary rounded-pill'
-                        role='button' data-bs-toggle='button'
+                        onClick={() => { setCurrentEditBox(figure.id) }}
+                        className={`list-group-item list-group-item-action d-flex justify-content-between align-items-start ${currentEditBoxActiveClass(figure)}`}
                       >
-                        X
-                      </div>
-                    </div>
-                    {currentEditBox === figure.id && figure.type === 'SkeletonFigure' &&
-                      <div className='row mb-3 mt-3'>
-                        <label className='col-sm-2 col-form-label'>Position</label>
-                        <div className='col-sm-10'>
-                          <select
-                            value={figure.deposition_type}
-                            className='form-select'
-                            aria-label='Default select example'
-                            onChange={(evt) => { onChangeFigure(figure.id, { ...figure, deposition_type: evt.target.value }) }}
-                          >
-                            <option value='unknown'>Unknown</option>
-                            <option value='back'>Back</option>
-                            <option value='side'>Side</option>
-                          </select>
+                        <div className='ms-2 me-auto'>
+                          <div className='fw-bold'>{figure.type}</div>
                         </div>
-                      </div>}
-                  </React.Fragment>
-                )}
+                        <div
+                          onClick={() => { removeEditBox(figure.id) }}
+                          className='btn btn-primary badge bg-primary rounded-pill'
+                          role='button' data-bs-toggle='button'
+                        >
+                          X
+                        </div>
+                      </div>
+                      {currentEditBox === figure.id && figure.type === 'SkeletonFigure' &&
+                        <div className='row mb-3 mt-3'>
+                          <label className='col-sm-2 col-form-label'>Position</label>
+                          <div className='col-sm-10'>
+                            <select
+                              value={figure.deposition_type}
+                              className='form-select'
+                              aria-label='Default select example'
+                              onChange={(evt) => { onChangeFigure(figure.id, { ...figure, deposition_type: evt.target.value }) }}
+                            >
+                              <option value='unknown'>Unknown</option>
+                              <option value='back'>Back</option>
+                              <option value='side'>Side</option>
+                            </select>
+                          </div>
+                        </div>}
+                    </React.Fragment>
+                  )}
 
-                <a
-                  href='#'
-                  onClick={(evt) => { evt.preventDefault(); createNewFigure() }}
-                  className='list-group-item list-group-item-action d-flex justify-content-between align-items-start'
-                >
-                  <div className='ms-2 me-auto'>
-                    <div className='fw-bold'>New Figure</div>
-                  </div>
-                </a>
-              </ul>
-            </div>
+                  <a
+                    href='#'
+                    onClick={(evt) => { evt.preventDefault(); createNewFigure() }}
+                    className='list-group-item list-group-item-action d-flex justify-content-between align-items-start'
+                  >
+                    <div className='ms-2 me-auto'>
+                      <div className='fw-bold'>New Figure</div>
+                    </div>
+                  </a>
+                </ul>
+              </div>
               <form action={next_url} method='post'>
-              <input type='hidden' name='_method' value='patch' />
-              <input type='hidden' name='authenticity_token' value={token} />
-              {Object.values(figures).map(figure => {
-                const id = figure.id
-                return (
-                  <React.Fragment key={figure.id}>
-                    <input type='hidden' name={`figures[${id}][x1]`} value={figure.x1} />
-                    <input type='hidden' name={`figures[${id}][x2]`} value={figure.x2} />
-                    <input type='hidden' name={`figures[${id}][y1]`} value={figure.y1} />
-                    <input type='hidden' name={`figures[${id}][y2]`} value={figure.y2} />
-                    <input type='hidden' name={`figures[${id}][verified]`} value={figure.verified} />
-                    <input type='hidden' name={`figures[${id}][disturbed]`} value={figure.disturbed} />
-                    <input type='hidden' name={`figures[${id}][deposition_type]`} value={figure.deposition_type} />
-                    <input type='hidden' name={`figures[${id}][publication_id]`} value={figure.publication_id} />
-                    <input type='hidden' name={`figures[${id}][text]`} value={figure.text} />
-                    <input type='hidden' name={`figures[${id}][angle]`} value={figure.angle} />
-                  </React.Fragment>
-                )
-              })}
+                <input type='hidden' name='_method' value='patch' />
+                <input type='hidden' name='authenticity_token' value={token} />
+                {Object.values(figures).map(figure => {
+                  const id = figure.id
+                  return (
+                    <React.Fragment key={figure.id}>
+                      <input type='hidden' name={`figures[${id}][x1]`} value={figure.x1} />
+                      <input type='hidden' name={`figures[${id}][x2]`} value={figure.x2} />
+                      <input type='hidden' name={`figures[${id}][y1]`} value={figure.y1} />
+                      <input type='hidden' name={`figures[${id}][y2]`} value={figure.y2} />
+                      <input type='hidden' name={`figures[${id}][verified]`} value={figure.verified} />
+                      <input type='hidden' name={`figures[${id}][disturbed]`} value={figure.disturbed} />
+                      <input type='hidden' name={`figures[${id}][deposition_type]`} value={figure.deposition_type} />
+                      <input type='hidden' name={`figures[${id}][publication_id]`} value={figure.publication_id} />
+                      <input type='hidden' name={`figures[${id}][text]`} value={figure.text} />
+                      <input type='hidden' name={`figures[${id}][angle]`} value={figure.angle} />
+                    </React.Fragment>
+                  )
+                })}
 
-              <input value='Save' type='submit' className='btn btn-primary card-link' />
-            </form>
+                <input value='Save' type='submit' className='btn btn-primary card-link' />
+              </form>
 
             </div>
           </div>

@@ -1,9 +1,10 @@
 import { ScaleControl, MapContainer, TileLayer, useMapEvents, useMap, useMapEvent, Rectangle } from 'react-leaflet'
 import React from 'react'
 import { useEventHandlers } from '@react-leaflet/core'
-
 // import { Radar } from 'react-chartjs-2'
 import LeafletMarker from './LeafletMarker'
+import czech from './czech.json'
+import { GeoJSON } from 'react-leaflet/GeoJSON'
 
 function polarToCartesian (x, y, r, degrees) {
   const radians = degrees * Math.PI / 180.0
@@ -81,7 +82,7 @@ function Markers ({ orientations }) {
 
     const currentSize = Object.values(orientation.angles).reduce((a, b) => a + b, 0)
 
-    let size = 65
+    let size = 400
     if (currentSize / maxSize < 0.3) {
       size = 35
     } else if (currentSize / maxSize < 0.6) {
@@ -92,8 +93,8 @@ function Markers ({ orientations }) {
       <LeafletMarker
         key={site.id} iconOptions={{
           className: 'jsx-marker',
-          iconSize: [size * 2, size],
-          iconAnchor: [30, 30]
+          iconSize: [size, size],
+          iconAnchor: [0, 0]
         }}
         position={[orientation.site.lat, orientation.site.lon]}
         eventHandlers={{
@@ -105,6 +106,14 @@ function Markers ({ orientations }) {
         <div>
           {zoom > 9 && <h4 style={{ fontSize: 10, color: 'black', fontWeight: 600, margin: 0 }}>{site.name}</h4>}
           <div style={{ width: size, height: size }}>
+            {/* <svg viewBox="0 0 40 80">
+              <path
+                fill="black"
+                fillRule="evenodd"
+                d="M11.291 21.706 12 21l-.709.706zM12 21l.708.706a1 1 0 0 1-1.417 0l-.006-.007-.017-.017-.062-.063a47.708 47.708 0 0 1-1.04-1.106 49.562 49.562 0 0 1-2.456-2.908c-.892-1.15-1.804-2.45-2.497-3.734C4.535 12.612 4 11.248 4 10c0-4.539 3.592-8 8-8 4.408 0 8 3.461 8 8 0 1.248-.535 2.612-1.213 3.87-.693 1.286-1.604 2.585-2.497 3.735a49.583 49.583 0 0 1-3.496 4.014l-.062.063-.017.017-.006.006L12 21zm0-8a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"
+                clipRule="evenodd"
+              />
+            </svg> */}
             <Radar
               angles={orientation.angles}
             />
@@ -117,7 +126,7 @@ function Markers ({ orientations }) {
 
   return (
     <>
-      <div class='leaflet-bottom leaflet-right' style={{ bottom: 60, right: 5 }}>
+      <div className='leaflet-bottom leaflet-right' style={{ bottom: 60, right: 5 }}>
         <div style={{ backgroundColor: 'white', padding: 5, borderRadius: 5 }}>
           <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
             <div style={{ width: 35, height: 35 }}>
@@ -252,6 +261,11 @@ export default function EuropeMap ({ orientations }) {
         />
         <Markers orientations={orientations} />
         <MinimapControl position='topright' />
+        <GeoJSON
+          data={czech}
+          attribution='https://cartographyvectors.com/map/895-czech-republic-detailed-boundary'
+          style={{ color: 'grey', fill: false }}
+        />
         <ScaleControl position='bottomright' />
         <NorthArrowControl position='bottomleft' />
       </MapContainer>
