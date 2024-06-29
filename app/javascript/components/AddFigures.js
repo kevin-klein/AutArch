@@ -95,6 +95,7 @@ function NewFigureDialog ({ closeDialog, addFigure }) {
                   <option value='Good'>Good</option>
                   <option value='Map'>Map</option>
                   <option value='Artefact'>Artefact</option>
+                  <option value='Ceramic'>Ceramic</option>
                 </select>
               </div>
             </form>
