@@ -57,3 +57,4 @@ yarn-debug.log*
 /models
 /test_env
 scale.jpg
+lithics.json
