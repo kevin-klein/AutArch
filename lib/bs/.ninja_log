@@ -79,3 +79,8 @@
 30	45	1715513290631237012	app/javascript/components/ManualContour.cmj	ba7b685ca032e823
 30	45	1715513290631237012	app/javascript/components/ManualContour.cmi	ba7b685ca032e823
 30	45	1715513290631237012	../../app/javascript/components/ManualContour_res.js	ba7b685ca032e823
+0	28	1719753502349662190	app/javascript/components/ManualContour.ast	bdf1fe1a8e5e1820
+28	31	1719753502349662190	app/javascript/components/ManualContour.d	5afa280d4364fec4
+31	47	1715513290631237012	app/javascript/components/ManualContour.cmj	ba7b685ca032e823
+31	47	1715513290631237012	app/javascript/components/ManualContour.cmi	ba7b685ca032e823
+31	47	1715513290631237012	../../app/javascript/components/ManualContour_res.js	ba7b685ca032e823
