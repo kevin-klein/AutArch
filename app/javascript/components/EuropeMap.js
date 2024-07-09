@@ -82,7 +82,7 @@ function Markers ({ orientations }) {
 
     const currentSize = Object.values(orientation.angles).reduce((a, b) => a + b, 0)
 
-    let size = 400
+    let size = 65
     if (currentSize / maxSize < 0.3) {
       size = 35
     } else if (currentSize / maxSize < 0.6) {
