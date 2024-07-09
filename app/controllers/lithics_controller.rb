@@ -27,7 +27,7 @@ class LithicsController < ApplicationController
           # rect[:width] < 500 && rect[:height] < 500 && !contour.flatten.any? { _1 < 0 }
         end
       end
-      .sample(10)
+      .sample(100)
 
     # raise
 
