@@ -14,6 +14,7 @@ import torchvision.transforms.functional as F
 import numpy as np
 import random
 from arrow_model import get_arrow_model
+import math
 
 plt.rcParams["savefig.bbox"] = 'tight'
 
@@ -40,7 +41,9 @@ def show(imgs):
 
 if __name__ == '__main__':
   # model = get_arrow_model()
-  model = torchvision.models.resnet152(weights=None, num_classes=72)
+  model = torchvision.models.resnet152(weights=torchvision.models.ResNet152_Weights.IMAGENET1K_V2)
+  model.fc = torch.nn.Linear(in_features=2048, out_features=2, bias=True)
+
   # model.load_state_dict(torch.load('models/arrow_resnet.model'))
   dataset = torchvision.datasets.ImageFolder('arrows', transforms.Compose([
         # transforms.RandomResizedCrop(224),
@@ -55,10 +58,10 @@ if __name__ == '__main__':
   model.to(device)
 
   # optimizer = torch.optim.SGD(model.parameters(), lr=0.0001, momentum=0.9)
-  # optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
-  optimizer = torch.optim.RMSprop(model.parameters(), lr=0.001)
+  optimizer = torch.optim.Adam(model.parameters(), lr=1e-5)
+  # optimizer = torch.optim.RMSprop(model.parameters(), lr=0.001)
   # weights = torchvision.models.ResNet18_Weights.DEFAULT
-  criterion = nn.CrossEntropyLoss()
+  criterion = nn.MSELoss()
 
   # 3000
   num_epochs = 1000
@@ -74,16 +77,19 @@ if __name__ == '__main__':
         # show(images)
         # images = [preprocess(image) for image in images]
         images = images.to(device)
-        angles = [random.randint(0, 71) for _ in images]
-        images = [rotate(image, angle * 5, fill=1) for image, angle in zip(images, angles)]
+        angles = [random.randint(0, 360) for _ in images]
+        images = [rotate(image, angle, fill=1) for image, angle in zip(images, angles)]
+        angles = [[math.cos(math.radians(angle)), math.sin(math.radians(angle))] for angle in angles]
         angles = torch.tensor(angles).cuda()
 
         images = torch.stack(images).to(device)
 
         outputs = model(images)
-        _, preds = torch.max(outputs, 1)
+        # _, preds = torch.max(outputs, 1)
         # print('Predictions: ' + str(preds))
         # print('Angles: ' + str(angles))
+        # print(outputs.shape)
+        # print(angles.shape)
         loss = criterion(outputs, angles)
 
         i += 1
