@@ -8,6 +8,7 @@ Rails.application.routes.draw do # rubocop:disable Metrics/BlockLength
   resources :anthropologies
   resources :cultures
   resources :taxonomies
+  resources :tags
   resources :chronologies do
     resources :c14_dates
   end

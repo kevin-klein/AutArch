@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_05_30_123803) do
+ActiveRecord::Schema[7.0].define(version: 2024_08_13_142400) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -160,6 +160,13 @@ ActiveRecord::Schema[7.0].define(version: 2024_05_30_123803) do
     t.index ["site_id"], name: "index_figures_on_site_id"
   end
 
+  create_table "figures_tags", force: :cascade do |t|
+    t.bigint "tag_id"
+    t.bigint "figure_id"
+    t.index ["figure_id"], name: "index_figures_tags_on_figure_id"
+    t.index ["tag_id"], name: "index_figures_tags_on_tag_id"
+  end
+
   create_table "genetics", force: :cascade do |t|
     t.integer "data_type"
     t.float "endo_content"
@@ -277,6 +284,10 @@ ActiveRecord::Schema[7.0].define(version: 2024_05_30_123803) do
     t.bigint "bone_id"
     t.index ["bone_id"], name: "index_stable_isotopes_on_bone_id"
     t.index ["skeleton_id"], name: "index_stable_isotopes_on_skeleton_id"
+  end
+
+  create_table "tags", force: :cascade do |t|
+    t.string "name", null: false
   end
 
   create_table "taxonomies", force: :cascade do |t|
