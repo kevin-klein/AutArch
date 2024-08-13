@@ -1,0 +1,6 @@
+<%= render('stepper') %>
+
+<%= simple_form_for(@grave, url: wizard_path) do |f| %>
+  <%= f.association :tags, as: :check_boxes %>
+  <%= f.submit("Next", class: "btn btn-primary") %>
+<% end %>

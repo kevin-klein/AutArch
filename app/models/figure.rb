@@ -64,6 +64,8 @@ class Figure < ApplicationRecord
   serialize :contour, JSON
   validates :publication, presence: true
 
+  has_and_belongs_to_many :tags
+
   before_save do
     self.publication_id = page.publication_id
   end

@@ -4,27 +4,22 @@ class GraveAngles
       figures ||= Arrow.includes({page: :image})
       figures.each do |arrow|
         prediction_result = arrow_angle(arrow)
-        ap prediction_result
-        ap convert_result(prediction_result)
-        # arrow.angle =
-        # arrow.save!
+        cos, sin = prediction_result
+        arrow.angle = GraveAngles.convert_angle_result(cos: cos, sin: sin)
+        arrow.save!
       end
     end
     nil
   end
 
-  def convert_domain(value)
-    value.clamp(-1, 1)
-  end
+  def self.convert_angle_result(cos:, sin:)
+    result = Math.atan2(sin, cos) * (180.0 / Math::PI)
 
-  def convert_acos_result(value)
-    (value / Math::PI) * 360
-  end
-
-  def convert_result(result)
-    cos, sin = result
-
-    Math.atan2(sin, cos) * (180.0 / Math::PI)
+    if result < 0
+      result.abs
+    else
+      -result % 360
+    end
   end
 
   def arrow_angle(arrow)

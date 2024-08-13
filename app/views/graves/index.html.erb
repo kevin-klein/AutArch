@@ -37,7 +37,7 @@
         <%= link_to('Length', url_for(params.permit!.to_h.merge({ sort: length_sort }))) %>
       </th>
       <th>
-        Depth
+        Tag
       </th>
       <th>Orientation [Grave]</th>
       <th></th>
@@ -66,7 +66,7 @@
             <%= number_with_unit grave.height_with_unit %>
           <% end %>
         </td>
-        <td><%= number_with_unit grave.grave_cross_section&.depth_with_unit %></td>
+        <td><%= grave.tags.map { _1.name }.join(' ') %></td>
         <td>
           <% unless grave&.arrow&.angle.nil? %>
             <%= ((grave.angle.abs.round + grave.arrow.angle) % 180).round %>
