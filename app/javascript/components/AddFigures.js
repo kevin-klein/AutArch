@@ -293,7 +293,7 @@ export default function AddFigure ({ image, pageFigures, page, next_url }) {
                         className={`list-group-item list-group-item-action d-flex justify-content-between align-items-start ${currentEditBoxActiveClass(figure)}`}
                       >
                         <div className='ms-2 me-auto'>
-                          <div className='fw-bold'>{figure.type}</div>
+                          <div className='fw-bold'>{figure.type} {figure.id}</div>
                         </div>
                         <div
                           onClick={() => { removeEditBox(figure.id) }}
