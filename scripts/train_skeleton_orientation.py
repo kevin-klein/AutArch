@@ -13,7 +13,6 @@ import matplotlib.pyplot as plt
 import torchvision.transforms.functional as F
 import numpy as np
 import random
-from arrow_model import get_arrow_model
 import math
 
 plt.rcParams["savefig.bbox"] = 'tight'
@@ -40,12 +39,10 @@ def show(imgs):
     plt.show()
 
 if __name__ == '__main__':
-  # model = get_arrow_model()
   model = torchvision.models.resnet152(weights=torchvision.models.ResNet152_Weights.IMAGENET1K_V2)
   model.fc = torch.nn.Linear(in_features=2048, out_features=2, bias=True)
 
-  # model.load_state_dict(torch.load('models/arrow_resnet.model'))
-  dataset = torchvision.datasets.ImageFolder('arrows', transforms.Compose([
+  dataset = torchvision.datasets.ImageFolder('skeleton_angles', transforms.Compose([
         # transforms.RandomResizedCrop(224),
         # transforms.RandomHorizontalFlip(),
         transforms.ToTensor(),
@@ -57,6 +54,8 @@ if __name__ == '__main__':
   device = torch.device('cuda')
   model.to(device)
 
+  model.load_state_dict(torch.load('models/skeleton_orientation_resnet.model'))
+
   # optimizer = torch.optim.SGD(model.parameters(), lr=0.0001, momentum=0.9)
   optimizer = torch.optim.Adam(model.parameters(), lr=1e-5)
   # optimizer = torch.optim.RMSprop(model.parameters(), lr=0.001)
@@ -64,7 +63,7 @@ if __name__ == '__main__':
   criterion = nn.MSELoss()
 
   # 3000
-  num_epochs = 1000
+  num_epochs = 300
   for epoch in range(num_epochs):
       start = time.time()
       optimizer.zero_grad()
@@ -97,4 +96,4 @@ if __name__ == '__main__':
 
       print(epoch_loss, f'time: {time.time() - start}')
 
-  torch.save(model.state_dict(), 'models/arrow_resnet.model')
+      torch.save(model.state_dict(), 'models/skeleton_orientation_resnet.model')

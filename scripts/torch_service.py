@@ -24,7 +24,10 @@ loaded_model.eval()
 loaded_model.to(device)
 
 app = Bottle()
-arrow_model = torchvision.models.resnet152(weights=None, num_classes=72).to(device)
+arrow_model = torchvision.models.resnet152(weights=torchvision.models.ResNet152_Weights.IMAGENET1K_V2)
+arrow_model.fc = torch.nn.Linear(in_features=2048, out_features=2, bias=True)
+arrow_model = arrow_model.to(device)
+
 arrow_model.load_state_dict(torch.load('models/arrow_resnet.model', map_location=device))
 
 skeleton_model = torchvision.models.resnet152(weights=None, num_classes=2).to(device)
@@ -67,9 +70,10 @@ def analyze_arrow(file):
     with torch.no_grad():
         arrow_model.eval()
         prediction = arrow_model(img)
-        _, prediction = torch.max(prediction, 1)
+        # _, prediction = torch.max(prediction, 1)
 
-    return prediction * 5
+    # return prediction * 5
+    return prediction
 
 def analyze_skeleton(file):
     request_object_content = file.read()
