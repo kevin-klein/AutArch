@@ -59,6 +59,23 @@ namespace :export do
     end
   end
 
+  task skeleton_images: :environment do
+    skeletons = SkeletonFigure
+      .includes(:grave)
+      .joins(:grave)
+      # .where("figures.probability > ?", 0.6)
+
+    skeletons.find_each do |skeleton|
+      spine = skeletonbash.grave.spines.first
+      next if spine.nil?
+      image = ImageProcessing.extractFigure(skeleton, skeleton.page.image.data.download)
+      image = ImageProcessing.rotateNoCutoff(image, -spine.angle)
+
+      ImageProcessing.imwrite(Rails.root.join("skeleton_angles", "#{skeleton.id}.jpg").to_s, image)
+    rescue ActiveStorage::FileNotFoundError
+    end
+  end
+
   task graves: :environment do
     graves = Grave
       .includes(:scale)
