@@ -1,6 +1,6 @@
 class UpdateGraveController < ApplicationController
   include Wicked::Wizard
-  steps :set_grave_data, :set_site, :resize_boxes, :show_contours, :set_scale, :set_north_arrow, :set_skeleton_data
+  steps :set_grave_data, :set_site, :set_tags, :resize_boxes, :show_contours, :set_scale, :set_north_arrow, :set_skeleton_data
 
   def show
     @grave = Grave.find(params[:grave_id])
@@ -18,6 +18,8 @@ class UpdateGraveController < ApplicationController
     when :set_grave_data, :set_skeleton_data
       @grave.update(grave_params)
     when :set_site
+      @grave.update(grave_params)
+    when :set_tags
       @grave.update(grave_params)
     when :set_scale
       if params[:scale].present?
@@ -71,6 +73,7 @@ class UpdateGraveController < ApplicationController
         :page_size,
         :identifier,
         :site_id,
+        tag_ids: [],
         skeleton_figures_attributes: %i[id deposition_type]
       )
     else

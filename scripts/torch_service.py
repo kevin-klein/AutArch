@@ -30,6 +30,10 @@ arrow_model = arrow_model.to(device)
 
 arrow_model.load_state_dict(torch.load('models/arrow_resnet.model', map_location=device))
 
+skeleton_orientation_model = model = torchvision.models.resnet152(weights=torchvision.models.ResNet152_Weights.IMAGENET1K_V2)
+skeleton_orientation_model.fc = torch.nn.Linear(in_features=2048, out_features=2, bias=True)
+skeleton_orientation_model.to(device)
+
 skeleton_model = torchvision.models.resnet152(weights=None, num_classes=2).to(device)
 skeleton_model.load_state_dict(torch.load('models/skeleton_resnet.model', map_location=device))
 skeleton_labels = torch.load('models/skeleton_resnet_labels.model', map_location=device)
@@ -70,9 +74,20 @@ def analyze_arrow(file):
     with torch.no_grad():
         arrow_model.eval()
         prediction = arrow_model(img)
-        # _, prediction = torch.max(prediction, 1)
 
-    # return prediction * 5
+    return prediction
+
+def analyze_skeleton_orientation(file):
+    request_object_content = file.read()
+    img = Image.open(io.BytesIO(request_object_content))
+
+    img, _ = PILToTensor()(img)
+    img = torch.stack([img]).to(device)
+
+    with torch.no_grad():
+        skeleton_orientation_model.eval()
+        prediction = skeleton_orientation_model(img)
+
     return prediction
 
 def analyze_skeleton(file):
@@ -109,6 +124,13 @@ def upload_arrow():
 def upload_arrow():
     upload_file = request.POST['image']
     result = analyze_skeleton(upload_file.file)
+
+    return { 'predictions': result }
+
+@app.post('/skeleton-orientation')
+def upload_skeleton_angle():
+    upload_file = request.POST['image']
+    result = analyze_skeleton_orientation(upload_file.file)
 
     return { 'predictions': result }
 
