@@ -66,6 +66,7 @@ class Grave < Figure
     inverse_of: :grave
   has_many :skulls, through: :skeleton_figures, foreign_key: "parent_id", class_name: "Skull", inverse_of: :grave
   has_many :spines, dependent: :destroy, foreign_key: "parent_id", class_name: "Spine", inverse_of: :grave
+  has_many :artefacts, dependent: :destroy, foreign_key: "parent_id", class_name: "Good", inverse_of: :grave
 
   accepts_nested_attributes_for :skeleton_figures
   validates :identifier, uniqueness: {scope: :publication}, allow_blank: true
