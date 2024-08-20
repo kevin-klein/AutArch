@@ -70,6 +70,8 @@ class PublicationsController < AuthorizedController
 
     # @graves_pca_chart = Stats.pca_chart(@graves_pca)
 
+    @heatmap_data = ArtefactsHeatmap.new.run(@publication)
+
     @outlines_data, _ = Stats.outlines_efd([@publication, *@other_publications].reverse, excluded: @excluded_graves)
 
     # upgma_result = Stats.upgma(@outlines_data)

@@ -185,8 +185,80 @@ class Figure < ApplicationRecord
     )
   end
 
+  def rotate_bounding_box(angle)
+    [[x1, y1], [x2, y2]].map do |x, y|
+      radians = angle * Math::PI / 180
+      cos = Math.cos(radians)
+      sin = Math.sin(radians)
+      [((x * cos) - (y * sin)).to_i, ((x * sin) + (y * cos)).to_i]
+    end
+  end
+
+  def rotate_contour(angle)
+    single_contour = if is_a?(StoneTool)
+      contour.max_by do |contour|
+        if contour.size < 10
+          0
+        else
+          ImageProcessing.contourArea(contour)
+        end
+      end
+    else
+      contour
+    end
+
+    return [] if single_contour.nil? || single_contour.size < 5
+
+    single_contour.map do |x, y|
+      radians = angle * Math::PI / 180
+      cos = Math.cos(radians)
+      sin = Math.sin(radians)
+      [((x * cos) - (y * sin)).to_i, ((x * sin) + (y * cos)).to_i]
+    end
+  end
+
+  def size_ignoring_contour(angle:)
+    return [] if contour.empty?
+
+    return [] if contour.nil? || contour.size < 5
+
+    rotated_contour = contour.map do |x, y|
+      radians = if angle.nil?
+        (arrow.angle * Math::PI) / 180
+      else
+        (angle * Math::PI) / 180
+      end
+      cos = Math.cos(radians)
+      sin = Math.sin(radians)
+      [(x * cos) - (y * sin), (x * sin) + (y * cos)]
+    end
+    rotated_contour += [rotated_contour[0]]
+
+    min_x = rotated_contour.min_by { -1[0] }[0]
+    min_y = rotated_contour.min_by { _1[1] }[1]
+
+    if min_x.negative?
+      rotated_contour = rotated_contour.map do |x, y|
+        [x + min_x.abs, y]
+      end
+    end
+
+    if min_y.negative?
+      rotated_contour = rotated_contour.map do |x, y|
+        [x, y + min_y.abs]
+      end
+    end
+
+    max_x = rotated_contour.max_by { _1[0] }[0]
+    max_y = rotated_contour.max_by { _1[1] }[1]
+
+    rotated_contour.map do |x, y|
+      [x / max_x.to_f, y / max_y.to_f]
+    end
+  end
+
   # x_width, y_width is in meters
-  def size_normalized_contour(x_width: 0.2, y_width: 0.2)
+  def size_normalized_contour(x_width: 0.2, y_width: 0.2, move_center: true, angle: nil, normalize_size: false)
     return [] if contour.empty?
 
     single_contour = if is_a?(StoneTool)
@@ -209,11 +281,14 @@ class Figure < ApplicationRecord
     center_y = (bounding[:height] / 2) + bounding[:y]
 
     rotated_contour =
-      if respond_to?(:arrow) && arrow.present?
+      if angle.present? || (respond_to?(:arrow) && arrow.present?)
         single_contour.map do |x, y|
-          angle = (arrow.angle * Math::PI) / 180
+          radians = if angle.nil?
+            (arrow.angle * Math::PI) / 180
+          else
+            (angle * Math::PI) / 180
+          end
 
-          radians = angle * Math::PI / 180
           x2 = x - center_x
           y2 = y - center_y
           cos = Math.cos(radians)
@@ -231,7 +306,7 @@ class Figure < ApplicationRecord
       cm_on_page = page_size.to_f / page.image.width
       (cm_on_page / 100.0) * percentage_scale
     else
-      raise
+      return []
     end
 
     center_x *= ratio
@@ -240,8 +315,19 @@ class Figure < ApplicationRecord
     offset_x = center_x - x_width
     offset_y = center_y - y_width
 
-    rotated_contour.map do |x, y|
+    result = rotated_contour.map do |x, y|
       [((x * ratio) - offset_x) * 1000, ((y * ratio) - offset_y) * 1000]
     end
+
+    if normalize_size
+      max_x = result.max_by { _1[0] }[0]
+      max_y = result.max_by { _1[1] }[1]
+
+      result = result.map do |x, y|
+        [x / max_x.to_f, y / max_y.to_f]
+      end
+    end
+
+    result
   end
 end

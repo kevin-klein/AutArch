@@ -53,4 +53,5 @@
 #  contour_info        :jsonb
 #
 class Artefact < Figure
+  belongs_to :grave, foreign_key: "parent_id", optional: true, inverse_of: :artefacts
 end
