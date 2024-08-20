@@ -11,66 +11,87 @@ import NorthArrow from '../components/NorthArrow'
 import EuropeMap from '../components/EuropeMap'
 import ImportProgress from '../components/ImportProgress'
 import SiteMap from '../components/SiteMap'
-import Chart from "react-apexcharts";
+import Chart from 'react-apexcharts'
+import simpleheat from '../components/simpleheat'
+// import h337 from 'heatmap.js'
 
-function ScatterChart({ data, colors }) {
-  console.log(data)
-  console.log(colors)
+import ReactOnRails from 'react-on-rails'
+import { Filler, LineElement, PointElement, RadialLinearScale, Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js'
 
+import Rails from '@rails/ujs'
+
+function Heatmap ({ data, graves }) {
+  const width = 500
+  const height = 700
+
+  React.useLayoutEffect(() => {
+    const newData = data
+      .map((point) => [point[0] * width, point[1] * height, 1])
+
+    simpleheat('heatmap')
+      .data(newData)
+      .overlays(graves)
+      .radius(15, 20)
+      .draw()
+  })
+
+  return (<canvas id='heatmap' width={width} height={height} />)
+}
+
+function ScatterChart ({ data, colors }) {
   const series = data.map(item => ({
     ...item,
     name: `${item.name} (N = ${item.data.length})`,
     data: item.data.map(dataItem => [dataItem.x, dataItem.y])
   }))
 
-  return <Chart type="scatter" series={series} options={{
-    tooltip: {
-      custom: function({series, seriesIndex, dataPointIndex, w}) {
-        return '<div class="arrow_box" style="padding: 10;">' +
+  return (
+    <Chart
+      type='scatter' series={series} options={{
+        tooltip: {
+          custom: function ({ series, seriesIndex, dataPointIndex, w }) {
+            return '<div class="arrow_box" style="padding: 10;">' +
           '<span>Grave ' + data[seriesIndex].data[dataPointIndex].title + '</span>' +
           '</div>'
-      }
-    },
-    colors: colors,
-    legend: {
-      fontSize: 16
-    },
-    chart: {
-      animations: {
-        enabled: false
-      },
-      events: {
-        markerClick: function(event, chartContext, { seriesIndex, dataPointIndex, config}) {
-          const item = data[seriesIndex].data[dataPointIndex]
-          const link = `/graves/${item.id}/update_grave/set_grave_data`
-          window.location.href = link
+          }
+        },
+        colors,
+        legend: {
+          fontSize: 16
+        },
+        chart: {
+          animations: {
+            enabled: false
+          },
+          events: {
+            markerClick: function (event, chartContext, { seriesIndex, dataPointIndex, config }) {
+              const item = data[seriesIndex].data[dataPointIndex]
+              const link = `/graves/${item.id}/update_grave/set_grave_data`
+              window.location.href = link
+            }
+          }
+        },
+        xaxis: {
+          type: 'numeric',
+          tickAmount: 10,
+          labels: {
+            formatter: function (val) {
+              return parseFloat(val).toFixed(1)
+            }
+          }
+        },
+        yaxis: {
+          tickAmount: 8,
+          labels: {
+            formatter: function (val) {
+              return parseFloat(val).toFixed(1)
+            }
+          }
         }
-      },
-    },
-    xaxis: {
-      type: 'numeric',
-      tickAmount: 10,
-      labels: {
-        formatter: function(val) {
-          return parseFloat(val).toFixed(1)
-        }
-      }
-    },
-    yaxis: {
-      tickAmount: 8,
-      labels: {
-        formatter: function(val) {
-          return parseFloat(val).toFixed(1)
-        }
-      }
-    },
-  }} />
+      }}
+    />
+  )
 }
-
-import ReactOnRails from 'react-on-rails'
-import { Filler, LineElement, PointElement, RadialLinearScale, Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js'
-
-import Rails from '@rails/ujs'
 
 ChartJS.register(Filler, LineElement, PointElement, ArcElement, Tooltip, Legend, RadialLinearScale)
 ReactOnRails.register({
@@ -79,6 +100,7 @@ ReactOnRails.register({
   AddFigures,
   ScatterChart,
   NorthArrow,
+  Heatmap,
   SiteMap: function (props, railsContext) {
     return () => <SiteMap {...props} />
   },
