@@ -1,0 +1,4 @@
+<%= simple_form_for(:tags, url: update_tags_publication_path(@publication)) do |f| %>
+  <%= f.input :tags, as: :check_boxes, collection: Tag.pluck(:name, :id) %>
+  <%= f.submit("Save", class: "btn btn-primary") %>
+<% end %>
