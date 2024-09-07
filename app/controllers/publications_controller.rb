@@ -1,5 +1,5 @@
 class PublicationsController < AuthorizedController
-  before_action :set_publication, only: %i[update_site assign_site progress summary show edit update destroy stats]
+  before_action :set_publication, only: %i[update_tags assign_tags update_site assign_site progress summary show edit update destroy stats]
 
   # GET /publications or /publications.json
   def index
@@ -28,8 +28,24 @@ class PublicationsController < AuthorizedController
   def assign_site
   end
 
+  def assign_tags
+  end
+
   def update_site
     @publication.figures.update_all(site_id: params[:site][:site_id])
+
+    redirect_to publications_path
+  end
+
+  def update_tags
+    tags = params[:tags].permit!.to_h[:tags].filter { !_1.blank? }.map do |tag_id|
+      Tag.find(tag_id)
+    end
+
+    @publication.figures.where(type: "Grave").find_each do |grave|
+      grave.tags = tags
+      grave.save!
+    end
 
     redirect_to publications_path
   end

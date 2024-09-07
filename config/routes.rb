@@ -36,6 +36,8 @@ Rails.application.routes.draw do # rubocop:disable Metrics/BlockLength
     member do
       post :update_site
       get :assign_site
+      get :assign_tags
+      post :update_tags
       get :progress
       get :stats
       get :analyze
