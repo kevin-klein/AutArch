@@ -209,7 +209,7 @@ if __name__ == '__main__':
             i += 1
 
             optimizer.zero_grad()
-            losses.backward()
+            loss_dict.backward()
             optimizer.step()
 
             epoch_loss += losses

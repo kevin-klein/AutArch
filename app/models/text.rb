@@ -57,5 +57,4 @@
 #  real_world_perimeter :float
 #
 class Text < Figure
-
 end
