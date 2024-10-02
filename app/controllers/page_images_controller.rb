@@ -1,6 +1,4 @@
 class PageImagesController < ApplicationController
-  before_action :set_page_image, only: %i[show edit update destroy]
-
   # GET /page_images or /page_images.json
   def index
     @page_images = PageImage.all
@@ -8,6 +6,8 @@ class PageImagesController < ApplicationController
 
   # GET /page_images/1 or /page_images/1.json
   def show
+    image = Image.find(params[:id])
+    send_file image.file_path
   end
 
   # GET /page_images/new
@@ -58,14 +58,4 @@ class PageImagesController < ApplicationController
   end
 
   private
-
-  # Use callbacks to share common setup or constraints between actions.
-  def set_page_image
-    @page_image = PageImage.find(params[:id])
-  end
-
-  # Only allow a list of trusted parameters through.
-  def page_image_params
-    params.require(:page_image).permit(:page_id, :data)
-  end
 end

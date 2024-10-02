@@ -58,3 +58,4 @@ yarn-debug.log*
 /test_env
 scale.jpg
 lithics.json
+images/*.jpg
