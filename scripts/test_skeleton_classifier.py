@@ -6,7 +6,6 @@ import transforms as T
 from torchvision import datasets, models, transforms
 import time
 import torch.nn as nn
-import utils
 from torchvision.io import read_image, ImageReadMode
 from transforms import PILToTensor, Compose
 

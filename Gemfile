@@ -22,11 +22,9 @@ gem "message_bus"
 gem "pagy"
 gem "parslet", git: "https://github.com/kschiess/parslet"
 gem "rails-erd", group: :development
-gem "sqlite3"
 gem "standard", group: [:development, :test]
 
 gem "matrix"
-gem "rice"
 gem "rtesseract"
 gem "xlsxtream"
 
@@ -58,7 +56,6 @@ gem "jbuilder"
 gem "redis", "~> 4.0"
 
 gem "react_on_rails"
-gem "rumale"
 
 # Use Kredis to get higher-level data types in Redis [https://github.com/rails/kredis]
 # gem 'kredis'

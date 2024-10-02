@@ -53,44 +53,44 @@ export function Box ({ onChangeFigure, onDraggingStart, active, figure, setActiv
     <>
       {(typeName === 'Spine') &&
         <>
-        <Arrow
-          fill={null}
-          stroke={color}
-          strokeWidth={3}
-          points={[x1, y1, x2, y2]}
-          ref={shapeRef}
-          onClick={() => setActive(id)}
-          onTap={() => setActive(id)}
-        />
-        <Circle
-          x={x1}
-          y={y1}
-          radius={10}
-          stroke={color}
-          draggable
-          onDragMove={e => {
-            onChangeFigure(figure.id, {
-              ...figure,
-              x1: e.target.x(),
-              y1: e.target.y()
-            })
-          }}
-        />
-        <Circle
-          x={x2}
-          y={y2}
-          radius={10}
-          stroke={color}
-          draggable
-          onDragMove={e => {
-            onChangeFigure(figure.id, {
-              ...figure,
-              x2: e.target.x(),
-              y2: e.target.y()
-            })
-          }}
-        />
-      </>}
+          <Arrow
+            fill={null}
+            stroke={color}
+            strokeWidth={3}
+            points={[x1, y1, x2, y2]}
+            ref={shapeRef}
+            onClick={() => setActive(id)}
+            onTap={() => setActive(id)}
+          />
+          <Circle
+            x={x1}
+            y={y1}
+            radius={10}
+            stroke={color}
+            draggable
+            onDragMove={e => {
+              onChangeFigure(figure.id, {
+                ...figure,
+                x1: e.target.x(),
+                y1: e.target.y()
+              })
+            }}
+          />
+          <Circle
+            x={x2}
+            y={y2}
+            radius={10}
+            stroke={color}
+            draggable
+            onDragMove={e => {
+              onChangeFigure(figure.id, {
+                ...figure,
+                x2: e.target.x(),
+                y2: e.target.y()
+              })
+            }}
+          />
+        </>}
 
       {typeName !== 'Spine' && <Rect
         fill={null}
@@ -105,38 +105,38 @@ export function Box ({ onChangeFigure, onDraggingStart, active, figure, setActiv
         onClick={() => setActive(id)}
         onTap={() => setActive(id)}
         onTransformEnd={(e) => {
-        const node = shapeRef.current
-        const scaleX = node.scaleX()
-        const scaleY = node.scaleY()
+          const node = shapeRef.current
+          const scaleX = node.scaleX()
+          const scaleY = node.scaleY()
 
-        node.scaleX(1)
-        node.scaleY(1)
+          node.scaleX(1)
+          node.scaleY(1)
 
-        const width = node.width() * scaleX
-        const height = node.height() * scaleY
+          const width = node.width() * scaleX
+          const height = node.height() * scaleY
 
-        onChangeFigure(figure.id, {
-          ...figure,
-          x1: node.x(),
-          y1: node.y(),
-          x2: node.x() + width,
-          y2: node.y() + height
-        })
-      }}
+          onChangeFigure(figure.id, {
+            ...figure,
+            x1: node.x(),
+            y1: node.y(),
+            x2: node.x() + width,
+            y2: node.y() + height
+          })
+        }}
                                />}
 
       {isSelected && typeName !== 'Spine' && (
         <Transformer
-        ref={trRef}
-        rotateEnabled={false}
-        keepRatio={false}
-        boundBoxFunc={(oldBox, newBox) => {
-          if (newBox.width < 5 || newBox.height < 5) {
-            return oldBox
-          }
-          return newBox
-        }}
-      />
+          ref={trRef}
+          rotateEnabled={false}
+          keepRatio={false}
+          boundBoxFunc={(oldBox, newBox) => {
+            if (newBox.width < 5 || newBox.height < 5) {
+              return oldBox
+            }
+            return newBox
+          }}
+        />
       )}
     </>
   )
@@ -149,29 +149,29 @@ function NewFigureDialog ({ closeDialog, addFigure }) {
     <div className='modal d-block' aria-hidden='false'>
       <div className='modal-dialog'>
         <div className='modal-content'>
-      <div className='modal-header'>
-          <h1 className='modal-title fs-5' id='exampleModalLabel'>New Figure</h1>
-          <button type='button' onClick={closeDialog} className='btn-close' data-bs-dismiss='modal' aria-label='Close' />
+          <div className='modal-header'>
+            <h1 className='modal-title fs-5' id='exampleModalLabel'>New Figure</h1>
+            <button type='button' onClick={closeDialog} className='btn-close' data-bs-dismiss='modal' aria-label='Close' />
+          </div>
+          <div className='modal-body'>
+            <form>
+              <div className='input-group mb-3'>
+                <select value={type} onChange={evt => setType(evt.target.value)} className='form-select' aria-label='Default select example'>
+                  <option value='Spine'>Spine</option>
+                  <option value='SkeletonFigure'>Skeleton</option>
+                  <option value='Scale'>Scale</option>
+                  <option value='GraveCrossSection'>Grave Cross Section</option>
+                  <option value='Arrow'>Arrow</option>
+                  <option value='Good'>Artefact</option>
+                </select>
+              </div>
+            </form>
+          </div>
+          <div className='modal-footer'>
+            <button type='button' onClick={closeDialog} className='btn btn-secondary' data-bs-dismiss='modal'>Close</button>
+            <button type='button' onClick={() => { addFigure(type); closeDialog() }} className='btn btn-primary'>Create</button>
+          </div>
         </div>
-      <div className='modal-body'>
-          <form>
-            <div className='input-group mb-3'>
-              <select value={type} onChange={evt => setType(evt.target.value)} className='form-select' aria-label='Default select example'>
-                <option value='Spine'>Spine</option>
-                <option value='SkeletonFigure'>Skeleton</option>
-                <option value='Scale'>Scale</option>
-                <option value='GraveCrossSection'>Grave Cross Section</option>
-                <option value='Arrow'>Arrow</option>
-                <option value='Good'>Artefact</option>
-              </select>
-            </div>
-          </form>
-        </div>
-      <div className='modal-footer'>
-          <button type='button' onClick={closeDialog} className='btn btn-secondary' data-bs-dismiss='modal'>Close</button>
-          <button type='button' onClick={() => { addFigure(type); closeDialog() }} className='btn btn-primary'>Create</button>
-        </div>
-    </div>
       </div>
     </div>
   )
@@ -482,34 +482,34 @@ function BoxResizer ({ next_url, grave, sites, image, page }) {
       {creatingNewFigure && <NewFigureDialog addFigure={createFigure} closeDialog={() => setCreatingNewFigure(false)} />}
       <div className='row'>
         <div className='col-md-8 card' ref={divRef}>
-        <div className='form-check'>
-          <div className='btn-group' role='group' aria-label='Basic example'>
-            <button type='button' style={{ backgroundColor: '#F44336' }} className='btn btn-secondary' onClick={() => createFigure('Spine')}>Spine</button>
-            <button type='button' style={{ backgroundColor: '#9575CD' }} className='btn btn-secondary' onClick={() => createFigure('SkeletonFigure')}>Skeleton</button>
-            <button type='button' style={{ backgroundColor: '#009688' }} className='btn btn-secondary' onClick={() => createFigure('Arrow')}>Arrow</button>
-            <button type='button' style={{ backgroundColor: '#26C6DA' }} className='btn btn-secondary' onClick={() => createFigure('GraveCrossSection')}>GraveCrossSection</button>
-            <button type='button' style={{ backgroundColor: '#4CAF50' }} className='btn btn-secondary' onClick={() => createFigure('Good')}>Artefact</button>
-            <button type='button' style={{ backgroundColor: '#FF9800' }} className='btn btn-secondary' onClick={() => createFigure('Scale')}>Scale</button>
+          <div className='form-check'>
+            <div className='btn-group' role='group' aria-label='Basic example'>
+              <button type='button' style={{ backgroundColor: '#F44336' }} className='btn btn-secondary' onClick={() => createFigure('Spine')}>Spine</button>
+              <button type='button' style={{ backgroundColor: '#9575CD' }} className='btn btn-secondary' onClick={() => createFigure('SkeletonFigure')}>Skeleton</button>
+              <button type='button' style={{ backgroundColor: '#009688' }} className='btn btn-secondary' onClick={() => createFigure('Arrow')}>Arrow</button>
+              <button type='button' style={{ backgroundColor: '#26C6DA' }} className='btn btn-secondary' onClick={() => createFigure('GraveCrossSection')}>GraveCrossSection</button>
+              <button type='button' style={{ backgroundColor: '#4CAF50' }} className='btn btn-secondary' onClick={() => createFigure('Good')}>Artefact</button>
+              <button type='button' style={{ backgroundColor: '#FF9800' }} className='btn btn-secondary' onClick={() => createFigure('Scale')}>Scale</button>
+            </div>
           </div>
+          <Canvas
+            setCurrentEditBox={setCurrentEditBox}
+            divRef={divRef}
+            image={image}
+            figures={figures}
+            onDraggingStart={onDraggingStart}
+            currentEditBox={currentEditBox}
+            onChangeFigure={onChangeFigure}
+          />
         </div>
-        <Canvas
-          setCurrentEditBox={setCurrentEditBox}
-          divRef={divRef}
-          image={image}
-          figures={figures}
-          onDraggingStart={onDraggingStart}
-          currentEditBox={currentEditBox}
-          onChangeFigure={onChangeFigure}
-        />
-      </div>
 
         <div className='col-md-4'>
-        <div style={{ position: 'sticky', top: 60 }} className='card'>
-          <div className='card-body'>
-            <h5 className='card-title'>Edit Grave</h5>
-            <div className='card-text'>
-              <ul className='list-group'>
-                {Object.values(figures).map(figure =>
+          <div style={{ position: 'sticky', top: 60 }} className='card'>
+            <div className='card-body'>
+              <h5 className='card-title'>Edit Grave</h5>
+              <div className='card-text'>
+                <ul className='list-group'>
+                  {Object.values(figures).map(figure =>
                   <React.Fragment key={figure.id}>
                     <div
                       onClick={() => { setCurrentEditBox(figure.id) }}
@@ -543,7 +543,7 @@ function BoxResizer ({ next_url, grave, sites, image, page }) {
                   </React.Fragment>
                 )}
 
-                <a
+                  <a
                   href='#'
                   onClick={(evt) => { evt.preventDefault(); createNewFigure() }}
                   className='list-group-item list-group-item-action d-flex justify-content-between align-items-start'
@@ -552,14 +552,14 @@ function BoxResizer ({ next_url, grave, sites, image, page }) {
                     <div className='fw-bold'>New Figure</div>
                   </div>
                 </a>
-              </ul>
-            </div>
-            <form action={next_url} method='post'>
-              <input type='hidden' name='_method' value='patch' />
-              <input type='hidden' name='authenticity_token' value={token} />
-              {Object.values(figures).map(figure => {
-                const id = figure.id
-                return (
+                </ul>
+              </div>
+              <form action={next_url} method='post'>
+                <input type='hidden' name='_method' value='patch' />
+                <input type='hidden' name='authenticity_token' value={token} />
+                {Object.values(figures).map(figure => {
+                  const id = figure.id
+                  return (
                   <React.Fragment key={figure.id}>
                     <input type='hidden' name={`figures[${id}][x1]`} value={figure.x1} />
                     <input type='hidden' name={`figures[${id}][x2]`} value={figure.x2} />
@@ -593,21 +593,21 @@ function BoxResizer ({ next_url, grave, sites, image, page }) {
                       <input type='hidden' name={`figures[${id}][anchor_point_4_y]`} value={figure.anchor_point_4_y} />
 
                       <input type='hidden' name={`figures[${id}][manual_bounding_box]`} value={figure.manual_bounding_box} />
-                                                   </>}
+                    </>}
                   </React.Fragment>
-                )
-              })}
+                  )
+                })}
 
-              <input value='Next' type='submit' className='btn btn-primary card-link mt-1' />
-            </form>
+                <input value='Next' type='submit' className='btn btn-primary card-link mt-1' />
+              </form>
 
-            <ul className='list-group mt-3'>
-              {validations}
-            </ul>
+              <ul className='list-group mt-3'>
+                {validations}
+              </ul>
 
+            </div>
           </div>
         </div>
-      </div>
 
       </div>
     </>
