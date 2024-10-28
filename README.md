@@ -1,5 +1,9 @@
 # AutArch
 
+## Workflow
+
+
+
 ## Installation
 
 This installation guide is intended for ubuntu linux. Windows systems are not supported. Installation procedure on other linux distributions will be similar.
@@ -65,7 +69,7 @@ $ ruby extconf.rb
 $ make
 ```
 
-AutArch was tested with PyTorch 2.4.1. Other compatible versions may worka s well. For the best performance a GPU is highly recommended. Depending on the available memory some functionality related to ML models might be reduced.
+AutArch was tested with PyTorch 2.4.1. Other compatible versions may worka s well. For the best performance a GPU is highly recommended. Depending on the available memory some functionality related to ML models might be reduced. AutArch can be run without any ML models. In this case, all annotations have to be added manually but all existing data can be edited and viewed without the automated support.
 
 To install Torch (depending on your system, please consult the [torch installation guide](https://pytorch.org/get-started/locally/)):
 
@@ -77,5 +81,20 @@ To copy the ML models:
 
 `$ unzip /path/to/autarch_models.zip -d models`
 
+## Running AutArch
 
+You need to start three different components, the rails server, shakapacker and the python ml service.
 
+To run shakapacker:
+
+`$ bin/shakapacker-dev-server`
+
+To run rails:
+
+`$ bin/rails s`
+
+To start the python ml service:
+
+`$ python scripts/torch_service.py`
+
+After all the services have successfully loaded, AutArch is accessible under [localhost:3000](http://localhost:3000)
