@@ -159,25 +159,28 @@ def get_transform(train):
 
 if __name__ == '__main__':
     dfg_dataset = DfgDataset(root="pdfs/page_images", transforms = get_transform(train=True))
-    dataset_test = DfgDataset(root="pdfs/page_images", transforms = get_transform(train=False), labels=dfg_dataset.labels)
+    # dataset_test = DfgDataset(root="pdfs/page_images", transforms = get_transform(train=False), labels=dfg_dataset.labels)
     # split the dataset in train and test set
 
     torch.save(dfg_dataset.labels, 'models/retinanet_v2_labels.model')
 
     torch.manual_seed(1)
     indices = torch.randperm(len(dfg_dataset)).tolist()
-    dataset = torch.utils.data.Subset(dfg_dataset, indices)
-    dataset_test = torch.utils.data.Subset(dataset_test, indices[-30:])
+    train_dataset, test_dataset = torch.utils.data.random_split(dfg_dataset, [0.8, 0.2])
+
 
     data_loader = torch.utils.data.DataLoader(
-                dataset, batch_size=8, shuffle=True, num_workers=8,
+                train_dataset, batch_size=8, shuffle=True, num_workers=8,
                 collate_fn=collate_fn)
-    # data_loader_test = torch.utils.data.DataLoader(
-    #         dataset_test, batch_size=1, shuffle=False, num_workers=8,
-    #         collate_fn=utils.collate_fn)
-    print("We have: {} examples, {} are training and {} testing".format(len(indices), len(dataset), len(dataset_test)))
+    data_loader_test = torch.utils.data.DataLoader(
+            test_dataset, batch_size=1, shuffle=False, num_workers=8,
+            collate_fn=collate_fn)
+    print("We have: {} examples, {} are training and {} testing".format(len(indices), len(train_dataset), len(test_dataset)))
 
-    device = torch.device('cuda')
+    if torch.cuda.is_available():
+        device = torch.device('cuda')
+    else:
+        device = torch.device('cpu')
 
     # our dataset has two classes only - raccoon and not racoon
     num_classes = len(dfg_dataset.labels.keys())
@@ -212,9 +215,22 @@ if __name__ == '__main__':
             loss_dict.backward()
             optimizer.step()
 
+            print(f'training loss: {losses}')
+
             epoch_loss += losses
 
-        print(epoch_loss, f'time: {time.time() - start}')
+        model.eval()
+        with torch.no_grad():
+            for images, targets in enumerate(data_loader_test):
+                images = list(image.to(device) for image in images)
+                targets = [{k: v.to(device) for k, v in t.items()} for t in targets]
+
+                loss_dict = model(images, targets)
+                losses = sum(loss for loss in loss_dict.values())
+
+                print(f'validation loss: {losses}')
+
+        print(f'epoch_loss: {epoch_loss}', f'time: {time.time() - start}')
 
         torch.save(model.state_dict(), 'models/retinanet_v2_dfg.model')
 
