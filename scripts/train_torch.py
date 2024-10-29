@@ -144,7 +144,7 @@ def get_model(num_classes, device):
     # model = torchvision.models.detection.fcos_resnet50_fpn(num_classes=num_classes, trainable_backbone_layers = 5)
     # model.load_state_dict(torch.load('models/fcos_dfg.model', map_location=device))
     # model.load_state_dict(torch.load('models/rcnn_dfg.model', map_location=device))
-    model.load_state_dict(torch.load('models/retinanet_v2_dfg.model', map_location=device))
+    # model.load_state_dict(torch.load('models/retinanet_v2_labels_new.model', map_location=device))
     return model
 
 def get_transform(train):
@@ -162,7 +162,7 @@ if __name__ == '__main__':
     # dataset_test = DfgDataset(root="pdfs/page_images", transforms = get_transform(train=False), labels=dfg_dataset.labels)
     # split the dataset in train and test set
 
-    torch.save(dfg_dataset.labels, 'models/retinanet_v2_labels.model')
+    torch.save(dfg_dataset.labels, 'models/retinanet_v2_labels_new.model')
 
     torch.manual_seed(1)
     indices = torch.randperm(len(dfg_dataset)).tolist()
@@ -173,8 +173,8 @@ if __name__ == '__main__':
                 train_dataset, batch_size=8, shuffle=True, num_workers=8,
                 collate_fn=collate_fn)
     data_loader_test = torch.utils.data.DataLoader(
-            test_dataset, batch_size=1, shuffle=False, num_workers=8,
-            collate_fn=collate_fn)
+                test_dataset, batch_size=8, shuffle=False, num_workers=8,
+                collate_fn=collate_fn)
     print("We have: {} examples, {} are training and {} testing".format(len(indices), len(train_dataset), len(test_dataset)))
 
     if torch.cuda.is_available():
@@ -194,7 +194,7 @@ if __name__ == '__main__':
     #                             momentum=0.9, weight_decay=5e-4)
     optimizer = torch.optim.Adam(params, lr=1e-4)
 
-    num_epochs = 50
+    num_epochs = 100
     for epoch in range(num_epochs):
         start = time.time()
         model.train()
@@ -202,7 +202,6 @@ if __name__ == '__main__':
         i = 0
         epoch_loss = 0
         for images, targets in data_loader:
-            print('training step')
             images = list(image.to(device) for image in images)
             targets = [{k: v.to(device) for k, v in t.items()} for t in targets]
 
@@ -212,16 +211,16 @@ if __name__ == '__main__':
             i += 1
 
             optimizer.zero_grad()
-            loss_dict.backward()
+            losses.backward()
             optimizer.step()
 
             print(f'training loss: {losses}')
 
             epoch_loss += losses
 
-        model.eval()
+        # model.eval()
         with torch.no_grad():
-            for images, targets in enumerate(data_loader_test):
+            for images, targets in data_loader_test:
                 images = list(image.to(device) for image in images)
                 targets = [{k: v.to(device) for k, v in t.items()} for t in targets]
 
@@ -232,7 +231,7 @@ if __name__ == '__main__':
 
         print(f'epoch_loss: {epoch_loss}', f'time: {time.time() - start}')
 
-        torch.save(model.state_dict(), 'models/retinanet_v2_dfg.model')
+        torch.save(model.state_dict(), 'models/retinanet_v2_dfg_new.model')
 
 # loss retinanet: 4.3512
 # retinanet sgd lr=0.005 momentum=0.9 weight_decay=0.0005

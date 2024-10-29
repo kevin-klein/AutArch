@@ -2,7 +2,13 @@
 
 ## Workflow
 
+Publications can be imported under [Publications -> Import](http://localhost:3000/publications/new)
 
+After the import has completed, the publication is available under [Publications](http://localhost:3000/publications). It is recommended to go to the [annotation screen](http://localhost:3000/publications/pages) and add all false negative objects.
+
+To review all the graves, go to the [grave screen](http://localhost:3000/graves). Use the filter on the top to select the publications just uploaded. Then click the edit button of the first grave on the list.
+
+###
 
 ## Installation
 
