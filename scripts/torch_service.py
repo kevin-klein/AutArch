@@ -1,5 +1,5 @@
 from bottle import Bottle, request, response
-from train_torch import get_model
+from train_object_detection import get_model
 from transforms import PILToTensor, Compose
 from PIL import Image, ImageDraw
 import torch

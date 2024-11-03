@@ -45,7 +45,7 @@ if __name__ == '__main__':
   model.fc = torch.nn.Linear(in_features=2048, out_features=2, bias=True)
 
   # model.load_state_dict(torch.load('models/arrow_resnet.model'))
-  dataset = torchvision.datasets.ImageFolder('arrows', transforms.Compose([
+  dataset = torchvision.datasets.ImageFolder('training_data/arrows', transforms.Compose([
         # transforms.RandomResizedCrop(224),
         # transforms.RandomHorizontalFlip(),
         transforms.ToTensor(),
@@ -54,7 +54,10 @@ if __name__ == '__main__':
   data_loader = torch.utils.data.DataLoader(
                 dataset, pin_memory=True, batch_size=16, shuffle=True, num_workers=8,)
 
-  device = torch.device('cuda')
+  if torch.cuda.is_available():
+      device = torch.device('cuda')
+  else:
+      device = torch.device('cpu')
   model.to(device)
 
   # optimizer = torch.optim.SGD(model.parameters(), lr=0.0001, momentum=0.9)

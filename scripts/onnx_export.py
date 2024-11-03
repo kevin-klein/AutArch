@@ -1,4 +1,4 @@
-from train_torch import get_model
+from scripts.train_object_detection import get_model
 from transforms import PILToTensor, Compose
 from PIL import Image, ImageDraw
 import torch

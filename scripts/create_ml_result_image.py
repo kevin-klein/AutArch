@@ -1,4 +1,4 @@
-from train_torch import get_model
+from scripts.train_object_detection import get_model
 from transforms import PILToTensor, Compose
 from PIL import Image, ImageDraw, ImageFont
 import torch
@@ -31,7 +31,10 @@ colors = {'text': '#d3d3d3',
          'bone_tool': '#ff1493',
          'skull_photo': '#f0e68c'}
 
-device = torch.device('cpu')
+if torch.cuda.is_available():
+      device = torch.device('cuda')
+else:
+        device = torch.device('cpu')
 
 loaded_model = get_model(num_classes = len(labels.keys()), device=device)
 loaded_model.load_state_dict(torch.load('models/rcnn_dfg.model', map_location=device))

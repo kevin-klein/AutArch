@@ -144,7 +144,7 @@ def get_model(num_classes, device):
     # model = torchvision.models.detection.fcos_resnet50_fpn(num_classes=num_classes, trainable_backbone_layers = 5)
     # model.load_state_dict(torch.load('models/fcos_dfg.model', map_location=device))
     # model.load_state_dict(torch.load('models/rcnn_dfg.model', map_location=device))
-    # model.load_state_dict(torch.load('models/retinanet_v2_labels_new.model', map_location=device))
+    # model.load_state_dict(torch.load('models/retinanet_v2_dfg_new.model', map_location=device))
     return model
 
 def get_transform(train):
@@ -158,13 +158,13 @@ def get_transform(train):
    return T.Compose(transforms)
 
 if __name__ == '__main__':
-    dfg_dataset = DfgDataset(root="pdfs/page_images", transforms = get_transform(train=True))
+    dfg_dataset = DfgDataset(root="training_data/object detection", transforms = get_transform(train=True))
     # dataset_test = DfgDataset(root="pdfs/page_images", transforms = get_transform(train=False), labels=dfg_dataset.labels)
     # split the dataset in train and test set
 
-    torch.save(dfg_dataset.labels, 'models/retinanet_v2_labels_new.model')
+    torch.save(dfg_dataset.labels, 'models/retinanet_v2_labels.model')
 
-    torch.manual_seed(1)
+    torch.manual_seed(0)
     indices = torch.randperm(len(dfg_dataset)).tolist()
     train_dataset, test_dataset = torch.utils.data.random_split(dfg_dataset, [0.8, 0.2])
 
@@ -231,7 +231,7 @@ if __name__ == '__main__':
 
         print(f'epoch_loss: {epoch_loss}', f'time: {time.time() - start}')
 
-        torch.save(model.state_dict(), 'models/retinanet_v2_dfg_new.model')
+        torch.save(model.state_dict(), 'models/retinanet_v2_dfg.model')
 
 # loss retinanet: 4.3512
 # retinanet sgd lr=0.005 momentum=0.9 weight_decay=0.0005
