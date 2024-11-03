@@ -18,7 +18,10 @@ def pil_loader(path):
         return img.convert("RGB")
 
 if __name__ == '__main__':
-  device = torch.device('cuda')
+  if torch.cuda.is_available():
+      device = torch.device('cuda')
+  else:
+      device = torch.device('cpu')
 
   model = torchvision.models.resnet152(pretrained=True)
   model.load_state_dict(torch.load('models/skeleton_resnet.model'))
