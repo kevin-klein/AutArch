@@ -63,7 +63,7 @@ def show(imgs):
     plt.show()
 
 if __name__ == '__main__':
-  dataset = torchvision.datasets.ImageFolder('skeletons', transforms.Compose([
+  dataset = torchvision.datasets.ImageFolder('training_data/skeletons', transforms.Compose([
         # transforms.RandomResizedCrop(224),
         transforms.Resize((300, 300)),
         transforms.RandomHorizontalFlip(),
@@ -78,7 +78,10 @@ if __name__ == '__main__':
   # model.fc = nn.Linear(num_ftrs, 2).cuda()
   model = torchvision.models.resnet152(weights=None, num_classes=2)
 
-  device = torch.device('cuda')
+  if torch.cuda.is_available():
+      device = torch.device('cuda')
+  else:
+      device = torch.device('cpu')
   model.to(device)
 
   params = [p for p in model.parameters() if p.requires_grad]

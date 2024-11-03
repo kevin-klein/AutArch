@@ -51,7 +51,10 @@ if __name__ == '__main__':
   data_loader = torch.utils.data.DataLoader(
                 dataset, pin_memory=True, batch_size=16, shuffle=True, num_workers=8,)
 
-  device = torch.device('cuda')
+  if torch.cuda.is_available():
+        device = torch.device('cuda')
+  else:
+      device = torch.device('cpu')
   model.to(device)
 
   model.load_state_dict(torch.load('models/skeleton_orientation_resnet.model'))
