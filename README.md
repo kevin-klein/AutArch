@@ -1,5 +1,14 @@
 # AutArch
 
+## Team
+
+| Name  |Role   | EMail  | Github |
+|---|---|---|---|
+| Kevin Klein   |   |   |   |
+| Maxime Brami  |   |   |   |
+| Ralf Laemmel |   |   |   |
+| Antoine Mueller | | | |
+
 ## Workflow
 
 Publications can be imported under [Publications -> Import](http://localhost:3000/publications/new)
@@ -11,12 +20,11 @@ To review all the graves, go to the [grave screen](http://localhost:3000/graves)
 #### Grave Data
 The ID assigned to the burial by the authors in the source publication is recorded. In case multiple images of the same grave are shown, the software will prevent duplicates in the results using this ID. In this step, the expert also has the option to discard drawings incorrectly classified as a grave.
 
-
 #### Site
-Graves can be assigned to specific sites.
+Graves can be assigned to specific sites. Sites can be added [here](http://localhost:3000/sites).
 
 #### Tags
-Graves can be given arbitrary tags to discern them and allow for filtering in the overview map.
+Graves can be given arbitrary tags to discern them and allow for filtering in the overview map. Tags can be added [here](http://localhost:3000/tags).
 
 #### Boxes
 Correcting bounding boxes. The user can manually add, remove or change the bounding box assigned to a specific grave. Potential tasks include selecting a different scale on the page, resizing bounding boxes because they do not fully encapsulate an object or marking north arrows that were initially missed by object detection. During this step, a manual arrow has to be drawn for every skeleton following the spine and pointing towards the skull, which is necessary to determine the orientation of the skeleton in the grave. Several automated steps are then performed. The contours are calculated using the new bounding boxes and the resulting changes in measurements are saved. The orientation of the north arrow and the deposition type of the skeleton are updated using their respective neural network. The analysis of the scale is performed again.
@@ -99,7 +107,7 @@ $ ruby extconf.rb
 $ make
 ```
 
-AutArch was tested with PyTorch 2.4.1. Other compatible versions may worka s well. For the best performance a GPU is highly recommended. Depending on the available memory some functionality related to ML models might be reduced. AutArch can be run without any ML models. In this case, all annotations have to be added manually but all existing data can be edited and viewed without the automated support.
+AutArch was tested with PyTorch 2.4.1. Other compatible versions may work as well. For the best performance a GPU is highly recommended.
 
 To install Torch (depending on your system, please consult the [torch installation guide](https://pytorch.org/get-started/locally/)):
 
@@ -137,7 +145,7 @@ To train the models yourself, download the "training_data" folder and put it ins
 
 To train the skeleton deposition type classifier:
 
-`$ python scripts/train_skeleton_classifier`
+`$ python scripts/train_skeleton_classifier.py`
 
 To train the arrow angle detection network:
 
