@@ -1,10 +1,16 @@
 # AutArch
 
+## Summary
+AutArch is an AI-assisted workflow capable of creating uniform 
+archaeological datasets from heterogeneous published resources. The implementation provided here
+takes large and unsorted PDF files as input, and uses neural networks to 
+conduct image processing, object detection, and classification.
+
 ## Recommended Hardware
 
 AutArch should run most on most systems but the performance of the ML models is heavily depending
 on the availability of a PyTorch supported graphics card. Please consult the
-[PyTorch manual](https://pytorch.org/get-started/locally/) The current configuration has been successfully
+[PyTorch manual](https://pytorch.org/get-started/locally/). The current configuration has been successfully
 tested on an Nvidia RTX 2060 with 8GB of dedicated GPU memory. AutArch will fallback to use GPU in case it
 can not detect a supported GPU.
 
@@ -16,7 +22,7 @@ AutArch requires the following packages:
 
 `$ sudo apt install libpq-dev postgresql libopencv-dev tesseract-ocr redis-server libvips42 build-essential`
 
-To manage the installations of ruby, python and nodejs asdf is recommended. Please refer to the [asdf guide](https://asdf-vm.com/guide/getting-started.html).
+To manage the installations of ruby, python and nodejs asdf is recommended. Please refer to the [asdf guide](https://asdf-vm.com/guide/getting-started.html) in case of any problem.
 
 After installing asdf, install these asdf plugins:
 
@@ -52,6 +58,11 @@ Change the password in 'config/database.yml' for the development database settin
 Download the database dump front the provided link and load the dump into your copy of postgres:
 
 _For reviewers only:_**:
+
+A database dump, pretrained models and images are provided to reviewers under this [link](https://seafile.rlp.net/d/ca172259a7b54383b6fa/).
+The database dump and images are location in the `autarch_data` folder. Make sure to download each file this folder individually due to limitations
+regarding file size from seafile. 
+
 ```
 $ bin/rails db:create
 
@@ -120,21 +131,16 @@ After all the services have successfully loaded, AutArch is accessible under [lo
 
 ## Team
 
-| Name  |Role   | EMail  | Github |
+| Name  | Contribution   | EMail  | Github |
 |---|---|---|---|
-| Kevin Klein   |   |   |   |
-| Maxime Brami  |   |   |   |
-| Ralf Laemmel |   |   |   |
-| Antoine Muller | | | |
-
-Kevin Klein
-Antoine Muller
-Alyssa Wohde
-Alexander V. Gorelik
-Volker Heyd
-Ralf Lämmel
-Yoan Diekmann
-Maxime Brami
+| Kevin Klein           | Conceptualization, Data curation, Formal analysis, Investigation, Methodology, Resources, Software, Validation, Visualisation, Writing | kkevin@students.uni-mainz.de | [github](https://github.com/kevin-klein) |
+| Antoine Muller        | Data curation, Formal analysis, Investigation, Visualisation, Writing | | |
+| Alyssa Wohde          | Methodology, Writing | | |
+| Alexander V. Gorelik  | Data curation, Investigation, Resources, Writing | | |
+| Volker Heyd           | Validation | | |
+| Ralf Lämmel           | Validation, Writing | | |
+| Yoan Diekmann         | Writing, Validation | | |
+| Maxime Brami          | Conceptualization, Funding acquisition, Project administration, Resources, Supervision, Validation, Writing | | |
 
 
 ## Workflow
@@ -172,7 +178,11 @@ Finally, the pose of all skeletons has to be validated, which (for now) consists
 
 ## Training the models (reviewers only)
 
-In case you get an error related to not enough memory being available, reducing the batch size will make it run but
+The training data can be found in the `training_data` folder. Note that you can download the whole folder by clicking
+the download button that appears while hovering over the folder. Put the folder within the `training_data` folder
+inside the autarch folder.
+
+In case you get an error related to not enough memory being available, reducing the batch size within the training scripts will make it run but
 the resulting model will potentially differ from the one we supplied.
 
 To train the models yourself, download the "training_data" folder and put it inside the AutArch folder. To train the object detection network:
@@ -186,3 +196,10 @@ To train the skeleton deposition type classifier:
 To train the arrow angle detection network:
 
 `$ python scripts/train_arrow_angle_network.py`
+
+
+## Output
+
+Under [publications](http://localhost:3000/publications). Publications can be analyzed using
+the `analyze link` for every publication. The shown page can be used to compare publications by selecting
+them from the top. Note that only 4 publications can be compared at the same time.
