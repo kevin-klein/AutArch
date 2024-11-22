@@ -11,6 +11,27 @@ namespace :export do
     end
   end
 
+  task :orientations, [:tag_id] => :environment do |t, args|
+    tag_id = args[:tag_id]
+    @skeleton_angles = Site.includes(
+      graves: [:spines, :arrow]
+    ).all.to_a.map do |site|
+      # 3 = corded ware
+      # 2 = bell beaker
+
+      spines = site.graves.joins(:tags).where(tags: {id: tag_id}).flat_map do |grave|
+        grave.spines
+      end
+
+      angles = Stats.all_spine_angles(spines).to_a
+      angles
+    end.filter do |grave_data|
+      grave_data.sum > 0
+    end.flatten
+
+    File.write("orientations-#{Tag.find(tag_id).name}.json", @skeleton_angles.to_json)
+  end
+
   task spines: :environment do
     CSV.open("spines.csv", "w") do |csv|
       csv << %w[ID Angle]
