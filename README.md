@@ -34,7 +34,7 @@ After installing asdf, install these asdf plugins:
 ### Python
 `$ asdf plugin-add python`
 
-To install the necessary versions of the languages mentioned above:
+Download the autarch folder from seafile (by hovering over it a download button will appear) as a zip file and unzip it in a location of your choice. To install the necessary versions of the languages mentioned above:
 
 ```
 $ cd autarch
