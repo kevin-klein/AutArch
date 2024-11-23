@@ -9,7 +9,7 @@
   "BoxResizer",
   props: {
     image:
-      @grave.page.image.as_json.merge(href: url_for(@grave.page.image.data)),
+      @grave.page.image.as_json.merge(href: @grave.page.image.url),
     grave:
       @grave.as_json(
         methods: [:type],
