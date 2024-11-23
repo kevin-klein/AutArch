@@ -1,22 +1,21 @@
 # AutArch
 
 ## Summary
-AutArch is an AI-assisted workflow capable of creating uniform 
+AutArch is an AI-assisted workflow capable of creating uniform
 archaeological datasets from heterogeneous published resources. The implementation provided here
-takes large and unsorted PDF files as input, and uses neural networks to 
-conduct image processing, object detection, and classification.
+takes large and unsorted PDF files as input, and uses neural networks to
+
 
 ## Recommended Hardware
 
 AutArch should run most on most systems but the performance of the ML models is heavily depending
 on the availability of a PyTorch supported graphics card. Please consult the
 [PyTorch manual](https://pytorch.org/get-started/locally/). The current configuration has been successfully
-tested on an Nvidia RTX 2060 with 8GB of dedicated GPU memory. AutArch will fallback to use GPU in case it
-can not detect a supported GPU.
+tested on an Nvidia RTX 2060 with 8GB of dedicated GPU memory. AutArch will fallback to use CPU in case it can not detect a supported GPU.
 
 ## Installation
 
-This installation guide is intended for ubuntu linux. Windows systems are not natively supported but [WSL](https://learn.microsoft.com/en-us/windows/wsl/install) is known to work. Installation procedure on other linux distributions will be similar.
+This installation guide is intended for ubuntu linux. Windows systems are not natively supported but [WSL](https://learn.microsoft.com/en-us/windows/wsl/install) is known to work. Installation procedures on other linux distributions will be similar.
 
 AutArch requires the following packages:
 
@@ -42,7 +41,7 @@ $ cd AutArch
 $ asdf install
 ```
 
-To install ruby dependecies:
+To install ruby dependencies:
 
 `$ bundle install `
 
@@ -60,10 +59,10 @@ Download the database dump front the provided link and load the dump into your c
 _For reviewers only:_**:
 
 A database dump, pretrained models and images are provided to reviewers under this [link](https://seafile.rlp.net/d/ca172259a7b54383b6fa/).
-The database dump and images are location in the `autarch_data` folder. Make sure to download each file this folder individually due to limitations
-regarding file size from seafile. 
+The database dump and images are located in the `autarch_data` folder. Make sure to download each file of this folder individually due to limitations regarding file size from seafile.
 
 ```
+$chmod a+x bin/rails
 $ bin/rails db:create
 
 $ cat autarch_dump.gz | gunzip | psql -h localhost -U postgres comove_development
@@ -90,7 +89,12 @@ _For reviewers end_**
 
 Install js dependencies:
 
-`$ yarn`
+```
+$ sudo apt purge cmdtest
+$ npm install --global yarn
+$ yarn
+
+```
 
 To compile the C++ extensions:
 
@@ -204,3 +208,8 @@ To train the arrow angle detection network:
 Under [publications](http://localhost:3000/publications). Publications can be analyzed using
 the `analyze link` for every publication. The shown page can be used to compare publications by selecting
 them from the top. Note that only 4 publications can be compared at the same time.
+<<<<<<< HEAD
+
+
+=======
+>>>>>>> 2ebf96a32bbbf6f3f512f17e11871fd53fc91189
