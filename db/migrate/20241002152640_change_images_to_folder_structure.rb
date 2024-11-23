@@ -1,7 +1,7 @@
 class ChangeImagesToFolderStructure < ActiveRecord::Migration[7.0]
   def up
     Image.find_each do |image|
-      data = image.data.download
+      data = image.data
       File.binwrite(image.file_path, data)
     rescue ActiveStorage::FileNotFoundError
       # image.destroy!
