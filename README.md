@@ -122,7 +122,10 @@ You need to start three different components, the rails server, shakapacker and 
 
 To run shakapacker:
 
-`$ bin/shakapacker-dev-server`
+```
+$ chmod a+x bin/shakapacker-dev-server
+$ bin/shakapacker-dev-server
+```
 
 To run rails:
 
