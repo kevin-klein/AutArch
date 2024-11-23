@@ -76,7 +76,7 @@ _For reviewers end_**
 _For regular users_**:
 
 ```
-$ chmod a+x bin/rails 
+$ chmod a+x bin/rails
 $ bin/rails db:create
 
 $ bin/rails db:schema:load
@@ -214,8 +214,3 @@ To train the arrow angle detection network:
 Under [publications](http://localhost:3000/publications). Publications can be analyzed using
 the `analyze link` for every publication. The shown page can be used to compare publications by selecting
 them from the top. Note that only 4 publications can be compared at the same time.
-<<<<<<< HEAD
-
-
-=======
->>>>>>> 2ebf96a32bbbf6f3f512f17e11871fd53fc91189
