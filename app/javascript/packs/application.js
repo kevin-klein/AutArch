@@ -33,6 +33,30 @@ function Heatmap ({ data, graves }) {
       .overlays(graves)
       .radius(15, 20)
       .draw()
+
+    function arrow (context, fromx, fromy, tox, toy) {
+      const headlen = 20
+      const dx = tox - fromx
+      const dy = toy - fromy
+      const angle = Math.atan2(dy, dx)
+      context.moveTo(fromx, fromy)
+      context.lineTo(tox, toy)
+      context.lineTo(tox - headlen * Math.cos(angle - Math.PI / 6), toy - headlen * Math.sin(angle - Math.PI / 6))
+      context.moveTo(tox, toy)
+      context.lineTo(tox - headlen * Math.cos(angle + Math.PI / 6), toy - headlen * Math.sin(angle + Math.PI / 6))
+    }
+
+    const ctx = document.getElementById('heatmap').getContext('2d')
+    ctx.lineWidth = 3
+    ctx.beginPath()
+    ctx.globalAlpha = 1
+    ctx.strokeStyle = 'black'
+    ctx.fillStyle = 'black'
+    arrow(ctx, 250, 600, 250, 200)
+    ctx.stroke()
+
+    ctx.font = '24px Arial'
+    ctx.fillText('Orientation', 260, 400)
   })
 
   return (<canvas id='heatmap' width={width} height={height} />)

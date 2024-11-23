@@ -217,3 +217,7 @@ To train the arrow angle detection network:
 Under [publications](http://localhost:3000/publications). Publications can be analyzed using
 the `analyze link` for every publication. The shown page can be used to compare publications by selecting
 them from the top. Note that only 4 publications can be compared at the same time.
+
+## License
+
+Currently the same copyright applies to this code as to the text and the other supplementary material. With the publication of the article, the AutArch source code will be available publicly under GPL license.
