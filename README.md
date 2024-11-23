@@ -74,6 +74,7 @@ _For reviewers end_**
 _For regular users:_**:
 
 ```
+$ chmod a+x bin/rails 
 $ bin/rails db:create
 
 $ bin/rails db:schema:load
