@@ -83,6 +83,12 @@ module Stats
       .tally
   end
 
+  def all_spine_angles(spines)
+    spines.map { [_1, _1.grave&.arrow] }
+      .filter { |_spine, arrow| arrow.present? }
+      .map { |spine, arrow| spine.angle_with_arrow(arrow) }
+  end
+
   def grave_angles(graves)
     graves.map { [_1, _1.arrow] }
       .filter { |_grave, arrow| arrow&.angle.present? }
@@ -129,7 +135,7 @@ module Stats
 
     pca_data = publications.map do |publication|
       frequencies, graves = outlines_efd([publication])
-      
+
       if frequencies.empty?
         {
           name: publication.short_description,
@@ -139,7 +145,7 @@ module Stats
         grave_data = pca.transform(frequencies).to_a.map do |pca_item|
           convert_pca_item_to_polar(pca_item)
         end
-  
+
         graves = grave_data.zip(graves)
         data = graves.map do |item, grave|
           item[:mark] = true if special_objects.include?(grave.id)
