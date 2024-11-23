@@ -43,7 +43,10 @@ $ asdf install
 
 To install ruby dependencies:
 
-`$ bundle install `
+```
+$ gem install bundler
+$ bundle install
+```
 
 Change your postgres password:
 
@@ -70,7 +73,7 @@ $ cat autarch_dump.gz | gunzip | psql -h localhost -U postgres comove_developmen
 
 _For reviewers end_**
 
-_For regular users:_**:
+_For regular users_**:
 
 ```
 $ chmod a+x bin/rails 
@@ -79,7 +82,7 @@ $ bin/rails db:create
 $ bin/rails db:schema:load
 ```
 
-_For reviewers only:_**:
+_For reviewers only_**:
 
 Extract the downloaded images to the storage folder:
 
