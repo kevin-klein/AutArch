@@ -15,10 +15,14 @@ class Image < ApplicationRecord
 
   has_one :page, dependent: :destroy
 
-  has_one_attached :data
+  # has_one_attached :data
 
   def file_path
     Rails.root.join("images/#{id}.jpg").to_s
+  end
+
+  def data
+    File.binread(file_path)
   end
 
   def url
