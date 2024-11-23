@@ -89,7 +89,7 @@ namespace :export do
     skeletons.find_each do |skeleton|
       spine = skeletonbash.grave.spines.first
       next if spine.nil?
-      image = ImageProcessing.extractFigure(skeleton, skeleton.page.image.data.download)
+      image = ImageProcessing.extractFigure(skeleton, skeleton.page.image.data)
       image = ImageProcessing.rotateNoCutoff(image, -spine.angle)
 
       ImageProcessing.imwrite(Rails.root.join("skeleton_angles", "#{skeleton.id}.jpg").to_s, image)
@@ -103,7 +103,7 @@ namespace :export do
       .joins(:grave)
 
     skeletons.find_each do |skeleton|
-      image = ImageProcessing.extractFigure(skeleton, skeleton.page.image.data.download)
+      image = ImageProcessing.extractFigure(skeleton, skeleton.page.image.data)
 
       ImageProcessing.imwrite(Rails.root.join("keypoint_skeletons", "#{skeleton.id}.jpg").to_s, image)
     rescue ActiveStorage::FileNotFoundError

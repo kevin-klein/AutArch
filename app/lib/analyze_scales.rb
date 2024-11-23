@@ -17,7 +17,7 @@ class AnalyzeScales
   end
 
   def scale_text(scale)
-    image = ImageProcessing.extractFigure(scale, scale.page.image.data.download)
+    image = ImageProcessing.extractFigure(scale, scale.page.image.data)
     return "" if image.size == 0
 
     begin
@@ -50,7 +50,7 @@ class AnalyzeScales
   end
 
   def assign_contour_width(scale)
-    image = ImageProcessing.extractFigure(scale, scale.page.image.data.download)
+    image = ImageProcessing.extractFigure(scale, scale.page.image.data)
     contours = ImageProcessing.findContours(image, "tree")
     rects = contours.map { ImageProcessing.minAreaRect _1 }
 

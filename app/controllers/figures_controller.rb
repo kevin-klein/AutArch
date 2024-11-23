@@ -16,7 +16,7 @@ class FiguresController < AuthorizedController
   end
 
   def preview
-    @image = Vips::Image.new_from_buffer(@figure.page.image.data.download, "")
+    @image = Vips::Image.new_from_buffer(@figure.page.image.data, "")
     @image = @image.crop(@figure.x1, @figure.y1, @figure.box_width, @figure.box_height)
 
     send_data @image.write_to_buffer(".jpg[Q=90]"), filename: "#{@figure.id}.jpg"

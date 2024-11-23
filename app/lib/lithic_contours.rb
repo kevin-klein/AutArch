@@ -1,6 +1,6 @@
 class LithicContours
   def create(lithic)
-    image = ImageProcessing.extractFigure(lithic, lithic.page.image.data.download)
+    image = ImageProcessing.extractFigure(lithic, lithic.page.image.data)
     contours = ImageProcessing.findContours(image, "external")
     contours = filter_by_area(lithic, contours)
 
