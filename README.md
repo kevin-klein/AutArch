@@ -37,7 +37,7 @@ After installing asdf, install these asdf plugins:
 To install the necessary versions of the languages mentioned above:
 
 ```
-$ cd AutArch
+$ cd autarch
 $ asdf install
 ```
 
@@ -52,10 +52,18 @@ Change your postgres password:
 
 ```
 $ sudo su postgres -c psql
-> alter user postgres with password '[your-password]'
+> alter user postgres with password '[your-password]';
 ```
 
 Change the password in 'config/database.yml' for the development database settings to the one you chose.
+
+To compile the C++ extensions:
+
+```
+$ cd image_processing
+$ ruby extconf.rb
+$ make
+```
 
 Download the database dump front the provided link and load the dump into your copy of postgres:
 
@@ -65,7 +73,7 @@ A database dump, pretrained models and images are provided to reviewers under th
 The database dump and images are located in the `autarch_data` folder. Make sure to download each file of this folder individually due to limitations regarding file size from seafile.
 
 ```
-$chmod a+x bin/rails
+$ chmod a+x bin/rails
 $ bin/rails db:create
 
 $ cat autarch_dump.gz | gunzip | psql -h localhost -U postgres comove_development
@@ -84,9 +92,12 @@ $ bin/rails db:schema:load
 
 _For reviewers only_**:
 
-Extract the downloaded images to the storage folder:
+Extract the downloaded images to the images folder:
 
-`$ unzip /path/to/autarch_images.zip -d storage`
+```
+$ zip -F /path/to/autarch_images.zip --ou autarch_images_single.zip
+$ unzip autarch_images_single.zip -d .
+```
 
 _For reviewers end_**
 
@@ -99,25 +110,15 @@ $ yarn
 
 ```
 
-To compile the C++ extensions:
-
-```
-$ cd image_processing
-$ ruby extconf.rb
-$ make
-```
-
 AutArch was tested with PyTorch 2.4.1. Other compatible versions may work as well. For the best performance a GPU is highly recommended.
 
-To install Torch (depending on your system, please consult the [torch installation guide](https://pytorch.org/get-started/locally/)):
-
-`$ pip install torch torchvision --index-url --index-url https://download.pytorch.org/whl/cu118`
+To install Torch (depending on your system, please consult the [torch installation guide](https://pytorch.org/get-started/locally/)).
 
 `$ pip install numpy pillow bottle`
 
 To copy the ML models:
 
-`$ unzip /path/to/autarch_models.zip -d models`
+`$ unzip /path/to/models.zip -d .`
 
 ## Running AutArch
 
