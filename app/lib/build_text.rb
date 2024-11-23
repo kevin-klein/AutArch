@@ -10,7 +10,7 @@ class BuildText
   def analyze_page(page, lang)
     page.text_items.destroy_all
     page.page_texts.destroy_all
-    ImageProcessing.imwrite("page.jpg", page.image.data.download)
+    ImageProcessing.imwrite("page.jpg", page.image.data)
 
     tesseract_result = RTesseract.new("page.jpg", lang: lang, psm: 11)
     create_text_blocks(tesseract_result, page)
