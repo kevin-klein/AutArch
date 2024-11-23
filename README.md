@@ -67,7 +67,7 @@ $ make
 
 Download the database dump front the provided link and load the dump into your copy of postgres:
 
-_For reviewers only:_**:
+**_For reviewers only_**:
 
 A database dump, pretrained models and images are provided to reviewers under this [link](https://seafile.rlp.net/d/ca172259a7b54383b6fa/).
 The database dump and images are located in the `autarch_data` folder. Make sure to download each file of this folder individually due to limitations regarding file size from seafile.
@@ -79,9 +79,9 @@ $ bin/rails db:create
 $ cat autarch_dump.gz | gunzip | psql -h localhost -U postgres comove_development
 ```
 
-_For reviewers end_**
+**_For reviewers end_**
 
-_For regular users_**:
+**_For regular users_**:
 
 ```
 $ chmod a+x bin/rails
@@ -90,16 +90,18 @@ $ bin/rails db:create
 $ bin/rails db:schema:load
 ```
 
-_For reviewers only_**:
+**_For regular users end_**
+
+**_For reviewers only_**:
 
 Extract the downloaded images to the images folder:
 
 ```
-$ zip -F /path/to/autarch_images.zip --ou autarch_images_single.zip
+$ zip -F /path/to/autarch_images.zip --out autarch_images_single.zip
 $ unzip autarch_images_single.zip -d .
 ```
 
-_For reviewers end_**
+**_For reviewers end_**
 
 Install js dependencies:
 
@@ -112,7 +114,7 @@ $ yarn
 
 AutArch was tested with PyTorch 2.4.1. Other compatible versions may work as well. For the best performance a GPU is highly recommended.
 
-To install Torch (depending on your system, please consult the [torch installation guide](https://pytorch.org/get-started/locally/)).
+To install Torch (depending on your system, please consult the [torch installation guide](https://pytorch.org/get-started/locally/)). Please note that asdf installs Python 3.7.12. Please consult the asdf documentation in case you want your system python installation to be used or you want to use a different version.
 
 `$ pip install numpy pillow bottle`
 
