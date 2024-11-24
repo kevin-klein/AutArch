@@ -118,6 +118,7 @@ To install Torch (depending on your system, please consult the [torch installati
 
 `$ pip install numpy pillow bottle`
 
+Download the models folder from seafile (by hovering over it a download button will appear) as a zip file.
 To copy the ML models:
 
 `$ unzip /path/to/models.zip -d .`
