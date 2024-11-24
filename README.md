@@ -114,7 +114,7 @@ $ yarn
 
 AutArch was tested with PyTorch 2.4.1. Other compatible versions may work as well. For the best performance a GPU is highly recommended.
 
-To install Torch please consult the [torch installation guide](https://pytorch.org/get-started/locally/). Please note that asdf installs Python 3.7.12. Please consult the asdf documentation in case you want your system python installation to be used or you want to use a different version.
+To install Torch please consult the [torch installation guide](https://pytorch.org/get-started/locally/). Please note that asdf installs Python 3.12.7. Please consult the asdf documentation in case you want your system python installation to be used or you want to use a different version.
 
 `$ pip install numpy pillow bottle`
 
