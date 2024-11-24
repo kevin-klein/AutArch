@@ -142,6 +142,10 @@ To start the python ml service:
 
 `$ python scripts/torch_service.py`
 
+To start background jobs:
+
+`$ bundle exec sidekiq`
+
 After all the services have successfully loaded, AutArch is accessible under [localhost:3000](http://localhost:3000)
 
 ## Team
@@ -199,6 +203,8 @@ inside the autarch folder.
 
 In case you get an error related to not enough memory being available, reducing the batch size within the training scripts will make it run but
 the resulting model will potentially differ from the one we supplied.
+
+Other pretrained models are available in the models folder as well. The used models can be swapped out by commenting out the retinanet model and enabling the relevant line to use RCNN or SSD instead (scripts/torch_service.py#20, scripts/train_object_detection#127-148).
 
 To train the models yourself, download the "training_data" folder and put it inside the AutArch folder. To train the object detection network:
 
