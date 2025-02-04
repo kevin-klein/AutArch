@@ -15,6 +15,7 @@ gem "pg"
 gem "sprockets-rails"
 gem "cancancan"
 gem "mina"
+gem "rmagick"
 
 gem "bootstrap"
 gem "graphql"
@@ -23,6 +24,7 @@ gem "pagy"
 gem "parslet", git: "https://github.com/kschiess/parslet"
 gem "rails-erd", group: :development
 gem "standard", group: [:development, :test]
+gem "parallel"
 
 gem "matrix"
 gem "rtesseract"
@@ -111,6 +113,7 @@ gem "sidekiq", "~> 6.5"
 
 gem "dotenv-rails", "~> 2.8"
 gem "pkg-config"
+gem "minopencv", github: "kevin-klein/ruby-minopencv"
 
 gem "shakapacker"
 

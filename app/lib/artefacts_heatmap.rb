@@ -7,7 +7,7 @@ class ArtefactsHeatmap
       grave = spine.grave
 
       grave_outside = grave.rotate_bounding_box(-spine.angle)
-      grave_contour = ImageProcessing.boundingRect(
+      grave_contour = MinOpenCV.boundingRect(
         grave
         .rotate_contour(-spine.angle)
         .map do |point|

@@ -1,9 +1,7 @@
 # AutArch
 
 ## Summary
-AutArch is an AI-assisted workflow capable of creating uniform
-archaeological datasets from heterogeneous published resources. The implementation provided here
-takes large and unsorted PDF files as input, and uses neural networks to
+AutArch is an AI-assisted workflow capable of creating uniform archaeological datasets from heterogeneous published resources. The implementation provided here takes large and unsorted PDF files as input, and uses neural networks to conduct image processing, object detection, and classification.
 
 
 ## Recommended Hardware
