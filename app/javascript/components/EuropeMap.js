@@ -43,12 +43,12 @@ function Radar ({ angles }) {
     >
       {/* <path strokeWidth='1' stroke='black' d='M50,0,50,100' />
       <path strokeWidth='1' stroke='black' d='M0,50,100,50' /> */}
-      <circle cx='50' cy='50' r='27' stroke='blue' strokeWidth='25' fill='none' />
+      <circle cx='50' cy='50' r='27' stroke='#dcac0a' strokeWidth='25' fill='none' />
 
       {Object.keys(angles).map(angle => {
         const count = angles[angle]
         const intensity = (count / max)
-        const fill = `rgb(${intensity * 255} 0  ${(1 - intensity) * 255})`
+        const fill = `rgb(${(intensity) * 35} ${(intensity) * 83} ${(intensity) * 245})`
 
         return (
           <Segment
@@ -214,7 +214,7 @@ function MinimapControl ({ position, zoom }) {
   const minimap = React.useMemo(
     () => (
       <MapContainer
-        style={{ height: 140, width: 140 }}
+        style={{ height: 100, width: 140 }}
         center={parentMap.getCenter()}
         zoom={mapZoom}
         dragging={false}
@@ -253,7 +253,7 @@ function NorthArrowControl ({ position }) {
 
 export default function EuropeMap ({ orientations }) {
   return (
-    <div style={{ height: 800 }}>
+    <div style={{ height: 500 }}>
       <MapContainer scrollWheelZoom style={{ height: '100%' }} center={[48.505, 16]} zoom={7}>
         <TileLayer
           attribution='Tiles &copy; Esri &mdash; Source: Esri'

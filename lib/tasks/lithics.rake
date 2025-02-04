@@ -13,7 +13,7 @@ namespace :export do
     #   if contour.empty?
     #     false
     #   else
-    #     # rect = ImageProcessing.minAreaRect(contour)
+    #     # rect = MinOpenCV.minAreaRect(contour)
     #     true
     #     # rect[:height] < 400
     #     # rect[:width] < 500 && rect[:height] < 500 && !contour.flatten.any? { _1 < 0 }

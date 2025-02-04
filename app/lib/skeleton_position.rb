@@ -11,7 +11,7 @@ class SkeletonPosition
   end
 
   def deposition_type(skeleton)
-    image = ImageProcessing.extractFigure(skeleton, skeleton.page.image.data)
+    image = MinOpenCV.extractFigure(skeleton, skeleton.page.image.data)
     io = StringIO.new(image)
     file = HTTP::FormData::File.new io, filename: "arrow.jpg"
     response = HTTP.post("http://127.0.0.1:8080/skeleton", form: {

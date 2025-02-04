@@ -1,4 +1,99 @@
 namespace :export do
+  task masks: :environment do
+    require "rvg/rvg"
+
+    def mask_path(image, figure)
+      Pathname.new("/mnt/g/masks/#{image.id}_#{figure.id}_mask.jpg")
+    end
+
+    def bounding_boxes(figures)
+      figures.map do |figure|
+        contour = global_contour(figure)
+
+        MinOpenCV.boundingRect(contour.each_slice(2).to_a)
+      end
+    end
+
+    def global_contour(figure)
+      if figure.manual_bounding_box
+        figure.contour.flatten
+      elsif figure.instance_of?(StoneTool)
+        (figure.contour.first + [figure.contour.first[0]]).map do |point|
+          [point[0] + figure.x1, point[1] + figure.y1]
+        end.flatten
+      else
+        (figure.contour + [figure.contour[0]]).map do |point|
+          [point[0] + figure.x1, point[1] + figure.y1]
+        end.flatten
+      end
+    end
+
+    def create_mask(image, figure)
+      magick_image = Vips::Image.new_from_file(image.file_path)
+      width, height = magick_image.size
+
+      rvg = Magick::RVG.new(width, height) do |canvas|
+        canvas.background_fill = "black"
+
+        polygon = global_contour(figure)
+
+        canvas.polygon(polygon).styles(fill: "white")
+      end
+      rvg.draw.write(mask_path(image, figure))
+      true
+    rescue Magick::ImageMagickError => e
+      ap e
+      false
+    end
+
+    def export_page(page)
+      figures = page.figures.filter { _1.probability > 0.6 && !_1.contour.empty? && ["Grave", "Scale", "Arrow", "Ceramic"].include?(_1.type) }
+
+      path = page.image.file_path
+      if File.exist?(path) && figures.size > 0
+        target_path = Pathname.new("/mnt/g/masks/#{page.image.id}.jpg")
+        FileUtils.cp(path, target_path)
+
+        boxes = bounding_boxes(figures)
+        labels = figures.map(&:type)
+
+        data = figures.zip(boxes, labels).filter_map do |figure, box, label|
+          if create_mask(page.image, figure)
+            [figure, box, label, mask_path(page.image, figure).basename]
+          end
+        end
+
+        if !data.empty?
+          File.open("/mnt/g/masks/#{page.image.id}.json", "w") do |f|
+            masks = data.map { _1[3] }
+            labels = data.map { _1[2] }
+            boxes = data.map { _1[1] }
+
+            data = {
+              image: target_path.basename,
+              masks: masks,
+              bounding_boxes: boxes,
+              labels: labels
+            }
+            f.write(JSON.pretty_generate(data))
+          end
+        else
+          File.delete(target_path)
+        end
+      end
+    end
+
+    page_ids = Grave.all.filter do |grave|
+      grave.width_with_unit[:unit] != "px" && grave.height_with_unit[:unit] != "px"
+    end.map { _1.page_id }.uniq
+
+    pages = Page.includes(:figures, :image).find(page_ids)
+
+    Parallel.map(pages, in_processes: 8, progress: "Exporting pages") do |page|
+      export_page(page)
+    end
+  end
+
   task lithics: :environment do
     publication = Publication.find(32)
 
@@ -65,18 +160,18 @@ namespace :export do
 
   task skeletons: :environment do
     SkeletonFigure.find_each do |skeleton|
-      image = ImageProcessing.extractFigure(skeleton, skeleton.page.image.data)
-      ImageProcessing.imwrite(Rails.root.join("skeletons", "#{skeleton.id}.jpg").to_s, image)
+      image = MinOpenCV.extractFigure(skeleton, skeleton.page.image.data)
+      MinOpenCV.imwrite(Rails.root.join("skeletons", "#{skeleton.id}.jpg").to_s, image)
     end
   end
 
   task arrows: :environment do
     Arrow.find_each do |arrow|
       # next if arrow.angle.nil?
-      image = ImageProcessing.extractFigure(arrow, arrow.page.image.data)
-      # image = ImageProcessing.rotateNoCutoff(image, -arrow.angle)
+      image = MinOpenCV.extractFigure(arrow, arrow.page.image.data)
+      # image = MinOpenCV.rotateNoCutoff(image, -arrow.angle)
 
-      ImageProcessing.imwrite(Rails.root.join("arrows", "#{arrow.id}.jpg").to_s, image)
+      MinOpenCV.imwrite(Rails.root.join("arrows", "#{arrow.id}.jpg").to_s, image)
     end
   end
 
@@ -89,10 +184,10 @@ namespace :export do
     skeletons.find_each do |skeleton|
       spine = skeletonbash.grave.spines.first
       next if spine.nil?
-      image = ImageProcessing.extractFigure(skeleton, skeleton.page.image.data)
-      image = ImageProcessing.rotateNoCutoff(image, -spine.angle)
+      image = MinOpenCV.extractFigure(skeleton, skeleton.page.image.data)
+      image = MinOpenCV.rotateNoCutoff(image, -spine.angle)
 
-      ImageProcessing.imwrite(Rails.root.join("skeleton_angles", "#{skeleton.id}.jpg").to_s, image)
+      MinOpenCV.imwrite(Rails.root.join("skeleton_angles", "#{skeleton.id}.jpg").to_s, image)
     rescue ActiveStorage::FileNotFoundError
     end
   end
@@ -103,9 +198,9 @@ namespace :export do
       .joins(:grave)
 
     skeletons.find_each do |skeleton|
-      image = ImageProcessing.extractFigure(skeleton, skeleton.page.image.data)
+      image = MinOpenCV.extractFigure(skeleton, skeleton.page.image.data)
 
-      ImageProcessing.imwrite(Rails.root.join("keypoint_skeletons", "#{skeleton.id}.jpg").to_s, image)
+      MinOpenCV.imwrite(Rails.root.join("keypoint_skeletons", "#{skeleton.id}.jpg").to_s, image)
     rescue ActiveStorage::FileNotFoundError
     end
   end
@@ -133,7 +228,7 @@ namespace :export do
         if contour.empty?
           false
         else
-          # rect = ImageProcessing.minAreaRect(contour)
+          # rect = MinOpenCV.minAreaRect(contour)
           true
           # rect[:height] < 400
           # rect[:width] < 500 && rect[:height] < 500 && !contour.flatten.any? { _1 < 0 }

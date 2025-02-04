@@ -5,8 +5,8 @@ class LithicContoursComponent < ViewComponent::Base
     super
     @lithic = lithic
     @color = "rgb(#{color.join(" ")})"
-    @image_data = ImageProcessing.imencode(
-      ImageProcessing.extractFigure(lithic, lithic.page.image.data)
+    @image_data = MinOpenCV.imencode(
+      MinOpenCV.extractFigure(lithic, lithic.page.image.data)
     )
     @image = Vips::Image.new_from_buffer(@image_data, "")
     @image_data = "data:image/jpeg;base64,#{Base64.encode64 @image_data}"

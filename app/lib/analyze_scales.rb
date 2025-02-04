@@ -17,11 +17,11 @@ class AnalyzeScales
   end
 
   def scale_text(scale)
-    image = ImageProcessing.extractFigure(scale, scale.page.image.data)
+    image = MinOpenCV.extractFigure(scale, scale.page.image.data)
     return "" if image.size == 0
 
     begin
-      ImageProcessing.imwrite("scale.jpg", image)
+      MinOpenCV.imwrite("scale.jpg", image)
       t = RTesseract.new("scale.jpg", lang: "eng")
       result = t.to_s.strip
       result.tr("i", "1")
@@ -50,9 +50,9 @@ class AnalyzeScales
   end
 
   def assign_contour_width(scale)
-    image = ImageProcessing.extractFigure(scale, scale.page.image.data)
-    contours = ImageProcessing.findContours(image, "tree")
-    rects = contours.map { ImageProcessing.minAreaRect _1 }
+    image = MinOpenCV.extractFigure(scale, scale.page.image.data)
+    contours = MinOpenCV.findContours(image, "tree")
+    rects = contours.map { MinOpenCV.minAreaRect _1 }
 
     return if rects.empty?
 

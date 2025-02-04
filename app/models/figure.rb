@@ -204,7 +204,7 @@ class Figure < ApplicationRecord
         if contour.size < 10
           0
         else
-          ImageProcessing.contourArea(contour)
+          MinOpenCV.contourArea(contour)
         end
       end
     else
@@ -252,7 +252,7 @@ class Figure < ApplicationRecord
       end
     end
 
-    bounding = ImageProcessing.boundingRect(rotated_contour)
+    bounding = MinOpenCV.boundingRect(rotated_contour)
 
     rotated_contour = rotated_contour.map do |x, y|
       [x - bounding[:x], y - bounding[:y]]
@@ -277,7 +277,7 @@ class Figure < ApplicationRecord
         if contour.size < 10
           0
         else
-          ImageProcessing.contourArea(contour)
+          MinOpenCV.contourArea(contour)
         end
       end
     else
@@ -286,7 +286,7 @@ class Figure < ApplicationRecord
 
     return [] if single_contour.nil? || single_contour.size < 5
 
-    bounding = ImageProcessing.boundingRect(single_contour)
+    bounding = MinOpenCV.boundingRect(single_contour)
 
     center_x = (bounding[:width] / 2) + bounding[:x]
     center_y = (bounding[:height] / 2) + bounding[:y]

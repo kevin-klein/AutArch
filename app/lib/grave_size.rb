@@ -25,11 +25,11 @@ class GraveSize
       figure.width = figure.bounding_box_width
       figure.height = figure.bounding_box_height
     else
-      image = ImageProcessing.extractFigure(figure, figure.page.image.data)
-      contours = ImageProcessing.findContours(image, "tree")
-      contour = contours.max_by { ImageProcessing.contourArea _1 }
+      image = MinOpenCV.extractFigure(figure, figure.page.image.data)
+      contours = MinOpenCV.findContours(image, "tree")
+      contour = contours.max_by { MinOpenCV.contourArea _1 }
       return if contour.nil?
-      rect = ImageProcessing.boundingRect(contour)
+      rect = MinOpenCV.boundingRect(contour)
       return if rect == -1
 
       figure.contour = contour.map { |x, y| [x, y] }
@@ -66,25 +66,25 @@ class GraveSize
     if contour.nil? || contour.empty?
       {contour: [], perimeter: 0, area: 0, width: 0, height: 0, angle: 0}
     else
-      arc = ImageProcessing.arcLength(contour)
-      area = ImageProcessing.contourArea(contour)
-      rect = ImageProcessing.minAreaRect(contour)
+      arc = MinOpenCV.arcLength(contour)
+      area = MinOpenCV.contourArea(contour)
+      rect = MinOpenCV.minAreaRect(contour)
       {contour: contour, perimeter: arc, area: area, width: rect[:width], height: rect[:height], angle: rect[:angle]}
     end
   end
 
   def contour_stats(figure, image)
-    image = ImageProcessing.extractFigure(figure, image)
-    # image = ImageProcessing.dilate(image, [5, 5])
-    # image = ImageProcessing.erode(image, [19, 19])
-    contours = ImageProcessing.findContours(image, "tree")
-    contour = contours.max_by { ImageProcessing.contourArea _1 }
+    image = MinOpenCV.extractFigure(figure, image)
+    # image = MinOpenCV.dilate(image, [5, 5])
+    # image = MinOpenCV.erode(image, [19, 19])
+    contours = MinOpenCV.findContours(image, "tree")
+    contour = contours.max_by { MinOpenCV.contourArea _1 }
     if contour.nil? || contour.empty?
       {contour: [], perimeter: 0, area: 0, width: 0, height: 0, angle: 0}
     else
-      arc = ImageProcessing.arcLength(contour)
-      area = ImageProcessing.contourArea(contour)
-      rect = ImageProcessing.minAreaRect(contour)
+      arc = MinOpenCV.arcLength(contour)
+      area = MinOpenCV.contourArea(contour)
+      rect = MinOpenCV.minAreaRect(contour)
       {contour: contour, perimeter: arc, area: area, width: rect[:width], height: rect[:height], angle: rect[:angle]}
     end
   end
