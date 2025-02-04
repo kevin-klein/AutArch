@@ -21,6 +21,8 @@ w1 = data[clusters == 1]
 plt.plot(w0[:, 0], w0[:, 1], 'o', alpha=0.5, label='cluster 0')
 plt.plot(w1[:, 0], w1[:, 1], 'd', alpha=0.5, label='cluster 1')
 
+plt.scatter(centroids[:, 0], centroids[:, 1], c='r', zorder=5)
+
 def positive(angles):
   return (angles + 360) % (360)
 
@@ -35,7 +37,8 @@ print(positive(average_euclidian_angle_w1))
 
 print(silhouette_score(data, clusters))
 
-plt.scatter(centroids[:, 0], centroids[:, 1], c='r')
+plt.xlim(-1.25, 1.25)
+plt.ylim(-1.25, 1.25)
 ax = plt.gca()
 ax.set_aspect('equal', adjustable='box')
-plt.savefig('grave orientation cluster.png')
+plt.savefig('grave orientation cluster.pdf', dpi=300)

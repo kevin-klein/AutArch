@@ -9,5 +9,6 @@
     "initializer_list": "cpp",
     "regex": "cpp",
     "utility": "cpp"
-  }
+  },
+  "git.ignoreLimitWarning": true
 }

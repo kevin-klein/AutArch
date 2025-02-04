@@ -6,57 +6,56 @@ import pandas as pd
 import itertools
 import statistics
 from matplotlib import cm
+import matplotlib.ticker as mtick
 
-with open('errors_comove.json', 'r') as f:
-  comove_error = json.load(f)
+autarch_data = pd.read_csv('comove_error.csv')
+inkscape_data = pd.read_csv('inkscape_error.csv')
 
-with open('errors_inkscape.json', 'r') as f:
-  inkscape_error = json.load(f)
+fig, ax = plt.subplots()
 
 with open('user_map.json', 'r') as f:
   user_map = json.load(f)
 
-print(inkscape_error.keys())
+count_data = {
+  'Autarch': [],
+  'Inkscape': []
+}
 
-for user, errors in comove_error.items():
-  figure = plt.figure()
-  ax = figure.subplots()
-  ax.bar([str(i + 1) for i in range(0, len(errors))], errors)
+for user in user_map:
+  inkscape_count = inkscape_data.loc[inkscape_data['User'] == f"{user}_inkscape.csv"]
+  if len(inkscape_count.to_dict(orient='records')) > 0:
+    inkscape_count = inkscape_count['Error'].values[0].round(2) * 100
+  else:
+    inkscape_count = np.nan
 
-  ax.set_ylabel('average error')
-  ax.set_xlabel('graves')
+  autarch_count = autarch_data.loc[autarch_data['User'] == f"{user}.csv"]
+  if len(autarch_count.to_dict(orient='records')) > 0:
+    autarch_count = autarch_count['Error'].values[0].round(2) * 100
+  else:
+    autarch_count = np.nan
 
-  username = user_map[user.replace('.csv', '')]
+  count_data['Autarch'] = count_data['Autarch'] + [autarch_count]
+  count_data['Inkscape'] = count_data['Inkscape'] + [inkscape_count]
 
-  ax.set_title(f'AutArch error per grave {username}')
-  figure.savefig(f"errors_comove_user_{username}.png")
+x = np.arange(len(user_map.keys()))  # the label locations
+width = 0.3  # the width of the bars
+multiplier = 0
 
-for user, errors in inkscape_error.items():
-  figure = plt.figure()
-  ax = figure.subplots()
-  ax.bar([str(i + 1) for i in range(0, len(errors))], errors)
+fig, ax = plt.subplots(layout='constrained')
 
-  ax.set_ylabel('average error')
-  ax.set_xlabel('graves')
-  username = user_map[user.replace('_inkscape.csv', '')]
+# print(count_data)
 
-  ax.set_title(f'Inkscape error per grave {username}')
-  figure.savefig(f"errors_inkscape_user_{username}.png")
+for attribute, measurement in count_data.items():
+    offset = width * multiplier
+    rects = ax.bar(x + offset, measurement, width, label=attribute)
+    ax.bar_label(rects, padding=3, fmt='%.0f%%')
+    multiplier += 1
 
-# comove_count_data = data.to_dict('list')
+# Add some text for labels, title and custom x-axis tick labels, etc.
+ax.set_ylabel('errors in percent')
+ax.yaxis.set_major_formatter(mtick.PercentFormatter())
+ax.set_title('Error per graves by user')
+ax.set_xticks(x + width, user_map.values())
+ax.legend(loc='upper left', ncols=3)
 
-# fig, ax = plt.subplots()
-
-
-
-# labels = [user_map[user.replace('.csv', '')] for user in data['User']]
-
-# bar_colors = [cm.jet(1.*i/len(labels)) for i in range(0, len(labels))]
-
-# ax.bar([str(i + 1) for i in range(0, len(labels))], data['Error'], label=labels, color=bar_colors)
-
-# ax.set_ylabel('average error')
-# ax.set_title('average error per user')
-# ax.legend(title='user')
-
-# plt.savefig('bar_chart_error.png')
+plt.savefig('bar_chart_error.png', dpi=300)

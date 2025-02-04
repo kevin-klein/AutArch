@@ -1,0 +1,31 @@
+[tool.poetry]
+name = "dfg"
+version = "0.1.0"
+description = ""
+authors = ["Kevin <kevin.k1252@gmail.com>"]
+license = "GPL"
+readme = "README.md"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.12"
+numpy = "^2.2.1"
+torch = {version = "^2.5.1+cu118", source = "pytorch_cuda"}
+torchvision = {version = "^0.20.1+cu118", source = "pytorch_cuda"}
+torchaudio = {version = "^2.5.1+cu118", source = "pytorch_cuda"}
+scipy = "^1.14.1"
+matplotlib = "^3.10.0"
+scikit-learn = "^1.6.0"
+opencv-python = "^4.10.0.84"
+pyproj = "^3.7.0"
+pycocotools = "^2.0.8"
+bottle = "^0.13.2"
+
+[[tool.poetry.source]]
+name = "pytorch_cuda"
+url = "https://download.pytorch.org/whl/cu124"
+priority = "explicit"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

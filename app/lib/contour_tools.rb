@@ -5,7 +5,7 @@ module ContourTools
     area = figure.box_width * figure.box_height
 
     contours.filter do |contour|
-      contour_area = ImageProcessing.contourArea(contour)
+      contour_area = MinOpenCV.contourArea(contour)
 
       (contour_area / area) > min_area && (contour_area / area) < max_area
     end
