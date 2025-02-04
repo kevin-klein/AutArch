@@ -1,4 +1,10 @@
 GIT
+  remote: https://github.com/kevin-klein/ruby-minopencv.git
+  revision: a5e3469ddeecf5c847510067e077bb5c329eb6d5
+  specs:
+    minopencv (0.1.0)
+
+GIT
   remote: https://github.com/kschiess/parslet
   revision: f61daf0ef11a7b6ff795043ec8f64a6803e5162b
   specs:
@@ -212,6 +218,7 @@ GEM
     nokogiri (1.16.3-x86_64-linux)
       racc (~> 1.4)
     numo-narray (0.9.2.1)
+    observer (0.1.2)
     package_json (0.1.0)
     pagy (6.0.1)
     parallel (1.24.0)
@@ -288,6 +295,9 @@ GEM
     reverse_markdown (2.1.1)
       nokogiri
     rexml (3.2.6)
+    rmagick (6.1.0)
+      observer (~> 0.1)
+      pkg-config (~> 1.4)
     rtesseract (3.1.2)
     rubocop (1.62.1)
       json (~> 2.3)
@@ -548,8 +558,10 @@ DEPENDENCIES
   matrix
   message_bus
   mina
+  minopencv!
   msgpack
   pagy
+  parallel
   parslet!
   pdf-reader
   pg
@@ -559,6 +571,7 @@ DEPENDENCIES
   rails-erd
   react_on_rails
   redis (~> 4.0)
+  rmagick
   rtesseract
   rubocop-rails
   ruby-lsp

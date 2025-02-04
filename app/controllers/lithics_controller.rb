@@ -21,7 +21,7 @@ class LithicsController < ApplicationController
         if contour.empty?
           false
         else
-          # rect = ImageProcessing.minAreaRect(contour)
+          # rect = MinOpenCV.minAreaRect(contour)
           true
           # rect[:height] < 400
           # rect[:width] < 500 && rect[:height] < 500 && !contour.flatten.any? { _1 < 0 }
@@ -40,9 +40,9 @@ class LithicsController < ApplicationController
 
     # ap @lithics.map(&:scale).map(&:meter_ratio)
     # ap @lithics[10]
-    # ap @lithics.map { ap ImageProcessing.minAreaRect(_1.size_normalized_contour) }
+    # ap @lithics.map { ap MinOpenCV.minAreaRect(_1.size_normalized_contour) }
     # ap @contours
-    # ap @contours.map { ImageProcessing.minAreaRect(_1) }
+    # ap @contours.map { MinOpenCV.minAreaRect(_1) }
   end
 
   def show
