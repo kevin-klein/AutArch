@@ -42,13 +42,6 @@ export function Box ({ onChangeFigure, onDraggingStart, active, figure, setActiv
     return <ManualContour onChangeFigure={onChangeFigure} active={active} onDraggingStart={onDraggingStart} figure={figure} color={color} />
   }
 
-  function onMouseDown (figure) {
-    return function (evt) {
-      evt.preventDefault()
-      onDraggingStart(evt, figure)
-    }
-  }
-
   return (
     <>
       {(typeName === 'Spine') &&
