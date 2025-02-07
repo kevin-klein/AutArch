@@ -1,11 +1,12 @@
 class MapsController < AuthorizedController
   def index
-    publications = []
-
     @skeleton_angles = Site.includes(
-      graves: [:spines, :arrow]
+      graves: [:spines, :arrow, :tags, :publication]
     ).all.to_a.map do |site|
-      spines = site.graves.joins(:tags).where(tags: {id: params[:tag_id]}).flat_map do |grave|
+
+      spines = site.graves.filter do |grave|
+        grave.tags.any? { _1.id.to_s == params[:tag_id] }
+      end.flat_map do |grave|
         grave.spines
       end
 

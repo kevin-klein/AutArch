@@ -39,4 +39,5 @@ test:
 
 production:
   <<: *default
-  database: autarch_production
+  host: db
+  database: postgres

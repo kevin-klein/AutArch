@@ -14,7 +14,7 @@
 class Publication < ApplicationRecord
   has_many :pages, dependent: :destroy
   has_many :figures, through: :pages
-  belongs_to :user
+  # belongs_to :user
 
   # attribute :site, :string
   has_one_attached :pdf
