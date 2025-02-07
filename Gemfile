@@ -1,18 +1,16 @@
 source "https://rubygems.org"
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-ruby "3.1.2"
+ruby "3.1.6"
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails', branch: 'main'
 gem "rails", "~> 7.0.2", ">= 7.0.2.3"
 
 gem "awesome_print"
 
-# The original asset pipeline for Rails [https://github.com/rails/sprockets-rails]
 gem "activerecord-import"
 gem "msgpack"
 gem "pg"
-gem "sprockets-rails"
 gem "cancancan"
 gem "mina"
 gem "rmagick"

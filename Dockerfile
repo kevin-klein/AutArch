@@ -1,30 +1,104 @@
-FROM ubuntu:latest
+FROM ruby:3.1.6 as builder
 
-RUN apt-get update
-RUN apt-get -y upgrade
-RUN apt-get install -y git libpq-dev postgresql libopencv-dev tesseract-ocr redis-server libvips42 build-essential zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev wget libbz2-dev
+RUN apt-get update -qq
+RUN apt-get install -y git libpq-dev libopencv-dev tesseract-ocr libvips42 build-essential wget libmagickwand-dev
 
-RUN git clone --depth 1 https://github.com/asdf-vm/asdf.git ~/.asdf
+RUN git clone --depth 1 https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.15.0
 ENV PATH="$PATH:/root/.asdf/bin"
 ENV PATH=$PATH:/root/.asdf/shims
 
+ENV RAILS_ENV="production" \
+    BUNDLE_DEPLOYMENT="1" \
+    BUNDLE_PATH="/usr/local/bundle" \
+    BUNDLE_WITHOUT="development"
+
 RUN asdf plugin add nodejs https://github.com/asdf-vm/asdf-nodejs.git
-RUN asdf plugin add ruby https://github.com/asdf-vm/asdf-ruby.git
-RUN asdf plugin-add python
-
-ADD deployment-keys/id_rsa /root/.ssh/id_rsa
-RUN touch /root/.ssh/known_hosts
-RUN ssh-keyscan github.com >> /root/.ssh/known_hosts
-RUN git clone git@github.com:kevin-klein/dfg.git
-WORKDIR /dfg
-
+WORKDIR /tmp
+COPY .tool-versions.web /tmp/.tool-versions
 RUN asdf install
-RUN bundle
+RUN npm install -g yarn
+
+
+FROM builder as bundler
+WORKDIR /tmp
+RUN gem install bundler
+COPY Gemfile /tmp/
+COPY Gemfile.lock /tmp/
+RUN bundle install
+
+FROM node:18-bullseye-slim as yarn
+WORKDIR /tmp
+COPY package.json .
+COPY yarn.lock .
+RUN yarn install
+
+FROM builder as assets
+WORKDIR /tmp
+COPY --from=bundler /usr/local/bundle /usr/local/bundle
+COPY --from=yarn /tmp/node_modules node_modules
+COPY app/assets app/assets
+COPY app/javascript app/javascript
+COPY bin bin
+COPY config config
+COPY Rakefile Gemfile Gemfile.lock package.json yarn.lock /tmp/
+RUN RAILS_ENV=production bundle exec rails shakapacker:compile
+
+# RUN git clone --depth 1 https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.15.0
+# ENV PATH="$PATH:/root/.asdf/bin"
+# ENV PATH=$PATH:/root/.asdf/shims
+
+
+# ENV RAILS_ENV="production" \
+#     BUNDLE_DEPLOYMENT="1" \
+#     BUNDLE_PATH="/usr/local/bundle" \
+#     BUNDLE_WITHOUT="development"
+
+# RUN asdf plugin add nodejs https://github.com/asdf-vm/asdf-nodejs.git
+
+FROM builder as app
+
+WORKDIR /dfg
+COPY app '/dfg/app'
+COPY assets '/dfg/assets'
+COPY bin '/dfg/bin'
+COPY config '/dfg/config'
+COPY db '/dfg/db'
+COPY lib '/dfg/lib'
+COPY log '/dfg/log'
+COPY map '/dfg/map'
+COPY public '/dfg/public'
+COPY tmp '/dfg/tmp'
+COPY vendor '/dfg/vendor'
+COPY config.ru .
+COPY Gemfile .
+COPY Gemfile.lock .
+COPY package.json .
+COPY yarn.lock .
+COPY Rakefile .
+
+COPY --from=bundler /usr/local/bundle /usr/local/bundle
+COPY --from=assets /tmp/public public
+
 RUN chmod a+x bin/rails
-RUN bin/rails db:create
 
-RUN npm install --global yarn
-RUN yarn
+EXPOSE 3000
 
-RUN pip install poetry
-RUN poetry install
+CMD ["bin/rails", "server"]
+
+
+
+# RUN asdf install
+# RUN bundle
+# RUN chmod a+x bin/rails
+
+# RUN npm install --global yarn
+# RUN yarn
+
+# RUN bundle exec bootsnap precompile app/ lib/
+# RUN ./bin/rails shakapacker:compile --trace
+
+# # COPY images '/dfg/images'
+
+# EXPOSE 3000
+# CMD ["./bin/rails", "server"]
+

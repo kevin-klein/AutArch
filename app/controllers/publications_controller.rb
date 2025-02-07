@@ -142,7 +142,7 @@ class PublicationsController < AuthorizedController
       title: publication_params[:title],
       pdf: publication_params[:pdf],
       year: publication_params[:year],
-      user: current_user
+      # user: current_user
     })
 
     respond_to do |format|

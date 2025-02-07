@@ -1,0 +1,34 @@
+services:
+  ml-services:
+    build:
+      context: .
+      dockerfile: ml-services.Dockerfile
+    env_file:
+      - .env
+    volumes:
+      - ./models:/ml-services/models
+
+  web:
+    build: .
+    volumes:
+      - ./images:/dfg/images
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+
+  sidekiq:
+    volumes:
+      - ./images:/dfg/images
+    build: '.'
+    command: bundle exec sidekiq
+    env_file:
+      - .env
+
+  redis:
+    image: "redis:alpine"
+  db:
+    build: db
+    environment:
+      POSTGRES_PASSWORD: root110120
+

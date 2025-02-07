@@ -16,7 +16,7 @@ class SkeletonAngles
     image = MinOpenCV.extractFigure(skeleton, skeleton.page.image.data)
     io = StringIO.new(image)
     file = HTTP::FormData::File.new io, filename: "skeleton.jpg"
-    response = HTTP.post("http://127.0.0.1:8080/skeleton-orientation", form: {
+    response = HTTP.post("#{ENV["ML_SERVICE_URL"]}/skeleton-orientation", form: {
       image: file
     })
 

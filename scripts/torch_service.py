@@ -24,13 +24,13 @@ loaded_model.eval()
 loaded_model.to(device)
 
 app = Bottle()
-arrow_model = torchvision.models.resnet152(weights=torchvision.models.ResNet152_Weights.IMAGENET1K_V2)
+arrow_model = torchvision.models.resnet152(weights=None)
 arrow_model.fc = torch.nn.Linear(in_features=2048, out_features=2, bias=True)
 arrow_model = arrow_model.to(device)
 
 arrow_model.load_state_dict(torch.load('models/arrow_resnet.model', map_location=device))
 
-skeleton_orientation_model = model = torchvision.models.resnet152(weights=torchvision.models.ResNet152_Weights.IMAGENET1K_V2)
+skeleton_orientation_model = model = torchvision.models.resnet152(weights=None)
 skeleton_orientation_model.fc = torch.nn.Linear(in_features=2048, out_features=2, bias=True)
 skeleton_orientation_model.to(device)
 
@@ -135,4 +135,4 @@ def upload_skeleton_angle():
     return { 'predictions': result }
 
 if __name__ == '__main__':
-    app.run(debug=True, reloader=True, host='127.0.0.1')
+    app.run(debug=True, reloader=True, host='0.0.0.0')

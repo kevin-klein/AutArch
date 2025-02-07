@@ -26,7 +26,7 @@ class GraveAngles
     image = MinOpenCV.extractFigure(arrow, arrow.page.image.data)
     io = StringIO.new(image)
     file = HTTP::FormData::File.new io, filename: "arrow.jpg"
-    response = HTTP.post("http://127.0.0.1:8080/arrow", form: {
+    response = HTTP.post("#{ENV["ML_SERVICE_URL"]}/arrow", form: {
       image: file
     })
 

@@ -17,8 +17,9 @@ class AnalyzePublication
       page_number += 1
 
       image_data = image.write_to_buffer(".jpg")
-      page.image = Image.create!(width: image.width, height: image.height)
-      page.image.data.attach(io: StringIO.new(image_data), content_type: "image/jpg", filename: "#{publication.title}_#{index}.jpg")
+      page.image = ::Image.create!(width: image.width, height: image.height)
+      File.binwrite(page.image.file_path, image_data)
+      # page.image.data.attach(io: StringIO.new(image_data), content_type: "image/jpg", filename: "#{publication.title}_#{index}.jpg")
       page.save!
 
       predictions = predict_boxes(image_data)
@@ -38,8 +39,8 @@ class AnalyzePublication
     end
 
     Page.transaction do
-      MessageBus.publish("/importprogress", "Analyzing Text")
-      BuildText.new.run(publication)
+      # MessageBus.publish("/importprogress", "Analyzing Text")
+      # BuildText.new.run(publication)
       MessageBus.publish("/importprogress", "Grouping Figures to Graves")
       CreateGraves.new.run(publication.pages)
       CreateLithics.new.run(publication.pages)
@@ -71,7 +72,7 @@ class AnalyzePublication
   def predict_boxes(image)
     io = StringIO.new(image)
     file = HTTP::FormData::File.new io, filename: "page.jpg"
-    response = HTTP.post("http://localhost:8080", form: {
+    response = HTTP.post(ENV["ML_SERVICE_URL"], form: {
       image: file
     })
 

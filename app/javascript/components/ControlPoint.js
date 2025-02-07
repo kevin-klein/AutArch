@@ -1,10 +1,7 @@
-import * as ReactKonva from 'react-konva'
+import React from 'react'
 import { Circle } from 'react-konva'
 
-function ControlPoint (props) {
-  const figure = props.figure
-  const onChangeFigure = props.onChangeFigure
-  const point = props.point
+export default function ControlPoint ({ figure, onChangeFigure, point }) {
   return (
     <Circle
       draggable
@@ -43,10 +40,3 @@ function ControlPoint (props) {
     />
   )
 }
-
-const make = ControlPoint
-
-export {
-  make
-}
-/* react-konva Not a pure module */
