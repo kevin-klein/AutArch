@@ -1,4 +1,4 @@
-from scripts.train_object_detection import get_model
+import torchvision
 from transforms import PILToTensor, Compose
 from PIL import Image, ImageDraw, ImageFont
 import torch
@@ -36,25 +36,32 @@ if torch.cuda.is_available():
 else:
         device = torch.device('cpu')
 
-loaded_model = get_model(num_classes = len(labels.keys()), device=device)
+loaded_model = torchvision.models.detection.fasterrcnn_mobilenet_v3_large_fpn(num_classes=len(labels.keys()))
 loaded_model.load_state_dict(torch.load('models/rcnn_dfg.model', map_location=device))
 
 loaded_model.eval()
 
 loaded_model.to(device)
 
-# image = Image.open('scripts/Ortolf 2014_Lauda-Königshofen.pdf-113.png')
-image = Image.open('scripts/pastedImage.png').convert('RGB')
-img, _ = PILToTensor()(image)
+import argparse
 
-with torch.no_grad():
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('input')
+    parser.add_argument('output')
+    args = parser.parse_args()
+
+    image = Image.open(args.input).convert('RGB')
+    img, _ = PILToTensor()(image)
+
+    with torch.no_grad():
         prediction = loaded_model([img.to(device)])
 
-font = ImageFont.truetype("scripts/Gidole-Regular.ttf", size=20)
+    font = ImageFont.truetype("scripts/Gidole-Regular.ttf", size=20)
 
-image = image.convert('RGBA')
-draw = ImageDraw.Draw(image, 'RGBA')
-for element in range(len(prediction[0]["boxes"])):
+    image = image.convert('RGBA')
+    draw = ImageDraw.Draw(image, 'RGBA')
+    for element in range(len(prediction[0]["boxes"])):
         boxes = prediction[0]["boxes"][element].cpu().numpy()
         score = np.round(prediction[0]["scores"][element].cpu().numpy(),
                 decimals= 4)
@@ -67,4 +74,6 @@ for element in range(len(prediction[0]["boxes"])):
                 draw.rectangle([(boxes[0], boxes[1] - 30), (boxes[0] + length + 20, boxes[1])], fill=colors[label])
                 draw.text((boxes[0] + 10, boxes[1] -25), text=text, fill='white', font=font)
 
-image.save('scripts/object detection example.png')
+    image.save(args.output)
+
+

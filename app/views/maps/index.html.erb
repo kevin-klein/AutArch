@@ -1,6 +1,6 @@
 <%= form_tag(maps_path, method: :get) do %>
-  <%= select_tag(:tag_id, options_for_select(Tag.pluck(:name, :id), params[:tag_id])) %>
-  <%= submit_tag("Search") %>
+  <%= select_tag(:tag_id, options_for_select(Tag.pluck(:name, :id), params[:tag_id]), class: 'form-select') %>
+  <%= submit_tag("Search", class: 'btn btn-primary mt-1') %>
 <% end %>
 
 <%= react_component("EuropeMap", props: { orientations: @skeleton_angles }) %>

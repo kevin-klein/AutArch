@@ -75,6 +75,6 @@ class FiguresController < AuthorizedController
 
   # Only allow a list of trusted parameters through.
   def figure_params
-    params.require(:figure).permit(:parent_id, :angle, :page_id, :x1, :x2, :y1, :y2, :page_id, :type)
+    params.require(:figure).permit(:parent_id, :angle, :page_id, :x1, :x2, :y1, :y2, :page_id, :type, :probability)
   end
 end

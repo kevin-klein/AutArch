@@ -116,7 +116,7 @@ def get_transform(train):
     #   transforms.append(T.RandomHorizontalFlip(0.5))
    return T.Compose(transforms)
 
-dfg_dataset = DfgDataset(root="pdfs/page_images", transforms = get_transform(train=True))
+dfg_dataset = DfgDataset(root="training_data/object detection", transforms = get_transform(train=True))
 
 data_loader = torch.utils.data.DataLoader(
                 dfg_dataset, batch_size=1, shuffle=True, num_workers=8,

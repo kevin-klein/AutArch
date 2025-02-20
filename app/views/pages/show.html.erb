@@ -4,12 +4,12 @@
     <li class="page-item">
       <a
         class="page-link"
-        href="<%= publication_page_path(@publication, Page.order(:id).where('id < ?', @page.id).last || @grave.id) %>"
+        href="<%= publication_page_path(@publication, @publication.pages.order(:id).where('id < ?', @page.id).last || @page.id) %>"
       >Previous</a></li>
     <li class="page-item">
       <a
         class="page-link"
-        href="<%= publication_page_path(@publication, Page.order(:id).where('id > ?', @page.id).first || @grave.id) %>"
+        href="<%= publication_page_path(@publication, @publication.pages.order(:id).where('id > ?', @page.id).first || @page.id) %>"
       >Next</a></li>
   </ul>
 </nav>
@@ -17,8 +17,8 @@
   "AddFigures",
   {
     props: {
-      image: @page.image.as_json.merge(href: url_for(@page.image.data)),
-      pageFigures: @page.figures.as_json(methods: [:type]),
+      image: @page.image.as_json.merge(href: @page.image.url),
+      pageFigures: @page.figures.select { (_1.probability || 1) > 0.6 }.as_json(methods: [:type]),
       page: @page,
       next_url: publication_page_path(@publication, @page)
     }

@@ -10,7 +10,7 @@
 
     <div class='col-md-6'>
       <%= simple_form_for(@grave, url: wizard_path) do |f| %>
-        <%= f.input :percentage_scale %>
+        <%= f.input :percentage_scale, input_html: { value: "1:#{@grave.percentage_scale}" }, as: :string %>
         <%= f.input :page_size %>
         <%= f.submit("Next", class: "btn btn-primary") %>
       <% end %>

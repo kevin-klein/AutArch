@@ -165,6 +165,7 @@ if __name__ == '__main__':
     torch.save(dfg_dataset.labels, 'models/retinanet_v2_labels.model')
 
     torch.manual_seed(0)
+
     indices = torch.randperm(len(dfg_dataset)).tolist()
     train_dataset, test_dataset = torch.utils.data.random_split(dfg_dataset, [0.8, 0.2])
 
@@ -232,11 +233,3 @@ if __name__ == '__main__':
         print(f'epoch_loss: {epoch_loss}', f'time: {time.time() - start}')
 
         torch.save(model.state_dict(), 'models/retinanet_v2_dfg.model')
-
-# loss retinanet: 4.3512
-# retinanet sgd lr=0.005 momentum=0.9 weight_decay=0.0005
-# ssd adam lr=0.0001
-# loss ssd: 4.136
-# rcnn adam 0.0001
-# loss rcnn: 6.4547
-# retinanet large loss: 4.7259

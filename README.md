@@ -6,7 +6,7 @@ AutArch is an AI-assisted workflow capable of creating uniform archaeological da
 
 ## Recommended Hardware
 
-AutArch should run most on most systems but the performance of the ML models is heavily depending
+AutArch should run on most systems but the performance of the ML models is heavily depending
 on the availability of a PyTorch supported graphics card. Please consult the
 [PyTorch manual](https://pytorch.org/get-started/locally/). The current configuration has been successfully
 tested on an Nvidia RTX 2060 with 8GB of dedicated GPU memory, AMD Ryzen 9 7900X3D and 64GB of DDR5 RAM. AutArch will fallback to use CPU in case it can not detect a supported GPU.

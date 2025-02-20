@@ -86,8 +86,6 @@ def count_objects_by_quality():
     objects = Counter(objects)
     result[quality] = result[quality] + objects
 
-  print(set(all_imgs).difference(datasets))
-
   print(result)
 
 if __name__ == '__main__':
