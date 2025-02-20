@@ -3,7 +3,7 @@
           collection:
             Publication
               .accessible_by(current_ability)
-              .order(:created_at)
+              .order(:author, :year)
               .pluck(:author, :year, :id)
               .map { |author, year, id| ["#{author} #{year}", id] },
               include_blank: true,

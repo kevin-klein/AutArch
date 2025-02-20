@@ -1,6 +1,5 @@
 # !/bin/python3
 
-import pandas as pd
 import matplotlib.pyplot as pl
 from mpl_toolkits.basemap import Basemap
 from adjustText import adjust_text
@@ -27,11 +26,11 @@ VLINEVES = {
 	'name': 'Vlineves'
 }
 
-TOSHCHEV_REDINA = {
-	'lat': 45.60169040802629,
-	'lon': 29.3085223525153,
-	'name': 'Toshchev & Redina (1991)'
-}
+# TOSHCHEV_REDINA = {
+# 	'lat': 45.60169040802629,
+# 	'lon': 29.3085223525153,
+# 	'name': 'Toshchev & Redina (1991)'
+# }
 
 VILKLETICE = {
 	'lat': 50.3500781,
@@ -125,65 +124,66 @@ KOSTYLEVA_UTKIN_RECTANGLE = {
 	'name': 'Kostyleva & Utkin 2010'
 }
 
-FRINCULEASA_CHILDREN_OF_THE_STEPPE_RECTANGLE = {
-	'left_bottom': {
-		'lat' :44.846219,
-		'lon': 25.808062
-	},
-	'right_bottom': {
-		'lat' :44.846219,
-		'lon': 26.092226
-	},
-	'left_top': {
-		'lat' :45.090368,
-		'lon': 25.808062
-	},
-	'right_top': {
-		'lat' :45.090368,
-		'lon': 26.092226
-	},
-	'name': 'Frînculeasa (2013, 2014, 2015,2019)'
-}
+# FRINCULEASA_CHILDREN_OF_THE_STEPPE_RECTANGLE = {
+# 	'left_bottom': {
+# 		'lat' :44.846219,
+# 		'lon': 25.808062
+# 	},
+# 	'right_bottom': {
+# 		'lat' :44.846219,
+# 		'lon': 26.092226
+# 	},
+# 	'left_top': {
+# 		'lat' :45.090368,
+# 		'lon': 25.808062
+# 	},
+# 	'right_top': {
+# 		'lat' :45.090368,
+# 		'lon': 26.092226
+# 	},
+# 	'name': 'Frînculeasa (2013, 2014, 2015,2019)'
+# }
 
-FRINCULEASA_2017_RECTANGLE = {
-	'right_bottom': {
-		'lat': 44.077390,
-		'lon': 26.013624
-	},
-	'left_top': {
-		'lat': 43.913002,
-		'lon': 25.559257
-	},
-	'left_bottom': {
-		'lat': 43.913002,
-		'lon': 25.165311
-	},
-	'right_top': {
-		'lat': 44.077390,
-		'lon': 25.559257
-	},
-	'name': 'Frînculeasa 2017'
-}
+# FRINCULEASA_2017_RECTANGLE = {
+# 	'right_bottom': {
+# 		'lat': 44.077390,
+# 		'lon': 26.013624
+# 	},
+# 	'left_top': {
+# 		'lat': 43.913002,
+# 		'lon': 25.559257
+# 	},
+# 	'left_bottom': {
+# 		'lat': 43.913002,
+# 		'lon': 25.165311
+# 	},
+# 	'right_top': {
+# 		'lat': 44.077390,
+# 		'lon': 25.559257
+# 	},
+# 	'name': 'Frînculeasa 2017'
+# }
 
-SOUTHERN_BUG_RECTANGLE = {
-	'left_top': {
-		'lat': 47.9747313,
-		'lon': 30.8916686
-	},
-	'right_top': {
-		'lat': 47.9747313,
-		'lon': 32.4235999
-	},
-	'left_bottom': {
-		'lat': 46.2978464,
-		'lon': 30.8916686
-	},
-	'right_bottom': {
-		'lat': 46.2978464,
-		'lon': 32.4235999
-	},
-	'name': 'Shaposhnikova et al. 1986'
-}
+# SOUTHERN_BUG_RECTANGLE = {
+# 	'left_top': {
+# 		'lat': 47.9747313,
+# 		'lon': 30.8916686
+# 	},
+# 	'right_top': {
+# 		'lat': 47.9747313,
+# 		'lon': 32.4235999
+# 	},
+# 	'left_bottom': {
+# 		'lat': 46.2978464,
+# 		'lon': 30.8916686
+# 	},
+# 	'right_bottom': {
+# 		'lat': 46.2978464,
+# 		'lon': 32.4235999
+# 	},
+# 	'name': 'Shaposhnikova et al. 1986'
+# }
+
 EARLY_BRONZE_AGE_RECTANGLE = {
 	'left_top': {
 		'lat': 48.5801736,
@@ -323,16 +323,17 @@ for place in [
 
 
 for rect in [
-	SOUTHERN_BUG_RECTANGLE,
+	# SOUTHERN_BUG_RECTANGLE,
 	EARLY_BRONZE_AGE_RECTANGLE,
-	FRINCULEASA_2017_RECTANGLE,
+	# FRINCULEASA_2017_RECTANGLE,
 	KOSTYLEVA_UTKIN_RECTANGLE,
 	IVANOVA_TOSHCHEV,
 	LOUGAS_2016,
 	Gadzyatskaya_1976,
 	Krainov_1963,
 	Krainov_1964,
-	FRINCULEASA_CHILDREN_OF_THE_STEPPE_RECTANGLE]:
+	# FRINCULEASA_CHILDREN_OF_THE_STEPPE_RECTANGLE
+	]:
 	poly = Polygon([
 		(rect['left_top']['lon'], rect['left_top']['lat']),
 		(rect['right_top']['lon'], rect['right_top']['lat']),
@@ -342,5 +343,5 @@ for rect in [
 	pl.gca().add_patch(poly)
 	text.append(pl.text(rect['left_top']['lon'], rect['left_top']['lat'], rect['name'], fontweight='demibold',color='k', fontsize=8, alpha=0.7))
 
-adjust_text(text, force_text=0.2, arrowprops=dict(arrowstyle='-', alpha=0.8, color='k'))
-pl.savefig('comove_map.png', dpi=300, bbox_inches='tight')
+adjust_text(text, force_explode=(0.1, 0.5), expand_axes=True, force_text=1.0, arrowprops=dict(arrowstyle='-', alpha=0.8, color='k'))
+pl.savefig('output/map.png', dpi=300, bbox_inches='tight')

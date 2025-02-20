@@ -1,14 +1,21 @@
-<p style="color: green"><%= notice %></p>
+<table class='table'>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th></th>
+    </tr>
+  </thead>
 
-<h1>Tags</h1>
+  <tbody>
+    <% @tags.each do |tag| %>
+      <tr>
+        <td><%= tag.name %></td>
+        <td>
+          <%= button_to "Edit", edit_tag_path(tag), class: 'btn btn-secondary' %>
 
-<div id="tags">
-  <% @tags.each do |tag| %>
-    <%= render tag %>
-    <p>
-      <%= link_to "Show this tag", tag %>
-    </p>
-  <% end %>
-</div>
-
-<%= link_to "New tag", new_tag_path %>
+          <%= button_to "Delete", tag, method: :delete, class: 'btn btn-warning' %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

@@ -3,42 +3,47 @@ from scipy.cluster.vq import vq, kmeans2, whiten
 import matplotlib.pyplot as plt
 import json
 import math
-from sklearn.metrics import silhouette_score, davies_bouldin_score, calinski_harabasz_score
-import sys
+from sklearn.metrics import silhouette_score
+import argparse
 
-with open(sys.argv[1], 'r') as f:
-  data = json.load(f)
+if __name__ == '__main__':
+  parser = argparse.ArgumentParser()
+  parser.add_argument('input')
+  parser.add_argument('output')
+  args = parser.parse_args()
 
-data =[[math.sin(math.radians(angle)), math.cos(math.radians(angle))] for angle in data]
-data = np.array(data)
-# data = whiten(data)
+  with open(args.input, 'r') as f:
+    data = json.load(f)
 
-centroids, clusters = kmeans2(data, 2, minit='random')
+  data =[[math.sin(math.radians(angle)), math.cos(math.radians(angle))] for angle in data]
+  data = np.array(data)
 
-w0 = data[clusters == 0]
-w1 = data[clusters == 1]
+  centroids, clusters = kmeans2(data, 2, minit='random')
 
-plt.plot(w0[:, 0], w0[:, 1], 'o', alpha=0.5, label='cluster 0')
-plt.plot(w1[:, 0], w1[:, 1], 'd', alpha=0.5, label='cluster 1')
+  w0 = data[clusters == 0]
+  w1 = data[clusters == 1]
 
-plt.scatter(centroids[:, 0], centroids[:, 1], c='r', zorder=5)
+  plt.plot(w0[:, 0], w0[:, 1], 'o', alpha=0.5, label='cluster 0')
+  plt.plot(w1[:, 0], w1[:, 1], 'd', alpha=0.5, label='cluster 1')
 
-def positive(angles):
-  return (angles + 360) % (360)
+  plt.scatter(centroids[:, 0], centroids[:, 1], c='r', zorder=5)
 
-average_w0 = np.average(w0, axis=0)
-average_euclidian_angle_w0 = np.arctan2(average_w0[0], average_w0[1]) * 180 / np.pi
+  def positive(angles):
+    return (angles + 360) % (360)
 
-average_w1 = np.average(w1, axis=0)
-average_euclidian_angle_w1 = np.arctan2(average_w1[0], average_w1[1]) * 180 / np.pi
+  average_w0 = np.average(w0, axis=0)
+  average_euclidian_angle_w0 = np.arctan2(average_w0[0], average_w0[1]) * 180 / np.pi
 
-print(positive(average_euclidian_angle_w0))
-print(positive(average_euclidian_angle_w1))
+  average_w1 = np.average(w1, axis=0)
+  average_euclidian_angle_w1 = np.arctan2(average_w1[0], average_w1[1]) * 180 / np.pi
 
-print(silhouette_score(data, clusters))
+  print("Averag w0 angle: ", positive(average_euclidian_angle_w0))
+  print("Averag w1 angle: ", positive(average_euclidian_angle_w1))
 
-plt.xlim(-1.25, 1.25)
-plt.ylim(-1.25, 1.25)
-ax = plt.gca()
-ax.set_aspect('equal', adjustable='box')
-plt.savefig('grave orientation cluster.pdf', dpi=300)
+  print("Silhouette score: ", silhouette_score(data, clusters))
+
+  plt.xlim(-1.25, 1.25)
+  plt.ylim(-1.25, 1.25)
+  ax = plt.gca()
+  ax.set_aspect('equal', adjustable='box')
+  plt.savefig(args.output, dpi=300)

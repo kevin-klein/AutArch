@@ -10,6 +10,7 @@ ENV POETRY_NO_INTERACTION=1 \
 WORKDIR /ml-services
 COPY pyproject.toml .
 COPY poetry.lock .
+COPY poetry.toml .
 
 RUN poetry install --no-root && rm -rf $POETRY_CACHE_DIR
 
