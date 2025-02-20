@@ -12,6 +12,7 @@ services:
     build: .
     volumes:
       - ./images:/dfg/images
+      - ./storage:/dfg/storage
     ports:
       - "3000:3000"
     env_file:
@@ -20,6 +21,7 @@ services:
   sidekiq:
     volumes:
       - ./images:/dfg/images
+      - ./storage:/dfg/storage
     build: '.'
     command: bundle exec sidekiq
     env_file:

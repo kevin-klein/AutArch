@@ -46,10 +46,12 @@
           <% if can?(:delete, publication) %>
             <%= link_to "Delete", publication_path(publication), method: :delete, 'data-confirm': 'Are you sure?' %>
           <% end %>
+          <div class="vr mx-1"></div>
+          <%= link_to 'Download', rails_blob_path(publication.pdf, disposition: "attachment") %>
         </td>
       </tr>
     <% end %>
   </tbody>
 </table>
 
-<%= link_to "New publication", new_publication_path %>
+<%= link_to "Upload new publication", new_publication_path %>

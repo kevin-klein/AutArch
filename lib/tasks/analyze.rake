@@ -112,15 +112,15 @@ namespace :analyze do
     baseline_csv = CSV.open(base_path, headers: true, header_converters: :symbol).to_a.map(&:to_hash)
     files = [
       "0_1.csv",
-      "2_0.csv",
-      "3_0.csv",
-      "3_1.csv",
-      "4_0.csv",
-      "4_1.csv",
-      "5_0.csv",
-      "5_1.csv",
-      "6_0.csv",
-      "6_1.csv"
+      # "2_0.csv",
+      # "3_0.csv",
+      # "3_1.csv",
+      # "4_0.csv",
+      # "4_1.csv",
+      # "5_0.csv",
+      # "5_1.csv",
+      # "6_0.csv",
+      # "6_1.csv"
     ]
     graves_processed = {}
 
@@ -128,8 +128,8 @@ namespace :analyze do
       data = CSV.open(Rails.root.join("supplementary", "experiment", "comove", file).to_s, headers: true, header_converters: :symbol).to_a.map(&:to_hash)
       combined_data = baseline_csv.zip(data)
 
-      # grave_count = data.count
-      # graves_processed[file] = grave_count
+      grave_count = data.count
+      graves_processed[file] = grave_count
       combined_data = combined_data.filter { |base, user| base.present? && user.present? }
       total_error = get_error(combined_data)
       [file, total_error]
@@ -143,9 +143,9 @@ namespace :analyze do
         nil
       else
         difference = [
-          (base[:length_m].to_f - (user[:length_m].to_f / 100)) / base[:length_m].to_f,
-          (base[:width_m].to_f - (user[:width_m].to_f / 100)) / base[:width_m].to_f,
-          (base[:depth_m].to_f - (user[:depth_m].to_f / 100)) / base[:depth_m].to_f
+          (base[:length].to_f - user[:length].to_f) / base[:length].to_f,
+          (base[:width].to_f - user[:width].to_f) / base[:width].to_f,
+          (base[:depth].to_f - user[:depth].to_f) / base[:depth].to_f
         ].compact.map(&:abs)
         difference.sum(0.0) / difference.size
       end

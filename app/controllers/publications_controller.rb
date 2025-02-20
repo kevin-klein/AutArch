@@ -5,18 +5,20 @@ class PublicationsController < AuthorizedController
   def index
     @publications = Publication.accessible_by(current_ability).select(:id, :public, :user_id, :title, :author, :year)
 
-    if params[:sort] == "title:asc"
-      @publications = @publications.order("title ASC NULLS LAST")
+    @publications = if params[:sort] == "title:asc"
+      @publications.order("title ASC NULLS LAST")
     elsif params[:sort] == "title:desc"
-      @publications = @publications.order("title DESC NULLS LAST")
+      @publications.order("title DESC NULLS LAST")
     elsif params[:sort] == "author:desc"
-      @publications = @publications.order("author DESC NULLS LAST")
+      @publications.order("author DESC NULLS LAST")
     elsif params[:sort] == "author:asc"
-      @publications = @publications.order("author ASC NULLS LAST")
+      @publications.order("author ASC NULLS LAST")
     elsif params[:sort] == "year:asc"
-      @publications = @publications.order("year ASC NULLS LAST")
+      @publications.order("year ASC NULLS LAST")
     elsif params[:sort] == "year:desc"
-      @publications = @publications.order("year DESC NULLS LAST")
+      @publications.order("year DESC NULLS LAST")
+    else
+      @publications.order(:created_at)
     end
   end
 
@@ -141,7 +143,7 @@ class PublicationsController < AuthorizedController
       author: publication_params[:author],
       title: publication_params[:title],
       pdf: publication_params[:pdf],
-      year: publication_params[:year],
+      year: publication_params[:year]
       # user: current_user
     })
 
@@ -203,6 +205,6 @@ class PublicationsController < AuthorizedController
 
   # Only allow a list of trusted parameters through.
   def publication_params
-    params.require(:publication).permit(:pdf, :public, :author, :title, :year, :public)
+    params.require(:publication).permit(:pdf, :public, :author, :title, :year)
   end
 end

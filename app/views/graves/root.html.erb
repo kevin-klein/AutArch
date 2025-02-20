@@ -1,4 +1,3 @@
-<!--Main Navigation-->
 <style>
   .leaflet-container {
     height: 100%;
@@ -29,7 +28,6 @@
                 <a href='https://gepris.dfg.de/gepris/projekt/466680522?language=en'>(Grant n° 466680522)</a>
               </figcaption>
 
-
               <br />
                 Conceptualization: Kevin Klein, Maxime N. Brami
               <br />
@@ -39,6 +37,20 @@
               <br>
 
               The AutArch preprint is available on ArXiv: <a href='https://arxiv.org/abs/2311.17978'>https://arxiv.org/abs/2311.17978</a>
+
+              <h3 class='mt-4'>Workflow</h3>
+
+              <p>
+                Publications can be imported under <a href="<%= new_publication_path %>">Publications -> Import or Upload Publication in the header</a>
+              </p>
+
+              <p>
+                After the import has completed, the publication is available under <a href="<%= publications_path %>">Publications</a>. It is recommended to go to the Annotations Screen under <a href="<%= publications_path %>">Publications</a> -> pages and add all <abbr title="objects missed by the object detection">false negative objects</abbr>.
+              </p>
+
+              <p>
+                To review all the graves, go to the <a href="<%= graves_path %>">grave screen</a>. Use the filter on the top to select the publications just uploaded. Then click the edit button of the first grave on the list.
+              </p>
           </div>
         </div>
         <div class="col-md-6 vh-100">

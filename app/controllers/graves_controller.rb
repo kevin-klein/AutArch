@@ -18,38 +18,40 @@ class GravesController < AuthorizedController
       @graves = @graves.where(site_id: params[:search][:site_id])
     end
 
-    if params[:sort] == "area:desc"
-      @graves = @graves.order("real_world_area DESC NULLS LAST")
+    @graves = if params[:sort] == "area:desc"
+      @graves.order("real_world_area DESC NULLS LAST")
     elsif params[:sort] == "area:asc"
-      @graves = @graves.order("real_world_area ASC NULLS LAST")
+      @graves.order("real_world_area ASC NULLS LAST")
     elsif params[:sort] == "perimeter:asc"
-      @graves = @graves.order("real_world_perimeter ASC NULLS LAST")
+      @graves.order("real_world_perimeter ASC NULLS LAST")
     elsif params[:sort] == "perimeter:desc"
-      @graves = @graves.order("real_world_perimeter DESC NULLS LAST")
+      @graves.order("real_world_perimeter DESC NULLS LAST")
     elsif params[:sort] == "width:desc"
-      @graves = @graves.order("real_world_width DESC NULLS LAST")
+      @graves.order("real_world_width DESC NULLS LAST")
     elsif params[:sort] == "width:asc"
-      @graves = @graves.order("real_world_width ASC NULLS LAST")
+      @graves.order("real_world_width ASC NULLS LAST")
     elsif params[:sort] == "length:asc"
-      @graves = @graves.order("real_world_height ASC NULLS LAST")
+      @graves.order("real_world_height ASC NULLS LAST")
     elsif params[:sort] == "length:desc"
-      @graves = @graves.order("real_world_height DESC NULLS LAST")
+      @graves.order("real_world_height DESC NULLS LAST")
     elsif params[:sort] == "id:asc"
-      @graves = @graves.order("id ASC NULLS LAST")
+      @graves.order("id ASC NULLS LAST")
     elsif params[:sort] == "id:desc"
-      @graves = @graves.order("id DESC NULLS LAST")
+      @graves.order("id DESC NULLS LAST")
     elsif params[:sort] == "depth:desc"
-      @graves = @graves.order("real_world_depth DESC NULLS LAST")
+      @graves.order("real_world_depth DESC NULLS LAST")
     elsif params[:sort] == "depth:asc"
-      @graves = @graves.order("real_world_depth DESC NULLS LAST")
+      @graves.order("real_world_depth DESC NULLS LAST")
     elsif params[:sort] == "site:asc"
-      @graves = @graves.joins(:site).reorder("sites.name ASC NULLS LAST")
+      @graves.joins(:site).reorder("sites.name ASC NULLS LAST")
     elsif params[:sort] == "site:desc"
-      @graves = @graves.joins(:site).reorder("sites.name DESC NULLS LAST")
+      @graves.joins(:site).reorder("sites.name DESC NULLS LAST")
     elsif params[:sort] == "publication:asc"
-      @graves = @graves.joins(:publication).reorder("publications.author ASC NULLS LAST")
+      @graves.joins(:publication).reorder("publications.author ASC NULLS LAST")
     elsif params[:sort] == "publication:desc"
-      @graves = @graves.joins(:publication).reorder("publications.author DESC NULLS LAST")
+      @graves.joins(:publication).reorder("publications.author DESC NULLS LAST")
+    else
+      @graves.joins(:publication).reorder("figures.created_at")
     end
 
     @graves_pagy, @graves = pagy(@graves.all)

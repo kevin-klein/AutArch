@@ -217,7 +217,8 @@ export default function AddFigure ({ image, pageFigures, page, next_url }) {
           y1: newFigure.y1,
           y2: newFigure.y2,
           page_id: newFigure.page_id,
-          type: newFigure.type
+          type: newFigure.type,
+          probability: 1
         }
       }),
       headers: {
