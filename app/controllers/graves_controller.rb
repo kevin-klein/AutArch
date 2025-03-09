@@ -1,5 +1,5 @@
 class GravesController < AuthorizedController
-  before_action :set_grave, only: %i[show edit update destroy]
+  before_action :set_grave, only: %i[show edit update destroy related]
 
   # GET /graves or /graves.json
   def index
@@ -59,6 +59,10 @@ class GravesController < AuthorizedController
 
   # GET /graves/1 or /graves/1.json
   def show
+  end
+
+  def related
+
   end
 
   def root

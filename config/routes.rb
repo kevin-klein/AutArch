@@ -21,6 +21,10 @@ Rails.application.routes.draw do # rubocop:disable Metrics/BlockLength
     collection do
       get :stats
     end
+
+    member do
+      get :related
+    end
   end
   resources :figures do
     member do

@@ -75,6 +75,8 @@ class Grave < Figure
   accepts_nested_attributes_for :skeleton_figures
   validates :identifier, uniqueness: {scope: :publication}, allow_blank: true
 
+  has_many :ceramics, dependent: :destroy, foreign_key: "parent_id", class_name: "Ceramic", inverse_of: :grave
+
   def upwards?
     width < height
   end
