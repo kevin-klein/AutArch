@@ -57,4 +57,5 @@
 #  real_world_perimeter :float
 #
 class Ceramic < Figure
+  belongs_to :grave, foreign_key: "parent_id", optional: true, inverse_of: :ceramics
 end

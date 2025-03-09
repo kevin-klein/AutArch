@@ -1,6 +1,23 @@
 <svg viewBox='<%= "0 0 #{@image.width} #{@image.height}" %>'>
   <image width='<%= @image.width %>' height='<%= @image.height %>' href='<%= @image.url %>' />
 
+  <% if @highlight_figure.present? %>
+    <polyline
+      points='<%= contour_path(@highlight_figure, @highlight_figure.contour) %>'
+      fill='#3F51B5'
+      stroke='#3F51B5'
+      strokeWidth='5'
+      opacity='.5'
+    />
+    <text
+      x='<%= @highlight_figure.x1 %>'
+      y='<%= @highlight_figure.y1 %>'
+      style='font-size: 36px;'
+      >
+      <%= @highlight_figure.type %> <%= @highlight_figure.identifier %>
+    </text>
+  <% end %>
+
   <% @figures.each do |figure| %>
     <% if figure.is_a?(Spine) %>
 

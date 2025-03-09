@@ -1,11 +1,12 @@
 # frozen_string_literal: true
 
 class FigureViewComponent < ViewComponent::Base
-  def initialize(figures:, image:, contours: false)
+  def initialize(figures:, image:, contours: false, highlight_figure: nil)
     super
     @figures = figures
     @image = image
     @contours = contours
+    @highlight_figure = highlight_figure
   end
 
   def contour_path(figure, contour)
