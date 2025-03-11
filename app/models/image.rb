@@ -30,4 +30,8 @@ class Image < ApplicationRecord
   def delete_file
     File.delete(file_path) if File.exist?(file_path)
   end
+
+  def exists?
+    File.exist?(file_path)
+  end
 end

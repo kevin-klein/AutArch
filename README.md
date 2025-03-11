@@ -193,28 +193,6 @@ The angle of the north arrow can be adjusted manually based on a preview. In cas
 #### Skeleton Information
 Finally, the pose of all skeletons has to be validated, which (for now) consists of “unknown”, “flexed on the side” or “supine”. As described above, a neural network will set the initial body position, but it can be adjusted manually. Further positions could easily be added in the future. “Unknown” is used in cases where skeletal remains are visible, but no position can be identified.
 
-## Training the models (reviewers only)
-
-The training data can be found in the `training_data` folder. Note that you can download the whole folder by clicking
-the download button that appears while hovering over the folder. Put the folder within the `training_data` folder
-inside the autarch folder.
-
-In case you get an error related to not enough memory being available, reducing the batch size within the training scripts will make it run but
-the resulting model will potentially differ from the one we supplied.
-
-Other pretrained models are available in the models folder as well. The used models can be swapped out by commenting out the retinanet model and enabling the relevant line to use RCNN or SSD instead (scripts/torch_service.py#20, scripts/train_object_detection#127-148).
-
-To train the models yourself, download the "training_data" folder and put it inside the AutArch folder. To train the object detection network:
-
-`$ python scripts/train_object_detection.py`
-
-To train the skeleton deposition type classifier:
-
-`$ python scripts/train_skeleton_classifier.py`
-
-To train the arrow angle detection network:
-
-`$ python scripts/train_arrow_angle_network.py`
 
 
 ## Output
