@@ -1,5 +1,5 @@
 class GravesController < AuthorizedController
-  before_action :set_grave, only: %i[show edit update destroy related]
+  before_action :set_grave, only: %i[show edit update destroy related save_related]
 
   # GET /graves or /graves.json
   def index
@@ -62,7 +62,11 @@ class GravesController < AuthorizedController
   end
 
   def related
+  end
 
+  def save_related
+    related = params[:related]
+    Figure.where(id: related).update_all(parent_id: @grave.id)
   end
 
   def root

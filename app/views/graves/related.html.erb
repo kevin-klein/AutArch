@@ -1,11 +1,12 @@
-<div class='row'>
-  <div class='col-md-6'>
-    <%= render(
-      FigureViewComponent.new(highlight_figure: @grave, figures: @grave.page.figures.filter { ['Ceramic', 'StoneTool', 'Artefact'].include?(_1.type) }, image: @grave.page.image)
-    ) %>
-  </div>
-
-  <div class='col-md-6'>
-
-  </div>
-</div>
+<%= react_component(
+  "Relations",
+  {
+    props: {
+      highlight: @grave.as_json(methods: [:type]),
+      image: @grave.page.image.as_json.merge(href: @grave.page.image.url),
+      figures: @grave.page.figures.filter { ['Ceramic', 'StoneTool', 'Artefact', 'ShaftAxe'].include?(_1.type) }.as_json(methods: [:type]),
+      page: @page,
+      saveUrl: save_related_grave_path(@grave)
+    }
+  }
+) %>
