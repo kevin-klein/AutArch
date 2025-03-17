@@ -13,6 +13,7 @@ import ImportProgress from '../components/ImportProgress'
 import SiteMap from '../components/SiteMap'
 import Chart from 'react-apexcharts'
 import simpleheat from '../components/simpleheat'
+import Relations from '../components/Relations'
 // import h337 from 'heatmap.js'
 
 import ReactOnRails from 'react-on-rails'
@@ -125,6 +126,9 @@ ReactOnRails.register({
   ScatterChart,
   NorthArrow,
   Heatmap,
+  Relations: function (props, railsContext) {
+    return () => <Relations {...props} />
+  },
   SiteMap: function (props, railsContext) {
     return () => <SiteMap {...props} />
   },
