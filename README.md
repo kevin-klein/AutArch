@@ -144,7 +144,7 @@ After installing asdf, install these asdf plugins:
 ### Python
 `$ asdf plugin-add python`
 
-Download the autarch folder from seafile (by hovering over it a download button will appear) as a zip file and unzip it in a location of your choice. To install the necessary versions of the languages mentioned above:
+Clone this repository first. To install the necessary versions of the languages mentioned above:
 
 ```
 $ cd autarch
@@ -175,16 +175,13 @@ $ ruby extconf.rb
 $ make
 ```
 
-Download the database dump front the provided link and load the dump into your copy of postgres:
-
-A database dump, pretrained models and images are provided to reviewers under this [link](https://seafile.rlp.net/d/ca172259a7b54383b6fa/).
-The database dump and images are located in the `autarch_data` folder. Make sure to download each file of this folder individually due to limitations regarding file size from seafile.
+Download the database dump from the [autarch supplementary repo](https://github.com/kevin-klein/autarch-material) and load the dump into your copy of postgres:
 
 ```
 $ chmod a+x bin/rails
 $ bin/rails db:create
 
-$ cat autarch_dump.gz | gunzip | psql -h localhost -U postgres comove_development
+$ cat autarch.sql | psql -h localhost -U postgres comove_development
 ```
 
 ```
@@ -209,10 +206,8 @@ To install Torch please consult the [torch installation guide](https://pytorch.o
 
 `$ pip install numpy pillow bottle`
 
-Download the models folder from seafile (by hovering over it a download button will appear) as a zip file.
-To copy the ML models:
+Download the models from the [autarch supplementary repo] (https://github.com/kevin-klein/autarch-material) and copy them to a models folder inside the AutArch folder.
 
-`$ unzip /path/to/models.zip -d .`
 
 ## Running AutArch
 
