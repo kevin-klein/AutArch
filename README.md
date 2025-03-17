@@ -6,8 +6,8 @@ AutArch is an AI-assisted workflow capable of creating uniform archaeological da
 ## Starting Guide (AutArch for Windows using WSL2)
 The recommended way to run AutArch is to use the prepackaged zip file provided [here](https://doi.org/10.5281/zenodo.15038809).
 
-1. Download the 'autarch public.zip' file and unpack the contents into one folder (labelled e.g. AutArch)
-2. Installing Docker Desktop
+### 1. Download the 'autarch public.zip' file and unpack the contents into one folder (labelled e.g. AutArch)
+### 2. Installing Docker Desktop
 
 Download WSL2 Docker Desktop: https://docs.docker.com/desktop/features/wsl/ . Install WSL2 Docker Desktop on your computer and restart it. Open the Docker Desktop app and agree to the terms of service.
 
@@ -16,7 +16,7 @@ If Docker Desktop does not start, press CTRL + ALT + DELETE and end any instance
 `wsl --update`
 
 Reopen Docker Desktop and press finish. You should see the start page with the container.
-3. Creating a Docker image
+### 3. Creating a Docker image
 
 Make sure that Docker Desktop is running in the background.
 
@@ -25,7 +25,7 @@ Go into the Windows PowerShell, change directory to the unpacked folder you crea
 All unpacked files should now be listed in this directory. Create the Docker image by using the following command:
 
 `docker compose --progress plain build`
-4. Running AutArch
+### 4. Running AutArch
 
 Make sure that Docker Desktop is running in the background.
 
@@ -40,7 +40,7 @@ Go to your internet browser (Chrome, Edge etc.) and enter the following address:
 [http://localhost:3000](http://localhost:3000) or [http://127.0.0.1:3000](http://127.0.0.1:3000)
 
 You should be at the homepage of the AutArch software.
-5. Operating AutArch (starting guide)
+### 5. Operating AutArch (starting guide)
 
 We recommend uploading a new publication that contains grave drawings. Click 'Upload Publication', choose a PDF file to upload, enter article information, then press 'create publication'.
 
@@ -53,10 +53,10 @@ If graves have been successfully detected, these will show in the list below. Yo
 Click 'Publications', select any publication from the list and click 'Stats' for a graphical overview of some of the results (e.g. orientation of the graves, whole-outline analysis)
 
 AutArch allows many other functionalities, such as comparing publications, mapping results etc. See Workflow below for more information.
-6. Closing AutArch
+### 6. Closing AutArch
 
 Close the AutArch tab in your internet browser. In the PowerShell, press Ctrl + C to stop the process
-7. Reopening AutArch
+### 7. Reopening AutArch
 
 Open Docker Desktop. Open the PowerShell and repeat Step 4.
 
