@@ -13,7 +13,7 @@ Download WSL2 Docker Desktop: https://docs.docker.com/desktop/features/wsl/ . In
 
 If Docker Desktop does not start, press CTRL + ALT + DELETE and end any instance of Docker running in the background. If you have not downloaded WSL before, you will get an error message saying that you need to update WSL. Go into the PowerShell in Windows and download/update WSL by entering the following command:
 
-`wsl --update
+`wsl --update`
 
 Reopen Docker Desktop and press finish. You should see the start page with the container.
 3. Creating a Docker image
