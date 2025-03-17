@@ -24,6 +24,7 @@ Rails.application.routes.draw do # rubocop:disable Metrics/BlockLength
 
     member do
       get :related
+      post :save_related
     end
   end
   resources :figures do
