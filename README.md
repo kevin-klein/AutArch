@@ -25,6 +25,7 @@ Go into the Windows PowerShell, change directory to the unpacked folder you crea
 All unpacked files should now be listed in this directory. Create the Docker image by using the following command:
 
 `docker compose --progress plain build`
+
 ### 4. Running AutArch
 
 Make sure that Docker Desktop is running in the background.
