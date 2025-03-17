@@ -79,7 +79,7 @@ tested on an Nvidia RTX 2060 with 8GB of dedicated GPU memory, AMD Ryzen 9 7900X
 | Volker Heyd           | Validation | | |
 | Ralf Lämmel           | Validation, Writing | | |
 | Yoan Diekmann         | Writing, Validation | | |
-| Maxime Brami          | Conceptualization, Funding acquisition, Project administration, Resources, Supervision, Validation, Writing | | |
+| Maxime Brami          | Conceptualization, Funding acquisition, Project administration, Resources, Supervision, Validation, Writing | mbrami@uni-mainz.de | |
 
 
 ## Workflow
