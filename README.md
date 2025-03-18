@@ -69,6 +69,9 @@ on the availability of a PyTorch supported graphics card. Please consult the
 [PyTorch manual](https://pytorch.org/get-started/locally/). The current configuration has been successfully
 tested on an Nvidia RTX 2060 with 8GB of dedicated GPU memory, AMD Ryzen 9 7900X3D and 64GB of DDR5 RAM. AutArch will fallback to use CPU in case it can not detect a supported GPU.
 
+## Alternate ML Models
+Some of the ML Models can be replaced, please refer to the [AutArch material](https://github.com/kevin-klein/autarch-material) repository for download. To replace the models please look at scripts/train_object_detection.py#get_model.
+
 ## Team
 
 | Name  | Contribution   | EMail  | Github |
