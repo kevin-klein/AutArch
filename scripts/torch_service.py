@@ -38,6 +38,17 @@ skeleton_model = torchvision.models.resnet152(weights=None, num_classes=2).to(de
 skeleton_model.load_state_dict(torch.load('models/skeleton_resnet.model', map_location=device))
 skeleton_labels = torch.load('models/skeleton_resnet_labels.model', map_location=device)
 
+def object_features(file):
+    request_object_content = file.read()
+    img = Image.open(io.BytesIO(request_object_content)).resize((200, 200), Image.Resampling.BILINEAR)
+
+    img, _ = PILToTensor()(img)
+    img = torch.stack([img]).to(device)
+
+    with torch.no_grad():
+        loaded_model.backbone.eval()
+        return loaded_model.backbone(img)
+
 def analyze_file(file):
     request_object_content = file.read()
     pil_image = Image.open(io.BytesIO(request_object_content))
@@ -100,8 +111,7 @@ def analyze_skeleton(file):
     with torch.no_grad():
         skeleton_model.eval()
         prediction = skeleton_model(img)
-        print(prediction)
-        print(skeleton_labels)
+
         _, prediction = torch.max(prediction, 1)
 
     return skeleton_labels[prediction]
@@ -119,6 +129,13 @@ def upload_arrow():
     result = analyze_arrow(upload_file.file)
 
     return { 'predictions': result.tolist()[0] }
+
+@app.post('/features')
+def upload_features():
+    upload_file = request.POST['image']
+    result = object_features(upload_file.file)
+
+    return { 'features': result['p7'].tolist()[0] }
 
 @app.post('/skeleton')
 def upload_arrow():

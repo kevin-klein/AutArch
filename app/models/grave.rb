@@ -55,6 +55,7 @@
 #  real_world_width     :float
 #  real_world_height    :float
 #  real_world_perimeter :float
+#  features             :float            default([]), not null, is an Array
 #
 class Grave < Figure
   belongs_to :site, optional: true
@@ -75,11 +76,8 @@ class Grave < Figure
   accepts_nested_attributes_for :skeleton_figures
   validates :identifier, uniqueness: {scope: :publication}, allow_blank: true
 
-<<<<<<< HEAD
   has_many :ceramics, dependent: :destroy, foreign_key: "parent_id", class_name: "Ceramic", inverse_of: :grave
 
-=======
->>>>>>> main
   def upwards?
     width < height
   end

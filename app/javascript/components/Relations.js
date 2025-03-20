@@ -35,7 +35,7 @@ export function Contour ({ figure, onClick, selected }) {
           x={figure.x1}
           y={figure.y1}
           width={figure.x2 - figure.x1}
-          height={figure.x2 - figure.x1}
+          height={figure.y2 - figure.y1}
           onClick={onClick}
         />
         <text
@@ -52,7 +52,7 @@ export function Contour ({ figure, onClick, selected }) {
 
 function PagePreview ({ image, highlight, selected, toggleSelected, figures }) {
   return (
-    <svg viewBox={`0 0 ${image.width} ${image.height}`}>
+    <svg preserveAspectRatio='xMidYMid meet' viewBox={`0 0 ${image.width} ${image.height}`} xmlns='http://www.w3.org/2000/svg'>
       <image width={`${image.width}`} height={`${image.height}`} href={`${image.href}`} />
 
       <Contour figure={highlight} />
@@ -78,8 +78,8 @@ function GraveDetails ({ grave, figures }) {
   )
 }
 
-export default function Relations ({ background, figures, image, highlight, saveUrl }) {
-  const [selected, setSelected] = React.useState([])
+export default function Relations ({ background, figures, image, highlight, saveUrl, related }) {
+  const [selected, setSelected] = React.useState(related)
   const selectedFigures = figures.filter(figure => selected.includes(figure.id))
 
   async function onSave () {
