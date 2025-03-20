@@ -3,6 +3,64 @@
 ## Summary
 AutArch is an AI-assisted workflow capable of creating uniform archaeological datasets from heterogeneous published resources. The implementation provided here takes large and unsorted PDF files as input, and uses neural networks to conduct image processing, object detection, and classification.
 
+## Starting Guide (AutArch for Windows using WSL2)
+The recommended way to run AutArch is to use the prepackaged zip file provided [here](https://doi.org/10.5281/zenodo.15038809).
+
+### 1. Download the 'autarch public.zip' file and unpack the contents into one folder (labelled e.g. AutArch)
+### 2. Installing Docker Desktop
+
+Download WSL2 Docker Desktop: https://docs.docker.com/desktop/features/wsl/ . Install WSL2 Docker Desktop on your computer and restart it. Open the Docker Desktop app and agree to the terms of service.
+
+If Docker Desktop does not start, press CTRL + ALT + DELETE and end any instance of Docker running in the background. If you have not downloaded WSL before, you will get an error message saying that you need to update WSL. Go into the PowerShell in Windows and download/update WSL by entering the following command:
+
+`wsl --update`
+
+Reopen Docker Desktop and press finish. You should see the start page with the container.
+### 3. Creating a Docker image
+
+Make sure that Docker Desktop is running in the background.
+
+Go into the Windows PowerShell, change directory to the unpacked folder you created. Unpacking may create an autarch folder within the autarch folder. Check that you are in the right directory by entering dir.
+
+All unpacked files should now be listed in this directory. Create the Docker image by using the following command:
+
+`docker compose --progress plain build`
+
+### 4. Running AutArch
+
+Make sure that Docker Desktop is running in the background.
+
+Go back to the PowerShell, change to the AutArch directory using `cd` . Type the following command:
+
+`docker compose up`
+
+Proceed to running AutArch, leaving the terminal opened in the background. You may have to wait a few minutes.
+
+Go to your internet browser (Chrome, Edge etc.) and enter the following address:
+
+[http://localhost:3000](http://localhost:3000) or [http://127.0.0.1:3000](http://127.0.0.1:3000)
+
+You should be at the homepage of the AutArch software.
+### 5. Operating AutArch (starting guide)
+
+We recommend uploading a new publication that contains grave drawings. Click 'Upload Publication', choose a PDF file to upload, enter article information, then press 'create publication'.
+
+Analysing the PDF may take a while, depending on the document. Note: The Docker environment supplied will only rely on the CPU. Certain aspects of the processing of PDFs will be slower than if the environment had a sufficient GPU available.
+
+Once the analysis of the publication is done, proceed to 'Graves' and filter by the publication you just uploaded. The uploaded publication should be available in the list, which is ordered alphabetically. Select it and click 'filter'.
+
+If graves have been successfully detected, these will show in the list below. You can make edits by clicking the 'edit' button. Follow the steps one by one until all graves have been processed or click 'Graves' to return to the list.
+
+Click 'Publications', select any publication from the list and click 'Stats' for a graphical overview of some of the results (e.g. orientation of the graves, whole-outline analysis)
+
+AutArch allows many other functionalities, such as comparing publications, mapping results etc. See Workflow below for more information.
+### 6. Closing AutArch
+
+Close the AutArch tab in your internet browser. In the PowerShell, press Ctrl + C to stop the process
+### 7. Reopening AutArch
+
+Open Docker Desktop. Open the PowerShell and repeat Step 4.
+
 
 ## Recommended Hardware
 
@@ -11,140 +69,8 @@ on the availability of a PyTorch supported graphics card. Please consult the
 [PyTorch manual](https://pytorch.org/get-started/locally/). The current configuration has been successfully
 tested on an Nvidia RTX 2060 with 8GB of dedicated GPU memory, AMD Ryzen 9 7900X3D and 64GB of DDR5 RAM. AutArch will fallback to use CPU in case it can not detect a supported GPU.
 
-## Installation
-
-This installation guide is intended for ubuntu linux. Windows systems are not natively supported but [WSL](https://learn.microsoft.com/en-us/windows/wsl/install) is known to work. Installation procedures on other linux distributions will be similar.
-
-AutArch requires the following packages:
-
-`$ sudo apt install libpq-dev postgresql libopencv-dev tesseract-ocr redis-server libvips42 build-essential zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev wget libbz2-dev`
-
-To manage the installations of ruby, python and nodejs asdf is recommended. Please refer to the [asdf guide](https://asdf-vm.com/guide/getting-started.html) in case of any problem.
-
-After installing asdf, install these asdf plugins:
-
-### NodeJS
-`$ asdf plugin add nodejs https://github.com/asdf-vm/asdf-nodejs.git`
-
-### Ruby
-`$ asdf plugin add ruby https://github.com/asdf-vm/asdf-ruby.git`
-
-### Python
-`$ asdf plugin-add python`
-
-Download the autarch folder from seafile (by hovering over it a download button will appear) as a zip file and unzip it in a location of your choice. To install the necessary versions of the languages mentioned above:
-
-```
-$ cd autarch
-$ asdf install
-```
-
-To install ruby dependencies:
-
-```
-$ gem install bundler
-$ bundle install
-```
-
-Change your postgres password:
-
-```
-$ sudo su postgres -c psql
-> alter user postgres with password '[your-password]';
-```
-
-Change the password in 'config/database.yml' for the development database settings to the one you chose.
-
-To compile the C++ extensions:
-
-```
-$ cd image_processing
-$ ruby extconf.rb
-$ make
-```
-
-Download the database dump front the provided link and load the dump into your copy of postgres:
-
-**_For reviewers only_**:
-
-A database dump, pretrained models and images are provided to reviewers under this [link](https://seafile.rlp.net/d/ca172259a7b54383b6fa/).
-The database dump and images are located in the `autarch_data` folder. Make sure to download each file of this folder individually due to limitations regarding file size from seafile.
-
-```
-$ chmod a+x bin/rails
-$ bin/rails db:create
-
-$ cat autarch_dump.gz | gunzip | psql -h localhost -U postgres comove_development
-```
-
-**_For reviewers end_**
-
-**_For regular users_**:
-
-```
-$ chmod a+x bin/rails
-$ bin/rails db:create
-
-$ bin/rails db:schema:load
-```
-
-**_For regular users end_**
-
-**_For reviewers only_**:
-
-Extract the downloaded images to the images folder:
-
-```
-$ zip -F /path/to/autarch_images.zip --out autarch_images_single.zip
-$ unzip autarch_images_single.zip -d .
-```
-
-**_For reviewers end_**
-
-Install js dependencies:
-
-```
-$ sudo apt purge cmdtest
-$ npm install --global yarn
-$ yarn
-
-```
-
-AutArch was tested with PyTorch 2.4.1. Other compatible versions may work as well. For the best performance a GPU is highly recommended.
-
-To install Torch please consult the [torch installation guide](https://pytorch.org/get-started/locally/). Please note that asdf installs Python 3.12.7. Please consult the asdf documentation in case you want your system python installation to be used or you want to use a different version.
-
-`$ pip install numpy pillow bottle`
-
-Download the models folder from seafile (by hovering over it a download button will appear) as a zip file.
-To copy the ML models:
-
-`$ unzip /path/to/models.zip -d .`
-
-## Running AutArch
-
-You need to start three different components, the rails server, shakapacker and the python ml service.
-
-To run shakapacker:
-
-```
-$ chmod a+x bin/shakapacker-dev-server
-$ bin/shakapacker-dev-server
-```
-
-To run rails:
-
-`$ bin/rails s`
-
-To start the python ml service:
-
-`$ python scripts/torch_service.py`
-
-To start background jobs:
-
-`$ bundle exec sidekiq`
-
-After all the services have successfully loaded, AutArch is accessible under [localhost:3000](http://localhost:3000)
+## Alternate ML Models
+Some of the ML Models can be replaced, please refer to the [AutArch material](https://github.com/kevin-klein/autarch-material) repository for download. To replace the models please look at scripts/train_object_detection.py#get_model.
 
 ## Team
 
@@ -157,7 +83,7 @@ After all the services have successfully loaded, AutArch is accessible under [lo
 | Volker Heyd           | Validation | | |
 | Ralf Lämmel           | Validation, Writing | | |
 | Yoan Diekmann         | Writing, Validation | | |
-| Maxime Brami          | Conceptualization, Funding acquisition, Project administration, Resources, Supervision, Validation, Writing | | |
+| Maxime Brami          | Conceptualization, Funding acquisition, Project administration, Resources, Supervision, Validation, Writing | mbrami@uni-mainz.de | |
 
 
 ## Workflow
@@ -193,28 +119,6 @@ The angle of the north arrow can be adjusted manually based on a preview. In cas
 #### Skeleton Information
 Finally, the pose of all skeletons has to be validated, which (for now) consists of “unknown”, “flexed on the side” or “supine”. As described above, a neural network will set the initial body position, but it can be adjusted manually. Further positions could easily be added in the future. “Unknown” is used in cases where skeletal remains are visible, but no position can be identified.
 
-## Training the models (reviewers only)
-
-The training data can be found in the `training_data` folder. Note that you can download the whole folder by clicking
-the download button that appears while hovering over the folder. Put the folder within the `training_data` folder
-inside the autarch folder.
-
-In case you get an error related to not enough memory being available, reducing the batch size within the training scripts will make it run but
-the resulting model will potentially differ from the one we supplied.
-
-Other pretrained models are available in the models folder as well. The used models can be swapped out by commenting out the retinanet model and enabling the relevant line to use RCNN or SSD instead (scripts/torch_service.py#20, scripts/train_object_detection#127-148).
-
-To train the models yourself, download the "training_data" folder and put it inside the AutArch folder. To train the object detection network:
-
-`$ python scripts/train_object_detection.py`
-
-To train the skeleton deposition type classifier:
-
-`$ python scripts/train_skeleton_classifier.py`
-
-To train the arrow angle detection network:
-
-`$ python scripts/train_arrow_angle_network.py`
 
 
 ## Output
@@ -222,6 +126,117 @@ To train the arrow angle detection network:
 Under [publications](http://localhost:3000/publications). Publications can be analyzed using
 the `analyze link` for every publication. The shown page can be used to compare publications by selecting
 them from the top. Note that only 4 publications can be compared at the same time.
+
+## Manual Installation
+
+This installation guide is intended for ubuntu linux. Windows systems are not natively supported but [WSL](https://learn.microsoft.com/en-us/windows/wsl/install) is known to work. Installation procedures on other linux distributions will be similar.
+
+AutArch requires the following packages:
+
+`$ sudo apt install libpq-dev postgresql libopencv-dev tesseract-ocr redis-server libvips42 build-essential zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev wget libbz2-dev`
+
+To manage the installations of ruby, python and nodejs asdf is recommended. Please refer to the [asdf guide](https://asdf-vm.com/guide/getting-started.html) in case of any problem.
+
+After installing asdf, install these asdf plugins:
+
+### NodeJS
+`$ asdf plugin add nodejs https://github.com/asdf-vm/asdf-nodejs.git`
+
+### Ruby
+`$ asdf plugin add ruby https://github.com/asdf-vm/asdf-ruby.git`
+
+### Python
+`$ asdf plugin-add python`
+
+Clone this repository first. To install the necessary versions of the languages mentioned above:
+
+```
+$ cd autarch
+$ asdf install
+```
+
+To install ruby dependencies:
+
+```
+$ gem install bundler
+$ bundle install
+```
+
+Change your postgres password:
+
+```
+$ sudo su postgres -c psql
+> alter user postgres with password '[your-password]';
+```
+
+Change the password in 'config/database.yml' for the development database settings to the one you chose.
+
+To compile the C++ extensions:
+
+```
+$ cd image_processing
+$ ruby extconf.rb
+$ make
+```
+
+Download the database dump from the [autarch supplementary repo](https://github.com/kevin-klein/autarch-material) and load the dump into your copy of postgres:
+
+```
+$ chmod a+x bin/rails
+$ bin/rails db:create
+
+$ cat autarch.sql | psql -h localhost -U postgres comove_development
+```
+
+```
+$ chmod a+x bin/rails
+$ bin/rails db:create
+
+$ bin/rails db:schema:load
+```
+
+Install js dependencies:
+
+```
+$ sudo apt purge cmdtest
+$ npm install --global yarn
+$ yarn
+
+```
+
+AutArch was tested with PyTorch 2.4.1. Other compatible versions may work as well. For the best performance a GPU is highly recommended.
+
+To install Torch please consult the [torch installation guide](https://pytorch.org/get-started/locally/). Please note that asdf installs Python 3.12.7. Please consult the asdf documentation in case you want your system python installation to be used or you want to use a different version.
+
+`$ pip install numpy pillow bottle`
+
+Download the models from the [autarch supplementary repo] (https://github.com/kevin-klein/autarch-material) and copy them to a models folder inside the AutArch folder.
+
+
+## Running AutArch
+
+You need to start three different components, the rails server, shakapacker and the python ml service.
+
+To run shakapacker:
+
+```
+$ chmod a+x bin/shakapacker-dev-server
+$ bin/shakapacker-dev-server
+```
+
+To run rails:
+
+`$ bin/rails s`
+
+To start the python ml service:
+
+`$ python scripts/torch_service.py`
+
+To start background jobs:
+
+`$ bundle exec sidekiq`
+
+After all the services have successfully loaded, AutArch is accessible under [localhost:3000](http://localhost:3000)
 
 ## License
 

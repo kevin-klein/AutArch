@@ -1,6 +1,5 @@
 <svg viewBox='<%= "0 0 #{@image.width} #{@image.height}" %>'>
   <image width='<%= @image.width %>' height='<%= @image.height %>' href='<%= @image.url %>' />
-
   <% if @highlight_figure.present? %>
     <polyline
       points='<%= contour_path(@highlight_figure, @highlight_figure.contour) %>'
