@@ -66,6 +66,7 @@ class GravesController < AuthorizedController
 
   def save_related
     related = params[:related]
+    Figure.where(type: ["Ceramic", "StoneTool", "Artefact", "ShaftAxe"]).where(parent_id: @grave).update_all(parent_id: nil)
     Figure.where(id: related).update_all(parent_id: @grave.id)
   end
 
