@@ -59,3 +59,9 @@ yarn-debug.log*
 scale.jpg
 lithics.json
 images/*.jpg
+db/autarch.sql
+models-new
+skeleton_angles
+test
+training_data
+keypoint_skeletons

@@ -1,4 +1,41 @@
 namespace :export do
+  def global_contour(figure)
+    if figure.manual_bounding_box
+      figure.contour.flatten
+    elsif figure.instance_of?(StoneTool)
+      (figure.contour.first + [figure.contour.first[0]]).map do |point|
+        [point[0] + figure.x1, point[1] + figure.y1]
+      end.flatten
+    else
+      (figure.contour + [figure.contour[0]]).map do |point|
+        [point[0] + figure.x1, point[1] + figure.y1]
+      end.flatten
+    end
+  end
+
+  task :page, [:page_id] => :environment do |_, args|
+    page_id = args[:page_id]
+    page = Page.find(page_id)
+
+    objects = page.figures.filter { _1.probability > 0.6 && !_1.contour.empty? && ["Grave", "Scale", "Arrow", "Ceramic"].include?(_1.type) }
+
+    data = objects.map do |figure|
+      figure_json = if figure.is_a?(Grave)
+        figure.as_json(methods: [:width_with_unit, :height_with_unit])
+      else
+        figure.as_json
+      end
+
+      {
+        id: figure.id,
+        figure: figure_json,
+        contour: global_contour(figure)
+      }
+    end
+
+    File.write(Rails.root.join("page_#{page_id}.json").to_s, JSON.pretty_generate(data))
+  end
+
   task masks: :environment do
     require "rvg/rvg"
 
@@ -11,20 +48,6 @@ namespace :export do
         contour = global_contour(figure)
 
         MinOpenCV.boundingRect(contour.each_slice(2).to_a)
-      end
-    end
-
-    def global_contour(figure)
-      if figure.manual_bounding_box
-        figure.contour.flatten
-      elsif figure.instance_of?(StoneTool)
-        (figure.contour.first + [figure.contour.first[0]]).map do |point|
-          [point[0] + figure.x1, point[1] + figure.y1]
-        end.flatten
-      else
-        (figure.contour + [figure.contour[0]]).map do |point|
-          [point[0] + figure.x1, point[1] + figure.y1]
-        end.flatten
       end
     end
 
