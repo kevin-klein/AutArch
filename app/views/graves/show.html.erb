@@ -1,0 +1,33 @@
+<table class='table'>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Image</th>
+      <th>Similar by Features</th>
+      <th>Similar by EFDs</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% Figure.where(type: ['Ceramic', 'StoneTool', 'Artefact', 'ShaftAxe']).where(parent_id: @grave).each do |figure| %>
+      <tr>
+        <td><%= figure.type %> <%= figure.id %></td>
+        <td><%= image_tag(preview_figure_path(figure), class: 'img-fluid') %></td>
+        <td>
+          <% FeatureSimilarity.where(first: figure).order(similarity: :desc).limit(5).each do |related| %>
+            <div>
+              <%= related.second.type %><%= related.second.id %> in <%= link_to(related.second.grave.identifier, grave_update_grave_path(related.second.grave, :set_grave_data))  %> (<%= related.similarity %>)
+            </div>
+            <% end %>
+        </td>
+        <td>
+          <% EfdSimilarity.where(first: figure).order(similarity: :desc).limit(5).each do |related| %>
+            <div>
+              <%= related.second.type %><%= related.second.id %> in <%= link_to(related.second.grave.identifier, grave_update_grave_path(related.second.grave, :set_grave_data))  %> (<%= related.similarity %>)
+            </div>
+            <% end %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

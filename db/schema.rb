@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_10_02_152640) do
+ActiveRecord::Schema[7.0].define(version: 2025_03_20_155546) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -156,6 +156,8 @@ ActiveRecord::Schema[7.0].define(version: 2024_10_02_152640) do
     t.float "real_world_width"
     t.float "real_world_height"
     t.float "real_world_perimeter"
+    t.float "features", default: [], null: false, array: true
+    t.float "efds", default: [], null: false, array: true
     t.index ["page_id"], name: "index_figures_on_page_id"
     t.index ["site_id"], name: "index_figures_on_site_id"
   end
@@ -204,6 +206,17 @@ ActiveRecord::Schema[7.0].define(version: 2024_10_02_152640) do
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "object_similarities", force: :cascade do |t|
+    t.string "type"
+    t.float "similarity"
+    t.bigint "first_id", null: false
+    t.bigint "second_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["first_id"], name: "index_object_similarities_on_first_id"
+    t.index ["second_id"], name: "index_object_similarities_on_second_id"
   end
 
   create_table "page_texts", force: :cascade do |t|
@@ -332,6 +345,8 @@ ActiveRecord::Schema[7.0].define(version: 2024_10_02_152640) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "figures", "pages", on_delete: :cascade
   add_foreign_key "genetics", "skeletons"
+  add_foreign_key "object_similarities", "figures", column: "first_id"
+  add_foreign_key "object_similarities", "figures", column: "second_id"
   add_foreign_key "page_texts", "pages"
   add_foreign_key "pages", "images", on_delete: :cascade
   add_foreign_key "pages", "publications", on_delete: :cascade

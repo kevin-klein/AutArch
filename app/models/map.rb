@@ -55,6 +55,7 @@
 #  real_world_width     :float
 #  real_world_height    :float
 #  real_world_perimeter :float
+#  features             :float            default([]), not null, is an Array
 #
 class Map < Figure
 end
