@@ -36,6 +36,7 @@ Rails.application.routes.draw do # rubocop:disable Metrics/BlockLength
     resources :stable_isotopes
   end
   resources :page_images
+  resources :ceramics
   resources :publications do
     resources :pages
     member do

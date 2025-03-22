@@ -110,7 +110,7 @@ module Stats
     return [[], []] if graves.empty?
 
     contours = graves.map(&:size_normalized_contour)
-    frequencies = contours.map { Efd.elliptic_fourier_descriptors(_1, normalize: false, order: 15).to_a.flatten }
+    frequencies = contours.map { Efd.elliptic_fourier_descriptors(_1, normalize: true, order: 15).to_a.flatten }
     max = (10.0 / frequencies.flatten.max)
     frequencies = frequencies.map { |item| item.each_slice(2).map(&:last).map { _1 * max } }
 
