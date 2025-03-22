@@ -898,6 +898,20 @@ matplotlib = ">=2.1.0"
 numpy = "*"
 
 [[package]]
+name = "pyefd"
+version = "1.6.0"
+description = "Python implementation of \"Elliptic Fourier Features of a Closed Contour\""
+optional = false
+python-versions = ">=2.7.10"
+files = [
+    {file = "pyefd-1.6.0-py2.py3-none-any.whl", hash = "sha256:3c0bff21bdd00a8f1da69618ed61ea5b8a38d94c7ff5556073716aae0f66c8a2"},
+    {file = "pyefd-1.6.0.tar.gz", hash = "sha256:628f50f395d41c82db9625834674975584fa8f829fc60cfc127937dec8f22980"},
+]
+
+[package.dependencies]
+numpy = ">=1.7.0"
+
+[[package]]
 name = "pyparsing"
 version = "3.2.1"
 description = "pyparsing module - Classes and methods to define and execute parsing grammars"
@@ -1268,4 +1282,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "ec52bcdd09d43d39f98042b6fb934d3113e89d9829bf8e648f5c92a79ad9d944"
+content-hash = "dcccf1eb0527a25b431c816466ffbd6cf69bdf979575602942477383a98e1c70"

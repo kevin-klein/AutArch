@@ -26,6 +26,7 @@ bottle = "^0.13.2"
 # name = "pytorch_cuda"
 # url = "https://download.pytorch.org/whl/cu124"
 # priority = "explicit"
+pyefd = "^1.6.0"
 
 [build-system]
 requires = ["poetry-core"]

@@ -5,7 +5,10 @@ namespace :features do
 
       next if ceramic.contour.empty?
 
-      ceramic.efds = Efd.elliptic_fourier_descriptors(ceramic.contour, normalize: false, order: 15).to_a.flatten
+      frequencies = Efd.elliptic_fourier_descriptors(ceramic.contour, normalize: true, order: 15).to_a.flatten
+      max = (10.0 / frequencies.flatten.max)
+      frequencies = frequencies.each_slice(2).map(&:last).map { _1 * max }
+      ceramic.efds = frequencies
       ceramic.save!
     end
   end

@@ -7,6 +7,7 @@ import numpy as np
 import io
 import os
 import torchvision
+from pyefd import elliptic_fourier_descriptors
 
 labels = torch.load('models/retinanet_v2_labels.model')
 labels = {v: k for k, v in labels.items()}
@@ -150,6 +151,15 @@ def upload_skeleton_angle():
     result = analyze_skeleton_orientation(upload_file.file)
 
     return { 'predictions': result }
+
+@app.post('/efd')
+def efd():
+    data = request.json
+    coeffs = elliptic_fourier_descriptors(data['contour'], order=data['order'], normalize=data['normalize'], return_transformation=data['return_transformation'])
+
+    return {
+        'efds': coeffs.tolist()
+    }
 
 if __name__ == '__main__':
     app.run(debug=True, reloader=True, host='0.0.0.0')
