@@ -13,6 +13,18 @@ namespace :export do
     end
   end
 
+  def local_contour(figure)
+    if figure.manual_bounding_box
+      figure.manual_contour.map do |point|
+        [point[0] - figure.x1, point[1] - figure.y1]
+      end.flatten
+    elsif figure.instance_of?(StoneTool)
+      (figure.contour.first + [figure.contour.first[0]]).flatten
+    else
+      (figure.contour + [figure.contour[0]]).flatten
+    end
+  end
+
   task :page, [:page_id] => :environment do |_, args|
     page_id = args[:page_id]
     page = Page.find(page_id)
@@ -34,6 +46,85 @@ namespace :export do
     end
 
     File.write(Rails.root.join("page_#{page_id}.json").to_s, JSON.pretty_generate(data))
+  end
+
+  task single_masks: :environment do
+    require "rvg/rvg"
+
+    def mask_path(figure)
+      Pathname.new("/mnt/g/single_masks/#{figure.id}_mask.jpg")
+    end
+
+    def bounding_box(figure)
+      contour = global_contour(figure)
+      MinOpenCV.boundingRect(contour.each_slice(2).to_a)
+    end
+
+    def create_mask(image, figure)
+      width, height = image.size
+
+      rvg = Magick::RVG.new(width, height) do |canvas|
+        canvas.background_fill = "black"
+
+        polygon = local_contour(figure)
+
+        canvas.polygon(polygon).styles(fill: "white")
+      end
+      rvg.draw.write(mask_path(figure))
+      true
+    rescue Magick::ImageMagickError => e
+      ap e
+      false
+    end
+
+    def export_page(page)
+      figures = page.figures.filter { _1.probability > 0.6 && !_1.contour.empty? && ["Grave", "Scale", "Arrow", "Ceramic"].include?(_1.type) }
+
+      path = page.image.file_path
+      if File.exist?(path)
+        figures.each do |figure|
+          image = MinOpenCV.extractFigure(figure, page.image.data)
+          image = Vips::Image.new_from_buffer(image, "")
+
+          target_path = Pathname.new("/mnt/g/single_masks/#{figure.id}.jpg").to_s
+          image.write_to_file(target_path)
+
+          create_mask(image, figure)
+
+          # if create_mask(page.image, figure)
+          #   data = [figure, box, label, mask_path(page.image, figure).basename]
+          # end
+
+          # if !data.empty?
+          #   File.open("/mnt/g/single_masks/#{figure.id}.json", "w") do |f|
+          #     masks = data.map { _1[3] }
+          #     labels = data.map { _1[2] }
+          #     boxes = data.map { _1[1] }
+
+          #     data = {
+          #       image: target_path.basename,
+          #       masks: masks,
+          #       bounding_boxes: boxes,
+          #       labels: labels
+          #     }
+          #     f.write(JSON.pretty_generate(data))
+          #   end
+          # else
+          #   File.delete(target_path)
+          # end
+        end
+      end
+    end
+
+    page_ids = Grave.all.filter do |grave|
+      grave.width_with_unit[:unit] != "px" && grave.height_with_unit[:unit] != "px"
+    end.map { _1.page_id }.uniq
+
+    pages = Page.includes(:figures, :image).find(page_ids)
+
+    Parallel.map(pages, in_processes: 8, progress: "Exporting pages") do |page|
+      export_page(page)
+    end
   end
 
   task masks: :environment do
