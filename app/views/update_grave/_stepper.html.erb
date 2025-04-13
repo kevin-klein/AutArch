@@ -1,5 +1,6 @@
 <ol class='stepper'>
   <% wizard_steps.each do |step| %>
+    <% next if params[:short] && ![:resize_boxes, :set_scale, :set_north_arrow, :set_grave_data, :show_contours, :set_skeleton_data].include?(step) %>
     <li class="stepper-item <%= step.to_s == params[:id] ? 'active' : '' %>">
       <h3 class="stepper-title">
         <%= link_to(t(step), grave_update_grave_path(params[:grave_id], step)) %>

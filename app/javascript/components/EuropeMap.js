@@ -43,12 +43,14 @@ function Radar ({ angles }) {
     >
       {/* <path strokeWidth='1' stroke='black' d='M50,0,50,100' />
       <path strokeWidth='1' stroke='black' d='M0,50,100,50' /> */}
-      <circle cx='50' cy='50' r='27' stroke='#dcac0a' strokeWidth='25' fill='none' />
+      {/* <circle cx='50' cy='50' r='27' stroke='#dcac0a' strokeWidth='25' fill='none' /> */}
+      <circle cx='50' cy='50' r='27' stroke='blue' strokeWidth='25' fill='none' />
 
       {Object.keys(angles).map(angle => {
         const count = angles[angle]
         const intensity = (count / max)
-        const fill = `rgb(${(intensity) * 35} ${(intensity) * 83} ${(intensity) * 245})`
+        // const fill = `rgb(${(intensity) * 35} ${(intensity) * 83} ${(intensity) * 245})`
+        const fill = `rgb(${intensity * 255} 0  ${(1 - intensity) * 255})`
 
         return (
           <Segment
@@ -254,7 +256,7 @@ function NorthArrowControl ({ position }) {
 export default function EuropeMap ({ orientations }) {
   return (
     <div style={{ height: 500 }}>
-      <MapContainer scrollWheelZoom style={{ height: '100%' }} center={[48.505, 16]} zoom={7}>
+      <MapContainer scrollWheelZoom style={{ height: '100%' }} center={[49.555, 16]} zoom={7}>
         <TileLayer
           attribution='Tiles &copy; Esri &mdash; Source: Esri'
           url='https://server.arcgisonline.com/ArcGIS/rest/services/World_Shaded_Relief/MapServer/tile/{z}/{y}/{x}'
@@ -267,7 +269,7 @@ export default function EuropeMap ({ orientations }) {
           style={{ color: 'grey', fill: false }}
         />
         <ScaleControl position='bottomright' />
-        <NorthArrowControl position='bottomleft' />
+        <NorthArrowControl position='topleft' />
       </MapContainer>
     </div>
   )

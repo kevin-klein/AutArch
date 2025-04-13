@@ -1,5 +1,5 @@
 class PublicationsController < AuthorizedController
-  before_action :set_publication, only: %i[update_tags assign_tags update_site assign_site progress summary show edit update destroy stats]
+  before_action :set_publication, only: %i[radar update_tags assign_tags update_site assign_site progress summary show edit update destroy stats]
 
   # GET /publications or /publications.json
   def index
@@ -65,6 +65,10 @@ class PublicationsController < AuthorizedController
            type
          end, value]
       end.to_h
+  end
+
+  def radar
+    @skeleton_angles = Stats.spine_angles(@publication.figures.where(type: "Spine").includes(grave: :arrow))
   end
 
   def stats # rubocop:disable Metrics/AbcSize
@@ -139,12 +143,16 @@ class PublicationsController < AuthorizedController
 
   # POST /publications or /publications.json
   def create # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
+    name = publication_params[:title]
+    if name.empty?
+      name = publication_params[:pdf].original_filename.gsub(".pdf", "")
+    end
+
     @publication = Publication.new({
       author: publication_params[:author],
-      title: publication_params[:title],
+      title: name,
       pdf: publication_params[:pdf],
       year: publication_params[:year]
-      # user: current_user
     })
 
     respond_to do |format|
@@ -152,7 +160,7 @@ class PublicationsController < AuthorizedController
         AnalyzePublicationJob.perform_later(@publication, site_id: publication_params[:site])
 
         format.html do
-          redirect_to progress_publication_path(@publication), notice: "Publication was successfully created."
+          redirect_to progress_publication_path(@publication)
         end
       else
         format.html { render :new, status: :unprocessable_entity }

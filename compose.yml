@@ -1,15 +1,14 @@
 services:
   ml-services:
-    build:
-      context: .
-      dockerfile: ml-services.Dockerfile
+    image: 'kevin1252/autarch-ml-services:1.1'
     env_file:
       - .env
     volumes:
       - ./models:/ml-services/models
 
   web:
-    build: .
+    image: 'kevin1252/autarch:1.0'
+    command: bundle exec rails s -b0
     volumes:
       - ./images:/dfg/images
       - ./storage:/dfg/storage
@@ -17,20 +16,23 @@ services:
       - "3000:3000"
     env_file:
       - .env
+    tmpfs:
+      - /tmp/pids/
 
   sidekiq:
     volumes:
       - ./images:/dfg/images
       - ./storage:/dfg/storage
-    build: '.'
+    image: 'kevin1252/autarch:1.0'
     command: bundle exec sidekiq
     env_file:
       - .env
 
   redis:
     image: "redis:alpine"
+
   db:
-    build: db
+    image: 'kevin1252/autarch-db:1.0'
     environment:
       POSTGRES_PASSWORD: root110120
 

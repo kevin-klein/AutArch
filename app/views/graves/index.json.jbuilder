@@ -1,1 +1,1 @@
-json.array! @graves, partial: "graves/grafe", as: :grafe
+json.array! @graves, partial: "graves/grave", as: :grave

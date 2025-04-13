@@ -73,4 +73,5 @@ Rails.application.configure do
 
   config.action_mailer.delivery_method = :smtp
 
+  config.hosts << "host.docker.internal"
 end
