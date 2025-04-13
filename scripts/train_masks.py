@@ -80,7 +80,7 @@ def get_model_instance_segmentation(num_classes, device):
 
     # model = torchvision.models.detection.MaskRCNN(backbone, num_classes=2)
 
-    model = torchvision.models.detection.maskrcnn_resnet50_fpn(weights=torchvision.models.detection.MaskRCNN_ResNet50_FPN_Weights.COCO_V1, trainable_backbone_layers=5)
+    model = torchvision.models.detection.maskrcnn_resnet50_fpn_v2(weights=torchvision.models.detection.MaskRCNN_ResNet50_FPN_V2_Weights.COCO_V1, trainable_backbone_layers=5)
 
     # get number of input features for the classifier
     in_features = model.roi_heads.box_predictor.cls_score.in_features
@@ -96,7 +96,7 @@ def get_model_instance_segmentation(num_classes, device):
         hidden_layer,
         2,
     )
-    model.load_state_dict(torch.load('models/mask_rcnn_resnet50.model', map_location=device, weights_only=True))
+    # model.load_state_dict(torch.load('models/mask_rcnn_resnet50_v2.model', map_location=device, weights_only=True))
     model.to(device)
 
     return model
@@ -104,8 +104,8 @@ def get_model_instance_segmentation(num_classes, device):
 def get_transform(train):
     transforms = []
     transforms.append(v2.ConvertBoundingBoxFormat(tv_tensors.BoundingBoxFormat.XYXY))
-    transforms.append(v2.Resize(size=512))
     if train:
+        transforms.append(v2.Resize(size=512))
         transforms.append(v2.RandomHorizontalFlip(0.5))
     transforms.append(v2.ToDtype(torch.float, scale=True))
     transforms.append(v2.ToPureTensor())
@@ -115,85 +115,86 @@ def get_transform(train):
 from engine import train_one_epoch, evaluate
 import utils
 
-# train on the GPU or on the CPU, if a GPU is not available
-device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
+if __name__ == '__main__':
+  # train on the GPU or on the CPU, if a GPU is not available
+  device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
-# our dataset has two classes only - background and person
-# use our dataset and defined transformations
-dataset = DfgDataset('/mnt/g/masks', get_transform(train=True))
-dataset_test = DfgDataset('/mnt/g/masks', get_transform(train=False))
-num_classes = len(dataset.labels.keys())
+  # our dataset has two classes only - background and person
+  # use our dataset and defined transformations
+  dataset = DfgDataset('/mnt/g/masks', get_transform(train=True))
+  dataset_test = DfgDataset('/mnt/g/masks', get_transform(train=False))
+  num_classes = len(dataset.labels.keys())
 
-torch.save(dataset.labels, 'models/maskrcnn_labels.model')
+  torch.save(dataset.labels, 'models/maskrcnn_labels.model')
 
-# split the dataset in train and test set
-indices = torch.randperm(len(dataset)).tolist()
+  # split the dataset in train and test set
+  indices = torch.randperm(len(dataset)).tolist()
 
-dataset, dataset_test = torch.utils.data.random_split(dataset, [0.8, 0.2])
+  dataset, dataset_test = torch.utils.data.random_split(dataset, [0.8, 0.2])
 
-# define training and validation data loaders
-data_loader = torch.utils.data.DataLoader(
-    dataset,
-    batch_size=8,
-    shuffle=True,
-    collate_fn=utils.collate_fn
-)
+  # define training and validation data loaders
+  data_loader = torch.utils.data.DataLoader(
+      dataset,
+      batch_size=4,
+      shuffle=True,
+      collate_fn=utils.collate_fn
+  )
 
-data_loader_test = torch.utils.data.DataLoader(
-    dataset_test,
-    batch_size=1,
-    shuffle=False,
-    collate_fn=utils.collate_fn
-)
+  data_loader_test = torch.utils.data.DataLoader(
+      dataset_test,
+      batch_size=1,
+      shuffle=False,
+      collate_fn=utils.collate_fn
+  )
 
-# get the model using our helper function
-model = get_model_instance_segmentation(num_classes, device)
+  # get the model using our helper function
+  model = get_model_instance_segmentation(num_classes, device)
 
-# move model to the right device
-model.to(device)
+  # move model to the right device
+  model.to(device)
 
-# construct an optimizer
-params = [p for p in model.parameters() if p.requires_grad]
-optimizer = torch.optim.SGD(
-    params,
-    lr=0.005,
-    momentum=0.9,
-    weight_decay=0.0005
-)
-# and a learning rate scheduler
-lr_scheduler = torch.optim.lr_scheduler.StepLR(
-    optimizer,
-    step_size=3,
-    gamma=0.1
-)
+  # construct an optimizer
+  params = [p for p in model.parameters() if p.requires_grad]
+  optimizer = torch.optim.SGD(
+      params,
+      lr=0.005,
+      momentum=0.9,
+      weight_decay=0.0005
+  )
+  # and a learning rate scheduler
+  lr_scheduler = torch.optim.lr_scheduler.StepLR(
+      optimizer,
+      step_size=3,
+      gamma=0.1
+  )
 
-num_epochs = 15
+  num_epochs = 15
 
-# from torchvision.utils import draw_bounding_boxes, draw_segmentation_masks
-# import matplotlib.pyplot as plt
+  # from torchvision.utils import draw_bounding_boxes, draw_segmentation_masks
+  # import matplotlib.pyplot as plt
 
-# for images, targets in data_loader:
-#   image = images[0][0].repeat(3, 1, 1)
+  # for images, targets in data_loader:
+  #   image = images[0][0].repeat(3, 1, 1)
 
-#   print(targets[0]['boxes'])
+  #   print(targets[0]['boxes'])
 
-#   output_image = draw_bounding_boxes(image, targets[0]['boxes'], ['Grave' for _ in targets[0]['labels']], colors="red")
+  #   output_image = draw_bounding_boxes(image, targets[0]['boxes'], ['Grave' for _ in targets[0]['labels']], colors="red")
 
-#   masks = targets[0]['masks']
-#   output_image = draw_segmentation_masks(output_image, masks, alpha=0.5, colors="blue")
+  #   masks = targets[0]['masks']
+  #   output_image = draw_segmentation_masks(output_image, masks, alpha=0.5, colors="blue")
 
-#   plt.figure(figsize=(12, 12))
-#   plt.imshow(output_image.permute(1, 2, 0))
-#   plt.show()
+  #   plt.figure(figsize=(12, 12))
+  #   plt.imshow(output_image.permute(1, 2, 0))
+  #   plt.show()
 
-for epoch in range(num_epochs):
-    # train for one epoch, printing every 10 iterations
-    train_one_epoch(model, optimizer, data_loader, device, epoch, print_freq=10)
+  for epoch in range(num_epochs):
+      # train for one epoch, printing every 10 iterations
+      train_one_epoch(model, optimizer, data_loader, device, epoch, print_freq=10)
 
-    torch.save(model.state_dict(), 'models/mask_rcnn_resnet50.model')
-    # update the learning rate
-    lr_scheduler.step()
-    # evaluate on the test dataset
-    # evaluate(model, data_loader_test, device=device)
+      torch.save(model.state_dict(), 'models/mask_rcnn_resnet50_v2.model')
+      # update the learning rate
+      lr_scheduler.step()
+      # evaluate on the test dataset
+      # evaluate(model, data_loader_test, device=device)
 
-print("That's it!")
+  print("That's it!")
