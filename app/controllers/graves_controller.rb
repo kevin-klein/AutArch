@@ -57,6 +57,25 @@ class GravesController < AuthorizedController
     @graves_pagy, @graves = pagy(@graves.all)
   end
 
+  def orientations
+    tag_id = Tag.find_by(name: params[:name])
+    @skeleton_angles = Site.includes(
+      graves: [:spines, :arrow]
+    ).all.to_a.map do |site|
+      # 3 = corded ware
+      # 2 = bell beaker
+
+      spines = site.graves.joins(:tags).where(tags: {id: tag_id}).flat_map do |grave|
+        grave.spines
+      end
+
+      angles = Stats.all_spine_angles(spines).to_a
+      angles
+    end.filter do |grave_data|
+      grave_data.sum > 0
+    end.flatten
+  end
+
   # GET /graves/1 or /graves/1.json
   def show
   end

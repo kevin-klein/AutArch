@@ -20,6 +20,7 @@ Rails.application.routes.draw do # rubocop:disable Metrics/BlockLength
     resources :update_grave
     collection do
       get :stats
+      get :orientations
     end
   end
   resources :figures do
