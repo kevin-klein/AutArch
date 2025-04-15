@@ -259,7 +259,7 @@ export default function AddFigure ({ image, pageFigures, page, next_url }) {
       {creatingNewFigure && <NewFigureDialog addFigure={createFigure} closeDialog={() => setCreatingNewFigure(false)} />}
       <div className='row'>
         <div className='col-md-8 card'>
-          <h3>Page {page.number + 1}</h3>
+          <h3>Page {page.number}</h3>
           <div className='form-check'>
             <select value={rendering} onChange={evt => setRendering(evt.target.value)} className='form-select' aria-label='Default select example'>
               <option value='boxes'>Show Bounding Boxes</option>
