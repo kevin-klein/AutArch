@@ -10,7 +10,7 @@ module Charts
       @padding = padding
       @width = width
       @height = height
-      @svg = Victor::SVG.new template: :html, width: width, height: height, class: html_class
+      @svg = Victor::SVG.new width: width, height: height, class: html_class
       set_css
     end
 

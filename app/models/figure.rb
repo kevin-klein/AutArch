@@ -294,8 +294,10 @@ class Figure < ApplicationRecord
     rotated_contour =
       if angle.present? || (respond_to?(:arrow) && arrow.present?)
         single_contour.map do |x, y|
-          radians = if angle.nil?
+          radians = if angle.nil? && arrow.angle.present?
             (arrow.angle * Math::PI) / 180
+          elsif angle.nil?
+            0
           else
             (angle * Math::PI) / 180
           end

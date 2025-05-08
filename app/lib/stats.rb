@@ -263,7 +263,7 @@ module Stats
         grave.normalized_width_with_unit[:value],
         grave.normalized_height_with_unit[:value],
         grave.grave_cross_section&.normalized_depth_with_unit.try(:[], :value) || 0,
-        ((grave.angle.abs.round + grave.arrow.angle) % 180).round
+        ((grave.angle.abs.round + (grave.arrow.angle || 0)) % 180).round
       ]
     end.compact
   end
