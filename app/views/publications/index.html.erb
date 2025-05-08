@@ -48,6 +48,8 @@
           <% end %>
           <div class="vr mx-1"></div>
           <%= link_to 'Download', rails_blob_path(publication.pdf, disposition: "attachment") %>
+          <div class="vr mx-1"></div>
+          <%= link_to 'Export Data', export_publication_path(publication) %>
         </td>
       </tr>
     <% end %>

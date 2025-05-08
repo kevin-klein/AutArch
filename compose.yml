@@ -7,7 +7,7 @@ services:
       - ./models:/ml-services/models
 
   web:
-    image: 'kevin1252/autarch:1.0'
+    image: 'kevin1252/autarch:1.2'
     command: bundle exec rails s -b0
     volumes:
       - ./images:/dfg/images
@@ -23,7 +23,7 @@ services:
     volumes:
       - ./images:/dfg/images
       - ./storage:/dfg/storage
-    image: 'kevin1252/autarch:1.0'
+    image: 'kevin1252/autarch:1.2'
     command: bundle exec sidekiq
     env_file:
       - .env

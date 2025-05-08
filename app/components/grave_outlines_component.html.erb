@@ -1,15 +1,11 @@
+<% unless @compact %>
 <div
   class='col-md-6'
   data-id='figure-view'
-  id='figure-view'
-  <%
-=begin%>
- style='padding-top: 20px;'
-<%
-=end%>
->
+  id='figure-view'>
 <h3 style='text-align: center'><%= @title %> (n = <%= @graves.filter { !_1.manual_bounding_box }.length %>)</h3>
 <h4 style='text-align: center'><%= @subtitle %></h4>
+<% end %>
 
 <svg
   style='touch-action: none; user-select: none;'
@@ -23,4 +19,6 @@
   <% end %>
 </svg>
 
+<% unless @compact %>
 </div>
+<% end %>

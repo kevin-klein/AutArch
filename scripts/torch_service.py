@@ -8,7 +8,7 @@ import io
 import os
 import torchvision
 
-labels = torch.load('models/retinanet_v2_labels.model')
+labels = torch.load('models/retinanet_v2_labels.model', weights_only=True)
 labels = {v: k for k, v in labels.items()}
 
 if torch.cuda.is_available():
@@ -17,7 +17,7 @@ else:
     device = torch.device('cpu')
 
 loaded_model = get_model(num_classes = len(labels.keys()), device=device)
-loaded_model.load_state_dict(torch.load('models/retinanet_v2_dfg.model', map_location=device))
+loaded_model.load_state_dict(torch.load('models/retinanet_v2_dfg.model', map_location=device, weights_only=True))
 
 loaded_model.eval()
 
@@ -28,15 +28,15 @@ arrow_model = torchvision.models.resnet152(weights=None)
 arrow_model.fc = torch.nn.Linear(in_features=2048, out_features=2, bias=True)
 arrow_model = arrow_model.to(device)
 
-arrow_model.load_state_dict(torch.load('models/arrow_resnet.model', map_location=device))
+arrow_model.load_state_dict(torch.load('models/arrow_resnet.model', map_location=device, weights_only=True))
 
 skeleton_orientation_model = model = torchvision.models.resnet152(weights=None)
 skeleton_orientation_model.fc = torch.nn.Linear(in_features=2048, out_features=2, bias=True)
 skeleton_orientation_model.to(device)
 
 skeleton_model = torchvision.models.resnet152(weights=None, num_classes=2).to(device)
-skeleton_model.load_state_dict(torch.load('models/skeleton_resnet.model', map_location=device))
-skeleton_labels = torch.load('models/skeleton_resnet_labels.model', map_location=device)
+skeleton_model.load_state_dict(torch.load('models/skeleton_resnet.model', map_location=device, weights_only=True))
+skeleton_labels = torch.load('models/skeleton_resnet_labels.model', map_location=device, weights_only=True)
 
 def analyze_file(file):
     request_object_content = file.read()

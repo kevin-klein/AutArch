@@ -35,6 +35,7 @@ Rails.application.routes.draw do # rubocop:disable Metrics/BlockLength
   resources :publications do
     resources :pages
     member do
+      get :export
       post :update_site
       get :assign_site
       get :assign_tags

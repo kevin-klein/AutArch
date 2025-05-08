@@ -14,8 +14,8 @@ gem "pg"
 gem "cancancan"
 gem "mina"
 gem "rmagick"
+gem "sprockets-rails"
 
-gem "bootstrap"
 gem "graphql"
 gem "message_bus"
 gem "pagy"
@@ -69,6 +69,7 @@ gem "tzinfo-data", platforms: %i[mingw mswin x64_mingw jruby]
 # Reduces boot times through caching; required in config/boot.rb
 gem "bootsnap", require: false
 gem "simple_form"
+gem "rubyzip", require: "zip"
 
 # Use Sass to process CSS
 # gem 'sassc-rails'
@@ -80,6 +81,7 @@ gem "csv"
 gem "ruby-vips"
 gem "victor"
 gem "rumale"
+gem "concurrent-ruby", "1.3.4"
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem

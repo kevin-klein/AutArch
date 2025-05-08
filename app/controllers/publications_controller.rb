@@ -1,5 +1,5 @@
 class PublicationsController < AuthorizedController
-  before_action :set_publication, only: %i[radar update_tags assign_tags update_site assign_site progress summary show edit update destroy stats]
+  before_action :set_publication, only: %i[export radar update_tags assign_tags update_site assign_site progress summary show edit update destroy stats]
 
   # GET /publications or /publications.json
   def index
@@ -133,6 +133,12 @@ class PublicationsController < AuthorizedController
 
   # GET /publications/1/edit
   def edit
+  end
+
+  def export
+    ExportPublication.new.export(@publication)
+
+    send_file "export.zip", filename: "#{@publication.short_description}.zip"
   end
 
   def analyze
