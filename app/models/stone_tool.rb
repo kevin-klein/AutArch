@@ -58,7 +58,7 @@
 #  features             :float            default([]), not null, is an Array
 #
 class StoneTool < Figure
-  belongs_to :grave, foreign_key: "parent_id", optional: true, inverse_of: :spines
+  belongs_to :good, foreign_key: "parent_id", optional: true, inverse_of: :stone_tool
 
   has_one :scale, dependent: :destroy, foreign_key: "parent_id", class_name: "Scale", inverse_of: :stone_tool
 end

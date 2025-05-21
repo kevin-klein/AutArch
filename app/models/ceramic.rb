@@ -58,5 +58,5 @@
 #  features             :float            default([]), not null, is an Array
 #
 class Ceramic < Figure
-  belongs_to :grave, foreign_key: "parent_id", optional: true, inverse_of: :ceramics
+  belongs_to :good, foreign_key: "parent_id", optional: true, inverse_of: :ceramic
 end

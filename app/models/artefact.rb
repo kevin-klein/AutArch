@@ -58,5 +58,5 @@
 #  features             :float            default([]), not null, is an Array
 #
 class Artefact < Figure
-  belongs_to :grave, foreign_key: "parent_id", optional: true, inverse_of: :artefacts
+  belongs_to :good, foreign_key: "parent_id", optional: true, inverse_of: :artefact
 end
