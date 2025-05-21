@@ -62,12 +62,24 @@ class GravesController < AuthorizedController
   end
 
   def related
+    @grave_good_ids = @grave.goods.pluck(:id)
+    @related_artefacts = Figure.where(type: ["Ceramic", "StoneTool", "Artefact", "ShaftAxe"]).where(parent_id: @grave_good_ids)
+    @relations = @grave_good_ids.map do |grave_good_id|
+      [grave_good_id, @related_artefacts.filter { _1.parent_id == grave_good_id }.first&.id]
+    end.to_h
   end
 
   def save_related
-    related = params[:related]
-    Figure.where(type: ["Ceramic", "StoneTool", "Artefact", "ShaftAxe"]).where(parent_id: @grave).update_all(parent_id: nil)
-    Figure.where(id: related).update_all(parent_id: @grave.id)
+    Figure.transaction do
+      relations = params[:relations].permit!.to_h
+      relations.each do |good_id, full_drawing_id|
+        next if full_drawing_id.nil?
+        Figure.where(parent_id: good_id).update_all(parent_id: nil)
+        artefact = Figure.find(full_drawing_id)
+        artefact.parent_id = good_id
+        artefact.save!
+      end
+    end
   end
 
   def root
