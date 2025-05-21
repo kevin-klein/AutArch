@@ -4,10 +4,11 @@
     props: {
       highlight: @grave.as_json(methods: [:type]),
       image: @grave.page.image.as_json.merge(href: @grave.page.image.url),
-      figures: @grave.page.figures.filter { ['Ceramic', 'StoneTool', 'Artefact', 'ShaftAxe'].include?(_1.type) }.as_json(methods: [:type]),
+      figures: @grave.page.figures.filter { ['Ceramic', 'StoneTool', 'Artefact', 'ShaftAxe'].include?(_1.type) }.filter { _1.probability > 0.6 }.as_json(methods: [:type]),
       page: @page,
-      related: Figure.where(type: ['Ceramic', 'StoneTool', 'Artefact', 'ShaftAxe']).where(parent_id: @grave).pluck(:id),
-      saveUrl: save_related_grave_path(@grave)
+      relations: @relations,
+      saveUrl: save_related_grave_path(@grave),
+      graveGoods: @grave.goods.as_json
     }
   }
 ) %>
