@@ -62,7 +62,7 @@ class Good < Figure
 
   has_one :ceramic, foreign_key: "parent_id"
   has_one :stone_tool, foreign_key: "parent_id"
-  has_one :artefact, foreign_key: "parent_id"
+  has_many :artefact, foreign_key: "parent_id"
 
   def relative_center_to_grave
     x1 = (x1 - grave.x1).abs
