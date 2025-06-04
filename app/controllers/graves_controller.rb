@@ -62,6 +62,7 @@ class GravesController < AuthorizedController
   end
 
   def related
+    @page = @grave.page
     @grave_good_ids = @grave.goods.pluck(:id)
     @related_artefacts = Figure.where(type: ["Ceramic", "StoneTool", "Artefact", "ShaftAxe"]).where(parent_id: @grave_good_ids)
     @relations = @grave_good_ids.map do |grave_good_id|

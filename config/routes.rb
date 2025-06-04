@@ -38,7 +38,11 @@ Rails.application.routes.draw do # rubocop:disable Metrics/BlockLength
   resources :page_images
   resources :ceramics
   resources :publications do
-    resources :pages
+    resources :pages do
+      collection do
+        get :by_page_number
+      end
+    end
     member do
       post :update_site
       get :assign_site

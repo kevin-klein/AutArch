@@ -16,6 +16,7 @@
   <div class='col-md-6'>
     <%= simple_form_for(@grave, url: wizard_path) do |f| %>
       <%= f.input :identifier %>
+      <%= f.input :internment_type, collection: Grave.internment_types.keys %>
       <%= f.submit("Next", class: "btn btn-primary") %>
     <% end %>
     <%= link_to("Delete", grave_path(@grave), method: :delete, class: 'btn btn-danger mt-2', 'data-confirm': 'Are you sure?') %>

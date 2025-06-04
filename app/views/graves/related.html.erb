@@ -4,13 +4,15 @@
   "Relations",
   {
     props: {
+      publicationId: @page.publication_id,
       highlight: @grave.as_json(methods: [:type]),
       image: @grave.page.image.as_json.merge(href: @grave.page.image.url),
       figures: @grave.page.figures.filter { ['Ceramic', 'StoneTool', 'Artefact', 'ShaftAxe'].include?(_1.type) }.filter { _1.probability > 0.6 }.as_json(methods: [:type]),
       page: @page,
       relations: @relations,
       saveUrl: save_related_grave_path(@grave),
-      graveGoods: @grave.goods.as_json
+      graveGoods: @grave.goods.as_json,
+      pageNumber: @page.number
     }
   }
 ) %>
