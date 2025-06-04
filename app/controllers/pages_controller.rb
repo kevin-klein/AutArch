@@ -21,6 +21,11 @@ class PagesController < ApplicationController
   def edit
   end
 
+  def by_page_number
+    @page = @publication.pages.find_by(number: params[:page])
+    render :show
+  end
+
   # POST /pages or /pages.json
   def create
     @page = Page.new(page_params)
