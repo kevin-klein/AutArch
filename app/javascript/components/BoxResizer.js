@@ -503,48 +503,48 @@ function BoxResizer ({ next_url, grave, sites, image, page }) {
               <div className='card-text'>
                 <ul className='list-group'>
                   {Object.values(figures).map(figure =>
-                  <React.Fragment key={figure.id}>
-                    <div
-                      onClick={() => { setCurrentEditBox(figure.id) }}
-                      className={`list-group-item list-group-item-action d-flex justify-content-between align-items-start ${currentEditBoxActiveClass(figure)}`}
-                    >
-                      <div className='ms-2 me-auto'>
-                        <div className='fw-bold'>{figure.typeName === 'Good' ? 'Artefact' : figure.typeName}</div>
-                      </div>
+                    <React.Fragment key={figure.id}>
                       <div
-                        onClick={() => { removeEditBox(figure.id) }}
-                        className='btn btn-primary badge bg-primary rounded-pill'
-                        role='button' data-bs-toggle='button'
+                        onClick={() => { setCurrentEditBox(figure.id) }}
+                        className={`list-group-item list-group-item-action d-flex justify-content-between align-items-start ${currentEditBoxActiveClass(figure)}`}
                       >
-                        X
-                      </div>
-                    </div>
-                    {currentEditBox === figure.id && (figure.typeName === 'Grave' || figure.typeName === 'GraveCrossSection') &&
-                      <div className='row mb-3 mt-3'>
-                        <div className='form-check ms-3'>
-                          <input
-                            className='form-check-input'
-                            type='checkbox'
-                            checked={figure.manual_bounding_box}
-                            onChange={(evt) => { setManualBoundingBox(figure, evt.target.checked) }}
-                          />
-                          <label className='form-check-label'>
-                            manual bounding box
-                          </label>
+                        <div className='ms-2 me-auto'>
+                          <div className='fw-bold'>{figure.typeName === 'Good' ? 'Artefact' : figure.typeName}</div>
                         </div>
-                      </div>}
-                  </React.Fragment>
-                )}
+                        <div
+                          onClick={() => { removeEditBox(figure.id) }}
+                          className='btn btn-primary badge bg-primary rounded-pill'
+                          role='button' data-bs-toggle='button'
+                        >
+                          X
+                        </div>
+                      </div>
+                      {currentEditBox === figure.id && (figure.typeName === 'Grave' || figure.typeName === 'GraveCrossSection') &&
+                        <div className='row mb-3 mt-3'>
+                          <div className='form-check ms-3'>
+                            <input
+                              className='form-check-input'
+                              type='checkbox'
+                              checked={figure.manual_bounding_box}
+                              onChange={(evt) => { setManualBoundingBox(figure, evt.target.checked) }}
+                            />
+                            <label className='form-check-label'>
+                              manual bounding box
+                            </label>
+                          </div>
+                        </div>}
+                    </React.Fragment>
+                  )}
 
                   <a
-                  href='#'
-                  onClick={(evt) => { evt.preventDefault(); createNewFigure() }}
-                  className='list-group-item list-group-item-action d-flex justify-content-between align-items-start'
-                >
-                  <div className='ms-2 me-auto'>
-                    <div className='fw-bold'>New Figure</div>
-                  </div>
-                </a>
+                    href='#'
+                    onClick={(evt) => { evt.preventDefault(); createNewFigure() }}
+                    className='list-group-item list-group-item-action d-flex justify-content-between align-items-start'
+                  >
+                    <div className='ms-2 me-auto'>
+                      <div className='fw-bold'>New Figure</div>
+                    </div>
+                  </a>
                 </ul>
               </div>
               <form action={next_url} method='post'>
@@ -553,41 +553,41 @@ function BoxResizer ({ next_url, grave, sites, image, page }) {
                 {Object.values(figures).map(figure => {
                   const id = figure.id
                   return (
-                  <React.Fragment key={figure.id}>
-                    <input type='hidden' name={`figures[${id}][x1]`} value={figure.x1} />
-                    <input type='hidden' name={`figures[${id}][x2]`} value={figure.x2} />
-                    <input type='hidden' name={`figures[${id}][y1]`} value={figure.y1} />
-                    <input type='hidden' name={`figures[${id}][y2]`} value={figure.y2} />
-                    <input type='hidden' name={`figures[${id}][verified]`} value={figure.verified} />
-                    <input type='hidden' name={`figures[${id}][disturbed]`} value={figure.disturbed} />
-                    <input type='hidden' name={`figures[${id}][deposition_type]`} value={figure.deposition_type} />
-                    <input type='hidden' name={`figures[${id}][publication_id]`} value={figure.publication_id} />
-                    <input type='hidden' name={`figures[${id}][text]`} value={figure.text} />
-                    <input type='hidden' name={`figures[${id}][angle]`} value={figure.angle} />
-                    {figure.manual_bounding_box && <>
-                      <input type='hidden' name={`figures[${id}][control_point_1_x]`} value={figure.control_point_1_x} />
-                      <input type='hidden' name={`figures[${id}][control_point_2_x]`} value={figure.control_point_2_x} />
-                      <input type='hidden' name={`figures[${id}][control_point_3_x]`} value={figure.control_point_3_x} />
-                      <input type='hidden' name={`figures[${id}][control_point_4_x]`} value={figure.control_point_4_x} />
+                    <React.Fragment key={figure.id}>
+                      <input type='hidden' name={`figures[${id}][x1]`} value={figure.x1} />
+                      <input type='hidden' name={`figures[${id}][x2]`} value={figure.x2} />
+                      <input type='hidden' name={`figures[${id}][y1]`} value={figure.y1} />
+                      <input type='hidden' name={`figures[${id}][y2]`} value={figure.y2} />
+                      <input type='hidden' name={`figures[${id}][verified]`} value={figure.verified} />
+                      <input type='hidden' name={`figures[${id}][disturbed]`} value={figure.disturbed} />
+                      <input type='hidden' name={`figures[${id}][deposition_type]`} value={figure.deposition_type} />
+                      <input type='hidden' name={`figures[${id}][publication_id]`} value={figure.publication_id} />
+                      <input type='hidden' name={`figures[${id}][text]`} value={figure.text} />
+                      <input type='hidden' name={`figures[${id}][angle]`} value={figure.angle} />
+                      {figure.manual_bounding_box && <>
+                        <input type='hidden' name={`figures[${id}][control_point_1_x]`} value={figure.control_point_1_x} />
+                        <input type='hidden' name={`figures[${id}][control_point_2_x]`} value={figure.control_point_2_x} />
+                        <input type='hidden' name={`figures[${id}][control_point_3_x]`} value={figure.control_point_3_x} />
+                        <input type='hidden' name={`figures[${id}][control_point_4_x]`} value={figure.control_point_4_x} />
 
-                      <input type='hidden' name={`figures[${id}][control_point_1_y]`} value={figure.control_point_1_y} />
-                      <input type='hidden' name={`figures[${id}][control_point_2_y]`} value={figure.control_point_2_y} />
-                      <input type='hidden' name={`figures[${id}][control_point_3_y]`} value={figure.control_point_3_y} />
-                      <input type='hidden' name={`figures[${id}][control_point_4_y]`} value={figure.control_point_4_y} />
+                        <input type='hidden' name={`figures[${id}][control_point_1_y]`} value={figure.control_point_1_y} />
+                        <input type='hidden' name={`figures[${id}][control_point_2_y]`} value={figure.control_point_2_y} />
+                        <input type='hidden' name={`figures[${id}][control_point_3_y]`} value={figure.control_point_3_y} />
+                        <input type='hidden' name={`figures[${id}][control_point_4_y]`} value={figure.control_point_4_y} />
 
-                      <input type='hidden' name={`figures[${id}][anchor_point_1_x]`} value={figure.anchor_point_1_x} />
-                      <input type='hidden' name={`figures[${id}][anchor_point_2_x]`} value={figure.anchor_point_2_x} />
-                      <input type='hidden' name={`figures[${id}][anchor_point_3_x]`} value={figure.anchor_point_3_x} />
-                      <input type='hidden' name={`figures[${id}][anchor_point_4_x]`} value={figure.anchor_point_4_x} />
+                        <input type='hidden' name={`figures[${id}][anchor_point_1_x]`} value={figure.anchor_point_1_x} />
+                        <input type='hidden' name={`figures[${id}][anchor_point_2_x]`} value={figure.anchor_point_2_x} />
+                        <input type='hidden' name={`figures[${id}][anchor_point_3_x]`} value={figure.anchor_point_3_x} />
+                        <input type='hidden' name={`figures[${id}][anchor_point_4_x]`} value={figure.anchor_point_4_x} />
 
-                      <input type='hidden' name={`figures[${id}][anchor_point_1_y]`} value={figure.anchor_point_1_y} />
-                      <input type='hidden' name={`figures[${id}][anchor_point_2_y]`} value={figure.anchor_point_2_y} />
-                      <input type='hidden' name={`figures[${id}][anchor_point_3_y]`} value={figure.anchor_point_3_y} />
-                      <input type='hidden' name={`figures[${id}][anchor_point_4_y]`} value={figure.anchor_point_4_y} />
+                        <input type='hidden' name={`figures[${id}][anchor_point_1_y]`} value={figure.anchor_point_1_y} />
+                        <input type='hidden' name={`figures[${id}][anchor_point_2_y]`} value={figure.anchor_point_2_y} />
+                        <input type='hidden' name={`figures[${id}][anchor_point_3_y]`} value={figure.anchor_point_3_y} />
+                        <input type='hidden' name={`figures[${id}][anchor_point_4_y]`} value={figure.anchor_point_4_y} />
 
-                      <input type='hidden' name={`figures[${id}][manual_bounding_box]`} value={figure.manual_bounding_box} />
-                    </>}
-                  </React.Fragment>
+                        <input type='hidden' name={`figures[${id}][manual_bounding_box]`} value={figure.manual_bounding_box} />
+                      </>}
+                    </React.Fragment>
                   )
                 })}
 

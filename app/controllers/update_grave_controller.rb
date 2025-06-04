@@ -76,6 +76,7 @@ class UpdateGraveController < ApplicationController
         :page_size,
         :identifier,
         :site_id,
+        :internment_type,
         tag_ids: [],
         skeleton_figures_attributes: %i[id deposition_type]
       )
