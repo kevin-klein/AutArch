@@ -64,7 +64,8 @@ class SkeletonFigure < Figure
 
   enum deposition_type: {
     unknown: 0,
-    back: 1,
-    side: 2
+    left_side: 1,
+    right_side: 2,
+    back: 3
   }
 end
