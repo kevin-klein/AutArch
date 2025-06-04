@@ -52,7 +52,7 @@ export function Contour ({ figure, onClick, selected }) {
   }
 }
 
-function PagePreview ({ graveGoods, image, highlight, selected, toggleSelected, figures }) {
+function PagePreview ({ graveGoods, image, highlight, selected, setCurrentRelations, relations, activeArtefact, figures }) {
   return (
     <svg preserveAspectRatio='xMidYMid meet' viewBox={`0 0 ${image.width} ${image.height}`} xmlns='http://www.w3.org/2000/svg'>
       <image width={`${image.width}`} height={`${image.height}`} href={`${image.href}`} />
@@ -60,11 +60,11 @@ function PagePreview ({ graveGoods, image, highlight, selected, toggleSelected, 
       <Contour figure={highlight} />
 
       {graveGoods.map(figure => (
-        <Contour key={figure.id} figure={figure} selected={selected === figure.id} onClick={() => toggleSelected(figure.id)} />
+        <Contour key={figure.id} figure={figure} selected={selected.includes(figure.id)} onClick={() => setRelatedById(relations, setCurrentRelations, activeArtefact, figure.id)} />
       ))}
 
       {figures.map(figure => (
-        <Contour key={figure.id} figure={figure} selected={selected === figure.id} onClick={() => toggleSelected(figure.id)} />
+        <Contour key={figure.id} figure={figure} selected={selected.includes(figure.id)} onClick={() => setRelatedById(relations, setCurrentRelations, activeArtefact, figure.id)} />
       ))}
     </svg>
   )
@@ -93,7 +93,7 @@ function RelatedFiguresList ({ figures, selected, setSelected }) {
         <li
           key={figure.id}
           onClick={() => setSelected(figure.id)}
-          className={`list-group-item ${selected === figure.id ? 'active' : ''}`}
+          className={`list-group-item ${selected?.includes(figure.id) ? 'active' : ''}`}
         >
           {figure.type} {figure.id}
         </li>
@@ -102,17 +102,17 @@ function RelatedFiguresList ({ figures, selected, setSelected }) {
   )
 }
 
-function GraveDetails ({ graveGoods, grave, figures, relations, setRelations, selected, setSelected }) {
-  function setRelatedById (id) {
-    if (selected !== null) {
-      if (relations[selected] === id) {
-        setRelations({ ...relations, [selected]: null })
-      } else {
-        setRelations({ ...relations, [selected]: id })
-      }
+function setRelatedById (relations, setRelations, selected, id) {
+  if (selected !== null) {
+    if (relations[selected]?.includes(id)) {
+      setRelations({ ...relations, [selected]: relations[selected].filter(current => current !== id) })
+    } else {
+      setRelations({ ...relations, [selected]: [id, ...(relations[selected] || [])] })
     }
   }
+}
 
+function GraveDetails ({ graveGoods, grave, figures, relations, setRelations, selected, setSelected }) {
   return (
     <div>
       <h4>OBJ. {grave.identifier}</h4>
@@ -122,7 +122,7 @@ function GraveDetails ({ graveGoods, grave, figures, relations, setRelations, se
           <GraveGoodList goods={graveGoods} selected={selected} setSelected={setSelected} />
         </div>
         <div className='col-md-6'>
-          <RelatedFiguresList figures={figures} selected={relations[selected]} setSelected={setRelatedById} />
+          <RelatedFiguresList figures={figures} selected={relations[selected]} setSelected={(id) => setRelatedById(relations, setRelations, selected, id)} />
         </div>
       </div>
     </div>
@@ -154,8 +154,10 @@ export default function Relations ({ graveGoods, background, figures, image, hig
     <div className='row'>
       <div className='col-md-6'>
         <PagePreview
-          selected={currentRelations[selected]}
-          setSelected={setSelected}
+          relations={currentRelations}
+          selected={[selected, ...(currentRelations[selected] || [])]}
+          activeArtefact={selected}
+          setCurrentRelations={setCurrentRelations}
           graveGoods={graveGoods}
           image={image}
           highlight={highlight}

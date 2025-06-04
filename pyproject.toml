@@ -12,8 +12,6 @@ python = "^3.12"
 numpy = "^2.2.1"
 # torch = {version = "^2.5.1+cu118", source = "pytorch_cuda"}
 # torchvision = {version = "^0.20.1+cu118", source = "pytorch_cuda"}
-torchvision = "^0.20.1"
-torch = "^2.5.1"
 scipy = "^1.14.1"
 matplotlib = "^3.10.0"
 scikit-learn = "^1.6.0"
@@ -21,14 +19,16 @@ opencv-python-headless = "^4.10.0.84"
 pyproj = "^3.7.0"
 pycocotools = "^2.0.8"
 bottle = "^0.13.2"
-
-# [[tool.poetry.source]]
-# name = "pytorch_cuda"
-# url = "https://download.pytorch.org/whl/cu124"
-# priority = "explicit"
 pyefd = "^1.6.0"
 segmentation-models-pytorch = "^0.4.0"
 lightning = "^2.5.1"
+torch = {version = "^2.7.0+cu128", source = "pytorch_cuda"}
+torchvision = {version = "^0.22.0+cu128", source = "pytorch_cuda"}
+
+[[tool.poetry.source]]
+name = "pytorch_cuda"
+url = "https://download.pytorch.org/whl/cu128"
+priority = "explicit"
 
 [build-system]
 requires = ["poetry-core"]
