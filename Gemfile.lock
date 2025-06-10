@@ -146,6 +146,8 @@ GEM
       rake
     globalid (1.0.0)
       activesupport (>= 5.0)
+    graphiql-rails (1.10.5)
+      railties
     graphql (2.0.16)
     hashery (2.1.2)
     http (5.1.1)
@@ -550,6 +552,7 @@ DEPENDENCIES
   debug
   dotenv-rails (~> 2.8)
   erb-formatter (~> 0.4.2)
+  graphiql-rails
   graphql
   http
   http-form_data

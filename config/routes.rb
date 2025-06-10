@@ -61,5 +61,7 @@ Rails.application.routes.draw do # rubocop:disable Metrics/BlockLength
   post "/login", to: "user_sessions#code"
   post "/login_code", to: "user_sessions#login_code"
 
+  post "/graphql", to: "graphql#execute"
+
   root "graves#root"
 end
