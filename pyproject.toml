@@ -24,6 +24,7 @@ segmentation-models-pytorch = "^0.4.0"
 lightning = "^2.5.1"
 torch = {version = "^2.7.0+cu128", source = "pytorch_cuda"}
 torchvision = {version = "^0.22.0+cu128", source = "pytorch_cuda"}
+opencv-python = "^4.11.0.86"
 
 [[tool.poetry.source]]
 name = "pytorch_cuda"
