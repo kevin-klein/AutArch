@@ -14,18 +14,19 @@
       <tr>
         <td><%= figure.type %> <%= figure.id %></td>
         <td><%= image_tag(preview_figure_path(figure), class: 'img-fluid', style: 'max-height: 120px') %></td>
-        <td><%= link_to figure.grave.identifier, grave_update_grave_path(figure.grave, :set_grave_data) %></td>
+        <td></td>
+        <td><%#= link_to figure.grave.identifier, grave_update_grave_path(figure.grave, :set_grave_data) %></td>
         <td>
           <% FeatureSimilarity.where(first: figure).where.not(second: figure).order(similarity: :desc).limit(5).each do |related| %>
             <div>
-              <%= related.second.type %><%= related.second.id %> in <%= link_to(related.second.grave.identifier, grave_path(related.second.grave))  %> (<%= related.similarity.round(4) %>)
+              <%#= related.second.type %><%#= related.second.id %> in <%#= link_to(related.second.grave.identifier, grave_path(related.second.grave))  %> (<%#= related.similarity.round(4) %>)
             </div>
             <% end %>
         </td>
         <td>
           <% EfdSimilarity.where(first: figure).where.not(second: figure).order(similarity: :desc).limit(5).each do |related| %>
             <div>
-              <%= related.second.type %><%= related.second.id %> in <%= link_to(related.second.grave.identifier, grave_path(related.second.grave))  %> (<%= related.similarity.round(4) %>)
+              <%#= related.second.type %><%#= related.second.id %> in <%#= link_to(related.second.grave.identifier, grave_path(related.second.grave))  %> (<%= related.similarity.round(4) %>)
             </div>
             <% end %>
         </td>
