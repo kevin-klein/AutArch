@@ -160,12 +160,12 @@ def apply_mask(model, image_path):
         x = eval_transform(image)
         # convert RGBA -> RGB and move to device
         x = x[:3, ...].to(device)
-        predictions = model([x.to(device), ])
-        pred = predictions[0]
+        predictions = model([x.to(device), ])[0]
+        # pred = predictions[0]
 
-    masks = (pred["masks"] > 0.5).squeeze(1)
-    predictions = zip(pred["labels"], pred["scores"], pred["boxes"].long(), masks)
-    predictions = [item for item in predictions] #if item[1] > 0.25]
+    # masks = (pred["masks"] > 0.5).squeeze(1)
+    # predictions = zip(pred["labels"], pred["scores"], pred["boxes"].long(), masks)
+    # predictions = [item for item in predictions] #if item[1] > 0.25]
     return predictions
 
 def get_object_detection_model():

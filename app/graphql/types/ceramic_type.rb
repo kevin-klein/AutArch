@@ -24,7 +24,7 @@ module Types
     field :validated, Boolean, null: false
     field :verified, Boolean, null: false
     field :disturbed, Boolean, null: false
-    field :contour, String, null: false
+    field :contour, GraphQL::Types::JSON, null: false
     field :deposition_type, Integer, null: false
     field :publication_id, Integer
     field :percentage_scale, Integer

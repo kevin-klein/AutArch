@@ -96,8 +96,8 @@ def get_model_instance_segmentation(num_classes, device):
         hidden_layer,
         2,
     )
-    model.load_state_dict(torch.load('models/mask_rcnn_resnet50_v2.model', map_location=device, weights_only=True))
     model.to(device)
+    model.load_state_dict(torch.load('models/mask_rcnn_resnet50_v2.model', map_location=device, weights_only=True))
 
     return model
 

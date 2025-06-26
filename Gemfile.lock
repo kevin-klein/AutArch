@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/kevin-klein/ruby-minopencv.git
-  revision: a5e3469ddeecf5c847510067e077bb5c329eb6d5
+  revision: 0c7c052af42bf8b7d7581c4b6045f28ff940c027
   specs:
     minopencv (0.1.0)
 
