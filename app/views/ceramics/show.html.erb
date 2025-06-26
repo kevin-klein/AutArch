@@ -1,0 +1,6 @@
+
+<%= link_to 'Edit Page', publication_page_path(@ceramic.page.publication, @ceramic.page) %>
+
+<%= render(
+  FigureViewComponent.new(figures: [@ceramic], image: @ceramic.page.image, contours: true)
+) %>
