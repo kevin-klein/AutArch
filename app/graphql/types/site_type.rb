@@ -10,5 +10,9 @@ module Types
     field :country_code, Integer
     field :site_code, String
     field :graves, [Types::GraveType]
+
+    def graves
+      object.graves.filter { _1.tags.map(&:id).include?(3) }
+    end
   end
 end
