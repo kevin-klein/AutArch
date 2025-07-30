@@ -66,6 +66,7 @@ class SkeletonFigure < Figure
     unknown: 0,
     left_side: 1,
     right_side: 2,
-    back: 3
+    back: 3,
+    belly: 4
   }
 end

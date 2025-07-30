@@ -3,9 +3,8 @@ class AnalyzeContour
     image = MinOpenCV.extractFigure(figure, figure.page.image.data)
     image = MinOpenCV.invert(image)
 
-    image = MinOpenCV.dilate(image, [6, 6])
+    image = MinOpenCV.dilate(image, [4, 4])
     image = MinOpenCV.erode(image, [2, 2])
-    MinOpenCV.imwrite("test.png", image)
     contours = MinOpenCV.findContours(image, "tree")
     contour = contours.max_by { MinOpenCV.contourArea _1 }
 

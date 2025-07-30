@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2025_06_17_101517) do
+ActiveRecord::Schema[7.0].define(version: 2025_07_15_180104) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -160,6 +160,7 @@ ActiveRecord::Schema[7.0].define(version: 2025_06_17_101517) do
     t.float "efds", default: [], null: false, array: true
     t.integer "internment_type"
     t.boolean "dummy", default: false, null: false
+    t.integer "actual_height_mm"
     t.index ["page_id"], name: "index_figures_on_page_id"
     t.index ["site_id"], name: "index_figures_on_site_id"
   end

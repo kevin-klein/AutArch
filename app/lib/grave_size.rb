@@ -26,6 +26,7 @@ class GraveSize
       figure.height = figure.bounding_box_height
     else
       image = MinOpenCV.extractFigure(figure, figure.page.image.data)
+      image = MinOpenCV.invert(image)
       contours = MinOpenCV.findContours(image, "tree")
       contour = contours.max_by { MinOpenCV.contourArea _1 }
       return if contour.nil?
@@ -75,8 +76,8 @@ class GraveSize
 
   def contour_stats(figure, image)
     image = MinOpenCV.extractFigure(figure, image)
-    # image = MinOpenCV.dilate(image, [5, 5])
-    # image = MinOpenCV.erode(image, [19, 19])
+    image = MinOpenCV.invert(image)
+    MinOpenCV.imwrite("test.png", image)
     contours = MinOpenCV.findContours(image, "tree")
     contour = contours.max_by { MinOpenCV.contourArea _1 }
     if contour.nil? || contour.empty?

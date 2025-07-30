@@ -60,6 +60,10 @@
 class Spine < Figure
   belongs_to :grave, foreign_key: "parent_id", optional: true, inverse_of: :spines
 
+  def skeleton
+    grave.skeleton_figures.filter { _1.contains?(self) }.first
+  end
+
   def angle
     y_axis = Vector[0, 1]
     figure_vector = Vector[(x2 - x1).abs, (y1 - y2).abs].normalize

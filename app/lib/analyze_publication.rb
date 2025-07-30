@@ -48,6 +48,9 @@ class AnalyzePublication
       GraveAngles.new.run(figures.select { _1.is_a?(Arrow) })
       MessageBus.publish("/importprogress", "Measuring Sizes")
       GraveSize.new.run(figures)
+      figures.each do |figure|
+        AnalyzeContour.new.run(figure)
+      end
       MessageBus.publish("/importprogress", "Analyzing Scales")
       AnalyzeScales.new.run(figures)
       MessageBus.publish("/importprogress", "Done. Please proceed to Graves in the NavBar.")

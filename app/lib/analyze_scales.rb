@@ -51,6 +51,7 @@ class AnalyzeScales
 
   def assign_contour_width(scale)
     image = MinOpenCV.extractFigure(scale, scale.page.image.data)
+    image = MinOpenCV.invert(image)
     contours = MinOpenCV.findContours(image, "tree")
     rects = contours.map { MinOpenCV.minAreaRect _1 }
 

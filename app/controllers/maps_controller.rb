@@ -21,6 +21,10 @@ class MapsController < AuthorizedController
       grave_data[:angles].values.sum > 0
     end
 
+    @count = @skeleton_angles.map { _1[:angles].values.sum }.sum
+
+    @site_ids = @skeleton_angles.flat_map { _1[:graves] }.map(&:site_id).uniq
+
     @publications = @skeleton_angles.flat_map { _1[:graves] }.map(&:publication).uniq
   end
 end
