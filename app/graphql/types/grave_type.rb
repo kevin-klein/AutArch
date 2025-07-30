@@ -5,6 +5,9 @@ module Types
     field :id, ID, null: false
     field :goods, [GoodType]
     field :page_id, Integer, null: false
+    field :width_with_unit, GraphQL::Types::JSON, null: false
+    field :height_with_unit, GraphQL::Types::JSON, null: false
+    field :area_with_unit, GraphQL::Types::JSON, null: false
     field :x1, Integer, null: false
     field :x2, Integer, null: false
     field :y1, Integer, null: false

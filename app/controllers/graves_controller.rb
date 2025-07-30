@@ -11,7 +11,7 @@ class GravesController < AuthorizedController
     end
 
     @graves = graves
-      .includes(:scale, :site, :publication, :arrow, page: :image, grave_cross_section: {grave: [:scale]})
+      .includes(:scale, :site, :publication, :tags, :arrow, page: :image, grave_cross_section: {grave: [:scale]})
       .where("figures.probability > ?", 0.6)
 
     if params.dig(:search, :site_id).present?

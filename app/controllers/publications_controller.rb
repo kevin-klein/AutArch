@@ -71,7 +71,7 @@ class PublicationsController < AuthorizedController
     marked_items = params.dig(:compare, :special_mark_graves)&.split("\n")&.map(&:to_i) || []
     @excluded_graves = params.dig(:compare, :exclude_graves)&.split("\n")&.map(&:to_i) || []
     @no_box = true
-    graves = @publication.figures.where(type: "Grave").where.not(id: @excluded_graves)
+    graves = @publication.figures.where(type: "Grave").where("probability > 0.6").where.not(id: @excluded_graves)
     @skeleton_per_grave_type = graves.includes(:skeleton_figures).map { _1.skeleton_figures.length }.tally
     @skeleton_angles = Stats.spine_angles(@publication.figures.where(type: "Spine").includes(grave: :arrow))
     @grave_angles = Stats.grave_angles(graves.includes(:arrow))
@@ -88,29 +88,27 @@ class PublicationsController < AuthorizedController
 
     # @graves_pca_chart = Stats.pca_chart(@graves_pca)
 
-    @heatmap_data = ArtefactsHeatmap.new.run(@publication)
+    @base_spines_by_site = @publication.figures.where(type: "Spine").group_by { |spine| spine.grave.site }
+
+    @spines_right = @publication.figures.where(type: "Spine")
+      .filter { |spine| spine.skeleton.deposition_type == "right_side" }
+    @spines_right = ArtefactsHeatmap.new.run(@spines_right)
+
+    @spines_left = @publication.figures.where(type: "Spine")
+      .filter { |spine| spine.skeleton.deposition_type == "left_side" }
+    @spines_left = ArtefactsHeatmap.new.run(@spines_left)
+
+    @spines_by_site_right = @base_spines_by_site.map do |site, spines|
+      spines = spines.filter { _1.skeleton.deposition_type == "right_side" }
+      [site, ArtefactsHeatmap.new.run(spines)]
+    end.to_h.filter { |site, data| !data[:graves].empty? }
+
+    @spines_by_site_left = @base_spines_by_site.map do |site, spines|
+      [site, ArtefactsHeatmap.new.run(spines.filter { _1.skeleton.deposition_type == "left_side" })]
+    end.to_h.filter { |site, data| !data[:graves].empty? }
 
     @outlines_data, _ = Stats.outlines_efd([@publication, *@other_publications].reverse, excluded: @excluded_graves)
 
-    # upgma_result = Stats.upgma(@outlines_data)
-    # @upgma_figure = Stats.upgma_figure(upgma_result)
-
-    # @cluster_upgma_chart = Stats.cluster_scatter_chart(@outlines_data, upgma_result)
-
-    # ward_result = Stats.ward(@outlines_data)
-    # @ward_figure = Stats.upgma_figure(ward_result)
-
-    # @cluster_ward_chart = Stats.cluster_scatter_chart(@outlines_data, ward_result)
-
-    # @clustering_result = Upgma.cluster(@outlines_pca_data.map do |item|
-    #   item[:data].map { [_1[:x], _1[:y]] }
-    # end.flatten(1).map { [_1] }, 10).map do |cluster|
-    #   {
-    #     data: cluster.map { { x: _1[0], y: _1[1] } }
-    #   }
-    # end
-
-    # @efd_pca_chart = Stats.pca_chart(@outlines_pca_data)
     @colors = [
       [209, 41, 41],
       [129, 239, 19],
