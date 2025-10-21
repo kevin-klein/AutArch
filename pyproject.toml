@@ -10,8 +10,6 @@ package-mode = false
 [tool.poetry.dependencies]
 python = "^3.12"
 numpy = "^2.2.1"
-# torch = {version = "^2.5.1+cu118", source = "pytorch_cuda"}
-# torchvision = {version = "^0.20.1+cu118", source = "pytorch_cuda"}
 scipy = "^1.14.1"
 matplotlib = "^3.10.0"
 scikit-learn = "^1.6.0"
@@ -25,7 +23,9 @@ lightning = "^2.5.1"
 torch = {version = "^2.7.0+cu128", source = "pytorch_cuda"}
 torchvision = {version = "^0.22.0+cu128", source = "pytorch_cuda"}
 opencv-python = "^4.11.0.86"
-sam-2 = {git = "https://github.com/facebookresearch/sam2.git"}
+transformers = "<4.57.0"
+accelerate = ">=0.26.0"
+segment-anything = {git = "https://github.com/facebookresearch/segment-anything.git"}
 
 [[tool.poetry.source]]
 name = "pytorch_cuda"

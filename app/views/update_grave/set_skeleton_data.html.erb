@@ -10,14 +10,9 @@
     <%= simple_form_for(@grave, url: wizard_path) do |f| %>
       <%= f.simple_fields_for :skeleton_figures do |ff| %>
         <h4><%= "Skeleton #{ff.object.id.to_s}" %></h4>
+        <%# raise %>
         <%= ff.input :deposition_type,
-                 collection: [
-                   %w[unknown unknown],
-                   %w[supine back],
-                   ['left side', 'left_side'],
-                   ['right side', 'right_side'],
-                   ['belly', 'belly']
-                 ],
+                 collection: SkeletonFigure.deposition_types.map { |k, v| [k.tr('_', ' '), k] },
                  selected: ff.object.deposition_type %>
       <% end %>
 

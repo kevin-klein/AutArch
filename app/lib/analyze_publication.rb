@@ -52,7 +52,9 @@ class AnalyzePublication
         AnalyzeContour.new.run(figure)
       end
       MessageBus.publish("/importprogress", "Analyzing Scales")
-      AnalyzeScales.new.run(figures)
+      figures.each do |figure|
+        AnalyzeScales.new.run(figure)
+      end
       MessageBus.publish("/importprogress", "Done. Please proceed to Graves in the NavBar.")
       # publication.graves.update_all(site_id: site_id)
     end

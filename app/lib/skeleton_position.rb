@@ -3,8 +3,8 @@ class SkeletonPosition
     SkeletonFigure.transaction do
       figures ||= SkeletonFigure.includes({page: :image})
       figures.each do |skeleton|
-        # skeleton.deposition_type = deposition_type(skeleton)
-        # skeleton.save!
+        skeleton.deposition_type = deposition_type(skeleton)
+        skeleton.save!
       end
     end
     nil
@@ -18,6 +18,6 @@ class SkeletonPosition
       image: file
     })
 
-    response.parse["predictions"]
+    response.parse["predictions"].tr(" ", "_")
   end
 end

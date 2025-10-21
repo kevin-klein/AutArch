@@ -39,8 +39,8 @@ def show(imgs):
     plt.show()
 
 if __name__ == '__main__':
-  model = torchvision.models.resnet152(weights=torchvision.models.ResNet152_Weights.IMAGENET1K_V2)
-  model.fc = torch.nn.Linear(in_features=2048, out_features=2, bias=True)
+  model = torchvision.models.resnext50_32x4d(weights=torchvision.models.ResNet152_Weights.IMAGENET1K_V2)
+  model.fc = torch.nn.Linear(in_features=2048, out_features=6, bias=True)
 
   dataset = torchvision.datasets.ImageFolder('skeleton_angles', transforms.Compose([
         # transforms.RandomResizedCrop(224),
@@ -48,6 +48,7 @@ if __name__ == '__main__':
         transforms.ToTensor(),
         # transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
     ]))
+
   data_loader = torch.utils.data.DataLoader(
                 dataset, pin_memory=True, batch_size=16, shuffle=True, num_workers=8,)
 
@@ -99,4 +100,4 @@ if __name__ == '__main__':
 
       print(epoch_loss, f'time: {time.time() - start}')
 
-      torch.save(model.state_dict(), 'models/skeleton_orientation_resnet.model')
+      torch.save(model.state_dict(), 'models/skeleton_orientation_resnext.model')

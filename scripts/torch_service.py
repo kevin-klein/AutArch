@@ -1,5 +1,5 @@
 from bottle import Bottle, request, response
-from train_object_detection import get_model
+from train_detr import MODEL_SAVE_PATH
 from transforms import PILToTensor, Compose
 from PIL import Image, ImageDraw
 import torch
@@ -8,10 +8,10 @@ import io
 import os
 import torchvision
 from pyefd import elliptic_fourier_descriptors
-from sam2.build_sam import build_sam2
-from sam2.sam2_image_predictor import SAM2ImagePredictor
+from segment_anything import SamPredictor, sam_model_registry
 import cv2
 import matplotlib.pyplot as plt
+from transformers import AutoModelForObjectDetection, AutoImageProcessor
 
 def show_mask(mask, ax, random_color=False, borders = True):
     if random_color:
@@ -64,8 +64,32 @@ if torch.cuda.is_available():
 else:
     device = torch.device('cpu')
 
-loaded_model = get_model(num_classes = len(labels.keys()), device=device)
-loaded_model.load_state_dict(torch.load('models/retinanet_v2_dfg.model', map_location=device))
+sam_checkpoint = "models/sam_vit_h_4b8939.pth"
+model_type = 'vit_h'
+
+sam = sam_model_registry[model_type](checkpoint=sam_checkpoint)
+sam.to(device=device)
+sam.eval()
+
+# loaded_model = get_model(num_classes = len(labels.keys()), device=device)
+# loaded_model.load_state_dict(torch.load('models/retinanet_v2_dfg.model', map_location=device))
+
+id2label = {v: k for k, v in labels.items()}
+label2id = labels
+
+processor = AutoImageProcessor.from_pretrained(
+    MODEL_SAVE_PATH,
+    do_resize=True,
+    do_pad=True,
+)
+
+loaded_model = AutoModelForObjectDetection.from_pretrained(
+    MODEL_SAVE_PATH,
+    id2label=id2label,
+    label2id=label2id,
+    num_labels=len(labels),
+    ignore_mismatched_sizes=True # Allow re-initialization of final layer
+)
 
 loaded_model.eval()
 
@@ -82,13 +106,13 @@ skeleton_orientation_model = model = torchvision.models.resnet152(weights=None)
 skeleton_orientation_model.fc = torch.nn.Linear(in_features=2048, out_features=2, bias=True)
 skeleton_orientation_model.to(device)
 
-skeleton_model = torchvision.models.resnet152(weights=None, num_classes=2).to(device)
-skeleton_model.load_state_dict(torch.load('models/skeleton_resnet.model', map_location=device))
 skeleton_labels = torch.load('models/skeleton_resnet_labels.model', map_location=device)
+skeleton_model = torchvision.models.convnext_tiny(weights=None, num_classes=len(skeleton_labels)).to(device)
+skeleton_model.load_state_dict(torch.load('models/skeleton_convnext_tiny.model', map_location=device))
 
-checkpoint = "models/sam2.1_hiera_tiny.pt"
-model_cfg = "configs/sam2.1/sam2.1_hiera_t.yaml"
-predictor = SAM2ImagePredictor(build_sam2(model_cfg, checkpoint))
+sam = sam_model_registry["vit_h"](checkpoint="models/sam_vit_h_4b8939.pth")
+sam.to(device)
+predictor = SamPredictor(sam)
 
 def object_features(file):
     request_object_content = file.read()
@@ -103,20 +127,21 @@ def object_features(file):
 
 def analyze_file(file):
     request_object_content = file.read()
-    pil_image = Image.open(io.BytesIO(request_object_content))
-
-    img, _ = PILToTensor()(pil_image)
+    img = Image.open(io.BytesIO(request_object_content))
 
     with torch.no_grad():
-        prediction = loaded_model([img.to(device)])
+        inputs = processor(images=[img], return_tensors="pt")
+        outputs = loaded_model(**inputs.to(device))
+        results = processor.post_process_object_detection(outputs, target_sizes=torch.tensor([(img.height, img.width)]), threshold=0.5)
+        prediction = results[0]
 
     result = []
-    for element in range(len(prediction[0]["boxes"])):
-            boxes = prediction[0]["boxes"][element].cpu().numpy().tolist()
-            score = np.round(prediction[0]["scores"][element].cpu().numpy(),
+    for element in range(len(prediction["boxes"])):
+            boxes = prediction["boxes"][element].cpu().numpy().tolist()
+            score = np.round(prediction["scores"][element].cpu().numpy(),
                     decimals= 4)
 
-            label = labels[prediction[0]['labels'][element].cpu().item()]
+            label = labels[prediction['labels'][element].cpu().item()]
 
             if score > 0.1:
                 result.append({
@@ -168,6 +193,27 @@ def analyze_skeleton(file):
 
     return skeleton_labels[prediction]
 
+def save_masks_as_images(masks, output_dir="masks_out"):
+    """
+    Save all boolean masks to image files.
+    Args:
+        masks: np.ndarray or torch.Tensor of shape (N, H, W), dtype=bool
+        output_dir: folder to save the images
+    """
+    os.makedirs(output_dir, exist_ok=True)
+
+    # Convert PyTorch tensor to NumPy if needed
+    if isinstance(masks, torch.Tensor):
+        masks = masks.cpu().numpy()
+
+    for i, mask in enumerate(masks):
+        # Convert boolean mask (True/False) to 0–255 grayscale image
+        img = (mask.astype(np.uint8)) * 255
+        im = Image.fromarray(img, mode="L")
+        im.save(os.path.join(output_dir, f"mask_{i:03d}.png"))
+
+    print(f"Saved {len(masks)} masks to '{output_dir}/'")
+
 @app.post('/segment')
 def segment_route():
     upload_file = request.POST['image']
@@ -177,39 +223,39 @@ def segment_route():
 
     height, width, channels = open_cv_image.shape
 
-    with torch.inference_mode(), torch.autocast("cuda", dtype=torch.bfloat16):
-        predictor.set_image(open_cv_image)
-        input_point = np.array([[width / 2, height / 2]])
-        input_label = np.array([1])
+    predictor.set_image(open_cv_image)
 
-        masks, scores, logits = predictor.predict(
-            point_coords=input_point,
-            point_labels=input_label,
-            multimask_output=True,
-        )
+    input_point = np.array([[width / 2, height / 2]])
+    input_label = np.array([1])
 
-        max_score_index = np.argmax(scores)
-        mask = masks[max_score_index]
-        score = scores[max_score_index]
+    masks, scores, logits = predictor.predict(
+        point_coords=input_point,
+        point_labels=input_label,
+        multimask_output=False,
+    )
 
-        h, w = mask.shape[-2:]
-        mask = mask.reshape(h, w)
+    save_masks_as_images(masks)
 
-        mask = mask.astype(dtype='uint8')
-        mask *= 255
+    mask_sizes = masks.sum(axis=(1, 2))
 
-        # contours, _  = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    largest_idx = mask_sizes.argmax()
 
-        contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
-        contours = [cv2.approxPolyDP(contour, epsilon=0.01, closed=True) for contour in contours]
-        contour = max(contours, key = cv2.contourArea)
+    mask = masks[largest_idx]
+    score = scores[largest_idx]
 
-        # show_masks(open_cv_image, masks, scores, point_coords=input_point, input_labels=input_label, borders=True)
+    h, w = mask.shape[-2:]
+    mask = mask.reshape(h, w)
 
-        return { 'predictions': {
-            'score': score.item(),
-            'contour': contour.astype(int).tolist()
-        } }
+    mask = mask.astype(dtype='uint8')
+    mask *= 255
+
+    contours, _  = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+    largest_contour = max(contours, key=cv2.contourArea)
+
+    return { 'predictions': {
+        'score': score.item(),
+        'contour': largest_contour.astype(int).tolist()
+    } }
 
 @app.post('/')
 def upload():
