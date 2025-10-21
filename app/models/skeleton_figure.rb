@@ -64,9 +64,11 @@ class SkeletonFigure < Figure
 
   enum deposition_type: {
     unknown: 0,
-    left_side: 1,
-    right_side: 2,
-    back: 3,
-    belly: 4
+    extended_supine: 1,
+    flexed_on_the_left: 2,
+    flexed_on_the_right: 3,
+    irregular_burials: 4,
+    supine_with_flexed_legs: 5,
+    supine_with_open_legs: 6
   }
 end

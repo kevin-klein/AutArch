@@ -3,8 +3,8 @@ class AnalyzeContour
     image = MinOpenCV.extractFigure(figure, figure.page.image.data)
     image = MinOpenCV.invert(image)
 
-    image = MinOpenCV.dilate(image, [4, 4])
-    image = MinOpenCV.erode(image, [2, 2])
+    # image = MinOpenCV.dilate(image, [4, 4])
+    # image = MinOpenCV.erode(image, [2, 2])
     contours = MinOpenCV.findContours(image, "tree")
     contour = contours.max_by { MinOpenCV.contourArea _1 }
 
@@ -14,15 +14,5 @@ class AnalyzeContour
     end
 
     figure
-  end
-
-  def segment(image)
-    io = StringIO.new(image)
-    file = HTTP::FormData::File.new io, filename: "page.jpg"
-    response = HTTP.post("#{ENV["ML_SERVICE_URL"]}/segment", form: {
-      image: file
-    })
-
-    response.parse["predictions"]
   end
 end
