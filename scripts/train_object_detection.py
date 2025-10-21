@@ -89,16 +89,6 @@ class DfgDataset(torch.utils.data.Dataset):
                 for box in bnd_boxes
             ])
 
-        # dims = (512, 362)
-
-        # new_image = FT.resize(img, dims)
-
-        # old_dims = torch.FloatTensor([img.width, img.height, img.width, img.height]).unsqueeze(0)
-        # new_boxes = boxes / old_dims
-
-        # new_dims = torch.FloatTensor([dims[1], dims[0], dims[1], dims[0]]).unsqueeze(0)
-        # new_boxes = new_boxes * new_dims
-
         return FT.to_tensor(img), {
             'boxes': boxes,
             'labels': labels,
