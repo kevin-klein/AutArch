@@ -1,21 +1,61 @@
-<%= render LithicOutlinesComponent.new(contours: @contours) %>
+<%= simple_form_for :search, url: lithics_path, method: "GET", html: { class: 'form-inline' } do |f| %>
+  <%= f.input :publication_id,
+          collection:
+            Publication
+              .accessible_by(current_ability)
+              .order(:author, :year)
+              .pluck(:author, :year, :id)
+              .map { |author, year, id| ["#{author} #{year}", id] },
+              include_blank: true,
+              selected: params.dig(:search, :publication_id) %>
+  <%= f.input :site_id, collection: Site.order(:name).pluck(:name, :id), selected: params.dig(:search, :site_id), include_blank: true %>
+  <%= f.submit "Filter", class: "btn btn-primary" %>
+<% end %>
 
-<%= image_tag "data:image/jpeg;base64,#{@efd_pca_chart}", class: "img-fluid" %>
 <table class='table'>
   <thead>
     <tr>
-      <th>ID</th>
-      <th>Preview</th>
+      <th>
+        <%= link_to('Publication', url_for(params.permit!.to_h.merge({ sort: publication_sort }))) %>
+      </th>
+      <th>
+        <%= link_to('Site', url_for(params.permit!.to_h.merge({ sort: site_sort }))) %>
+      </th>
+      <th>
+        <%= link_to('ID', url_for(params.permit!.to_h.merge({ sort: id_sort }))) %>
+      </th>
+      <th>
+        <%= link_to('Width', url_for(params.permit!.to_h.merge({ sort: width_sort }))) %>
+      </th>
+      <th>
+        <%= link_to('Length', url_for(params.permit!.to_h.merge({ sort: length_sort }))) %>
+      </th>
+      <th>
+        Tag
+      </th>
+      <th></th>
     </tr>
   </thead>
 
   <tbody>
-    <% @lithics.each do |stone_tool| %>
+    <% @lithics.each do |lithic| %>
       <tr>
-        <td><%= stone_tool.id %></td>
+        <td><%= lithic.publication.author %> <%= lithic.publication.year %></td>
+        <td><%= lithic.site&.name %></td>
+        <td><%= lithic.identifier %></td>
         <td>
+          <%= number_with_unit lithic.width_with_unit %>
+        </td>
+        <td>
+          <%= number_with_unit lithic.height_with_unit %>
+        </td>
+        <td><%= lithic.tags.map { _1.name }.join(' ') %></td>
+        <td>
+          <%= link_to("Edit", lithic_update_lithic_path(lithic, :set_lithic_data)) %>
         </td>
       </tr>
     <% end %>
   </tbody>
 </table>
+
+<%== pagy_bootstrap_combo_nav_js(@lithics_pagy) %>

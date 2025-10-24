@@ -1,5 +1,5 @@
 class GravesController < AuthorizedController
-  before_action :set_grave, only: %i[show edit update destroy]
+  before_action :set_grave, only: %i[show edit update destroy related save_related]
 
   # GET /graves or /graves.json
   def index
@@ -11,7 +11,7 @@ class GravesController < AuthorizedController
     end
 
     @graves = graves
-      .includes(:scale, :site, :publication, :arrow, page: :image, grave_cross_section: {grave: [:scale]})
+      .includes(:scale, :site, :publication, :tags, :arrow, page: :image, grave_cross_section: {grave: [:scale]})
       .where("figures.probability > ?", 0.6)
 
     if params.dig(:search, :site_id).present?
@@ -78,6 +78,26 @@ class GravesController < AuthorizedController
 
   # GET /graves/1 or /graves/1.json
   def show
+  end
+
+  def related
+    @page = @grave.page
+    @grave_good_ids = @grave.goods.pluck(:id)
+    @related_artefacts = Figure.where(type: ["Ceramic", "StoneTool", "Artefact", "ShaftAxe"]).where(parent_id: @grave_good_ids)
+    @relations = @grave_good_ids.map do |grave_good_id|
+      [grave_good_id, @related_artefacts.filter { _1.parent_id == grave_good_id }.pluck(:id)]
+    end.to_h
+  end
+
+  def save_related
+    Figure.transaction do
+      relations = params[:relations].permit!.to_h
+      relations.each do |good_id, full_drawing_ids|
+        next if full_drawing_ids.nil?
+        Figure.where(parent_id: good_id).update_all(parent_id: nil)
+        Figure.where(id: full_drawing_ids).update_all(parent_id: good_id)
+      end
+    end
   end
 
   def root

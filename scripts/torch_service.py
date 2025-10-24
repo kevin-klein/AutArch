@@ -1,5 +1,5 @@
 from bottle import Bottle, request, response
-from train_object_detection import get_model
+from train_detr import MODEL_SAVE_PATH
 from transforms import PILToTensor, Compose
 from PIL import Image, ImageDraw
 import torch
@@ -7,8 +7,59 @@ import numpy as np
 import io
 import os
 import torchvision
+from pyefd import elliptic_fourier_descriptors
+# from segment_anything import SamPredictor, sam_model_registry
+from mobile_sam import sam_model_registry, SamPredictor
+import cv2
+import matplotlib.pyplot as plt
+from transformers import AutoModelForObjectDetection, AutoImageProcessor
+import json
+from math import pi, atan2
 
-labels = torch.load('models/retinanet_v2_labels.model', weights_only=True)
+def show_mask(mask, ax, random_color=False, borders = True):
+    if random_color:
+        color = np.concatenate([np.random.random(3), np.array([0.6])], axis=0)
+    else:
+        color = np.array([30/255, 144/255, 255/255, 0.6])
+    h, w = mask.shape[-2:]
+    mask = mask.astype(np.uint8)
+    mask_image =  mask.reshape(h, w, 1) * color.reshape(1, 1, -1)
+    if borders:
+        import cv2
+        contours, _ = cv2.findContours(mask,cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+        # Try to smooth contours
+        contours = [cv2.approxPolyDP(contour, epsilon=0.01, closed=True) for contour in contours]
+        mask_image = cv2.drawContours(mask_image, contours, -1, (1, 0, 0, 0.5), thickness=10)
+    ax.imshow(mask_image)
+
+def show_points(coords, labels, ax, marker_size=375):
+    pos_points = coords[labels==1]
+    neg_points = coords[labels==0]
+    ax.scatter(pos_points[:, 0], pos_points[:, 1], color='green', marker='*', s=marker_size, edgecolor='white', linewidth=1.25)
+    ax.scatter(neg_points[:, 0], neg_points[:, 1], color='red', marker='*', s=marker_size, edgecolor='white', linewidth=1.25)
+
+def show_box(box, ax):
+    x0, y0 = box[0], box[1]
+    w, h = box[2] - box[0], box[3] - box[1]
+    ax.add_patch(plt.Rectangle((x0, y0), w, h, edgecolor='green', facecolor=(0, 0, 0, 0), lw=2))
+
+def show_masks(image, masks, scores, point_coords=None, box_coords=None, input_labels=None, borders=True):
+    for i, (mask, score) in enumerate(zip(masks, scores)):
+        plt.figure(figsize=(10, 10))
+        plt.imshow(image)
+        show_mask(mask, plt.gca(), borders=borders)
+        if point_coords is not None:
+            assert input_labels is not None
+            show_points(point_coords, input_labels, plt.gca())
+        if box_coords is not None:
+            # boxes
+            show_box(box_coords, plt.gca())
+        if len(scores) > 1:
+            plt.title(f"Mask {i+1}, Score: {score:.3f}", fontsize=18)
+        plt.axis('off')
+        plt.show()
+
+labels = torch.load('models/retinanet_v2_labels.model')
 labels = {v: k for k, v in labels.items()}
 
 if torch.cuda.is_available():
@@ -16,8 +67,32 @@ if torch.cuda.is_available():
 else:
     device = torch.device('cpu')
 
-loaded_model = get_model(num_classes = len(labels.keys()), device=device)
-loaded_model.load_state_dict(torch.load('models/retinanet_v2_dfg.model', map_location=device, weights_only=True))
+sam_checkpoint = "models/mobile_sam.pt"
+model_type = 'vit_t'
+
+sam = sam_model_registry[model_type](checkpoint=sam_checkpoint)
+sam.to(device=device)
+sam.eval()
+
+# loaded_model = get_model(num_classes = len(labels.keys()), device=device)
+# loaded_model.load_state_dict(torch.load('models/retinanet_v2_dfg.model', map_location=device))
+
+id2label = {v: k for k, v in labels.items()}
+label2id = labels
+
+processor = AutoImageProcessor.from_pretrained(
+    MODEL_SAVE_PATH,
+    do_resize=True,
+    do_pad=True,
+)
+
+loaded_model = AutoModelForObjectDetection.from_pretrained(
+    MODEL_SAVE_PATH,
+    id2label=id2label,
+    label2id=label2id,
+    num_labels=len(labels),
+    ignore_mismatched_sizes=True # Allow re-initialization of final layer
+)
 
 loaded_model.eval()
 
@@ -34,26 +109,42 @@ skeleton_orientation_model = model = torchvision.models.resnet152(weights=None)
 skeleton_orientation_model.fc = torch.nn.Linear(in_features=2048, out_features=2, bias=True)
 skeleton_orientation_model.to(device)
 
-skeleton_model = torchvision.models.resnet152(weights=None, num_classes=2).to(device)
-skeleton_model.load_state_dict(torch.load('models/skeleton_resnet.model', map_location=device, weights_only=True))
-skeleton_labels = torch.load('models/skeleton_resnet_labels.model', map_location=device, weights_only=True)
+skeleton_labels = torch.load('models/skeleton_resnet_labels.model', map_location=device)
+skeleton_model = torchvision.models.convnext_tiny(weights=None, num_classes=len(skeleton_labels)).to(device)
+skeleton_model.load_state_dict(torch.load('models/skeleton_convnext_tiny.model', map_location=device))
+
+sam = sam_model_registry["vit_h"](checkpoint="models/sam_vit_h_4b8939.pth")
+sam.to(device)
+predictor = SamPredictor(sam)
+
+def object_features(file):
+    request_object_content = file.read()
+    img = Image.open(io.BytesIO(request_object_content)).resize((200, 200), Image.Resampling.BILINEAR)
+
+    img, _ = PILToTensor()(img)
+    img = torch.stack([img]).to(device)
+
+    with torch.no_grad():
+        loaded_model.backbone.eval()
+        return loaded_model.backbone(img)
 
 def analyze_file(file):
     request_object_content = file.read()
-    pil_image = Image.open(io.BytesIO(request_object_content))
-
-    img, _ = PILToTensor()(pil_image)
+    img = Image.open(io.BytesIO(request_object_content))
 
     with torch.no_grad():
-        prediction = loaded_model([img.to(device)])
+        inputs = processor(images=[img], return_tensors="pt")
+        outputs = loaded_model(**inputs.to(device))
+        results = processor.post_process_object_detection(outputs, target_sizes=torch.tensor([(img.height, img.width)]), threshold=0.5)
+        prediction = results[0]
 
     result = []
-    for element in range(len(prediction[0]["boxes"])):
-            boxes = prediction[0]["boxes"][element].cpu().numpy().tolist()
-            score = np.round(prediction[0]["scores"][element].cpu().numpy(),
+    for element in range(len(prediction["boxes"])):
+            boxes = prediction["boxes"][element].cpu().numpy().tolist()
+            score = np.round(prediction["scores"][element].cpu().numpy(),
                     decimals= 4)
 
-            label = labels[prediction[0]['labels'][element].cpu().item()]
+            label = labels[prediction['labels'][element].cpu().item()]
 
             if score > 0.1:
                 result.append({
@@ -100,11 +191,127 @@ def analyze_skeleton(file):
     with torch.no_grad():
         skeleton_model.eval()
         prediction = skeleton_model(img)
-        print(prediction)
-        print(skeleton_labels)
+
         _, prediction = torch.max(prediction, 1)
 
     return skeleton_labels[prediction]
+
+def save_masks_as_images(masks, output_dir="masks_out"):
+    """
+    Save all boolean masks to image files.
+    Args:
+        masks: np.ndarray or torch.Tensor of shape (N, H, W), dtype=bool
+        output_dir: folder to save the images
+    """
+    os.makedirs(output_dir, exist_ok=True)
+
+    # Convert PyTorch tensor to NumPy if needed
+    if isinstance(masks, torch.Tensor):
+        masks = masks.cpu().numpy()
+
+    for i, mask in enumerate(masks):
+        # Convert boolean mask (True/False) to 0–255 grayscale image
+        img = (mask.astype(np.uint8)) * 255
+        im = Image.fromarray(img, mode="L")
+        im.save(os.path.join(output_dir, f"mask_{i:03d}.png"))
+
+    print(f"Saved {len(masks)} masks to '{output_dir}/'")
+
+class clockwise_angle_and_distance():
+    '''
+    A class to tell if point is clockwise from origin or not.
+    This helps if one wants to use sorted() on a list of points.
+
+    Parameters
+    ----------
+    point : ndarray or list, like [x, y]. The point "to where" we g0
+    self.origin : ndarray or list, like [x, y]. The center around which we go
+    refvec : ndarray or list, like [x, y]. The direction of reference
+
+    use:
+        instantiate with an origin, then call the instance during sort
+    reference:
+    https://stackoverflow.com/questions/41855695/sorting-list-of-two-dimensional-coordinates-by-clockwise-angle-using-python
+
+    Returns
+    -------
+    angle
+
+    distance
+
+
+    '''
+    def __init__(self, origin):
+        self.origin = origin[0]
+
+    def __call__(self, point, refvec = [0, 1]):
+        point = point[0]
+        if self.origin is None:
+            raise NameError("clockwise sorting needs an origin. Please set origin.")
+        # Vector between point and the origin: v = p - o
+        vector = [point[0]-self.origin[0], point[1]-self.origin[1]]
+        # Length of vector: ||v||
+        lenvector = np.linalg.norm(vector[0] - vector[1])
+        # If length is zero there is no angle
+        if lenvector == 0:
+            return -pi, 0
+        # Normalize vector: v/||v||
+        normalized = [vector[0]/lenvector, vector[1]/lenvector]
+        dotprod  = normalized[0]*refvec[0] + normalized[1]*refvec[1] # x1*x2 + y1*y2
+        diffprod = refvec[1]*normalized[0] - refvec[0]*normalized[1] # x1*y2 - y1*x2
+        angle = atan2(diffprod, dotprod)
+        # Negative angles represent counter-clockwise angles so we need to
+        # subtract them from 2*pi (360 degrees)
+        if angle < 0:
+            return 2*pi+angle, lenvector
+        # I return first the angle because that's the primary sorting criterium
+        # but if two vectors have the same angle then the shorter distance
+        # should come first.
+        return angle, lenvector
+
+@app.post('/segment')
+def segment_route():
+    upload_file = request.POST['image']
+    points = request.POST['points']
+    request_object_content = upload_file.file.read()
+    pil_image = Image.open(io.BytesIO(request_object_content))
+    open_cv_image = np.array(pil_image)
+
+    height, width, channels = open_cv_image.shape
+
+    predictor.set_image(open_cv_image)
+
+    points = json.loads(points)
+    input_point = np.array(points)
+    input_label = np.array([1] * len(points))
+
+    masks, scores, logits = predictor.predict(
+        point_coords=input_point,
+        point_labels=input_label,
+        multimask_output=False,
+    )
+
+    save_masks_as_images(masks)
+
+    mask_sizes = masks.sum(axis=(1, 2))
+
+    largest_idx = mask_sizes.argmax()
+
+    mask = masks[largest_idx]
+    score = scores[largest_idx]
+
+    h, w = mask.shape[-2:]
+    mask = mask.reshape(h, w)
+
+    mask = mask.astype(dtype='uint8')
+    mask *= 255
+
+    contours, _  = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+
+    return { 'predictions': {
+        'score': score.item(),
+        'contour': [contour[:, 0, :].astype(int).tolist() for contour in contours]
+    } }
 
 @app.post('/')
 def upload():
@@ -120,6 +327,13 @@ def upload_arrow():
 
     return { 'predictions': result.tolist()[0] }
 
+@app.post('/features')
+def upload_features():
+    upload_file = request.POST['image']
+    result = object_features(upload_file.file)
+
+    return { 'features': result['p7'].tolist()[0] }
+
 @app.post('/skeleton')
 def upload_arrow():
     upload_file = request.POST['image']
@@ -134,5 +348,14 @@ def upload_skeleton_angle():
 
     return { 'predictions': result }
 
+@app.post('/efd')
+def efd():
+    data = request.json
+    coeffs = elliptic_fourier_descriptors(data['contour'], order=data['order'], normalize=data['normalize'], return_transformation=data['return_transformation'])
+
+    return {
+        'efds': coeffs.tolist()
+    }
+
 if __name__ == '__main__':
-    app.run(debug=True, reloader=True, host='0.0.0.0')
+    app.run(debug=True, reloader=True, host='0.0.0.0', port=9000)

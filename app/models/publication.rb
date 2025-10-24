@@ -14,6 +14,7 @@
 class Publication < ApplicationRecord
   has_many :pages, dependent: :destroy
   has_many :figures, through: :pages
+  has_many :ceramics, through: :pages
 
   has_one_attached :pdf
 

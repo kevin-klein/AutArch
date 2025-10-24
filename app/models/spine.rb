@@ -55,9 +55,14 @@
 #  real_world_width     :float
 #  real_world_height    :float
 #  real_world_perimeter :float
+#  features             :float            default([]), not null, is an Array
 #
 class Spine < Figure
   belongs_to :grave, foreign_key: "parent_id", optional: true, inverse_of: :spines
+
+  def skeleton
+    grave.skeleton_figures.filter { _1.contains?(self) }.first
+  end
 
   def angle
     y_axis = Vector[0, 1]

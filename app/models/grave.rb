@@ -55,6 +55,7 @@
 #  real_world_width     :float
 #  real_world_height    :float
 #  real_world_perimeter :float
+#  features             :float            default([]), not null, is an Array
 #
 class Grave < Figure
   belongs_to :site, optional: true
@@ -74,6 +75,23 @@ class Grave < Figure
 
   accepts_nested_attributes_for :skeleton_figures
   validates :identifier, uniqueness: {scope: :publication}, allow_blank: true
+
+  has_many :ceramics, dependent: :destroy, foreign_key: "parent_id", class_name: "Ceramic", inverse_of: :grave
+
+  enum internment_type: {
+    cremation: 1,
+    inhumation: 2
+  }
+
+  with_unit :area, square: true
+  with_unit :perimeter
+  with_unit :width
+  with_unit :height
+  with_unit :bounding_box_width
+  with_unit :bounding_box_height
+
+  with_unit :normalized_width
+  with_unit :normalized_height
 
   def upwards?
     width < height
@@ -105,16 +123,6 @@ class Grave < Figure
   def meter_pixel
     scale&.width
   end
-
-  with_unit :area, square: true
-  with_unit :perimeter
-  with_unit :width
-  with_unit :height
-  with_unit :bounding_box_width
-  with_unit :bounding_box_height
-
-  with_unit :normalized_width
-  with_unit :normalized_height
 
   def normalized_width
     if bounding_box_width.present?
