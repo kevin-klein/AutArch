@@ -1,9 +1,9 @@
 class ArtefactsHeatmap
-  def run(publication)
+  def run(figures)
     graves = []
     artefacts = []
 
-    publication.figures.where(type: "Spine").each do |spine|
+    figures.each do |spine|
       grave = spine.grave
 
       grave_outside = grave.rotate_bounding_box(-spine.angle)

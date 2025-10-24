@@ -1,0 +1,24 @@
+<%= render("stepper") %>
+
+<div class="alert alert-primary" role="alert">
+  This tab shows you the contours of all detected objects that relate to this lithic.
+  Make sure that the grave cut is included.
+</div>
+
+<div class='row'>
+  <div class='col-md-6'>
+    <%= react_component(
+      "SamPointSelector",
+      props: {
+        figure: @lithic.as_json(methods: [:type]),
+        image: @lithic.page.image.as_json(methods: [:url]),
+        url: sam_contour_lithic_path(@lithic)
+      }
+    ) %>
+  </div>
+  <div class='col-md-6'>
+    <%= simple_form_for(@lithic, url: wizard_path) do |f| %>
+      <%= f.submit("Next", class: "btn btn-primary") %>
+    <% end %>
+  </div>
+</div>

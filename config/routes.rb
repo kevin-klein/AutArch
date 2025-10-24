@@ -12,7 +12,12 @@ Rails.application.routes.draw do # rubocop:disable Metrics/BlockLength
   resources :chronologies do
     resources :c14_dates
   end
-  resources :lithics
+  resources :lithics do
+    member do
+      get :sam_contour
+    end
+    resources :update_lithic
+  end
   resources :kurgans
   resources :sites
   resources :maps
@@ -21,6 +26,11 @@ Rails.application.routes.draw do # rubocop:disable Metrics/BlockLength
     collection do
       get :stats
       get :orientations
+    end
+
+    member do
+      get :related
+      post :save_related
     end
   end
   resources :figures do
@@ -32,8 +42,13 @@ Rails.application.routes.draw do # rubocop:disable Metrics/BlockLength
     resources :stable_isotopes
   end
   resources :page_images
+  resources :ceramics
   resources :publications do
-    resources :pages
+    resources :pages do
+      collection do
+        get :by_page_number
+      end
+    end
     member do
       get :export
       post :update_site
@@ -53,6 +68,8 @@ Rails.application.routes.draw do # rubocop:disable Metrics/BlockLength
   get "/logout", to: "user_sessions#logout"
   post "/login", to: "user_sessions#code"
   post "/login_code", to: "user_sessions#login_code"
+
+  post "/graphql", to: "graphql#execute"
 
   root "graves#root"
 end

@@ -1,51 +1,52 @@
 class LithicsController < ApplicationController
-  # pyimport "scipy"
-  # pyimport "numpy"
-  # pyimport "io"
-  # pyimport "base64"
-  # pyfrom "matplotlib", import: :pyplot
+  before_action :set_lithic, only: %i[show edit update destroy related sam_contour]
 
   def index
-    @lithics = StoneTool
-      .includes(:scale)
-      .joins(:scale)
-      # .where("figures.probability > ?", 0.5)
-      .where(publication: Publication.find(32))
-      .where(type: "StoneTool")
-      .filter { _1.scale&.meter_ratio.present? }
-      .filter { !_1.contour.empty? }
-      # .map(&:size_normalized_contour)
-      .filter do |lithic|
-        # ap lithic
-        contour = lithic.size_normalized_contour
-        if contour.empty?
-          false
-        else
-          # rect = MinOpenCV.minAreaRect(contour)
-          true
-          # rect[:height] < 400
-          # rect[:width] < 500 && rect[:height] < 500 && !contour.flatten.any? { _1 < 0 }
-        end
-      end
-      .sample(100)
+    lithics = StoneTool.where(publication: Publication.accessible_by(current_ability))
+    if params.dig(:search, :publication_id).present?
+      lithics = StoneTool
+        .joins(page: :publication)
+        .order(:id)
+        .where({publication: {id: params.dig(:search, :publication_id)}})
+    end
 
-    # raise
+    @lithics = lithics
+      .includes(:tags, :scale, :publication, page: :image)
+      .where("figures.probability > ?", 0.6)
 
-    @contours = @lithics.map { _1.size_normalized_contour(x_width: 0.1, y_width: 0.1) }
-    @efd_data = @contours.map { Efd.elliptic_fourier_descriptors(_1, normalize: false, order: 15).to_a.flatten }
-    @efd_data = @efd_data.map { |item| item.each_slice(2).map(&:last) }
-    @efd_pca_chart = Stats.efd_pca(@efd_data)
+    if params.dig(:search, :site_id).present?
+      @lithics = @lithics.where(site_id: params[:search][:site_id])
+    end
 
-    # @efd_pca_chart = Stats.base_pca_chart(@efd_pca_chart)
-
-    # ap @lithics.map(&:scale).map(&:meter_ratio)
-    # ap @lithics[10]
-    # ap @lithics.map { ap MinOpenCV.minAreaRect(_1.size_normalized_contour) }
-    # ap @contours
-    # ap @contours.map { MinOpenCV.minAreaRect(_1) }
+    @lithics_pagy, @lithics = pagy(@lithics.all)
   end
 
-  def show
+  def destroy
+    @lithic.delete
+
+    respond_to do |format|
+      format.html { redirect_to lithic_update_lithic_path(StoneTool.order(:id).where("id > ?", @lithic.id).first || @lithic.last, :set_lithic_data), notice: "Lithic was successfully removed." }
+      format.json { head :no_content }
+    end
+  end
+
+  def sam_contour
+    AnalyzeContourSam.new.run(@lithic, JSON.parse(params[:points]))
+    GraveSize.new.existing_contour_stats(@lithic)
+
+    render json: {
+      contour: @lithic.contour
+    }
+  end
+
+  private
+
+  def set_lithic
     @lithic = StoneTool.find(params[:id])
+  end
+
+  # Only allow a list of trusted parameters through.
+  def lithic_params
+    params.require(:lithic).permit(:arrowAngle, :site_id, figures: %i[id type_name x1 x2 y1 y2])
   end
 end

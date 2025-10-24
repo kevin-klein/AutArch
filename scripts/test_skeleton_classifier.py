@@ -9,7 +9,7 @@ import torch.nn as nn
 from torchvision.io import read_image, ImageReadMode
 from transforms import PILToTensor, Compose
 
-print(torch.load('models/skeleton_resnet_labels.model'))
+labels = torch.load('models/skeleton_resnet_labels.model')
 
 def pil_loader(path):
     # open path as file to avoid ResourceWarning (https://github.com/python-pillow/Pillow/issues/835)
@@ -23,17 +23,16 @@ if __name__ == '__main__':
   else:
       device = torch.device('cpu')
 
-  model = torchvision.models.resnet152(pretrained=True)
-  model.load_state_dict(torch.load('models/skeleton_resnet.model'))
+  model = torchvision.models.resnext50_32x4d(num_classes=len(labels))
+  model.load_state_dict(torch.load('models/skeleton_resnext.model'))
 
-  # model.eval()
   model.to(device)
   model.eval()
 
   with torch.no_grad():
-    for image in os.listdir('skeletons/back'):
+    for image in os.listdir('training_data/skeletons/extended supine'):
       print(image)
-      image = pil_loader(os.path.join('skeletons', 'back', image))
+      image = pil_loader(os.path.join('training_data', 'skeletons', 'extended supine', image))
 
       t = transforms.Compose([
           # transforms.RandomResizedCrop(224),
@@ -46,6 +45,5 @@ if __name__ == '__main__':
       # image = preprocess(image[:3, :, :]).unsqueeze(0).to(device)
 
       output = model(image)
-      probabilities = torch.nn.functional.softmax(output[0], dim=0)
-      top5, top5_id = torch.topk(probabilities, 2)
-      print(probabilities)
+      _, prediction = torch.max(output, 1)
+      print(prediction)

@@ -55,6 +55,7 @@
 #  real_world_width     :float
 #  real_world_height    :float
 #  real_world_perimeter :float
+#  features             :float            default([]), not null, is an Array
 #
 def bezier_point(anchor1:, anchor2:, control:, t:)
   return 0 if anchor2.nil? || anchor1.nil?
@@ -68,10 +69,16 @@ class Figure < ApplicationRecord
   serialize :contour, JSON
   validates :publication, presence: true
 
+  belongs_to :object_similarity, optional: true #, class_name: ''
+
   has_and_belongs_to_many :tags
 
   before_save do
     self.publication_id = page.publication_id
+  end
+
+  def similar
+
   end
 
   def manual_contour

@@ -55,9 +55,16 @@
 #  real_world_width     :float
 #  real_world_height    :float
 #  real_world_perimeter :float
+#  features             :float            default([]), not null, is an Array
 #
 class Good < Figure
   belongs_to :grave, foreign_key: "parent_id", optional: true
+
+  has_many :ceramics, foreign_key: "parent_id"
+  has_many :stone_tools, foreign_key: "parent_id"
+  has_many :artefacts, foreign_key: "parent_id"
+
+  alias_method :lithics, :stone_tools
 
   def relative_center_to_grave
     x1 = (x1 - grave.x1).abs

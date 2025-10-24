@@ -104,13 +104,15 @@ module Stats
 
   def outlines_efd(publications, excluded: [])
     graves = publications.map do |publication|
-      graves = publication.graves.sort_by { _1.id }
+      graves = publication.graves.filter { _1.probability > 0.6 && !_1.manual_bounding_box }.sort_by { _1.id }
       filter_graves(graves, excluded: excluded)
     end.flatten
     return [[], []] if graves.empty?
 
     contours = graves.map(&:size_normalized_contour)
-    frequencies = contours.map { Efd.elliptic_fourier_descriptors(_1, normalize: false, order: 15).to_a.flatten }
+    frequencies = contours.zip(graves).map do |contour, grave|
+      Efd.elliptic_fourier_descriptors(contour, normalize: true, order: 15).to_a.flatten
+    end
     max = (10.0 / frequencies.flatten.max)
     frequencies = frequencies.map { |item| item.each_slice(2).map(&:last).map { _1 * max } }
 

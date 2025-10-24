@@ -1,0 +1,3 @@
+class EfdSimilarity < ObjectSimilarity
+
+end

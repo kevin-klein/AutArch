@@ -1,0 +1,15 @@
+<%= render("stepper") %>
+
+<%= react_component(
+  "NorthArrow",
+  props: {
+    arrow: @grave.arrow,
+    next_url: wizard_path,
+    image:
+      @grave.page.image.as_json.merge(href: @grave.page.image.url)
+  }
+) %>
+
+<% if @grave.arrow.nil? %>
+  <%= link_to("Next", next_wizard_path) %>
+<% end %>

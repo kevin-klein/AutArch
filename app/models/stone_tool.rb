@@ -55,9 +55,28 @@
 #  real_world_width     :float
 #  real_world_height    :float
 #  real_world_perimeter :float
+#  features             :float            default([]), not null, is an Array
 #
 class StoneTool < Figure
-  belongs_to :grave, foreign_key: "parent_id", optional: true, inverse_of: :spines
+  belongs_to :good, foreign_key: "parent_id", optional: true, inverse_of: :stone_tool
+  belongs_to :site, optional: true
 
   has_one :scale, dependent: :destroy, foreign_key: "parent_id", class_name: "Scale", inverse_of: :stone_tool
+
+  with_unit :area, square: true
+  with_unit :perimeter
+  with_unit :width
+  with_unit :height
+  with_unit :bounding_box_width
+  with_unit :bounding_box_height
+
+  with_unit :normalized_width
+  with_unit :normalized_height
+
+  def figures
+    [
+      self,
+      scale
+    ].compact
+  end
 end

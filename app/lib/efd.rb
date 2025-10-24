@@ -4,30 +4,41 @@ module Efd
   # contour: numo array
   # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
   def self.elliptic_fourier_descriptors(contour, order: 10, normalize: false, return_transformation: false)
-    contour = Numo::DFloat[*contour] unless contour.is_a?(Numo::DFloat)
-    dxy = contour.diff(axis: 0)
-    dt = Numo::DFloat::Math.sqrt(contour**2).sum(axis: 1)
-    large_t = dt.cumsum[0]
+    body = {
+      contour:,
+      order:,
+      normalize:,
+      return_transformation:
+    }
+    response = HTTP.post("#{ENV["ML_SERVICE_URL"]}/efd", json: body)
 
-    phi = (2 * Math::PI * (Numo::DFloat[0.0, large_t])) / large_t
-    orders = Numo::DFloat.new(order).seq(1)
-    consts = (2 * orders * orders * Math::PI * Math::PI) * (1 / large_t)
-    phi *= orders.reshape(order, 1)
-
-    d_cos_phi = Numo::DFloat::Math.cos(phi[true, 1..-1]) - Numo::DFloat::Math.cos(phi[true, 0..-2])
-    d_sin_phi = Numo::DFloat::Math.sin(phi[true, 1..-1]) - Numo::DFloat::Math.sin(phi[true, 0..-2])
-
-    dt = dt[0]
-
-    a = consts * ((dxy[true, 0] / dt) * d_cos_phi).sum(axis: 1)
-    b = consts * ((dxy[true, 0] / dt) * d_sin_phi).sum(axis: 1)
-    c = consts * ((dxy[true, 1] / dt) * d_cos_phi).sum(axis: 1)
-    d = consts * ((dxy[true, 1] / dt) * d_sin_phi).sum(axis: 1)
-
-    coeffs = a.reshape(order, 1).concatenate(b.reshape(order, 1), c.reshape(order, 1), d.reshape(order, 1), axis: 1)
-    coeffs = normalize_efd(coeffs, return_transformation: return_transformation) if normalize
-    coeffs
+    response.parse["efds"].flatten
   end
+  # def self.elliptic_fourier_descriptors(contour, order: 10, normalize: false, return_transformation: false)
+  #   contour = Numo::DFloat[*contour] unless contour.is_a?(Numo::DFloat)
+  #   dxy = contour.diff(axis: 0)
+  #   dt = Numo::DFloat::Math.sqrt((contour**2).sum(axis: 1))
+  #   large_t = dt.cumsum[-1]
+
+  #   phi = (2 * Math::PI * (Numo::DFloat[0.0, large_t])) / large_t
+  #   orders = Numo::DFloat.new(order).seq(1)
+  #   consts = (2 * orders * orders * Math::PI * Math::PI) #* (1 / large_t)
+  #   phi *= orders.reshape(order, 1)
+
+  #   d_cos_phi = Numo::DFloat::Math.cos(phi[true, 1..-1]) - Numo::DFloat::Math.cos(phi[true, 0..-2])
+  #   d_sin_phi = Numo::DFloat::Math.sin(phi[true, 1..-1]) - Numo::DFloat::Math.sin(phi[true, 0..-2])
+
+  #   dt = dt[0]
+
+  #   a = consts * ((dxy[true, 0] / dt) * d_cos_phi).sum(axis: 1)
+  #   b = consts * ((dxy[true, 0] / dt) * d_sin_phi).sum(axis: 1)
+  #   c = consts * ((dxy[true, 1] / dt) * d_cos_phi).sum(axis: 1)
+  #   d = consts * ((dxy[true, 1] / dt) * d_sin_phi).sum(axis: 1)
+
+  #   coeffs = a.reshape(order, 1).concatenate(b.reshape(order, 1), c.reshape(order, 1), d.reshape(order, 1), axis: 1)
+  #   coeffs = normalize_efd(coeffs, return_transformation: return_transformation) if normalize
+  #   coeffs
+  # end
 
   def self.normalize_efd(coeffs, size_invariant: false, return_transformation: false)
     theta_1 = 0.5 * Math.atan2(

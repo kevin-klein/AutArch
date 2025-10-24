@@ -73,7 +73,10 @@
             deg
           <% end %>
         </td>
-        <td><%= link_to("Edit", grave_update_grave_path(grave, :set_grave_data)) %></td>
+        <td>
+          <%= link_to("Edit", grave_update_grave_path(grave, :set_grave_data)) %> |
+          <%= link_to("Relations", related_grave_path(grave)) %>
+        </td>
       </tr>
     <% end %>
   </tbody>

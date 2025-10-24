@@ -5,6 +5,7 @@ import React from 'react'
 import 'chartkick/chart.js'
 import bootstrap from 'bootstrap'
 
+import SamPointSelector from '../components/SamPointSelector'
 import BoxResizer from '../components/BoxResizer'
 import AddFigures from '../components/AddFigures'
 import NorthArrow from '../components/NorthArrow'
@@ -13,6 +14,7 @@ import ImportProgress from '../components/ImportProgress'
 import SiteMap from '../components/SiteMap'
 import Chart from 'react-apexcharts'
 import simpleheat from '../components/simpleheat'
+import Relations from '../components/Relations'
 // import h337 from 'heatmap.js'
 
 import ReactOnRails from 'react-on-rails'
@@ -20,15 +22,19 @@ import { Filler, LineElement, PointElement, RadialLinearScale, Chart as ChartJS,
 
 import Rails from '@rails/ujs'
 
-function Heatmap ({ data, graves }) {
+function Heatmap ({ data, graves, orientation }) {
   const width = 500
   const height = 700
+
+  const [uuid, _] = React.useState(crypto.randomUUID())
+
+  console.log(uuid)
 
   React.useLayoutEffect(() => {
     const newData = data
       .map((point) => [point[0] * width, point[1] * height, 1])
 
-    simpleheat('heatmap')
+    simpleheat(uuid)
       .data(newData)
       .overlays(graves)
       .radius(15, 20)
@@ -46,20 +52,70 @@ function Heatmap ({ data, graves }) {
       context.lineTo(tox - headlen * Math.cos(angle + Math.PI / 6), toy - headlen * Math.sin(angle + Math.PI / 6))
     }
 
-    const ctx = document.getElementById('heatmap').getContext('2d')
+    function drawSkeleton (context) {
+      context.beginPath()
+
+      // Draw body
+      if (orientation === 'left') {
+        context.moveTo(width * 0.5, height * 0.75)
+        context.lineTo(width * 0.65, height * 0.65)
+        context.lineTo(width * 0.5, height * 0.55)
+        context.lineTo(width * 0.5, height * 0.35)
+      } else if (orientation === 'right') {
+        context.moveTo(width * 0.5, height * 0.75)
+        context.lineTo(width * 0.35, height * 0.65)
+        context.lineTo(width * 0.5, height * 0.55)
+        context.lineTo(width * 0.5, height * 0.35)
+      }
+
+      // ctx.fill()
+      ctx.stroke()
+
+      // Draw left leg if right-oriented or right leg if left-oriented
+      // const footX = orientation === 'left' ? 200 : 300
+      // context.moveTo(baseLine, height - 100)
+      // context.lineTo(footX, height - 150)
+
+      // Draw head
+      // ctx.fill()
+
+      // Draw arms
+      // if (orientation === 'left') {
+      //   context.moveTo(baseLine + 70, height / 2)
+      //   arrow(context, baseLine + 70, height / 2, 300, height / 2 - 50)
+
+      //   context.moveTo(baseLine + 150, height / 2)
+      //   arrow(context, baseLine + 150, height / 2, 200, height / 2 - 80)
+      // } else {
+      //   context.moveTo(250 - 70, height / 2)
+      //   arrow(context, 250 - 70, height / 2, 50, height / 2 - 50)
+
+      //   context.moveTo(250 - 150, height / 2)
+      //   arrow(context, 250 - 150, height / 2, 100, height / 2 - 80)
+      // }
+
+      // Stroke and fill paths
+      // context.stroke()
+      // context.fill()
+
+      ctx.beginPath()
+
+      context.arc(width / 2, height * 0.35, 35, 0, Math.PI * 2) // Head circle
+      ctx.fill()
+    }
+
+    const ctx = document.getElementById(uuid).getContext('2d')
     ctx.lineWidth = 3
-    ctx.beginPath()
-    ctx.globalAlpha = 1
+    // ctx.beginPath()
+    // ctx.globalAlpha = 1
     ctx.strokeStyle = 'black'
     ctx.fillStyle = 'black'
-    arrow(ctx, 250, 600, 250, 200)
-    ctx.stroke()
+    // arrow(ctx, 250, 600, 250, 200)
+    drawSkeleton(ctx)
+    // ctx.stroke()
+  }, [uuid])
 
-    ctx.font = '24px Arial'
-    ctx.fillText('Orientation', 260, 400)
-  })
-
-  return (<canvas id='heatmap' width={width} height={height} />)
+  return (<canvas id={uuid} width={width} height={height} />)
 }
 
 function ScatterChart ({ data, colors }) {
@@ -125,6 +181,10 @@ ReactOnRails.register({
   ScatterChart,
   NorthArrow,
   Heatmap,
+  SamPointSelector,
+  Relations: function (props, railsContext) {
+    return () => <Relations {...props} />
+  },
   SiteMap: function (props, railsContext) {
     return () => <SiteMap {...props} />
   },

@@ -1,4 +1,6 @@
 import numpy as np
+from torchvision.models.detection.backbone_utils import _resnet_fpn_extractor
+from torchvision.ops.feature_pyramid_network import LastLevelP6P7
 import torch
 import torch.utils.data
 from PIL import Image, ImageDraw
@@ -87,16 +89,6 @@ class DfgDataset(torch.utils.data.Dataset):
                 for box in bnd_boxes
             ])
 
-        # dims = (512, 362)
-
-        # new_image = FT.resize(img, dims)
-
-        # old_dims = torch.FloatTensor([img.width, img.height, img.width, img.height]).unsqueeze(0)
-        # new_boxes = boxes / old_dims
-
-        # new_dims = torch.FloatTensor([dims[1], dims[0], dims[1], dims[0]]).unsqueeze(0)
-        # new_boxes = new_boxes * new_dims
-
         return FT.to_tensor(img), {
             'boxes': boxes,
             'labels': labels,
@@ -140,6 +132,11 @@ def get_model(num_classes, device):
     # model.head.classification_head.cls_logits = cls_logits
     model = torchvision.models.detection.retinanet_resnet50_fpn_v2(num_classes=num_classes, trainable_backbone_layers=5)
 
+    # backbone = _resnet_fpn_extractor(
+    #     torchvision.models.resnext50_32x4d(weights=torchvision.models.ResNeXt50_32X4D_Weights.IMAGENET1K_V2),
+    #     5, returned_layers=[2, 3, 4], extra_blocks=LastLevelP6P7(256, 256))
+    # model  = torchvision.models.detection.FCOS(backbone, num_classes=num_classes)
+
     # model = torchvision.models.detection.fasterrcnn_mobilenet_v3_large_fpn(num_classes=num_classes)
     # model = torchvision.models.detection.fcos_resnet50_fpn(num_classes=num_classes, trainable_backbone_layers = 5)
     # model.load_state_dict(torch.load('models/fcos_dfg.model', map_location=device))
@@ -162,7 +159,7 @@ if __name__ == '__main__':
     # dataset_test = DfgDataset(root="pdfs/page_images", transforms = get_transform(train=False), labels=dfg_dataset.labels)
     # split the dataset in train and test set
 
-    torch.save(dfg_dataset.labels, 'models/retinanet_v2_labels.model')
+    torch.save(dfg_dataset.labels, 'models/fcos_resnext_labels.model')
 
     torch.manual_seed(0)
 
@@ -171,10 +168,10 @@ if __name__ == '__main__':
 
 
     data_loader = torch.utils.data.DataLoader(
-                train_dataset, batch_size=8, shuffle=True, num_workers=8,
+                train_dataset, batch_size=32, shuffle=True, num_workers=6,
                 collate_fn=collate_fn)
     data_loader_test = torch.utils.data.DataLoader(
-                test_dataset, batch_size=8, shuffle=False, num_workers=8,
+                test_dataset, batch_size=32, shuffle=False, num_workers=6,
                 collate_fn=collate_fn)
     print("We have: {} examples, {} are training and {} testing".format(len(indices), len(train_dataset), len(test_dataset)))
 
@@ -189,6 +186,7 @@ if __name__ == '__main__':
     model = get_model(num_classes, device)
     # move model to the right device
     model.to(device)
+
     # construct an optimizer
     params = [p for p in model.parameters() if p.requires_grad]
     # optimizer = torch.optim.SGD(params, lr=1e-4,
@@ -231,5 +229,4 @@ if __name__ == '__main__':
                 print(f'validation loss: {losses}')
 
         print(f'epoch_loss: {epoch_loss}', f'time: {time.time() - start}')
-
-        torch.save(model.state_dict(), 'models/retinanet_v2_dfg.model')
+        torch.save(model.state_dict(), 'models/fcos_resnext.model')

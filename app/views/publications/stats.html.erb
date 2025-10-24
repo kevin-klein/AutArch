@@ -192,9 +192,25 @@
     <div class="card">
       <div class='row'>
         <div class='p-5 col-md-6'>
-          <h5 class="card-title">Heatmap Data of Artefact Distribution</h5>
-          <%= react_component('Heatmap', props: { data: @heatmap_data[:artefacts], graves: @heatmap_data[:graves] }) %>
+          <h5 class="card-title">Left Heatmap(n=<%= @spines_left[:graves].length %>)</h5>
+          <%= react_component('Heatmap', props: { orientation: 'left', data: @spines_left[:artefacts], graves: @spines_left[:graves] }) %>
         </div>
+        <div class='p-5 col-md-6'>
+          <h5 class="card-title">Right Heatmap (n=<%= @spines_right[:graves].length %>)</h5>
+          <%= react_component('Heatmap', props: { orientation: 'right', data: @spines_right[:artefacts], graves: @spines_right[:graves] }) %>
+        </div>
+        <% @spines_by_site_left.map do |site, data| %>
+          <div class='p-5 col-md-6'>
+            <h5 class="card-title">Left Heatmap <%= site.name %> (n=<%= data[:graves].length %>)</h5>
+            <%= react_component('Heatmap', props: { orientation: 'left', data: data[:artefacts], graves: data[:graves] }) %>
+          </div>
+        <% end %>
+        <% @spines_by_site_right.map do |site, data| %>
+          <div class='p-5 col-md-6'>
+            <h5 class="card-title">Right Heatmap <%= site.name %> (n=<%= data[:graves].length %>)</h5>
+            <%= react_component('Heatmap', props: { orientation: 'right', data: data[:artefacts], graves: data[:graves] }) %>
+          </div>
+        <% end %>
       </div>
     </div>
   </div>

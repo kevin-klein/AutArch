@@ -11,7 +11,14 @@ import torch.nn as nn
 import matplotlib.pyplot as plt
 import torchvision.transforms.functional as F
 import numpy as np
+from functools import partial
 plt.rcParams["savefig.bbox"] = 'tight'
+
+from torchvision.models.convnext import LayerNorm2d
+norm_layer = partial(LayerNorm2d, eps=1e-6)
+
+import torch.optim.lr_scheduler as lr_scheduler
+
 
 def get_transform():
    transforms = []
@@ -62,6 +69,9 @@ def show(imgs):
         axs[0, i].set(xticklabels=[], yticklabels=[], xticks=[], yticks=[])
     plt.show()
 
+LR = 1e-5
+EPOCHS = 100
+
 if __name__ == '__main__':
   dataset = torchvision.datasets.ImageFolder('training_data/skeletons', transforms.Compose([
         # transforms.RandomResizedCrop(224),
@@ -71,12 +81,12 @@ if __name__ == '__main__':
         # transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
     ]))
   data_loader = torch.utils.data.DataLoader(
-                dataset, pin_memory=True, batch_size=12, shuffle=True, num_workers=8,)
+                dataset, pin_memory=True, batch_size=4, shuffle=True, num_workers=8,)
 
-  # model = torchvision.models.vit_b_16(weights=None, num_classes=2)
-  # num_ftrs = model.fc.in_features
-  # model.fc = nn.Linear(num_ftrs, 2).cuda()
-  model = torchvision.models.resnet152(weights=None, num_classes=2)
+  model = torchvision.models.convnext_tiny(weights=torchvision.models.ConvNeXt_Tiny_Weights.IMAGENET1K_V1)
+  model.classifier = nn.Sequential(
+    model.classifier[0], model.classifier[1], nn.Linear(model.classifier[2].in_features, len(dataset.classes))
+  )
 
   if torch.cuda.is_available():
       device = torch.device('cuda')
@@ -84,20 +94,19 @@ if __name__ == '__main__':
       device = torch.device('cpu')
   model.to(device)
 
-  params = [p for p in model.parameters() if p.requires_grad]
+  # params = [p for p in model.parameters() if p.requires_grad]
   # optimizer = torch.optim.SGD(model.parameters(), lr=0.0001, momentum=0.9)
-  # optimizer = torch.optim.AdamW(model.parameters(), lr=1e-4)
-  optimizer = torch.optim.RMSprop(model.parameters(), lr=0.001)
+  optimizer = torch.optim.Adam(model.parameters(), lr=LR)
+  # optimizer = torch.optim.RMSprop(model.parameters(), lr=LR)
   criterion = nn.CrossEntropyLoss()
 
-  num_epochs = 400
-  for epoch in range(num_epochs):
+  scheduler = lr_scheduler.LinearLR(optimizer, start_factor=1, end_factor=0.01, total_iters=EPOCHS)
+
+  torch.save(dataset.classes, 'models/skeleton_resnet_labels.model')
+  model.train()
+
+  for epoch in range(EPOCHS):
       start = time.time()
-      optimizer.zero_grad()
-
-      model.train()
-
-      torch.save(dataset.classes, 'models/skeleton_resnet_labels.model')
 
       i = 0
       epoch_loss = 0
@@ -106,21 +115,22 @@ if __name__ == '__main__':
         # images = [preprocess(image) for image in images]
         # show(images)
 
-        images = torch.tensor(images).to(device)
+        images = images.to(device)
         targets = targets.to(device)
 
         outputs = model(images)
-        # print(outputs)
-        _, preds = torch.max(outputs, 1)
         loss = criterion(outputs, targets)
 
         i += 1
 
+        optimizer.zero_grad()
         loss.backward()
         optimizer.step()
 
         epoch_loss += loss
 
-      torch.save(model.state_dict(), 'models/skeleton_resnet.model')
+      scheduler.step()
+
 
       print(epoch_loss, f'time: {time.time() - start}')
+  torch.save(model.state_dict(), 'models/skeleton_convnext_base.model')

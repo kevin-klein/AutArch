@@ -146,10 +146,6 @@ body {
   // color: #727272;
 }
 
-.sidebar .nav-link.active {
-  // color: #2470dc;
-}
-
 .sidebar .nav-link:hover .feather,
 .sidebar .nav-link.active .feather {
   color: inherit;
@@ -244,4 +240,15 @@ svg {
 
 .leaflet-container {
   font-family: "Roboto", sans-serif;
+}
+
+rect.btn {
+  // stroke:#fff;
+  fill:#fff;
+  fill-opacity:0;
+  // stroke-opacity:0;
+}
+
+.list-group-item {
+  cursor: pointer;
 }

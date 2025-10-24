@@ -1,135 +1,26 @@
 import React from 'react'
-import { Wizard, useWizard } from 'react-use-wizard'
-import Select from 'react-select'
 import { useFigureStore } from './store'
-
-export function Box ({ onDraggingStart, active, figure: { id, x1, y1, x2, y2, type } }) {
-  let color = 'black'
-  if (active === id) {
-    color = '#F44336'
-  }
-
-  function onMouseDown (figure) {
-    return function (evt) {
-      evt.preventDefault()
-      onDraggingStart(evt, figure)
-    }
-  }
-
-  return (
-    <>
-      <defs>
-        <marker
-          id='arrowhead' markerWidth='10' markerHeight='7'
-          refX='0' refY='3.5' orient='auto'
-        >
-          <polygon points='0 0, 10 3.5, 0 7' />
-        </marker>
-      </defs>
-
-      {(type === 'Spine' || type === 'CrossSectionArrow') &&
-        <line
-          fill='none'
-          stroke={color}
-          strokeWidth='2'
-          x1={x1}
-          y1={y1}
-          x2={x2}
-          y2={y2}
-          markerEnd='url(#arrowhead)'
-        />}
-
-      {type !== 'Spine' && <rect
-        fill='none'
-        stroke={color}
-        strokeOpacity={color === 'black' ? '0.2' : '1'}
-        strokeWidth='3'
-        x={x1}
-        y={y1}
-        width={x2 - x1}
-        height={y2 - y1}
-                           />}
-
-      <circle
-        onMouseDown={onMouseDown({ figure: { id, x1, x2, y1, y2 }, point: 1 })}
-        className='moveable-point'
-        r='10'
-        cx={x1}
-        cy={y1}
-        stroke='black'
-      />
-      <circle
-        onMouseDown={onMouseDown({ figure: { id, x1, x2, y1, y2 }, point: 2 })}
-        className='moveable-point'
-        r='10'
-        cx={x2}
-        cy={y2}
-        stroke='black'
-      />
-    </>
-  )
-}
-
-function NewFigureDialog ({ closeDialog, addFigure }) {
-  const [type, setType] = React.useState('Grave')
-
-  return (
-    <div className='modal d-block' aria-hidden='false'>
-      <div className='modal-dialog'>
-        <div className='modal-content'>
-          <div className='modal-header'>
-            <h1 className='modal-title fs-5' id='exampleModalLabel'>New Figure</h1>
-            <button type='button' onClick={closeDialog} className='btn-close' data-bs-dismiss='modal' aria-label='Close' />
-          </div>
-          <div className='modal-body'>
-            <form>
-              <div className='input-group mb-3'>
-                <select value={type} onChange={evt => setType(evt.target.value)} className='form-select' aria-label='Default select example'>
-                  <option value='Grave'>Grave</option>
-                  <option value='Spine'>Spine</option>
-                  <option value='Skeleton'>Skeleton</option>
-                  <option value='Skull'>Skull</option>
-                  <option value='Scale'>Scale</option>
-                  <option value='GraveCrossSection'>Grave Cross Section</option>
-                  <option value='Arrow'>Arrow</option>
-                  <option value='Good'>Good</option>
-                  <option value='Map'>Map</option>
-                  <option value='Artefact'>Artefact</option>
-                  <option value='Ceramic'>Ceramic</option>
-                </select>
-              </div>
-            </form>
-          </div>
-          <div className='modal-footer'>
-            <button type='button' onClick={closeDialog} className='btn btn-secondary' data-bs-dismiss='modal'>Close</button>
-            <button type='button' onClick={() => { addFigure(type); closeDialog() }} className='btn btn-primary'>Create</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-function Contour ({ figure, active }) {
-  const points = [...figure.contour, figure.contour[0]].map(point => `${point[0] + figure.x1},${point[1] + figure.y1}`).join(' ')
-  return (
-    <polyline
-      points={points}
-      fill={figure.id === active ? '#F4433699' : '#3F51B5'}
-      stroke='#3F51B5'
-      strokeWidth={5}
-    />
-  )
-}
+import BoxCanvas from './BoxCanvas'
 
 export default function AddFigure ({ image, pageFigures, page, next_url }) {
   const { figures, updateFigure, setFigures, addFigure, removeFigure } = useFigureStore()
 
-  const [rendering, setRendering] = React.useState('boxes')
-  const [draggingState, setDraggingState] = React.useState(null)
-  const [creatingNewFigure, setCreatingNewFigure] = React.useState(false)
-  const canvasRef = React.useRef(null)
   const [currentEditBox, setCurrentEditBox] = React.useState(null)
+  const divRef = React.useRef(null)
+
+  const [isDrawing, setIsDrawing] = React.useState(false)
+  const [newFigureType, setNewFigureType] = React.useState(null)
+  const [newFigureCoords, setNewFigureCoords] = React.useState(null)
+
+  React.useEffect(() => {
+    if (divRef.current) {
+      if (isDrawing) {
+        divRef.current.style.cursor = 'crosshair'
+      } else {
+        divRef.current.style.cursor = 'default'
+      }
+    }
+  }, [isDrawing])
 
   React.useEffect(() => {
     setFigures(pageFigures)
@@ -144,8 +35,55 @@ export default function AddFigure ({ image, pageFigures, page, next_url }) {
     }
   }
 
-  function createNewFigure () {
-    setCreatingNewFigure(true)
+  // --- New functions for drawing ---
+  function startDrawing (type) {
+    setIsDrawing(true)
+    setNewFigureType(type)
+    setNewFigureCoords(null) // Clear any previous drawing
+    setCurrentEditBox(null) // Deselect any active box
+  }
+
+  async function finishDrawing () {
+    if (!isDrawing || !newFigureCoords || !newFigureType) {
+      setIsDrawing(false)
+      setNewFigureType(null)
+      setNewFigureCoords(null)
+      return
+    }
+
+    // Prevent creating a zero-size box
+    if (newFigureCoords.x1 === newFigureCoords.x2 || newFigureCoords.y1 === newFigureCoords.y2) {
+      setIsDrawing(false)
+      setNewFigureType(null)
+      setNewFigureCoords(null)
+      return
+    }
+
+    // Ensure x1,y1 is top-left and x2,y2 is bottom-right
+    const coords = {
+      x1: Math.min(newFigureCoords.x1, newFigureCoords.x2),
+      y1: Math.min(newFigureCoords.y1, newFigureCoords.y2),
+      x2: Math.max(newFigureCoords.x1, newFigureCoords.x2),
+      y2: Math.max(newFigureCoords.y1, newFigureCoords.y2)
+    }
+
+    setIsDrawing(false)
+    setNewFigureType(null)
+    setNewFigureCoords(null)
+
+    // Call the modified createFigure
+    await createFigure(newFigureType, coords)
+  }
+  // ---------------------------------
+
+  function onChangeFigure (id, figure) {
+    setFigures(Object.values(figures).map((currentFigure) => {
+      if (currentFigure.id === figure.id) {
+        return figure
+      } else {
+        return currentFigure
+      }
+    }))
   }
 
   async function removeEditBox (id) {
@@ -163,48 +101,19 @@ export default function AddFigure ({ image, pageFigures, page, next_url }) {
     }
   }
 
-  function onChangeFigure (id, figure) {
-    setFigures(figures.map((currentFigure) => {
-      if (currentFigure.id === figure.id) {
-        return figure
-      } else {
-        return currentFigure
-      }
-    }))
-  }
+  async function createFigure (type, coords) {
+    let x1, y1, x2, y2
 
-  function onDraggingStart (evt, data) {
-    const figure = data.figure
-    setCurrentEditBox(figure.id)
-    let svgPoint = canvasRef.current.createSVGPoint()
-    svgPoint.x = evt.clientX
-    svgPoint.y = evt.clientY
-    svgPoint = svgPoint.matrixTransform(canvasRef.current.getScreenCTM().inverse())
-
-    let x = 0
-    let y = 0
-    if (data.point === 1) {
-      x = figure.x1
-      y = figure.y1
+    if (coords) {
+      // Use coords from drawing
+      x1 = coords.x1
+      y1 = coords.y1
+      x2 = coords.x2
+      y2 = coords.y2
     } else {
-      x = figure.x2
-      y = figure.y2
+      // Default fallback
+      x1 = 0; y1 = 0; x2 = 100; y2 = 100
     }
-
-    setDraggingState({
-      point: svgPoint,
-      x: svgPoint.x - x,
-      y: svgPoint.y - y,
-      data
-    })
-  }
-
-  async function createFigure (type) {
-    const x1 = image.width * 0.3
-    const x2 = image.width * 0.6
-
-    const y1 = image.height * 0.4
-    const y2 = image.height * 0.6
 
     const newFigure = { page_id: page.id, y1, y2, x1, x2, type }
 
@@ -235,51 +144,35 @@ export default function AddFigure ({ image, pageFigures, page, next_url }) {
     }
   }
 
-  function onDrag (evt) {
-    if (draggingState !== null) {
-      const figure = figures[draggingState.data.figure.id]
-
-      draggingState.point.x = evt.clientX
-      draggingState.point.y = evt.clientY
-      const cursor = draggingState.point.matrixTransform(canvasRef.current.getScreenCTM().inverse())
-
-      const x = cursor.x - draggingState.x
-      const y = cursor.y - draggingState.y
-
-      if (draggingState.data.point === 1) {
-        updateFigure({ ...figure, x1: x, y1: y })
-      } else {
-        updateFigure({ ...figure, x2: x, y2: y })
-      }
-    }
-  }
-
   return (
     <>
-      {creatingNewFigure && <NewFigureDialog addFigure={createFigure} closeDialog={() => setCreatingNewFigure(false)} />}
+      <div style={{ position: 'sticky', top: 0, display: 'flex', zIndex: 999 }}>
+        <div className='btn-group' role='group' aria-label='Basic example'>
+          <button type='button' style={{ backgroundColor: '#F44336', color: 'white' }} className='btn btn-secondary' onClick={() => startDrawing('Spine')}>Spine</button>
+          <button type='button' style={{ backgroundColor: '#9575CD', color: 'white' }} className='btn btn-secondary' onClick={() => startDrawing('SkeletonFigure')}>Skeleton</button>
+          <button type='button' style={{ backgroundColor: '#009688', color: 'white' }} className='btn btn-secondary' onClick={() => startDrawing('Arrow')}>Arrow</button>
+          <button type='button' style={{ backgroundColor: '#26C6DA', color: 'white' }} className='btn btn-secondary' onClick={() => startDrawing('GraveCrossSection')}>GraveCrossSection</button>
+          <button type='button' style={{ backgroundColor: '#4CAF50', color: 'white' }} className='btn btn-secondary' onClick={() => startDrawing('Good')}>Artefact</button>
+          <button type='button' style={{ backgroundColor: '#FF9800', color: 'white' }} className='btn btn-secondary' onClick={() => startDrawing('Scale')}>Scale</button>
+          <button type='button' style={{ backgroundColor: 'grey', color: 'white' }} className='btn btn-secondary' onClick={() => startDrawing('StoneTool')}>Lithic</button>
+        </div>
+      </div>
+
       <div className='row'>
-        <div className='col-md-8 card'>
-          <h3>Page {page.number}</h3>
-          <div className='form-check'>
-            <select value={rendering} onChange={evt => setRendering(evt.target.value)} className='form-select' aria-label='Default select example'>
-              <option value='boxes'>Show Bounding Boxes</option>
-              <option value='contours'>Show Contours</option>
-              <option value='nothing'>Show Nothing</option>
-            </select>
-          </div>
-          <svg
-            ref={canvasRef}
-            onMouseMove={onDrag}
-            onMouseUp={() => { setDraggingState(null) }}
-            onMouseLeave={() => { setDraggingState(null) }}
-            viewBox={`0 0 ${image.width} ${image.height}`}
-            preserveAspectRatio='xMidYMid meet'
-            xmlns='http://www.w3.org/2000/svg'
-          >
-            <image width={image.width} height={image.height} href={image.href} />
-            {rendering === 'boxes' && Object.values(figures).map(figure => <Box canvas={canvasRef} key={figure.id} onDraggingStart={onDraggingStart} active={currentEditBox} figure={figure} />)}
-            {rendering === 'contours' && figures.filter(figure => ['Grave', 'Arrow', 'Scale'].indexOf(figure.type) !== -1).map(figure => <Contour key={figure.id} active={currentEditBox} figure={figure} />)}
-          </svg>
+        <div className='col-md-8 card' ref={divRef}>
+          <h3>Page {page.number + 1}</h3>
+          <BoxCanvas
+            setCurrentEditBox={setCurrentEditBox}
+            divRef={divRef}
+            image={image}
+            figures={figures}
+            currentEditBox={currentEditBox}
+            onChangeFigure={onChangeFigure}
+            isDrawing={isDrawing}
+            newFigureCoords={newFigureCoords}
+            setNewFigureCoords={setNewFigureCoords}
+            finishDrawing={finishDrawing}
+          />
         </div>
 
         <div className='col-md-4'>

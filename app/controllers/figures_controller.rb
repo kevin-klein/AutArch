@@ -16,8 +16,18 @@ class FiguresController < AuthorizedController
   end
 
   def preview
+    @other_figures = @figure.page.figures.filter { (_1.probability || 1.0) > 0.6 && _1.id != @figure.id }
+
+    @contained_figures = @other_figures.filter { @figure.contains?(_1) && !_1.contains?(@figure) }
+
     @image = Vips::Image.new_from_buffer(@figure.page.image.data, "")
     @image = @image.crop(@figure.x1, @figure.y1, @figure.box_width, @figure.box_height)
+
+    @contained_figures.each do |contained|
+      x1 = contained.x1 - @figure.x1
+      y1 = contained.y1 - @figure.y1
+      @image = @image.draw_rect([255, 255, 255], x1, y1, contained.box_width, contained.box_height, fill: true)
+    end
 
     send_data @image.write_to_buffer(".jpg[Q=90]"), filename: "#{@figure.id}.jpg"
   end

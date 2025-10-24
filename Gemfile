@@ -128,3 +128,4 @@ gem "view_component", "~> 2.82"
 gem "ruby-progressbar", "~> 1.13"
 
 gem "erb-formatter", "~> 0.4.2"
+gem "graphiql-rails", group: :development
