@@ -1,5 +1,5 @@
 class PublicationsController < AuthorizedController
-  before_action :set_publication, only: %i[export radar update_tags assign_tags update_site assign_site progress summary show edit update destroy stats]
+  before_action :set_publication, only: %i[export_lithics export radar update_tags assign_tags update_site assign_site progress summary show edit update destroy stats]
 
   # GET /publications or /publications.json
   def index
@@ -131,6 +131,12 @@ class PublicationsController < AuthorizedController
 
   # GET /publications/1/edit
   def edit
+  end
+
+  def export_lithics
+    @lithics = @publication.figures.where(type: "StoneTool").where("probability > ?", 0.6)
+
+    render json: ExportLithics.new.export(@lithics)
   end
 
   def export
