@@ -5,6 +5,7 @@ import React from 'react'
 import 'chartkick/chart.js'
 import bootstrap from 'bootstrap'
 
+import SamPointSelector from '../components/SamPointSelector'
 import BoxResizer from '../components/BoxResizer'
 import AddFigures from '../components/AddFigures'
 import NorthArrow from '../components/NorthArrow'
@@ -180,6 +181,7 @@ ReactOnRails.register({
   ScatterChart,
   NorthArrow,
   Heatmap,
+  SamPointSelector,
   Relations: function (props, railsContext) {
     return () => <Relations {...props} />
   },
