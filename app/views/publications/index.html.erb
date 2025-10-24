@@ -49,7 +49,9 @@
           <div class="vr mx-1"></div>
           <%= link_to 'Download', rails_blob_path(publication.pdf, disposition: "attachment") %>
           <div class="vr mx-1"></div>
-          <%= link_to 'Export Data', export_publication_path(publication) %>
+          <%= link_to 'Export Grave Data', export_publication_path(publication) %>
+          <div class="vr mx-1"></div>
+          <%= link_to 'Export Lithics', export_lithics_publication_path(publication) %>
         </td>
       </tr>
     <% end %>
