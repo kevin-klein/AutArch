@@ -18,6 +18,6 @@ class SkeletonPosition
       image: file
     })
 
-    response.parse["predictions"]
+    response.parse["predictions"].tr(" ", "_")
   end
 end

@@ -1,0 +1,3 @@
+class FeatureSimilarity < ObjectSimilarity
+
+end

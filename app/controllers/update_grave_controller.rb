@@ -61,7 +61,7 @@ class UpdateGraveController < ApplicationController
   end
 
   def finish_wizard_path
-    next_grave = Grave.order(:id).where("id > ?", @grave.id).first
+    next_grave = Grave.order(:id).where("id > ?", @grave.id).where("probability > 0.6").first
     if !next_grave.nil?
       grave_update_grave_path(next_grave, :set_grave_data)
     else
@@ -76,6 +76,7 @@ class UpdateGraveController < ApplicationController
         :page_size,
         :identifier,
         :site_id,
+        :internment_type,
         tag_ids: [],
         skeleton_figures_attributes: %i[id deposition_type]
       )

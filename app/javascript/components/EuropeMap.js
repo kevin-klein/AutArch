@@ -101,7 +101,7 @@ function Markers ({ orientations }) {
         position={[orientation.site.lat, orientation.site.lon]}
         eventHandlers={{
           click: (e) => {
-            window.location.href = `/graves?search[site_id]=${site.id}`
+            window.open(`/graves?search[site_id]=${site.id}`, '_blank').focus()
           }
         }}
       >
