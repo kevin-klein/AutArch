@@ -12,7 +12,12 @@ Rails.application.routes.draw do # rubocop:disable Metrics/BlockLength
   resources :chronologies do
     resources :c14_dates
   end
-  resources :lithics
+  resources :lithics do
+    member do
+      get :sam_contour
+    end
+    resources :update_lithic
+  end
   resources :kurgans
   resources :sites
   resources :maps

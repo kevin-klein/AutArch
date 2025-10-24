@@ -8,10 +8,13 @@ import io
 import os
 import torchvision
 from pyefd import elliptic_fourier_descriptors
-from segment_anything import SamPredictor, sam_model_registry
+# from segment_anything import SamPredictor, sam_model_registry
+from mobile_sam import sam_model_registry, SamPredictor
 import cv2
 import matplotlib.pyplot as plt
 from transformers import AutoModelForObjectDetection, AutoImageProcessor
+import json
+from math import pi, atan2
 
 def show_mask(mask, ax, random_color=False, borders = True):
     if random_color:
@@ -64,8 +67,8 @@ if torch.cuda.is_available():
 else:
     device = torch.device('cpu')
 
-sam_checkpoint = "models/sam_vit_h_4b8939.pth"
-model_type = 'vit_h'
+sam_checkpoint = "models/mobile_sam.pt"
+model_type = 'vit_t'
 
 sam = sam_model_registry[model_type](checkpoint=sam_checkpoint)
 sam.to(device=device)
@@ -214,9 +217,62 @@ def save_masks_as_images(masks, output_dir="masks_out"):
 
     print(f"Saved {len(masks)} masks to '{output_dir}/'")
 
+class clockwise_angle_and_distance():
+    '''
+    A class to tell if point is clockwise from origin or not.
+    This helps if one wants to use sorted() on a list of points.
+
+    Parameters
+    ----------
+    point : ndarray or list, like [x, y]. The point "to where" we g0
+    self.origin : ndarray or list, like [x, y]. The center around which we go
+    refvec : ndarray or list, like [x, y]. The direction of reference
+
+    use:
+        instantiate with an origin, then call the instance during sort
+    reference:
+    https://stackoverflow.com/questions/41855695/sorting-list-of-two-dimensional-coordinates-by-clockwise-angle-using-python
+
+    Returns
+    -------
+    angle
+
+    distance
+
+
+    '''
+    def __init__(self, origin):
+        self.origin = origin[0]
+
+    def __call__(self, point, refvec = [0, 1]):
+        point = point[0]
+        if self.origin is None:
+            raise NameError("clockwise sorting needs an origin. Please set origin.")
+        # Vector between point and the origin: v = p - o
+        vector = [point[0]-self.origin[0], point[1]-self.origin[1]]
+        # Length of vector: ||v||
+        lenvector = np.linalg.norm(vector[0] - vector[1])
+        # If length is zero there is no angle
+        if lenvector == 0:
+            return -pi, 0
+        # Normalize vector: v/||v||
+        normalized = [vector[0]/lenvector, vector[1]/lenvector]
+        dotprod  = normalized[0]*refvec[0] + normalized[1]*refvec[1] # x1*x2 + y1*y2
+        diffprod = refvec[1]*normalized[0] - refvec[0]*normalized[1] # x1*y2 - y1*x2
+        angle = atan2(diffprod, dotprod)
+        # Negative angles represent counter-clockwise angles so we need to
+        # subtract them from 2*pi (360 degrees)
+        if angle < 0:
+            return 2*pi+angle, lenvector
+        # I return first the angle because that's the primary sorting criterium
+        # but if two vectors have the same angle then the shorter distance
+        # should come first.
+        return angle, lenvector
+
 @app.post('/segment')
 def segment_route():
     upload_file = request.POST['image']
+    points = request.POST['points']
     request_object_content = upload_file.file.read()
     pil_image = Image.open(io.BytesIO(request_object_content))
     open_cv_image = np.array(pil_image)
@@ -225,8 +281,9 @@ def segment_route():
 
     predictor.set_image(open_cv_image)
 
-    input_point = np.array([[width / 2, height / 2]])
-    input_label = np.array([1])
+    points = json.loads(points)
+    input_point = np.array(points)
+    input_label = np.array([1] * len(points))
 
     masks, scores, logits = predictor.predict(
         point_coords=input_point,
@@ -250,11 +307,10 @@ def segment_route():
     mask *= 255
 
     contours, _  = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
-    largest_contour = max(contours, key=cv2.contourArea)
 
     return { 'predictions': {
         'score': score.item(),
-        'contour': largest_contour.astype(int).tolist()
+        'contour': [contour[:, 0, :].astype(int).tolist() for contour in contours]
     } }
 
 @app.post('/')

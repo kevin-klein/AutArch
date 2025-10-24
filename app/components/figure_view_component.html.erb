@@ -37,7 +37,7 @@
           <%= figure.type %> <%= figure.id %>
         </text>
     <% else %>
-      <% if @contours && ['Grave', 'Arrow', 'GraveCrossSection', 'Scale', 'Ceramic'].include?(figure.class.to_s) %>
+      <% if @contours && ['Grave', 'Arrow', 'GraveCrossSection', 'Scale', 'Ceramic', 'StoneTool'].include?(figure.class.to_s) %>
         <polyline
           points='<%= contour_path(figure, figure.contour) %>'
           fill='#3F51B5'
