@@ -74,6 +74,21 @@ class GraveSize
     end
   end
 
+  def existing_contour_stats(figure)
+    contour = figure.contour
+    if contour.nil? || contour.empty?
+      nil
+    else
+      rect = MinOpenCV.minAreaRect(contour.flatten(1))
+
+      figure.assign_attributes(
+        width: rect[:width],
+        height: rect[:height]
+      )
+      figure.save!
+    end
+  end
+
   def contour_stats(figure, image)
     image = MinOpenCV.extractFigure(figure, image)
     image = MinOpenCV.invert(image)

@@ -83,6 +83,16 @@ class Grave < Figure
     inhumation: 2
   }
 
+  with_unit :area, square: true
+  with_unit :perimeter
+  with_unit :width
+  with_unit :height
+  with_unit :bounding_box_width
+  with_unit :bounding_box_height
+
+  with_unit :normalized_width
+  with_unit :normalized_height
+
   def upwards?
     width < height
   end
@@ -113,16 +123,6 @@ class Grave < Figure
   def meter_pixel
     scale&.width
   end
-
-  with_unit :area, square: true
-  with_unit :perimeter
-  with_unit :width
-  with_unit :height
-  with_unit :bounding_box_width
-  with_unit :bounding_box_height
-
-  with_unit :normalized_width
-  with_unit :normalized_height
 
   def normalized_width
     if bounding_box_width.present?

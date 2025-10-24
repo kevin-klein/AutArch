@@ -54,8 +54,6 @@ class GravesController < AuthorizedController
       @graves.joins(:publication).reorder("figures.created_at")
     end
 
-    ap @graves.count
-
     @graves_pagy, @graves = pagy(@graves.all)
   end
 

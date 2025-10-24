@@ -1,0 +1,26 @@
+<%= render("stepper") %>
+
+<div class="alert alert-primary" role="alert">
+  This tab allows you to resize bounding boxes and create new boxes (if necessary) for
+  different objects on the page, related to this particular burial.
+</div>
+
+<%= react_component(
+  "BoxResizer",
+  props: {
+    image:
+      @lithic.page.image.as_json.merge(href: @lithic.page.image.url),
+    grave:
+      @lithic.as_json(
+        methods: [:type],
+        include: {
+          figures: {
+            methods: [:type]
+          }
+        }
+      ),
+    sites: Site.all,
+    page: @lithic.page,
+    next_url: wizard_path
+  }
+) %>
