@@ -13,7 +13,7 @@
 class User < ApplicationRecord
   has_many :publications
 
-  enum role: {
+  enum :role, {
     user: 1,
     admin: 2
   }
