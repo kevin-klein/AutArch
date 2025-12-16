@@ -78,7 +78,7 @@ class Grave < Figure
 
   has_many :ceramics, dependent: :destroy, foreign_key: "parent_id", class_name: "Ceramic", inverse_of: :grave
 
-  enum internment_type: {
+  enum :internment_type, {
     cremation: 1,
     inhumation: 2
   }

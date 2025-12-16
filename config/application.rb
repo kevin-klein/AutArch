@@ -11,6 +11,11 @@ module Dfgrb
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 7.0
 
+    # Please, add to the `ignore` list any other `lib` subdirectories that do
+    # not contain `.rb` files, or that should not be reloaded or eager loaded.
+    # Common ones are `templates`, `generators`, or `middleware`, for example.
+    config.autoload_lib(ignore: %w[assets tasks])
+
     # Configuration for the application, engines, and railties goes here.
     #
     # These settings can be overridden in specific environments using the files
@@ -18,18 +23,5 @@ module Dfgrb
     #
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
-
-    config.action_mailer.smtp_settings = {
-      address: "mail.uni-mainz.de",
-      port: 587,
-      user_name: "kkevin",
-      password: "A1n#2u,bis12",
-      authentication: "login",
-      enable_starttls: true,
-      open_timeout: 5,
-      read_timeout: 5
-    }
   end
 end
-
-# pyfrom 'scipy.cluster.hierarchy', import: [:dendrogram, :linkage]

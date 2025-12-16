@@ -12,8 +12,8 @@
 class Page < ApplicationRecord
   belongs_to :publication
   belongs_to :image, dependent: :destroy
-  # has_many :text_items, dependent: :destroy
-  # has_many :page_texts, dependent: :destroy
+  has_many :text_items, dependent: :destroy
+  has_many :page_texts, dependent: :destroy
   has_many :figures, inverse_of: :page, dependent: :destroy
   has_many :ceramics, inverse_of: :page, dependent: :destroy
   has_many :graves, through: :figures

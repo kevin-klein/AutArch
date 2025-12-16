@@ -62,7 +62,7 @@ class SkeletonFigure < Figure
 
   has_many :skulls, foreign_key: "parent_id", class_name: "Skull"
 
-  enum deposition_type: {
+  enum :deposition_type, {
     unknown: 0,
     extended_supine: 1,
     flexed_on_the_left: 2,

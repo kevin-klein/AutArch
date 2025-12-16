@@ -2,6 +2,7 @@
   "name": "app",
   "private": true,
   "dependencies": {
+    "@apollo/client": "^4.0.10",
     "@babel/core": "7",
     "@babel/plugin-transform-runtime": "7",
     "@babel/preset-env": "7",
@@ -22,6 +23,7 @@
     "compression-webpack-plugin": "9",
     "css-loader": "^6.7.3",
     "css-minimizer-webpack-plugin": "^4.2.2",
+    "graphql": "^16.12.0",
     "ignore-loader": "^0.1.2",
     "jquery": "^3.6.3",
     "konva": "^9.2.0",
