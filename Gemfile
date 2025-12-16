@@ -1,10 +1,10 @@
 source "https://rubygems.org"
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-ruby "3.1.6"
+ruby "3.3.10"
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails', branch: 'main'
-gem "rails", "~> 7.0.2", ">= 7.0.2.3"
+gem "rails", "~> 8.1"
 
 gem "awesome_print"
 
@@ -15,6 +15,8 @@ gem "cancancan"
 gem "mina"
 gem "rmagick"
 gem "sprockets-rails"
+gem "mittens"
+gem "engtagger"
 
 gem "graphql"
 gem "message_bus"
@@ -49,6 +51,9 @@ gem "active_median"
 gem "turbo-rails"
 gem "wicked"
 
+gem 'torch-rb'
+gem 'torchvision'
+
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 gem "jbuilder"
 
@@ -80,7 +85,6 @@ gem "rubyzip", require: "zip"
 gem "csv"
 gem "ruby-vips"
 gem "victor"
-gem "rumale"
 gem "concurrent-ruby", "1.3.4"
 
 group :development, :test do
@@ -123,7 +127,7 @@ gem "stemmify", "~> 0.0.2"
 
 gem "amatch", "~> 0.4.1"
 
-gem "view_component", "~> 2.82"
+gem "view_component"
 
 gem "ruby-progressbar", "~> 1.13"
 
