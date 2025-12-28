@@ -1,4 +1,4 @@
-<%= simple_form_for :search, url: lithics_path, method: "GET", html: { class: 'form-inline' } do |f| %>
+<%= simple_form_for :search, url: url_for(params.permit!.to_h), method: "GET", html: { class: 'form-inline' } do |f| %>
   <%= f.input :publication_id,
           collection:
             Publication
@@ -38,7 +38,7 @@
   </thead>
 
   <tbody>
-    <% @lithics.each do |lithic| %>
+    <% @figures.each do |lithic| %>
       <tr>
         <td><%= lithic.publication.author %> <%= lithic.publication.year %></td>
         <td><%= lithic.site&.name %></td>
@@ -51,11 +51,11 @@
         </td>
         <td><%= lithic.tags.map { _1.name }.join(' ') %></td>
         <td>
-          <%= link_to("Edit", lithic_update_lithic_path(lithic, :set_lithic_data)) %>
+          <%= link_to("Edit", size_figure_update_size_figure_path(lithic, :set_data)) %>
         </td>
       </tr>
     <% end %>
   </tbody>
 </table>
 
-<%== pagy_bootstrap_combo_nav_js(@lithics_pagy) %>
+<%== @figures_pagy.series_nav(:bootstrap) %>

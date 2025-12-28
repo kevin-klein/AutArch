@@ -1,0 +1,20 @@
+<%= render("stepper") %>
+
+<div class='row'>
+  <div class='col-md-6'>
+    <div class="online_3d_viewer"
+      style="min-height: 600px;"
+      model="<%= rails_blob_path(@figure.three_d_model) %>">
+    </div>
+  </div>
+
+  <div class='col-md-6'>
+    <%= render(
+      FigureViewComponent.new(
+        figures: @figure.figures,
+        image: @figure.page.image,
+        contours: true
+      )
+    ) %>
+  </div>
+</div>

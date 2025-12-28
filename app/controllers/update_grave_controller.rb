@@ -2,6 +2,23 @@ class UpdateGraveController < ApplicationController
   include Wicked::Wizard
   steps :set_grave_data, :set_site, :set_tags, :resize_boxes, :show_contours, :set_scale, :set_north_arrow, :set_skeleton_data
 
+  def skeleton_keypoints
+    skeleton = SkeletonFigure.find(params[:skeleton_id])
+    keypoints = AnalyzeSkeleton.new.run(skeleton)
+    # raise
+    skeleton.key_points.destroy_all
+    keypoints[0].each do |name, data|
+      next if data[:x].nil?
+      skeleton.key_points.create!(
+        label: name,
+        x: data[:x],
+        y: data[:y]
+      )
+    end
+
+    redirect_to grave_update_grave_path(params[:grave_id], :set_skeleton_data)
+  end
+
   def show
     @grave = Grave.find(params[:grave_id])
     @scale = @grave.scale

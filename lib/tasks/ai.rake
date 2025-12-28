@@ -1,6 +1,10 @@
 namespace :ai do
   task center_net_pose: :environment do
-    model = Vision::CenterNet::PoseModel.new(num_classes: 1, num_keypoints: 15)
+    model = Vision::CenterNet::PoseModel.new(
+      backbone: 'simple',
+      input_size: 256,
+      heatmap_size: 64
+    )
     model.load_state_dict(Torch.load("models/center_net_keypoints.pth"))
     model.eval
 

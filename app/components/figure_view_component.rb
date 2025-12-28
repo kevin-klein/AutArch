@@ -2,7 +2,6 @@
 
 class FigureViewComponent < ViewComponent::Base
   def initialize(figures:, image:, contours: false, highlight_figure: nil)
-    super
     @figures = figures
     @image = image
     @contours = contours

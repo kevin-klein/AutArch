@@ -37,6 +37,17 @@
           <%= figure.type %> <%= figure.id %>
         </text>
     <% else %>
+      <% figure.key_points.each do |keypoint| %>
+        <text
+          x='<%= figure.x1 + keypoint.x %>'
+          y='<%= figure.y1 + keypoint.y %>'
+          style='font-size: 18px;'
+          >
+          <%= keypoint.label %>
+        </text>
+        <circle cx=<%= keypoint.x + figure.x1 %> cy=<%= keypoint.y + figure.y1 %> r="5" />
+      <% end %>
+
       <% if @contours && ['Grave', 'Arrow', 'GraveCrossSection', 'Scale', 'Ceramic', 'StoneTool'].include?(figure.class.to_s) %>
         <polyline
           points='<%= contour_path(figure, figure.contour) %>'

@@ -10,14 +10,14 @@
     <%= react_component(
       "SamPointSelector",
       props: {
-        figure: @lithic.as_json(methods: [:type]),
-        image: @lithic.page.image.as_json(methods: [:url]),
-        url: sam_contour_lithic_path(@lithic)
+        figure: @figure.as_json(methods: [:type]),
+        image: @figure.page.image.as_json(methods: [:url]),
+        url: size_figure_sam_contour_path(@figure)
       }
     ) %>
   </div>
   <div class='col-md-6'>
-    <%= simple_form_for(@lithic, url: wizard_path) do |f| %>
+    <%= simple_form_for(@figure, url: wizard_path) do |f| %>
       <%= f.submit("Next", class: "btn btn-primary") %>
     <% end %>
   </div>

@@ -2,7 +2,7 @@
   <% wizard_steps.each do |step| %>
     <li class="stepper-item <%= step.to_s == params[:id] ? 'active' : '' %>">
       <h3 class="stepper-title">
-        <%= link_to(t(step), lithic_update_lithic_path(params[:lithic_id], step)) %>
+        <%= link_to(t(step), size_figure_update_size_figure_path(params[:size_figure_id], step)) %>
       </h3>
     </li>
   <% end %>

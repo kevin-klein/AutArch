@@ -48,6 +48,13 @@ namespace :export do
     File.write(Rails.root.join("page_#{page_id}.json").to_s, JSON.pretty_generate(data))
   end
 
+  task ceramics: :environment do
+    Ceramic.where('probability > 0.6').find_each do |ceramics|
+      image = MinOpenCV.extractFigure(ceramics, ceramics.page.image.data)
+      MinOpenCV.imwrite(Rails.root.join("ceramics", "#{ceramics.id}.jpg").to_s, image)
+    end
+  end
+
   task single_masks: :environment do
     require "rvg/rvg"
 
@@ -273,7 +280,7 @@ namespace :export do
   end
 
   task skeletons: :environment do
-    SkeletonFigure.find_each do |skeleton|
+    SkeletonFigure.where('probability > 0.6').find_each do |skeleton|
       image = MinOpenCV.extractFigure(skeleton, skeleton.page.image.data)
       MinOpenCV.imwrite(Rails.root.join("skeletons", "#{skeleton.id}.jpg").to_s, image)
     end
@@ -293,7 +300,7 @@ namespace :export do
     skeletons = SkeletonFigure
       .includes(:grave)
       .joins(:grave)
-    # .where("figures.probability > ?", 0.6)
+      .where("figures.probability > ?", 0.6)
 
     skeletons.find_each do |skeleton|
       spine = skeletonbash.grave.spines.first

@@ -15,6 +15,7 @@ import matplotlib.pyplot as plt
 from transformers import AutoModelForObjectDetection, AutoImageProcessor
 import json
 from math import pi, atan2
+from transformers import BitsAndBytesConfig, AutoModelForSeq2SeqLM, AutoTokenizer
 
 def show_mask(mask, ax, random_color=False, borders = True):
     if random_color:
@@ -91,7 +92,7 @@ loaded_model = AutoModelForObjectDetection.from_pretrained(
     id2label=id2label,
     label2id=label2id,
     num_labels=len(labels),
-    ignore_mismatched_sizes=True # Allow re-initialization of final layer
+    ignore_mismatched_sizes=True
 )
 
 loaded_model.eval()
@@ -116,6 +117,22 @@ skeleton_model.load_state_dict(torch.load('models/skeleton_convnext_tiny.model',
 sam = sam_model_registry["vit_h"](checkpoint="models/sam_vit_h_4b8939.pth")
 sam.to(device)
 predictor = SamPredictor(sam)
+
+# quantization_config = BitsAndBytesConfig(
+#     load_in_4bit=True,
+#     bnb_4bit_compute_dtype=torch.bfloat16,
+#     bnb_4bit_quant_type="nf4"
+# )
+# tokenizer = AutoTokenizer.from_pretrained(
+#     "google/pegasus-cnn_dailymail"
+# )
+# print(tokenizer.max_len_single_sentence)
+# model = AutoModelForSeq2SeqLM.from_pretrained(
+#     "google/pegasus-cnn_dailymail",
+#     dtype=torch.bfloat16,
+#     device_map="auto",
+#     quantization_config=quantization_config
+# )
 
 def object_features(file):
     request_object_content = file.read()
@@ -217,57 +234,18 @@ def save_masks_as_images(masks, output_dir="masks_out"):
 
     print(f"Saved {len(masks)} masks to '{output_dir}/'")
 
-class clockwise_angle_and_distance():
-    '''
-    A class to tell if point is clockwise from origin or not.
-    This helps if one wants to use sorted() on a list of points.
+@app.post('/summary')
+def summarize():
+    text = request.POST['text']
 
-    Parameters
-    ----------
-    point : ndarray or list, like [x, y]. The point "to where" we g0
-    self.origin : ndarray or list, like [x, y]. The center around which we go
-    refvec : ndarray or list, like [x, y]. The direction of reference
+    input_ids = tokenizer(text, return_tensors="pt").to(model.device)
+    output = model.generate(**input_ids, cache_implementation="static")
 
-    use:
-        instantiate with an origin, then call the instance during sort
-    reference:
-    https://stackoverflow.com/questions/41855695/sorting-list-of-two-dimensional-coordinates-by-clockwise-angle-using-python
+    print(output)
 
-    Returns
-    -------
-    angle
-
-    distance
-
-
-    '''
-    def __init__(self, origin):
-        self.origin = origin[0]
-
-    def __call__(self, point, refvec = [0, 1]):
-        point = point[0]
-        if self.origin is None:
-            raise NameError("clockwise sorting needs an origin. Please set origin.")
-        # Vector between point and the origin: v = p - o
-        vector = [point[0]-self.origin[0], point[1]-self.origin[1]]
-        # Length of vector: ||v||
-        lenvector = np.linalg.norm(vector[0] - vector[1])
-        # If length is zero there is no angle
-        if lenvector == 0:
-            return -pi, 0
-        # Normalize vector: v/||v||
-        normalized = [vector[0]/lenvector, vector[1]/lenvector]
-        dotprod  = normalized[0]*refvec[0] + normalized[1]*refvec[1] # x1*x2 + y1*y2
-        diffprod = refvec[1]*normalized[0] - refvec[0]*normalized[1] # x1*y2 - y1*x2
-        angle = atan2(diffprod, dotprod)
-        # Negative angles represent counter-clockwise angles so we need to
-        # subtract them from 2*pi (360 degrees)
-        if angle < 0:
-            return 2*pi+angle, lenvector
-        # I return first the angle because that's the primary sorting criterium
-        # but if two vectors have the same angle then the shorter distance
-        # should come first.
-        return angle, lenvector
+    return {
+        'summary': tokenizer.decode(output[0], skip_special_tokens=True)
+    }
 
 @app.post('/segment')
 def segment_route():

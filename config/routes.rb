@@ -12,17 +12,32 @@ Rails.application.routes.draw do # rubocop:disable Metrics/BlockLength
   resources :chronologies do
     resources :c14_dates
   end
-  resources :lithics do
-    member do
-      get :sam_contour
-    end
-    resources :update_lithic
+
+  get '/figures/:figure_type', to: 'size_figures#index'
+  delete '/figures/:figure_type/:id', to: 'size_figures#destroy'
+
+  resources :size_figures do
+    resources :update_size_figure
+
+    get :sam_contour
   end
+
+
+  # resources :lithics do
+  #   member do
+  #     get :sam_contour
+  #   end
+  #   # resources :update_lithic
+  # end
   resources :kurgans
   resources :sites
   resources :maps
   resources :graves do
-    resources :update_grave
+    resources :update_grave do
+      collection do
+        get :skeleton_keypoints
+      end
+    end
     collection do
       get :stats
       get :orientations

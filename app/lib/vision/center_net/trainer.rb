@@ -2,45 +2,79 @@ module Vision
   module CenterNet
     class Trainer
       def initialize
-        @data = Vision::KeypointDataset.parse_labelstudio_json("training_data/Keynote Skeletons.json", "training_data/skeleton_keypoint_images")
-        @dataset = Vision::KeypointDataset.new(@data, downsample: 32)
+        transforms = TorchVision::Transforms::Compose.new([
+          TorchVision::Transforms::Resize.new([256, 256]),
+          TorchVision::Transforms::ToTensor.new
+        ])
+        @dataset = Vision::KeypointDataset.new("training_data/Keynote Skeletons.json",
+          "training_data/skeleton_keypoint_images",
+          input_size: 256,
+          heatmap_size: 64,
+          transform: transforms,
+          max_persons_per_image: 1
+        )
       end
 
-      def train(model, epochs: 50, batch_size: 8, lr: 1e-4, device: "cpu")
+      def train(model, epochs: 50, batch_size: 8, lr: 1e-4, device: "cuda")
         model.to(device)
-        opt = Torch::Optim::AdamW.new(model.parameters, lr: lr)
+        model.train
+        optimizer = Torch::Optim::Adam.new(model.parameters, lr: lr)
 
-        indices = (0...@dataset.length).to_a
+        criterion = KeypointDetectionLoss.new
+        criterion.to(device)
 
         epochs.times do |epoch|
-          indices.shuffle!
           total_loss = 0.0
-          steps = 0
+          batches = 0
 
-          indices.each_slice(batch_size) do |batch_idxs|
-            imgs, tgt = @dataset.get_batch(batch_idxs)
+          # Shuffle indices
+          indices = (0...@dataset.size).to_a.shuffle
 
-            imgs = imgs.to(device)
-            tgt.each { |k, v| tgt[k] = v.to(device) }
+          0.step(indices.size - 1, batch_size) do |start_idx|
+            batch_indices = indices[start_idx, batch_size]
+            next if batch_indices.nil? || batch_indices.empty?
 
-            out = model.call(imgs)
+            # Initialize batch tensors
+            batch_images = []
+            batch_heatmaps = []
+            batch_visibility = []
 
-            loss_hm = Vision::CenterNet::Loss.focal_loss(out[:heatmap], tgt[:heatmap])
-            loss_sz = Vision::CenterNet::Loss.l1_loss(out[:size], tgt[:size], tgt[:mask])
-            loss_of = Vision::CenterNet::Loss.l1_loss(out[:offset], tgt[:offset], tgt[:mask])
-            loss_kp = Vision::CenterNet::Loss.l1_loss(out[:kpts], tgt[:kpts], tgt[:mask])
+            batch_indices.each do |idx|
+              sample = @dataset[idx]
+              batch_images << sample[:image]
+              batch_heatmaps << sample[:heatmaps]
+              batch_visibility << sample[:visibility]
+            end
 
-            loss = loss_hm + loss_sz + loss_of + loss_kp
+            # Stack into batch tensors
+            images = Torch.stack(batch_images, 0).to(device)
+            target_heatmaps = Torch.stack(batch_heatmaps, 0).to(device)
+            target_visibility = Torch.stack(batch_visibility, 0).to(device)
 
-            opt.zero_grad
-            loss.backward
-            opt.step
+            # Forward pass
+            output = model.call(images)
+            pred_heatmaps = output[:heatmaps]
+            pred_visibility = output[:visibility]
 
-            total_loss += loss.item
-            steps += 1
+
+            # Combined loss with weighting
+            loss = criterion.call(pred_heatmaps, target_heatmaps, pred_visibility, target_visibility)
+
+            # Backward pass
+            optimizer.zero_grad
+            loss[:total].backward
+            optimizer.step
+
+            total_loss += loss[:total].item
+            batches += 1
+
+            if batches % 10 == 0
+              puts "Epoch #{epoch + 1}, Batch #{batches}: Loss = #{loss[:total].item.round(4)}"
+            end
           end
 
-          puts "Epoch #{epoch + 1}: loss=#{total_loss / steps}"
+          avg_loss = total_loss / batches if batches > 0
+          puts "Epoch #{epoch + 1} completed. Average loss: #{avg_loss.round(4)}"
         end
 
         Torch.save(model.state_dict, "models/center_net_keypoints.pth")

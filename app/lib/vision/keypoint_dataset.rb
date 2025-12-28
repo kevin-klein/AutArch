@@ -1,18 +1,24 @@
 module Vision
-  KEYPOINT_NAMES = [
-    "Head", "neck", "left shoulder", "right shoulder",
-    "left elbow", "right elbow", "left wrist", "right wrist",
-    "pelvic", "left hip", "right hip",
-    "left knee", "right knee", "left ankle", "right ankle"
-  ]
-  NUM_KEYPOINTS = KEYPOINT_NAMES.length
-  KP_NAME_TO_IDX = KEYPOINT_NAMES.each_with_index.to_h
-
-  # ------------------------------------------------------------
-  # CenterNet-Pose Dataset
-  # ------------------------------------------------------------
   class KeypointDataset
-    def self.parse_labelstudio_json(json_path, image_dir)
+    attr_reader :keypoint_names, :num_keypoints, :kp_name_to_idx
+
+    def initialize(json_path, image_dir, transform: nil, input_size: 256, heatmap_size: 64, max_persons_per_image: 1)
+      @json_path = json_path
+      @image_dir = image_dir
+      @transform = transform
+      @input_size = input_size
+      @heatmap_size = heatmap_size
+      @max_persons_per_image = max_persons_per_image
+
+      @keypoint_names = CenterNet::PoseModel::KEYPOINT_NAMES
+      @num_keypoints = CenterNet::PoseModel::NUM_KEYPOINTS
+      @kp_name_to_idx = CenterNet::PoseModel::KP_NAME_TO_IDX
+
+      @records = parse_labelstudio_json(json_path, image_dir)
+      @samples = prepare_samples
+    end
+
+    def parse_labelstudio_json(json_path, image_dir)
       data = JSON.parse(File.read(json_path))
       records = []
 
@@ -77,110 +83,109 @@ module Vision
       records
     end
 
-    def self.transforms
-      @transforms ||= TorchVision::Transforms::Compose.new([
-        TorchVision::Transforms::Resize.new([@input_size, @input_size]),
-        TorchVision::Transforms::ToTensor.new
-      ])
+    def prepare_samples
+      samples = []
+
+      @records.each do |record|
+        image_path = record[:image_path]
+        width = record[:width]
+        height = record[:height]
+
+        # Process each person (or up to max_persons_per_image)
+        record[:persons].take(@max_persons_per_image).each do |person_kps|
+          # Create arrays for all keypoints
+          keypoints = Array.new(@num_keypoints) { [nil, nil] }
+          visibility = Array.new(@num_keypoints, 0)
+
+          person_kps.each do |kp_name, (x_abs, y_abs)|
+            idx = @kp_name_to_idx[kp_name]
+            if idx
+              # Convert to normalized coordinates
+              x_norm = x_abs / width.to_f
+              y_norm = y_abs / height.to_f
+              keypoints[idx] = [x_norm, y_norm]
+              visibility[idx] = 1
+            end
+          end
+
+          samples << {
+            image_path: image_path,
+            width: width,
+            height: height,
+            keypoints: keypoints,
+            visibility: visibility
+          }
+        end
+      end
+
+      samples
     end
 
-    def initialize(records, input_size: 256, downsample: 8)
-      @records = records
-      @input_size = input_size
-      @down = downsample
-      @out_size = input_size / downsample
-      @transforms = transforms
+    def [](index)
+      sample = @samples[index]
+
+      # Load and preprocess image
+      img = Vips::Image.new_from_file(sample[:image_path])
+      img = img.colourspace("srgb")
+
+      # Resize to input size
+      img = img.resize(@input_size.to_f / img.width, vscale: @input_size.to_f / img.height)
+
+      # Convert to array and normalize to [0, 1]
+      img_array = img.to_a
+      img_tensor = Torch.tensor(img_array).permute(2, 0, 1).float / 255.0
+
+      # Generate heatmaps
+      heatmaps = generate_heatmaps(
+        sample[:keypoints],
+        sample[:visibility],
+        size: [@heatmap_size, @heatmap_size]
+      )
+
+      {
+        image: img_tensor,
+        heatmaps: heatmaps,
+        visibility: Torch.tensor(sample[:visibility], dtype: :float32),
+        original_size: [sample[:width], sample[:height]],
+        image_path: sample[:image_path]
+      }
+    end
+
+    def size
+      @samples.size
     end
 
     def length
-      @records.length
+      size
     end
 
-    def get_item(idx)
-      rec = @records[idx]
-      img = Vips::Image.new_from_file(rec[:image_path])
-      img = img.colourspace("b-w")
+    private
 
-      img_t = @transforms.call(img)
+    def generate_heatmaps(keypoints, visibility, size: [64, 64])
+      height, width = size
+      heatmaps = Torch.zeros([@num_keypoints, height, width])
 
-      # Targets
-      heatmap = Torch.zeros(1, @out_size, @out_size)
-      size = Torch.zeros(2, @out_size, @out_size)
-      offset = Torch.zeros(2, @out_size, @out_size)
-      kpts = Torch.zeros(NUM_KEYPOINTS * 2, @out_size, @out_size)
-      mask = Torch.zeros(1, @out_size, @out_size)
+      @num_keypoints.times do |k|
+        next unless visibility[k] == 1
 
-      rec[:persons].each do |person|
-        xs = []
-        ys = []
+        x_norm, y_norm = keypoints[k]
+        next if x_norm.nil? || y_norm.nil?
 
-        person.each do |_, (x, y)|
-          xs << x * @input_size / rec[:width]
-          ys << y * @input_size / rec[:height]
-        end
+        # Convert normalized coordinates to heatmap coordinates
+        x_heatmap = (x_norm * (width - 1)).to_i
+        y_heatmap = (y_norm * (height - 1)).to_i
 
-        next if xs.empty?
+        # Create Gaussian heatmap
+        sigma = 2.0
+        grid_y, grid_x = Torch.meshgrid(
+          [Torch.arange(0, height, dtype: :float32), Torch.arange(0, width, dtype: :float32)]
+        )
 
-        cx = xs.sum / xs.length
-        cy = ys.sum / ys.length
-
-        cx_ds = cx / @down
-        cy_ds = cy / @down
-        cx_i = cx_ds.floor
-        cy_i = cy_ds.floor
-
-        next if cx_i < 0 || cy_i < 0 || cx_i >= @out_size || cy_i >= @out_size
-
-        heatmap[0, cy_i, cx_i] = 1.0
-        offset[0, cy_i, cx_i] = cx_ds - cx_i
-        offset[1, cy_i, cx_i] = cy_ds - cy_i
-        mask[0, cy_i, cx_i] = 1.0
-
-        w = xs.max - xs.min
-        h = ys.max - ys.min
-        size[0, cy_i, cx_i] = w / @down
-        size[1, cy_i, cx_i] = h / @down
-
-        person.each do |name, (x, y)|
-          k = KP_NAME_TO_IDX[name]
-          next if k.nil?
-          kpts[2 * k, cy_i, cx_i] = (x * @input_size / rec[:width] - cx) / @down
-          kpts[2 * k + 1, cy_i, cx_i] = (y * @input_size / rec[:height] - cy) / @down
-        end
+        heatmap = Torch.exp(-((grid_x - x_heatmap)**2 + (grid_y - y_heatmap)**2) / (2 * sigma**2))
+        heatmaps[k] = heatmap
       end
 
-      [img_t, {heatmap: heatmap, size: size, offset: offset, kpts: kpts, mask: mask}]
-    end
-
-    # ---- batching helper ----
-    def get_batch(indices)
-      imgs = []
-      hms = []
-      szs = []
-      ofs = []
-      kps = []
-      mks = []
-
-      indices.each do |i|
-        img, tgt = get_item(i)
-        imgs << img
-        hms << tgt[:heatmap]
-        szs << tgt[:size]
-        ofs << tgt[:offset]
-        kps << tgt[:kpts]
-        mks << tgt[:mask]
-      end
-
-      [
-        Torch.stack(imgs),
-        {
-          heatmap: Torch.stack(hms),
-          size: Torch.stack(szs),
-          offset: Torch.stack(ofs),
-          kpts: Torch.stack(kps),
-          mask: Torch.stack(mks)
-        }
-      ]
+      heatmaps
     end
   end
 end

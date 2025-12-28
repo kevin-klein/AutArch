@@ -4,13 +4,13 @@
   <div class='row'>
     <div class='col-md-6'>
       <%= render(
-        FigureViewComponent.new(figures: @lithic.figures, image: @lithic.page.image)
+        FigureViewComponent.new(figures: @figure.figures, image: @figure.page.image)
       ) %>
     </div>
 
     <div class='col-md-6'>
-      <%= simple_form_for(@lithic, url: wizard_path) do |f| %>
-        <%= f.input :percentage_scale, input_html: { value: "1:#{@lithic.percentage_scale}" }, as: :string %>
+      <%= simple_form_for(@figure, url: wizard_path) do |f| %>
+        <%= f.input :percentage_scale, input_html: { value: "1:#{@figure.percentage_scale}" }, as: :string %>
         <%= f.input :page_size %>
         <%= f.submit("Next", class: "btn btn-primary") %>
       <% end %>
@@ -24,7 +24,7 @@
   <div class='row'>
     <div class='col-md-6'>
       <%= render(
-        FigureViewComponent.new(figures: [@lithic.scale], image: @lithic.page.image)
+        FigureViewComponent.new(figures: [@figure.scale], image: @figure.page.image)
       ) %>
     </div>
 
