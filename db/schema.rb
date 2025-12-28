@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_12_16_092344) do
+ActiveRecord::Schema[8.1].define(version: 2025_12_17_131441) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -195,6 +195,16 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_16_092344) do
     t.integer "width"
   end
 
+  create_table "key_points", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "figure_id", null: false
+    t.integer "label", null: false
+    t.datetime "updated_at", null: false
+    t.integer "x", null: false
+    t.integer "y", null: false
+    t.index ["figure_id"], name: "index_key_points_on_figure_id"
+  end
+
   create_table "kurgans", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.integer "height"
@@ -349,6 +359,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_16_092344) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "figures", "pages", on_delete: :cascade
   add_foreign_key "genetics", "skeletons"
+  add_foreign_key "key_points", "figures"
   add_foreign_key "object_similarities", "figures", column: "first_id"
   add_foreign_key "object_similarities", "figures", column: "second_id"
   add_foreign_key "page_texts", "pages"

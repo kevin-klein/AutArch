@@ -16,6 +16,7 @@ import Chart from 'react-apexcharts'
 import simpleheat from '../components/simpleheat'
 import Relations from '../components/Relations'
 // import h337 from 'heatmap.js'
+import * as OV from 'online-3d-viewer'
 
 import ReactOnRails from 'react-on-rails'
 import { Filler, LineElement, PointElement, RadialLinearScale, Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js'
@@ -172,6 +173,10 @@ function ScatterChart ({ data, colors }) {
     />
   )
 }
+
+window.addEventListener('load', () => {
+  OV.Init3DViewerElements()
+})
 
 ChartJS.register(Filler, LineElement, PointElement, ArcElement, Tooltip, Legend, RadialLinearScale)
 ReactOnRails.register({

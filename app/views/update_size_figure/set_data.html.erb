@@ -1,6 +1,6 @@
 <%= render("stepper") %>
 
-<% unless @lithic.page.image.exists? %>
+<% unless @figure.page.image.exists? %>
   <div class="alert alert-danger" role="alert">
     No page image found, it is not recommended to make any changes.
   </div>
@@ -9,15 +9,15 @@
 <div class='row'>
   <div class='col-md-6'>
     <%= render(
-      FigureViewComponent.new(figures: [@lithic], image: @lithic.page.image)
+      FigureViewComponent.new(figures: [@figure], image: @figure.page.image)
     ) %>
   </div>
 
   <div class='col-md-6'>
-    <%= simple_form_for(@lithic, url: wizard_path) do |f| %>
+    <%= simple_form_for(@figure, url: wizard_path) do |f| %>
       <%= f.input :identifier %>
       <%= f.submit("Next", class: "btn btn-primary") %>
     <% end %>
-    <%= link_to("Delete", lithic_path(@lithic), method: :delete, class: 'btn btn-danger mt-2', 'data-confirm': 'Are you sure?') %>
+    <%= link_to("Delete", size_figure_path(@figure), method: :delete, class: 'btn btn-danger mt-2', 'data-confirm': 'Are you sure?') %>
   </div>
 </div>

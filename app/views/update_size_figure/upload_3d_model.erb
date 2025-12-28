@@ -1,0 +1,6 @@
+<%= render('stepper') %>
+
+<%= simple_form_for(@figure, url: wizard_path) do |f| %>
+  <%= f.input :three_d_model, as: :file, label: "3D Model" %>
+  <%= f.submit("Next", class: "btn btn-primary") %>
+<% end %>

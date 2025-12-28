@@ -9,9 +9,9 @@
   "BoxResizer",
   props: {
     image:
-      @lithic.page.image.as_json.merge(href: @lithic.page.image.url),
+      @figure.page.image.as_json.merge(href: @figure.page.image.url),
     grave:
-      @lithic.as_json(
+      @figure.as_json(
         methods: [:type],
         include: {
           figures: {
@@ -20,7 +20,7 @@
         }
       ),
     sites: Site.all,
-    page: @lithic.page,
+    page: @figure.page,
     next_url: wizard_path
   }
 ) %>
