@@ -1,6 +1,6 @@
 <%= render("stepper") %>
 
-<%= simple_form_for(@lithic, url: wizard_path) do |f| %>
+<%= simple_form_for(@figure, url: wizard_path) do |f| %>
   <%= f.input :site_id, collection: Site.order(:name).pluck(:name, :id) %>
   <%= f.submit("Next", class: "btn btn-primary") %>
 <% end %>

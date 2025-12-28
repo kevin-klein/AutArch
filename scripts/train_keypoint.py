@@ -1,329 +1,309 @@
-import torchvision
-import torchvision.transforms.v2  as transforms
-from torchvision.models.detection.keypoint_rcnn import KeypointRCNNPredictor
-from torchvision.models.detection.rpn import AnchorGenerator
-from torchvision.models.detection import keypointrcnn_resnet50_fpn
-import os
+# train_keypointrcnn.py
 import json
-from cjm_torchvision_tfms.core import ResizeMax, PadSquare, CustomRandomIoUCrop, RandomPixelCopy
-from torch.utils.data import Dataset, DataLoader
-from PIL import Image
-import multiprocessing
+import os
+from pathlib import Path
+from typing import List, Dict, Any
 
 import torch
+from torch.utils.data import Dataset, DataLoader
+import torchvision
+from torchvision.models.detection import keypointrcnn_resnet50_fpn, KeypointRCNN_ResNet50_FPN_Weights
+from torchvision.transforms import functional as F
+from torch.optim.lr_scheduler import CosineAnnealingLR
+from PIL import Image
+import numpy as np
 
-base_folder = '/home/kevin/KeypointAnnotate/export/'
+
+# --- Edit this list if your dataset uses different keypoint labels ---
+KEYPOINT_NAMES = [
+    "Head", "neck", "left shoulder", "right shoulder",
+    "left elbow", "right elbow", "left wrist", "right wrist",
+    "pelvic", "left hip", "right hip",
+    "left knee", "right knee", "left ankle", "right ankle"
+]
+NUM_KEYPOINTS = len(KEYPOINT_NAMES)
+KP_NAME_TO_IDX = {n: i for i, n in enumerate(KEYPOINT_NAMES)}
 
 
-def keypoints_to_bbox(keypoints, offset=10):
+def parse_labelstudio_json(json_path: str, image_dir: str):
     """
-    Convert a tensor of keypoint coordinates to a bounding box.
-
-    Args:
-    keypoints (Tensor): A tensor of shape (N, 2), where N is the number of keypoints.
-
-    Returns:
-    Tensor: A tensor representing the bounding box [xmin, ymin, xmax, ymax].
+    Parse the JSON list (Label Studio export-like) into internal records.
+    Returns a list of dicts: {'image_path': ..., 'width':w, 'height':h, 'persons': [ {keypoints: {name: (x,y)}}, ... ] }
     """
-    x_coordinates, y_coordinates = keypoints[:, :, 0], keypoints[:, :, 1]
+    with open(json_path, "r", encoding="utf-8") as f:
+        data = json.load(f)
 
-    xmin = torch.min(x_coordinates)
-    ymin = torch.min(y_coordinates)
-    xmax = torch.max(x_coordinates)
-    ymax = torch.max(y_coordinates)
+    records = []
+    for item in data:
+        file_upload = item.get("file_upload", "")
+        # rule: take the part after the first dash
+        # example: '57b0015b-1.jpg' -> '1.jpg'
+        if "-" in file_upload:
+            filename = file_upload.split("-", 1)[1]
+        else:
+            filename = file_upload
+        image_path = os.path.join(image_dir, filename)
+        # Guard
+        if not os.path.exists(image_path):
+            # skip and warn
+            print(f"WARNING: image not found: {image_path} (skipping)")
+            continue
 
-    return [xmin-offset, ymin-offset, xmax+offset, ymax+offset]
+        width = None
+        height = None
+        persons = []
 
-def load_annotations(file):
-    base_name = os.path.splitext(file)[0]
-    annotations_file = os.path.join(base_folder, f"{base_name}.json")
-    with open(annotations_file, 'r') as f:
-        return json.load(f)
+        annotations = item.get("annotations", []) or []
+        for ann in annotations:
+            # Each annotation contains many 'result' entries (each a keypoint)
+            result = ann.get("result", []) or []
+            # group keypoints for this annotation
+            kp_dict = {}  # name -> (x_abs, y_abs)
+            for r in result:
+                typ = r.get("type", "")
+                val = r.get("value", {})
+                orig_w = r.get("original_width")
+                orig_h = r.get("original_height")
+                if orig_w is not None:
+                    width = orig_w
+                if orig_h is not None:
+                    height = orig_h
+                # assume x,y are percentages (0..100)
+                x_pct = val.get("x")
+                y_pct = val.get("y")
+                labels = val.get("keypointlabels") or []
+                if x_pct is None or y_pct is None or len(labels) == 0:
+                    continue
+                # there may be multiple labels but in your example it's single
+                label = labels[0]
+                # convert to absolute pixel coords
+                if width is None or height is None:
+                    # fall back to reading image size
+                    with Image.open(image_path) as im:
+                        w_img, h_img = im.size
+                        width = w_img if width is None else width
+                        height = h_img if height is None else height
+                x_abs = float(x_pct) / 100.0 * float(width)
+                y_abs = float(y_pct) / 100.0 * float(height)
+                kp_dict[label] = (x_abs, y_abs)
 
-def list_all_classes(images):
-    classes = set()
-    for image in images:
-        image_classes = [annotation['label'] for annotation in load_annotations(image)]
-        classes.update(image_classes)
+            if kp_dict:
+                persons.append(kp_dict)
 
-    return classes
+        # fallback to real image size if not provided in annotations
+        if width is None or height is None:
+            with Image.open(image_path) as im:
+                width, height = im.size
+
+        records.append({
+            "image_path": image_path,
+            "width": int(width),
+            "height": int(height),
+            "persons": persons
+        })
+    return records
+
 
 class KeypointDataset(Dataset):
-    def __init__(self, image_data, classes, transforms=None):
-        super(Dataset, self).__init__()
+    """
+    PyTorch Dataset that returns images and targets suitable for torchvision.keypointrcnn.
+    """
+
+    def __init__(self, records: List[Dict[str, Any]], transforms=None, expand_bbox_factor: float = 0.1):
+        """
+        records: output from parse_labelstudio_json
+        transforms: torchvision transforms to apply to the PIL image (and we'll apply same scaling to boxes/keypoints)
+        expand_bbox_factor: fraction to pad bbox (e.g. 0.1 -> +10%)
+        """
+        self.records = records
         self.transforms = transforms
-        self.image_data = image_data
-        self.labels = list(classes)
-        self.image_names = list(self.image_data.keys())
+        self.expand_bbox_factor = expand_bbox_factor
 
     def __len__(self):
-        return len(self.image_data.keys())
+        return len(self.records)
 
-    def __getitem__(self, index):
-        image = Image.open(os.path.join(base_folder, self.image_names[index])).convert("RGB")
-        image_tensor = transforms.ToTensor()(image)
-        annotations = self.image_data[self.image_names[index]]
+    def _person_to_target(self, person_kp_dict, img_w, img_h):
+        """
+        Given a dict mapping keypoint name -> (x,y) produce:
+            - keypoints array shape (K,3): x,y,v
+            - bbox [x_min, y_min, x_max, y_max]
+        """
+        keypoints = np.zeros((NUM_KEYPOINTS, 3), dtype=np.float32)
+        present = []
+        for name, idx in KP_NAME_TO_IDX.items():
+            if name in person_kp_dict:
+                x, y = person_kp_dict[name]
+                keypoints[idx, 0] = float(x)
+                keypoints[idx, 1] = float(y)
+                keypoints[idx, 2] = 2.0  # visible & labeled
+                present.append((x, y))
+            else:
+                # leave as zeros and v=0 -> not labeled
+                keypoints[idx, 2] = 0.0
 
-        keypoints = torch.Tensor([[[a['x'], a['y'], 1]] for a in annotations])
-        box = keypoints_to_bbox(keypoints)
-        target = {
-            "boxes": torch.Tensor([box for a in annotations]),
-            "keypoints": keypoints,
-            "labels": torch.Tensor([self.labels.index(a['label']) for a in annotations]).to(torch.int64),
-        }
-        return image_tensor, target
+        if len(present) == 0:
+            # fallback tiny bbox at image center
+            cx, cy = img_w / 2.0, img_h / 2.0
+            bbox = [cx - 1.0, cy - 1.0, cx + 1.0, cy + 1.0]
+        else:
+            xs = [p[0] for p in present]
+            ys = [p[1] for p in present]
+            x_min = float(min(xs))
+            x_max = float(max(xs))
+            y_min = float(min(ys))
+            y_max = float(max(ys))
+            w = x_max - x_min
+            h = y_max - y_min
+            pad = max(w, h) * self.expand_bbox_factor
+            x_min = max(0.0, x_min - pad)
+            y_min = max(0.0, y_min - pad)
+            x_max = min(float(img_w), x_max + pad)
+            y_max = min(float(img_h), y_max + pad)
+            bbox = [x_min, y_min, x_max, y_max]
 
-images = filter(lambda x: x.endswith('.jpg'), os.listdir(base_folder))
-images = list(images)
+        area = (bbox[2] - bbox[0]) * (bbox[3] - bbox[1])
+        return keypoints, bbox, area
 
-all_classes = list_all_classes(images)
+    def __getitem__(self, idx):
+        rec = self.records[idx]
+        img_path = rec["image_path"]
+        img = Image.open(img_path).convert("RGB")
+        img_w, img_h = img.size
 
-image_data = {image: load_annotations(image) for image in images}
+        target = {}
+        persons = rec.get("persons", [])
+        boxes = []
+        labels = []
+        keypoints_list = []
+        areas = []
+        iscrowd = []
+
+        for person in persons:
+            kps, bbox, area = self._person_to_target(person, img_w, img_h)
+            boxes.append(bbox)
+            labels.append(1)  # single class "person" -> label 1
+            keypoints_list.append(kps)
+            areas.append(area)
+            iscrowd.append(0)
+
+        if len(boxes) == 0:
+            # empty targets allowed (list -> tensors with 0 rows)
+            target["boxes"] = torch.zeros((0, 4), dtype=torch.float32)
+            target["labels"] = torch.zeros((0,), dtype=torch.int64)
+            target["keypoints"] = torch.zeros((0, NUM_KEYPOINTS, 3), dtype=torch.float32)
+            target["area"] = torch.zeros((0,), dtype=torch.float32)
+            target["iscrowd"] = torch.zeros((0,), dtype=torch.int64)
+            target["image_id"] = torch.tensor([idx])
+        else:
+            boxes = torch.as_tensor(boxes, dtype=torch.float32)
+            labels = torch.as_tensor(labels, dtype=torch.int64)
+            keypoints = torch.as_tensor(np.array(keypoints_list), dtype=torch.float32)
+            areas = torch.as_tensor(areas, dtype=torch.float32)
+            iscrowd = torch.as_tensor(iscrowd, dtype=torch.int64)
+            target["boxes"] = boxes
+            target["labels"] = labels
+            target["keypoints"] = keypoints
+            target["area"] = areas
+            target["iscrowd"] = iscrowd
+            target["image_id"] = torch.tensor([idx])
+
+        if self.transforms:
+            img = self.transforms(img)
+
+        return img, target
 
 
-model = keypointrcnn_resnet50_fpn(weights=None, num_classes=len(all_classes), trainable_backbone_layers=5)
-
-device = torch.device('cuda')
-model.to(device)
-
-train_sz = 300
-
-iou_crop = CustomRandomIoUCrop(min_scale=0.3,
-                               max_scale=1.0,
-                               min_aspect_ratio=0.5,
-                               max_aspect_ratio=2.0,
-                               sampler_options=[0.0, 0.1, 0.3, 0.5, 0.7, 0.9, 1.0],
-                               trials=400,
-                               jitter_factor=0.25)
-
-# Create a `ResizeMax` object
-resize_max = ResizeMax(max_sz=train_sz)
-
-# Create a `PadSquare` object
-pad_square = PadSquare(shift=True)
+def collate_fn(batch):
+    return tuple(zip(*batch))
 
 
-data_aug_tfms = transforms.Compose(
-    transforms=[
-        transforms.ColorJitter(
-                brightness = (0.8, 1.125),
-                contrast = (0.5, 1.5),
-                saturation = (0.5, 1.5),
-                hue = (-0.05, 0.05),
-        ),
-        transforms.RandomGrayscale(),
-        transforms.RandomEqualize(),
-        RandomPixelCopy(max_pct=0.025),
-        transforms.RandomPerspective(distortion_scale=0.15, p=0.5, fill=(123, 117, 104)),
-        transforms.RandomRotation(degrees=90, fill=(123, 117, 104)),
-        iou_crop,
-    ],
-)
-
-# Compose transforms to resize and pad input images
-resize_pad_tfm = transforms.Compose([
-    resize_max,
-    pad_square,
-    transforms.Resize([train_sz] * 2, antialias=True)
-])
-
-# Compose transforms to sanitize bounding boxes and normalize input data
-final_tfms = transforms.Compose([
-    transforms.ToImage(),
-    transforms.ToDtype(torch.float32, scale=True),
-    transforms.SanitizeBoundingBoxes(),
-])
-
-# Define the transformations for training and validation datasets
-train_tfms = transforms.Compose([
-    data_aug_tfms,
-    resize_pad_tfm,
-    final_tfms
-])
-valid_tfms = transforms.Compose([resize_pad_tfm, final_tfms])
-
-train_dataset = KeypointDataset(image_data, all_classes, train_tfms)
-valid_dataset = KeypointDataset(image_data, all_classes, valid_tfms)
-
-# print(train_dataset.__len__())
-# print(train_dataset[0])
-
-def run_epoch(model, dataloader, optimizer, device, epoch_id, is_training):
+def make_model(num_keypoints=NUM_KEYPOINTS, num_classes=2):  # 1 class (person) + background
     """
-    Function to run a single training or evaluation epoch.
-
-    Args:
-        model: A PyTorch model to train or evaluate.
-        dataloader: A PyTorch DataLoader providing the data.
-        optimizer: The optimizer to use for training the model.
-        loss_func: The loss function used for training.
-        device: The device (CPU or GPU) to run the model on.
-        scaler: Gradient scaler for mixed-precision training.
-        is_training: Boolean flag indicating whether the model is in training or evaluation mode.
-
-    Returns:
-        The average loss for the epoch.
+    Create a keypointrcnn model. num_classes include background.
     """
-    # Set model to training mode
+    model = keypointrcnn_resnet50_fpn(weights=KeypointRCNN_ResNet50_FPN_Weights.COCO_V1)
+    # Replace the box predictor for number of classes
+    in_features = model.roi_heads.box_predictor.cls_score.in_features
+    model.roi_heads.box_predictor = torchvision.models.detection.faster_rcnn.FastRCNNPredictor(in_features, num_classes)
+    # Replace keypoint predictor
+    in_features_kp = model.roi_heads.keypoint_predictor.kps_score_lowres.in_channels
+    # torchvision provides a helper:
+    model.roi_heads.keypoint_predictor = torchvision.models.detection.keypoint_rcnn.KeypointRCNNPredictor(
+        in_features_kp, num_keypoints
+    )
+    return model
+
+
+def train_one_epoch(model, optimizer, data_loader, device, stepper):
     model.train()
-
-    # Initialize the average loss for the current epoch
-    epoch_loss = 0
-
-    # Iterate over data batches
-    for batch_id, (inputs, targets) in enumerate(dataloader):
+    running_loss = 0.0
+    for images, targets in data_loader:
+        images = list(img.to(device) for img in images)
         targets = [{k: v.to(device) for k, v in t.items()} for t in targets]
-        # Move inputs and targets to the specified device
-        inputs = torch.stack(inputs).to(device)
-        # Extract the ground truth bounding boxes and labels
-        # gt_bboxes, gt_labels = zip(*[(d['boxes'].to(device), d['labels'].to(device)) for d in targets])
+        loss_dict = model(images, targets)
+        losses = sum(loss for loss in loss_dict.values())
 
-        # Convert ground truth bounding boxes from 'xyxy' to 'cxcywh' format and only keep center coordinates
-        # gt_keypoints = torchvision.ops.box_convert(torch.stack(gt_bboxes), 'xyxy', 'cxcywh')[:,:,:2]
+        optimizer.zero_grad()
+        losses.backward()
+        optimizer.step()
+        stepper.step()
 
-        # Initialize a visibility tensor with ones, indicating all keypoints are visible
-        # visibility = torch.ones(len(inputs),gt_keypoints.shape[1],1).to(device)
-        # Create a visibility mask based on whether the bounding boxes are valid (greater than or equal to 0)
-        # visibility_mask = (torch.stack(gt_bboxes) >= 0.)[..., 0].view(visibility.shape).to(device)
-
-        # Concatenate the keypoints with the visibility mask, adding a visibility channel to keypoints
-        # gt_keypoints_with_visibility = torch.concat((
-        #     gt_keypoints,
-        #     visibility*visibility_mask
-        # ), dim=2)
-
-        # Convert keypoints to bounding boxes for each input and move them to the specified device
-        # gt_object_bboxes = torch.vstack([keypoints_to_bbox(keypoints) for keypoints in gt_keypoints]).to(device)
-        # # Initialize ground truth labels as tensor of ones and move them to the specified device
-        # gt_labels = torch.ones(len(inputs), dtype=torch.int64).to(device)
-
-        # Prepare the targets for the Keypoint R-CNN model
-        # This includes bounding boxes, labels, and keypoints with visibility for each input image
-        # keypoint_rcnn_targets = [
-        #     {'boxes' : boxes[None], 'labels': labels[None], 'keypoints': keypoints[None]}
-        #     for boxes, labels, keypoints in zip(gt_object_bboxes, gt_labels, gt_keypoints_with_visibility)
-        # ]
+        running_loss += losses.item()
+    return running_loss / len(data_loader)
 
 
-        # Forward pass with Automatic Mixed Precision (AMP) context manager
-        # with conditional_autocast(torch.device(device).type):
-        if is_training:
-            optimizer.zero_grad()
+def main(
+    JSON_PATH,
+    IMAGE_DIR,
+    output_dir="checkpoints",
+    batch_size=4,
+    num_epochs=10,
+    lr=1e-5,
+    weight_decay=1e-4,
+    num_workers=4
+):
+    records = parse_labelstudio_json(JSON_PATH, IMAGE_DIR)
+    print(f"Loaded {len(records)} records")
 
-            loss_dict = model(inputs, targets)
-            losses = sum(loss for loss in loss_dict.values())
+    # basic transform: ToTensor (also normalizes to [0,1])
+    def _transforms(img: Image.Image):
+        return F.to_tensor(img)
 
-            # losses = sum(loss for loss in loss_dict.values())
-            # else:
-                # with torch.no_grad():
-                    # losses = model(inputs.to(device), move_data_to_device(keypoint_rcnn_targets, device))
+    dataset = KeypointDataset(records, transforms=_transforms)
+    data_loader = DataLoader(dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers,
+                             collate_fn=collate_fn)
 
-            # Compute the loss
-            # loss = sum([loss for loss in losses.values()])  # Sum up the losses
+    device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
+    print("Using device:", device)
 
-            losses.backward()
-            optimizer.step()
+    model = make_model(num_keypoints=NUM_KEYPOINTS, num_classes=2)
+    model.to(device)
 
-            loss_item = losses.item()
-            epoch_loss += loss_item
+    params = [p for p in model.parameters() if p.requires_grad]
+    optimizer = torch.optim.AdamW(params, lr=lr, weight_decay=weight_decay)
+    scheduler = CosineAnnealingLR(optimizer, T_max=num_epochs)
 
-        # If loss is NaN or infinity, stop training
-        if is_training:
-            stop_training_message = f"Loss is NaN or infinite at epoch {epoch_id}, batch {batch_id}. Stopping training."
-            # assert not math.isnan(loss_item) and math.isfinite(loss_item), stop_training_message
+    os.makedirs(output_dir, exist_ok=True)
 
-    return epoch_loss / (batch_id + 1)
+    for epoch in range(1, num_epochs + 1):
+        loss = train_one_epoch(model, optimizer, data_loader, device, scheduler)
+        print(f"Epoch {epoch}/{num_epochs}  loss: {loss:.4f}")
 
-def train_loop(model,
-               train_dataloader,
-               valid_dataloader,
-               optimizer,
-               device,
-               epochs,
-               checkpoint_path,
-               use_scaler=False):
-    """
-    Main training loop.
-
-    Args:
-        model: A PyTorch model to train.
-        train_dataloader: A PyTorch DataLoader providing the training data.
-        valid_dataloader: A PyTorch DataLoader providing the validation data.
-        optimizer: The optimizer to use for training the model.
-        device: The device (CPU or GPU) to run the model on.
-        epochs: The number of epochs to train for.
-        checkpoint_path: The path where to save the best model checkpoint.
-        use_scaler: Whether to scale graidents when using a CUDA device
-
-    Returns:
-        None
-    """
-
-    # Loop over the epochs
-    for epoch in range(epochs):
-        # Run a training epoch and get the training loss
-        train_loss = run_epoch(model, train_dataloader, optimizer, device, epoch, is_training=True)
-        # Run an evaluation epoch and get the validation loss
-        # with torch.no_grad():
-        #     valid_loss = run_epoch(model, valid_dataloader, None, device, epoch, is_training=False)
-
-        print(train_loss)
-
-        # # If the validation loss is lower than the best validation loss seen so far, save the model checkpoint
-        # if valid_loss < best_loss:
-        #     best_loss = valid_loss
-        #     torch.save(model.state_dict(), checkpoint_path)
-
-        #     # Save metadata about the training process
-        #     training_metadata = {
-        #         'epoch': epoch,
-        #         'train_loss': train_loss,
-        #         'valid_loss': valid_loss,
-        #         'learning_rate': lr_scheduler.get_last_lr()[0],
-        #         # 'model_architecture': model.name
-        #     }
-        #     with open('training_metadata.json', 'w') as f:
-        #         json.dump(training_metadata, f)
+        # save checkpoint
+        ckpt_path = os.path.join(output_dir, f"keypointrcnn_epoch{epoch}.pth")
+        torch.save({
+            "epoch": epoch,
+            "model_state_dict": model.state_dict(),
+            "optimizer_state_dict": optimizer.state_dict(),
+        }, ckpt_path)
+        print(f"Saved checkpoint: {ckpt_path}")
 
 
-# Set the training batch size
-bs = 4
-
-# Set the number of worker processes for loading data. This should be the number of CPUs available.
-num_workers = multiprocessing.cpu_count()
-
-# Define parameters for DataLoader
-data_loader_params = {
-    'batch_size': bs,  # Batch size for data loading
-    'num_workers': num_workers,  # Number of subprocesses to use for data loading
-    'persistent_workers': True,  # If True, the data loader will not shutdown the worker processes after a dataset has been consumed once. This allows to maintain the worker dataset instances alive.
-    'pin_memory': True,  # If True, the data loader will copy Tensors into CUDA pinned memory before returning them. Useful when using GPU.
-    # 'pin_memory_device': device,  # Specifies the device where the data should be loaded. Commonly set to use the GPU.
-    'collate_fn': lambda batch: tuple(zip(*batch)),
-}
-
-# Create DataLoader for training data. Data is shuffled for every epoch.
-train_dataloader = DataLoader(train_dataset, **data_loader_params, shuffle=True)
-
-# Create DataLoader for validation data. Shuffling is not necessary for validation data.
-valid_dataloader = DataLoader(valid_dataset, **data_loader_params)
-
-# Learning rate for the model
-lr = 5e-4
-
-# Number of training epochs
-epochs = 70
-
-params = [p for p in model.parameters() if p.requires_grad]
-optimizer = torch.optim.SGD(params, lr=lr, momentum=0.9, weight_decay=1e-4)
-
-checkpoint_path = 'checkpoint.json'
-
-train_loop(model=model,
-           train_dataloader=train_dataloader,
-           valid_dataloader=valid_dataloader,
-           optimizer=optimizer,
-           device=torch.device(device),
-           epochs=epochs,
-           checkpoint_path=checkpoint_path,
-           use_scaler=True)
+if __name__ == "__main__":
+    # ------------------- USER CONFIG -------------------
+    # path to JSON file (Label Studio export-like list of items)
+    JSON_PATH = "training_data/Keynote Skeletons.json"
+    # directory containing images; filenames are derived by taking part after the first '-' in file_upload
+    IMAGE_DIR = "training_data/skeleton_keypoint_images"
+    # ---------------------------------------------------
+    main(JSON_PATH, IMAGE_DIR, output_dir="checkpoints", batch_size=4, num_epochs=500)

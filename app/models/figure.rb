@@ -68,6 +68,9 @@ class Figure < ApplicationRecord
   include UnitAccessor
   serialize :contour, coder: JSON
   validates :publication, presence: true
+  has_many :key_points
+
+  has_one_attached :three_d_model
 
   belongs_to :object_similarity, optional: true #, class_name: ''
 
