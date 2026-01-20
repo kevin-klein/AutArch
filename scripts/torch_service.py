@@ -8,14 +8,12 @@ import io
 import os
 import torchvision
 from pyefd import elliptic_fourier_descriptors
-# from segment_anything import SamPredictor, sam_model_registry
 from mobile_sam import sam_model_registry, SamPredictor
 import cv2
 import matplotlib.pyplot as plt
 from transformers import AutoModelForObjectDetection, AutoImageProcessor
 import json
-from math import pi, atan2
-from transformers import BitsAndBytesConfig, AutoModelForSeq2SeqLM, AutoTokenizer
+from train_arrow_angle_network import model as arrow_model
 
 def show_mask(mask, ax, random_color=False, borders = True):
     if random_color:
@@ -100,15 +98,13 @@ loaded_model.eval()
 loaded_model.to(device)
 
 app = Bottle()
-arrow_model = torchvision.models.resnet152(weights=None)
-arrow_model.fc = torch.nn.Linear(in_features=2048, out_features=2, bias=True)
 arrow_model = arrow_model.to(device)
 
-arrow_model.load_state_dict(torch.load('models/arrow_resnet.model', map_location=device, weights_only=True))
+arrow_model.load_state_dict(torch.load('models/arrow_convnext.model', map_location=device, weights_only=True))
 
-skeleton_orientation_model = model = torchvision.models.resnet152(weights=None)
-skeleton_orientation_model.fc = torch.nn.Linear(in_features=2048, out_features=2, bias=True)
-skeleton_orientation_model.to(device)
+# skeleton_orientation_model = model = torchvision.models.resnet152(weights=None)
+# skeleton_orientation_model.fc = torch.nn.Linear(in_features=2048, out_features=2, bias=True)
+# skeleton_orientation_model.to(device)
 
 skeleton_labels = torch.load('models/skeleton_resnet_labels.model', map_location=device)
 skeleton_model = torchvision.models.convnext_tiny(weights=None, num_classes=len(skeleton_labels)).to(device)
@@ -234,18 +230,18 @@ def save_masks_as_images(masks, output_dir="masks_out"):
 
     print(f"Saved {len(masks)} masks to '{output_dir}/'")
 
-@app.post('/summary')
-def summarize():
-    text = request.POST['text']
+# @app.post('/summary')
+# def summarize():
+#     text = request.POST['text']
 
-    input_ids = tokenizer(text, return_tensors="pt").to(model.device)
-    output = model.generate(**input_ids, cache_implementation="static")
+#     input_ids = tokenizer(text, return_tensors="pt").to(model.device)
+#     output = model.generate(**input_ids, cache_implementation="static")
 
-    print(output)
+#     print(output)
 
-    return {
-        'summary': tokenizer.decode(output[0], skip_special_tokens=True)
-    }
+#     return {
+#         'summary': tokenizer.decode(output[0], skip_special_tokens=True)
+#     }
 
 @app.post('/segment')
 def segment_route():
@@ -269,7 +265,7 @@ def segment_route():
         multimask_output=False,
     )
 
-    save_masks_as_images(masks)
+    # save_masks_as_images(masks)
 
     mask_sizes = masks.sum(axis=(1, 2))
 
@@ -305,26 +301,26 @@ def upload_arrow():
 
     return { 'predictions': result.tolist()[0] }
 
-@app.post('/features')
-def upload_features():
-    upload_file = request.POST['image']
-    result = object_features(upload_file.file)
+# @app.post('/features')
+# def upload_features():
+#     upload_file = request.POST['image']
+#     result = object_features(upload_file.file)
 
-    return { 'features': result['p7'].tolist()[0] }
+#     return { 'features': result['p7'].tolist()[0] }
 
 @app.post('/skeleton')
-def upload_arrow():
+def upload_skeleton():
     upload_file = request.POST['image']
     result = analyze_skeleton(upload_file.file)
 
     return { 'predictions': result }
 
-@app.post('/skeleton-orientation')
-def upload_skeleton_angle():
-    upload_file = request.POST['image']
-    result = analyze_skeleton_orientation(upload_file.file)
+# @app.post('/skeleton-orientation')
+# def upload_skeleton_angle():
+#     upload_file = request.POST['image']
+#     result = analyze_skeleton_orientation(upload_file.file)
 
-    return { 'predictions': result }
+#     return { 'predictions': result }
 
 @app.post('/efd')
 def efd():

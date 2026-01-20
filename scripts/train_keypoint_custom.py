@@ -9,16 +9,15 @@ from torch.utils.data import Dataset, DataLoader
 import torchvision
 from torchvision.models.detection.backbone_utils import _resnet_fpn_extractor
 from torchvision.models.detection.keypoint_rcnn import KeypointRCNN
-from torchvision.transforms import functional as F
+from torchvision.transforms import v2
 from torchvision.models import resnet101, ResNet101_Weights
 from torch.optim.lr_scheduler import CosineAnnealingLR
 from PIL import Image
 import numpy as np
+from torchvision.tv_tensors import KeyPoints, BoundingBoxes, BoundingBoxFormat
 
 from torchvision.models import resnext50_32x4d, ResNeXt50_32X4D_Weights
 
-
-# --- Edit this list if your dataset uses different keypoint labels ---
 KEYPOINT_NAMES = [
     "Head", "neck", "left shoulder", "right shoulder",
     "left elbow", "right elbow", "left wrist", "right wrist",
@@ -127,18 +126,18 @@ class KeypointDataset(Dataset):
             - keypoints array shape (K,3): x,y,v
             - bbox [x_min, y_min, x_max, y_max]
         """
-        keypoints = np.zeros((NUM_KEYPOINTS, 3), dtype=np.float32)
+        keypoints = np.zeros((NUM_KEYPOINTS, 3), dtype=np.float16)
         present = []
         for name, idx in KP_NAME_TO_IDX.items():
             if name in person_kp_dict:
                 x, y = person_kp_dict[name]
                 keypoints[idx, 0] = float(x) * img_w
                 keypoints[idx, 1] = float(y) * img_h
-                keypoints[idx, 2] = 2.0  # visible & labeled
-                present.append((x, y))
+                keypoints[idx, 2] = 2  # visible & labeled
+                present.append((x * img_w, y * img_h))
             else:
                 # leave as zeros and v=0 -> not labeled
-                keypoints[idx, 2] = 0.0
+                keypoints[idx, 2] = 0
 
         if len(present) == 0:
             # fallback tiny bbox at image center
@@ -187,19 +186,24 @@ class KeypointDataset(Dataset):
             iscrowd.append(0)
 
         if len(boxes) == 0:
-            # empty targets allowed (list -> tensors with 0 rows)
-            target["boxes"] = torch.zeros((0, 4), dtype=torch.float32)
+            target["boxes"] = BoundingBoxes(torch.zeros((0, 4), dtype=torch.float32), format=BoundingBoxFormat.XYXY, canvas_size=(256, 256))
             target["labels"] = torch.zeros((0,), dtype=torch.int64)
-            target["keypoints"] = torch.zeros((0, NUM_KEYPOINTS, 3), dtype=torch.float32)
+            target["keypoints"] = KeyPoints(torch.zeros((0, NUM_KEYPOINTS, 3), dtype=torch.float32), canvas_size=(256, 256))
             target["area"] = torch.zeros((0,), dtype=torch.float32)
             target["iscrowd"] = torch.zeros((0,), dtype=torch.int64)
             target["image_id"] = torch.tensor([idx])
         else:
-            boxes = torch.as_tensor(boxes, dtype=torch.float32)
+            boxes = BoundingBoxes(torch.as_tensor(boxes, dtype=torch.float32), format=BoundingBoxFormat.XYXY, canvas_size=(256, 256))
             labels = torch.as_tensor(labels, dtype=torch.int64)
             keypoints = torch.as_tensor(np.array(keypoints_list), dtype=torch.float32)
             areas = torch.as_tensor(areas, dtype=torch.float32)
             iscrowd = torch.as_tensor(iscrowd, dtype=torch.int64)
+
+            coordinates = keypoints[:, :, :2]
+            visibility = keypoints[:, :, 2]
+            keypoints = KeyPoints(coordinates, canvas_size=(256, 256))
+
+            target['visibility'] = visibility
             target["boxes"] = boxes
             target["labels"] = labels
             target["keypoints"] = keypoints
@@ -208,7 +212,7 @@ class KeypointDataset(Dataset):
             target["image_id"] = torch.tensor([idx])
 
         if self.transforms:
-            img = self.transforms(img)
+            img, target = self.transforms(img, target)
 
         return img, target
 
@@ -225,31 +229,54 @@ def make_model(num_keypoints=NUM_KEYPOINTS, num_classes=2):  # 1 class (person) 
     backbone = _resnet_fpn_extractor(backbone, 5, norm_layer=torch.nn.BatchNorm2d)
     model = KeypointRCNN(backbone, num_classes, num_keypoints=num_keypoints)
 
-    # Replace the box predictor for number of classes
     in_features = model.roi_heads.box_predictor.cls_score.in_features
     model.roi_heads.box_predictor = torchvision.models.detection.faster_rcnn.FastRCNNPredictor(in_features, num_classes)
-    # Replace keypoint predictor
     in_features_kp = model.roi_heads.keypoint_predictor.kps_score_lowres.in_channels
-    # torchvision provides a helper:
     model.roi_heads.keypoint_predictor = torchvision.models.detection.keypoint_rcnn.KeypointRCNNPredictor(
         in_features_kp, num_keypoints
     )
     return model
 
-
-def train_one_epoch(model, optimizer, data_loader, device, stepper):
+def train_one_epoch(model, optimizer, data_loader, device, stepper, scaler=None):
     model.train()
     running_loss = 0.0
     for images, targets in data_loader:
+        optimizer.zero_grad()
+
+        for target in targets:
+            keypoints = target['keypoints']
+
+            if target['keypoints'].shape[0] > 0:
+                target['keypoints'] = torch.cat([
+                    keypoints,
+                    target['visibility'].unsqueeze(-1)
+                ], dim=2)
+            else:
+                target['keypoints'] = torch.cat([keypoints, torch.zeros(0, 15, 1)], dim=2)
+            del target['visibility']
+
+
         images = list(img.to(device) for img in images)
         targets = [{k: v.to(device) for k, v in t.items()} for t in targets]
-        loss_dict = model(images, targets)
-        losses = sum(loss for loss in loss_dict.values())
 
-        optimizer.zero_grad()
-        losses.backward()
-        optimizer.step()
-        stepper.step()
+        if scaler:
+            with torch.cuda.amp.autocast():
+                loss_dict = model(images, targets)
+                losses = sum(loss for loss in loss_dict.values())
+
+            stepper.step()
+            scaler.scale(losses).backward()
+            scaler.step(optimizer)
+            scaler.update()
+
+        else:
+            loss_dict = model(images, targets)
+            losses = sum(loss for loss in loss_dict.values())
+
+            optimizer.zero_grad()
+            losses.backward()
+            optimizer.step()
+            stepper.step()
 
         running_loss += losses.item()
     return running_loss / len(data_loader)
@@ -261,19 +288,28 @@ def main(
     output_dir="checkpoints",
     batch_size=4,
     num_epochs=10,
-    lr=1e-5,
+    lr=1e-4,
     weight_decay=1e-4,
     num_workers=4
 ):
     records = parse_labelstudio_json(JSON_PATH, IMAGE_DIR)
     print(f"Loaded {len(records)} records")
 
-    # basic transform: ToTensor (also normalizes to [0,1])
-    def _transforms(img: Image.Image):
-        return F.to_tensor(img)
+    def _transforms(img: Image.Image, target: Dict):
+        return v2.Compose([
+            v2.RandomVerticalFlip(p=0.5),
+            v2.RandomHorizontalFlip(p=0.5),
+            v2.RandomRotation(180),
+            # v2.SanitizeBoundingBoxes(),
+            # v2.SanitizeKeyPoints(),
+            v2.ToImage(),
+            v2.ToDtype(torch.float32, scale=True)
+        ])(img, target)
+
+    records = sorted(records, key=lambda x: sum(len(p) for p in x['persons']))
 
     dataset = KeypointDataset(records, transforms=_transforms)
-    data_loader = DataLoader(dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers,
+    data_loader = DataLoader(dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers,
                              collate_fn=collate_fn)
 
     device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
@@ -287,13 +323,15 @@ def main(
     scheduler = CosineAnnealingLR(optimizer, T_max=num_epochs)
 
     os.makedirs(output_dir, exist_ok=True)
+    scaler = torch.amp.GradScaler('cuda') if device.type == 'cuda' else None
+
 
     for epoch in range(1, num_epochs + 1):
-        loss = train_one_epoch(model, optimizer, data_loader, device, scheduler)
+        loss = train_one_epoch(model, optimizer, data_loader, device, scheduler, scaler=scaler)
         print(f"Epoch {epoch}/{num_epochs}  loss: {loss:.4f}")
 
     # save checkpoint
-    ckpt_path = os.path.join(output_dir, f"keypointrcnn_resnet101.pth")
+    ckpt_path = os.path.join(output_dir, f"keypointrcnn_resnext.pth")
     torch.save({
         "epoch": epoch,
         "model_state_dict": model.state_dict(),
@@ -309,4 +347,4 @@ if __name__ == "__main__":
     # directory containing images; filenames are derived by taking part after the first '-' in file_upload
     IMAGE_DIR = "training_data/skeleton_keypoint_images"
     # ---------------------------------------------------
-    main(JSON_PATH, IMAGE_DIR, output_dir="checkpoints", batch_size=4, num_epochs=500)
+    main(JSON_PATH, IMAGE_DIR, output_dir="checkpoints", batch_size=4, num_epochs=250)

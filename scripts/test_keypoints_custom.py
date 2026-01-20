@@ -11,6 +11,7 @@ from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 from sklearn.cluster import KMeans
 import matplotlib.pyplot as plt
+from train_keypoint_custom import make_model
 
 # --- Must match the training setup ---
 KEYPOINT_NAMES = [
@@ -44,19 +45,6 @@ def align_poses(keypoints, reference=None):
         transformations.append(mtx1)
 
     return np.array(aligned_poses)
-
-def make_model(num_keypoints=NUM_KEYPOINTS, num_classes=2):
-    """Create the same model structure used in training."""
-    model = torchvision.models.detection.keypointrcnn_resnet50_fpn(pretrained=False)
-    in_features = model.roi_heads.box_predictor.cls_score.in_features
-    model.roi_heads.box_predictor = torchvision.models.detection.faster_rcnn.FastRCNNPredictor(
-        in_features, num_classes
-    )
-    in_features_kp = model.roi_heads.keypoint_predictor.kps_score_lowres.in_channels
-    model.roi_heads.keypoint_predictor = torchvision.models.detection.keypoint_rcnn.KeypointRCNNPredictor(
-        in_features_kp, num_keypoints
-    )
-    return model
 
 
 def load_model(checkpoint_path, device):
