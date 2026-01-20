@@ -12,6 +12,7 @@ RUN apt-get update -qq && \
     wget \
     libmagickwand-dev \
     curl \
+    libffi-dev \
     ca-certificates
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
