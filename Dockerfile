@@ -1,4 +1,4 @@
-FROM ruby:3.1.6 AS builder
+FROM ubuntu:26.04 AS builder
 
 RUN apt-get update -qq
 RUN apt-get install -y git libpq-dev libopencv-dev tesseract-ocr libvips42 build-essential wget libmagickwand-dev
