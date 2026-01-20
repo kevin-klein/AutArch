@@ -13,7 +13,8 @@ RUN apt-get update -qq && \
     libmagickwand-dev \
     curl \
     libffi-dev \
-    ca-certificates
+    ca-certificates \
+    libyaml-dev
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 ENV MISE_DATA_DIR="/mise"
