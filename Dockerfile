@@ -1,23 +1,32 @@
 FROM ubuntu:26.04 AS builder
 
-RUN apt-get update -qq
-RUN apt-get install -y git libpq-dev libopencv-dev tesseract-ocr libvips42 build-essential wget libmagickwand-dev
+# Install dependencies
+RUN apt-get update -qq && \
+    apt-get install -y \
+    git \
+    libpq-dev \
+    libopencv-dev \
+    tesseract-ocr \
+    libvips42 \
+    build-essential \
+    wget \
+    libmagickwand-dev \
+    curl
 
-RUN git clone --depth 1 https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.15.0
-ENV PATH="$PATH:/root/.asdf/bin"
-ENV PATH=$PATH:/root/.asdf/shims
+# Install mise (replaces ASDF)
+RUN curl -fsSL https://mise.jdx.dev/install.sh | sh -s -- -b /usr/local/bin
 
-ENV RAILS_ENV="production" \
-    BUNDLE_DEPLOYMENT="1" \
-    BUNDLE_PATH="/usr/local/bundle" \
-    BUNDLE_WITHOUT="development"
+# Configure mise
+ENV MISO_ROOT=/root/.mise
+ENV PATH="/usr/local/bin:$PATH"
 
-RUN asdf plugin add nodejs https://github.com/asdf-vm/asdf-nodejs.git
+# Set up Node.js via mise (replaces asdf-nodejs)
 WORKDIR /tmp
 COPY .tool-versions /tmp/.tool-versions
-RUN asdf install
-RUN npm install -g yarn
+RUN mise install
 
+# Install yarn globally
+RUN npm install -g yarn
 
 FROM builder AS bundler
 WORKDIR /tmp
@@ -43,20 +52,7 @@ COPY config config
 COPY Rakefile Gemfile Gemfile.lock package.json yarn.lock /tmp/
 RUN RAILS_ENV=production bundle exec rails shakapacker:compile
 
-# RUN git clone --depth 1 https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.15.0
-# ENV PATH="$PATH:/root/.asdf/bin"
-# ENV PATH=$PATH:/root/.asdf/shims
-
-
-# ENV RAILS_ENV="production" \
-#     BUNDLE_DEPLOYMENT="1" \
-#     BUNDLE_PATH="/usr/local/bundle" \
-#     BUNDLE_WITHOUT="development"
-
-# RUN asdf plugin add nodejs https://github.com/asdf-vm/asdf-nodejs.git
-
 FROM builder as app
-
 WORKDIR /dfg
 COPY app '/dfg/app'
 COPY assets '/dfg/assets'
@@ -83,21 +79,3 @@ RUN chmod a+x bin/rails
 EXPOSE 3000
 
 CMD ["bin/rails", "server"]
-
-
-
-# RUN asdf install
-# RUN bundle
-# RUN chmod a+x bin/rails
-
-# RUN npm install --global yarn
-# RUN yarn
-
-# RUN bundle exec bootsnap precompile app/ lib/
-# RUN ./bin/rails shakapacker:compile --trace
-
-# # COPY images '/dfg/images'
-
-# EXPOSE 3000
-# CMD ["./bin/rails", "server"]
-
