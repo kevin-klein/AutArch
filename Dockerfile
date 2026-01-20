@@ -38,7 +38,9 @@ WORKDIR /tmp
 RUN gem install bundler
 COPY Gemfile /tmp/
 COPY Gemfile.lock /tmp/
-RUN bundle install --path /root/bundle
+RUN mkdir /usr/local/bundle
+RUN bundle config set path '/usr/local/bundle'
+RUN bundle install
 
 FROM node:18-bullseye-slim AS yarn
 WORKDIR /tmp
@@ -48,7 +50,7 @@ RUN yarn install
 
 FROM builder as assets
 WORKDIR /tmp
-COPY --from=bundler /root/bundle /root/bundle
+COPY --from=bundler /usr/local/bundle /usr/local/bundle
 COPY --from=yarn /tmp/node_modules node_modules
 COPY app/assets app/assets
 COPY app/javascript app/javascript
