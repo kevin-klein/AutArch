@@ -21,6 +21,8 @@ ENV MISE_CACHE_DIR="/mise/cache"
 ENV MISE_INSTALL_PATH="/usr/local/bin/mise"
 ENV PATH="/mise/shims:$PATH"
 
+RUN curl https://mise.run | sh
+
 # Set up Node.js via mise (replaces asdf-nodejs)
 WORKDIR /tmp
 COPY .tool-versions /tmp/.tool-versions
