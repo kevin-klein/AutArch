@@ -11,14 +11,15 @@ RUN apt-get update -qq && \
     build-essential \
     wget \
     libmagickwand-dev \
-    curl
+    curl \
+    ca-certificates
 
-# Install mise (replaces ASDF)
-RUN curl -fsSL https://mise.jdx.dev/install.sh | sh -s -- -b /usr/local/bin
-
-# Configure mise
-ENV MISO_ROOT=/root/.mise
-ENV PATH="/usr/local/bin:$PATH"
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+ENV MISE_DATA_DIR="/mise"
+ENV MISE_CONFIG_DIR="/mise"
+ENV MISE_CACHE_DIR="/mise/cache"
+ENV MISE_INSTALL_PATH="/usr/local/bin/mise"
+ENV PATH="/mise/shims:$PATH"
 
 # Set up Node.js via mise (replaces asdf-nodejs)
 WORKDIR /tmp
