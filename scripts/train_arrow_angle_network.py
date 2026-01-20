@@ -1,55 +1,25 @@
 import torchvision
 import torch
 import os
-from PIL import Image
-import transforms as T
-from torchvision import datasets, models, transforms
+from torchvision import transforms
 import time
 import torch.nn as nn
 from torchvision.transforms.functional import rotate
-from torchvision.io import read_image, ImageReadMode
 import torch.nn as nn
-import matplotlib.pyplot as plt
-import torchvision.transforms.functional as F
-import numpy as np
 import random
-from arrow_model import get_arrow_model
 import math
 
-plt.rcParams["savefig.bbox"] = 'tight'
+model = torchvision.models.convnext_tiny(weights=torchvision.models.ConvNeXt_Tiny_Weights.IMAGENET1K_V1)
+model.classifier = nn.Sequential(
+  nn.Flatten(),
+  nn.Linear(768, 2)
+)
 
-def get_transform():
-   transforms = []
-   # converts the image, a PIL image, into a PyTorch Tensor
-   transforms.append(T.PILToTensor())
-#    if train:
-      # during training, randomly flip the training images
-      # and ground-truth for data augmentation
-    #   transforms.append(T.RandomHorizontalFlip(0.5))
-   return T.Compose(transforms)
-
-def show(imgs):
-    # if not isinstance(imgs, list):
-    #     imgs = [imgs]
-    fig, axs = plt.subplots(ncols=len(imgs), squeeze=False)
-    for i, img in enumerate(imgs):
-        img = img[:3, :, :].detach()
-        img = F.to_pil_image(img)
-        axs[0, i].imshow(np.asarray(img))
-        axs[0, i].set(xticklabels=[], yticklabels=[], xticks=[], yticks=[])
-    plt.show()
 
 if __name__ == '__main__':
-  # model = get_arrow_model()
-  model = torchvision.models.resnet152(weights=torchvision.models.ResNet152_Weights.IMAGENET1K_V2)
-  model.fc = torch.nn.Linear(in_features=2048, out_features=2, bias=True)
-
-  # model.load_state_dict(torch.load('models/arrow_resnet.model'))
   dataset = torchvision.datasets.ImageFolder('training_data/arrows', transforms.Compose([
-        # transforms.RandomResizedCrop(224),
-        # transforms.RandomHorizontalFlip(),
         transforms.ToTensor(),
-        # transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
     ]))
   data_loader = torch.utils.data.DataLoader(
                 dataset, pin_memory=True, batch_size=16, shuffle=True, num_workers=8,)
@@ -60,14 +30,10 @@ if __name__ == '__main__':
       device = torch.device('cpu')
   model.to(device)
 
-  # optimizer = torch.optim.SGD(model.parameters(), lr=0.0001, momentum=0.9)
-  optimizer = torch.optim.Adam(model.parameters(), lr=1e-5)
-  # optimizer = torch.optim.RMSprop(model.parameters(), lr=0.001)
-  # weights = torchvision.models.ResNet18_Weights.DEFAULT
+  optimizer = torch.optim.AdamW(model.parameters(), lr=1e-4)
   criterion = nn.MSELoss()
 
-  # 3000
-  num_epochs = 1000
+  num_epochs = 250
   for epoch in range(num_epochs):
       start = time.time()
       optimizer.zero_grad()
@@ -77,8 +43,6 @@ if __name__ == '__main__':
       i = 0
       epoch_loss = 0
       for images, targets in data_loader:
-        # show(images)
-        # images = [preprocess(image) for image in images]
         images = images.to(device)
         angles = [random.randint(0, 360) for _ in images]
         images = [rotate(image, angle, fill=1) for image, angle in zip(images, angles)]
@@ -100,4 +64,4 @@ if __name__ == '__main__':
 
       print(epoch_loss, f'time: {time.time() - start}')
 
-  torch.save(model.state_dict(), 'models/arrow_resnet.model')
+  torch.save(model.state_dict(), 'models/arrow_convnext.model')
