@@ -14,7 +14,7 @@ ENV RAILS_ENV="production" \
 
 RUN asdf plugin add nodejs https://github.com/asdf-vm/asdf-nodejs.git
 WORKDIR /tmp
-COPY .tool-versions.web /tmp/.tool-versions
+COPY .tool-versions /tmp/.tool-versions
 RUN asdf install
 RUN npm install -g yarn
 
