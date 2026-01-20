@@ -57,6 +57,7 @@ COPY app/javascript app/javascript
 COPY bin bin
 COPY config config
 COPY Rakefile Gemfile Gemfile.lock package.json yarn.lock /tmp/
+RUN bundle config set path '/usr/local/bundle'
 RUN RAILS_ENV=production bundle exec rails shakapacker:compile
 
 FROM builder as app
