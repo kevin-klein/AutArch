@@ -47,10 +47,15 @@ COPY yarn.lock .
 RUN yarn install
 
 FROM builder as assets
+
+ARG RAILS_MASTER_KEY
+ENV RAILS_MASTER_KEY $RAILS_MASTER_KEY
+
 WORKDIR /tmp
 COPY --from=bundler /usr/local/bundle /usr/local/bundle
 COPY --from=yarn /tmp/node_modules node_modules
 COPY app/assets app/assets
+COPY .env .
 COPY app/javascript app/javascript
 COPY bin bin
 COPY config config
@@ -59,6 +64,10 @@ RUN bundle config set path '/usr/local/bundle'
 RUN RAILS_ENV=production bundle exec rails shakapacker:compile
 
 FROM builder as app
+
+ARG RAILS_MASTER_KEY
+ENV RAILS_MASTER_KEY $RAILS_MASTER_KEY
+
 WORKDIR /dfg
 COPY app '/dfg/app'
 COPY assets '/dfg/assets'
