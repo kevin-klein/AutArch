@@ -1,6 +1,5 @@
 FROM ubuntu:26.04 AS builder
 
-# Install dependencies
 RUN apt-get update -qq && \
     apt-get install -y \
     git \
@@ -30,7 +29,6 @@ WORKDIR /tmp
 COPY .tool-versions /tmp/.tool-versions
 RUN mise install
 
-# Install yarn globally
 RUN npm install -g yarn
 
 FROM builder AS bundler
@@ -86,4 +84,5 @@ RUN chmod a+x bin/rails
 
 EXPOSE 3000
 
-CMD ["bin/rails", "server"]
+CMD "bin/rails db:migrate && bin/rails s"
+#["bin/rails", "server"]
