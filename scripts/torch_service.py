@@ -110,8 +110,8 @@ skeleton_labels = torch.load('models/skeleton_resnet_labels.model', map_location
 skeleton_model = torchvision.models.convnext_tiny(weights=None, num_classes=len(skeleton_labels)).to(device)
 skeleton_model.load_state_dict(torch.load('models/skeleton_convnext_tiny.model', map_location=device))
 
-sam = sam_model_registry["vit_h"](checkpoint="models/sam_vit_h_4b8939.pth")
-sam.to(device)
+# sam = sam_model_registry["vit_h"](checkpoint="models/sam_vit_h_4b8939.pth")
+# sam.to(device)
 predictor = SamPredictor(sam)
 
 # quantization_config = BitsAndBytesConfig(
