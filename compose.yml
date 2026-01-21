@@ -1,14 +1,23 @@
 services:
   ml-services:
-    image: 'kevin1252/autarch-ml-services:1.1'
+    build:
+      dockerfile: ml-services.Dockerfile
+      tags: 
+        - 'kevin1252/autarch-ml-services:1.1'
+
     env_file:
       - .env
     volumes:
       - ./models:/ml-services/models
 
   web:
-    image: 'kevin1252/autarch:1.4'
     command: bundle exec rails s -b0
+    build:
+      context: .
+      tags:
+        - 'kevin1252/autarch:1.5'
+      args:
+        - RAILS_MASTER_KEY=${RAILS_MASTER_KEY}
     volumes:
       - ./images:/dfg/images
       - ./storage:/dfg/storage
@@ -23,7 +32,12 @@ services:
     volumes:
       - ./images:/dfg/images
       - ./storage:/dfg/storage
-    image: 'kevin1252/autarch:1.4'
+    build:
+      context: .
+      tags:
+        - 'kevin1252/autarch:1.5'
+      args:
+        - RAILS_MASTER_KEY=${RAILS_MASTER_KEY}
     command: bundle exec sidekiq
     env_file:
       - .env
@@ -32,7 +46,11 @@ services:
     image: "redis:alpine"
 
   db:
-    image: 'kevin1252/autarch-db:1.0'
+    build: 
+      context: ./db
+      tags:
+        - 'kevin1252/autarch-db:1.0'
+
     environment:
       POSTGRES_PASSWORD: root110120
 
