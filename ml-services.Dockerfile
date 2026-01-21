@@ -7,6 +7,7 @@ WORKDIR /ml-services
 COPY ./requirements.txt .
 
 RUN pip install -Ur requirements.txt
+RUN apt install -y x11-common
 
 FROM python:3.12-slim-bookworm as runtime
 
