@@ -1,4 +1,4 @@
-class Efd
+module Efd
   extend self
   # Calculate EFA coefficients for a given contour
   # contour: array of [x, y] points representing the closed shape
