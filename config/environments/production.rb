@@ -66,7 +66,9 @@ Rails.application.configure do
     password: ENV['EMAIL_PASSWORD'],
     address: ENV['EMAIL_HOST'],
     port: ENV['EMAIL_PORT'],
-    authentication: :plain
+    authentication: :plain,
+    ssl:                  true,
+    tls:                  true
   }
 
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
