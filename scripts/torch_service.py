@@ -332,4 +332,12 @@ def efd():
     }
 
 if __name__ == '__main__':
-    app.run(debug=True, reloader=True, host='0.0.0.0', port=9000)
+    # Check if we're in production mode
+    production = os.environ.get('RAILS_ENV') == 'production'
+
+    if production:
+        # Production configuration
+        app.run(host='127.0.0.1', port=9000, server='waitress')
+    else:
+        # Development configuration
+        app.run(debug=True, reloader=True, host='0.0.0.0', port=9000)
