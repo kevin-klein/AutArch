@@ -2,15 +2,15 @@ module Efd
   extend self
   # Calculate EFA coefficients for a given contour
   # contour: array of [x, y] points representing the closed shape
-  # n_harmonics: number of harmonics to compute
+  # order: number of harmonics to compute
   # normalize: boolean to enable/disable normalization (default: false)
-  def elliptic_fourier_descriptors(contour, n_harmonics, normalize: false)
+  def elliptic_fourier_descriptors(contour, order: 15, normalize: false)
     coefficients = []
     n_points = contour.length
 
-    (1..n_harmonics).each do |n|
+    (1..order).each do |n|
       a_n, b_n, c_n, d_n = calculate_harmonic(contour, n, n_points)
-      coefficients << {n: n, a: a_n, b: b_n, c: c_n, d: d_n}
+      coefficients << [n, a_n, b_n, c_n, d_n]
     end
 
     descriptors(coefficients, normalize)
@@ -58,13 +58,13 @@ module Efd
   def descriptors(coefficients, normalize)
     if normalize
       coefficients.map do |coeff|
-        {
-          n: coeff[:n],
-          a: coeff[:a] / (coeff[:a]**2 + coeff[:b]**2 + coeff[:c]**2 + coeff[:d]**2),
-          b: coeff[:b] / (coeff[:a]**2 + coeff[:b]**2 + coeff[:c]**2 + coeff[:d]**2),
-          c: coeff[:c] / (coeff[:a]**2 + coeff[:b]**2 + coeff[:c]**2 + coeff[:d]**2),
-          d: coeff[:d] / (coeff[:a]**2 + coeff[:b]**2 + coeff[:c]**2 + coeff[:d]**2)
-        }
+        [
+          coeff[0],  # n
+          coeff[1] / (coeff[1]**2 + coeff[2]**2 + coeff[3]**2 + coeff[4]**2),  # a
+          coeff[2] / (coeff[1]**2 + coeff[2]**2 + coeff[3]**2 + coeff[4]**2),  # b
+          coeff[3] / (coeff[1]**2 + coeff[2]**2 + coeff[3]**2 + coeff[4]**2),  # c
+          coeff[4] / (coeff[1]**2 + coeff[2]**2 + coeff[3]**2 + coeff[4]**2)   # d
+        ]
       end
     else
       coefficients

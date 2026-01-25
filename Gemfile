@@ -17,6 +17,7 @@ gem "rmagick"
 gem "sprockets-rails"
 gem "mittens"
 gem "engtagger"
+gem 'rumale'
 
 gem "graphql"
 gem "message_bus"
