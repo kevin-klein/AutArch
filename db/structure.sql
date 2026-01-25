@@ -19,11 +19,11 @@ SET default_table_access_method = heap;
 
 CREATE TABLE public.active_storage_attachments (
     id bigint NOT NULL,
-    blob_id bigint NOT NULL,
-    created_at timestamp(6) without time zone NOT NULL,
     name character varying NOT NULL,
+    record_type character varying NOT NULL,
     record_id bigint NOT NULL,
-    record_type character varying NOT NULL
+    blob_id bigint NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL
 );
 
 
@@ -52,14 +52,14 @@ ALTER SEQUENCE public.active_storage_attachments_id_seq OWNED BY public.active_s
 
 CREATE TABLE public.active_storage_blobs (
     id bigint NOT NULL,
+    key character varying NOT NULL,
+    filename character varying NOT NULL,
+    content_type character varying,
+    metadata text,
+    service_name character varying NOT NULL,
     byte_size bigint NOT NULL,
     checksum character varying,
-    content_type character varying,
-    created_at timestamp(6) without time zone NOT NULL,
-    filename character varying NOT NULL,
-    key character varying NOT NULL,
-    metadata text,
-    service_name character varying NOT NULL
+    created_at timestamp(6) without time zone NOT NULL
 );
 
 
@@ -118,17 +118,17 @@ ALTER SEQUENCE public.active_storage_variant_records_id_seq OWNED BY public.acti
 
 CREATE TABLE public.anthropologies (
     id bigint NOT NULL,
+    sex_morph integer,
+    sex_gen integer,
+    sex_consensus integer,
     age_as_reported character varying,
     age_class integer,
-    created_at timestamp(6) without time zone NOT NULL,
     height double precision,
     pathologies_type character varying,
-    sex_consensus integer,
-    sex_gen integer,
-    sex_morph integer,
     skeleton_id bigint,
-    species integer,
-    updated_at timestamp(6) without time zone NOT NULL
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL,
+    species integer
 );
 
 
@@ -169,8 +169,8 @@ CREATE TABLE public.ar_internal_metadata (
 
 CREATE TABLE public.bones (
     id bigint NOT NULL,
-    created_at timestamp(6) without time zone NOT NULL,
     name character varying,
+    created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL
 );
 
@@ -200,22 +200,22 @@ ALTER SEQUENCE public.bones_id_seq OWNED BY public.bones.id;
 
 CREATE TABLE public.c14_dates (
     id bigint NOT NULL,
-    age_bp integer,
-    bone_id bigint,
     c14_type integer NOT NULL,
-    cal_method integer,
+    lab_id character varying,
+    age_bp integer,
+    "interval" integer,
+    material integer,
     calbc_1_sigma_max double precision,
     calbc_1_sigma_min double precision,
     calbc_2_sigma_max double precision,
     calbc_2_sigma_min double precision,
+    date_note character varying,
+    cal_method integer,
+    ref_14c character varying,
     chronology_id bigint NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
-    date_note character varying,
-    "interval" integer,
-    lab_id character varying,
-    material integer,
-    ref_14c character varying,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    bone_id bigint
 );
 
 
@@ -246,11 +246,11 @@ CREATE TABLE public.chronologies (
     id bigint NOT NULL,
     context_from integer,
     context_to integer,
-    created_at timestamp(6) without time zone NOT NULL,
-    grave_id bigint,
-    period_id bigint,
     skeleton_id bigint,
-    updated_at timestamp(6) without time zone NOT NULL
+    grave_id bigint,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL,
+    period_id bigint
 );
 
 
@@ -279,8 +279,8 @@ ALTER SEQUENCE public.chronologies_id_seq OWNED BY public.chronologies.id;
 
 CREATE TABLE public.cultures (
     id bigint NOT NULL,
-    created_at timestamp(6) without time zone NOT NULL,
     name character varying,
+    created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL
 );
 
@@ -310,22 +310,36 @@ ALTER SEQUENCE public.cultures_id_seq OWNED BY public.cultures.id;
 
 CREATE TABLE public.figures (
     id bigint NOT NULL,
-    actual_height_mm integer,
-    anchor_point_1_x integer,
-    anchor_point_1_y integer,
-    anchor_point_2_x integer,
-    anchor_point_2_y integer,
-    anchor_point_3_x integer,
-    anchor_point_3_y integer,
-    anchor_point_4_x integer,
-    anchor_point_4_y integer,
-    angle double precision,
+    page_id bigint NOT NULL,
+    x1 integer NOT NULL,
+    x2 integer NOT NULL,
+    y1 integer NOT NULL,
+    y2 integer NOT NULL,
+    type character varying NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL,
     area double precision,
+    perimeter double precision,
+    meter_ratio double precision,
+    angle double precision,
+    parent_id integer,
+    identifier character varying,
+    width double precision,
+    height double precision,
+    text character varying,
+    site_id bigint,
+    validated boolean DEFAULT false NOT NULL,
+    verified boolean DEFAULT false NOT NULL,
+    disturbed boolean DEFAULT false NOT NULL,
+    contour text DEFAULT '[]'::text NOT NULL,
+    deposition_type integer DEFAULT 0 NOT NULL,
+    publication_id integer,
+    percentage_scale integer,
+    page_size integer,
+    manual_bounding_box boolean DEFAULT false,
     bounding_box_angle integer,
     bounding_box_height double precision,
     bounding_box_width double precision,
-    contour text DEFAULT '[]'::text NOT NULL,
-    contour_info jsonb,
     control_point_1_x integer,
     control_point_1_y integer,
     control_point_2_x integer,
@@ -334,39 +348,25 @@ CREATE TABLE public.figures (
     control_point_3_y integer,
     control_point_4_x integer,
     control_point_4_y integer,
-    created_at timestamp(6) without time zone NOT NULL,
-    deposition_type integer DEFAULT 0 NOT NULL,
-    disturbed boolean DEFAULT false NOT NULL,
-    dummy boolean DEFAULT false NOT NULL,
-    efds double precision[] DEFAULT '{}'::double precision[] NOT NULL,
-    features double precision[] DEFAULT '{}'::double precision[] NOT NULL,
-    height double precision,
-    identifier character varying,
-    internment_type integer,
-    manual_bounding_box boolean DEFAULT false,
-    meter_ratio double precision,
-    page_id bigint NOT NULL,
-    page_size integer,
-    parent_id integer,
-    percentage_scale integer,
-    perimeter double precision,
+    anchor_point_1_x integer,
+    anchor_point_1_y integer,
+    anchor_point_2_x integer,
+    anchor_point_2_y integer,
+    anchor_point_3_x integer,
+    anchor_point_3_y integer,
+    anchor_point_4_x integer,
+    anchor_point_4_y integer,
     probability double precision,
-    publication_id integer,
+    contour_info jsonb,
     real_world_area double precision,
+    real_world_width double precision,
     real_world_height double precision,
     real_world_perimeter double precision,
-    real_world_width double precision,
-    site_id bigint,
-    text character varying,
-    type character varying NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL,
-    validated boolean DEFAULT false NOT NULL,
-    verified boolean DEFAULT false NOT NULL,
-    width double precision,
-    x1 integer NOT NULL,
-    x2 integer NOT NULL,
-    y1 integer NOT NULL,
-    y2 integer NOT NULL
+    features double precision[] DEFAULT '{}'::double precision[] NOT NULL,
+    efds double precision[] DEFAULT '{}'::double precision[] NOT NULL,
+    internment_type integer,
+    dummy boolean DEFAULT false NOT NULL,
+    actual_height_mm integer
 );
 
 
@@ -395,8 +395,8 @@ ALTER SEQUENCE public.figures_id_seq OWNED BY public.figures.id;
 
 CREATE TABLE public.figures_tags (
     id bigint NOT NULL,
-    figure_id bigint,
-    tag_id bigint
+    tag_id bigint,
+    figure_id bigint
 );
 
 
@@ -425,15 +425,15 @@ ALTER SEQUENCE public.figures_tags_id_seq OWNED BY public.figures_tags.id;
 
 CREATE TABLE public.genetics (
     id bigint NOT NULL,
-    bone_id bigint,
-    created_at timestamp(6) without time zone NOT NULL,
     data_type integer,
     endo_content double precision,
-    mt_haplogroup_id bigint,
     ref_gen character varying,
     skeleton_id bigint NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
-    y_haplogroup_id bigint
+    mt_haplogroup_id bigint,
+    y_haplogroup_id bigint,
+    bone_id bigint
 );
 
 
@@ -463,9 +463,9 @@ ALTER SEQUENCE public.genetics_id_seq OWNED BY public.genetics.id;
 CREATE TABLE public.images (
     id bigint NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
-    height integer,
     updated_at timestamp(6) without time zone NOT NULL,
-    width integer
+    width integer,
+    height integer
 );
 
 
@@ -494,12 +494,12 @@ ALTER SEQUENCE public.images_id_seq OWNED BY public.images.id;
 
 CREATE TABLE public.key_points (
     id bigint NOT NULL,
-    created_at timestamp(6) without time zone NOT NULL,
-    figure_id bigint NOT NULL,
     label integer NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL,
     x integer NOT NULL,
-    y integer NOT NULL
+    y integer NOT NULL,
+    figure_id bigint NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
 );
 
 
@@ -528,12 +528,12 @@ ALTER SEQUENCE public.key_points_id_seq OWNED BY public.key_points.id;
 
 CREATE TABLE public.kurgans (
     id bigint NOT NULL,
-    created_at timestamp(6) without time zone NOT NULL,
+    width integer,
     height integer,
     name character varying NOT NULL,
     publication_id bigint,
-    updated_at timestamp(6) without time zone NOT NULL,
-    width integer
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
 );
 
 
@@ -562,8 +562,8 @@ ALTER SEQUENCE public.kurgans_id_seq OWNED BY public.kurgans.id;
 
 CREATE TABLE public.mt_haplogroups (
     id bigint NOT NULL,
-    created_at timestamp(6) without time zone NOT NULL,
     name character varying,
+    created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL
 );
 
@@ -593,11 +593,11 @@ ALTER SEQUENCE public.mt_haplogroups_id_seq OWNED BY public.mt_haplogroups.id;
 
 CREATE TABLE public.object_similarities (
     id bigint NOT NULL,
-    created_at timestamp(6) without time zone NOT NULL,
+    type character varying,
+    similarity double precision,
     first_id bigint NOT NULL,
     second_id bigint NOT NULL,
-    similarity double precision,
-    type character varying,
+    created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL
 );
 
@@ -627,9 +627,9 @@ ALTER SEQUENCE public.object_similarities_id_seq OWNED BY public.object_similari
 
 CREATE TABLE public.page_texts (
     id bigint NOT NULL,
-    created_at timestamp(6) without time zone NOT NULL,
     page_id bigint NOT NULL,
     text character varying,
+    created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL
 );
 
@@ -659,10 +659,10 @@ ALTER SEQUENCE public.page_texts_id_seq OWNED BY public.page_texts.id;
 
 CREATE TABLE public.pages (
     id bigint NOT NULL,
-    created_at timestamp(6) without time zone NOT NULL,
-    image_id bigint NOT NULL,
-    number integer,
     publication_id bigint NOT NULL,
+    number integer,
+    image_id bigint NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL
 );
 
@@ -692,8 +692,8 @@ ALTER SEQUENCE public.pages_id_seq OWNED BY public.pages.id;
 
 CREATE TABLE public.periods (
     id bigint NOT NULL,
-    created_at timestamp(6) without time zone NOT NULL,
     name character varying,
+    created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL
 );
 
@@ -724,13 +724,13 @@ ALTER SEQUENCE public.periods_id_seq OWNED BY public.periods.id;
 CREATE TABLE public.publications (
     id bigint NOT NULL,
     author character varying,
-    created_at timestamp(6) without time zone NOT NULL,
-    public boolean DEFAULT false NOT NULL,
-    summary text,
     title character varying,
+    created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
+    year character varying,
     user_id bigint,
-    year character varying
+    public boolean DEFAULT false NOT NULL,
+    summary text
 );
 
 
@@ -763,16 +763,48 @@ CREATE TABLE public.schema_migrations (
 
 
 --
+-- Name: share_publications; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.share_publications (
+    id bigint NOT NULL,
+    publication_id bigint NOT NULL,
+    user_id bigint NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: share_publications_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.share_publications_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: share_publications_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.share_publications_id_seq OWNED BY public.share_publications.id;
+
+
+--
 -- Name: sites; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.sites (
     id bigint NOT NULL,
-    country_code integer,
     lat double precision,
-    locality character varying,
     lon double precision,
     name character varying,
+    locality character varying,
+    country_code integer,
     site_code character varying
 );
 
@@ -802,22 +834,22 @@ ALTER SEQUENCE public.sites_id_seq OWNED BY public.sites.id;
 
 CREATE TABLE public.skeletons (
     id bigint NOT NULL,
-    anatonimcal_connection integer,
-    angle double precision,
-    body_position integer,
-    created_at timestamp(6) without time zone NOT NULL,
-    crouching_type integer,
     figure_id integer NOT NULL,
+    angle double precision,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL,
+    skeleton_id character varying,
     funerary_practice integer,
-    head_facing double precision,
     inhumation_type integer,
+    anatonimcal_connection integer,
+    body_position integer,
+    crouching_type integer,
+    other character varying,
+    head_facing double precision,
     ochre integer,
     ochre_position integer,
-    other character varying,
-    site_id bigint,
     skeleton_figure_id bigint,
-    skeleton_id character varying,
-    updated_at timestamp(6) without time zone NOT NULL
+    site_id bigint
 );
 
 
@@ -846,15 +878,15 @@ ALTER SEQUENCE public.skeletons_id_seq OWNED BY public.skeletons.id;
 
 CREATE TABLE public.stable_isotopes (
     id bigint NOT NULL,
-    baseline integer,
-    bone_id bigint,
-    created_at timestamp(6) without time zone NOT NULL,
+    skeleton_id bigint NOT NULL,
     iso_id character varying,
     iso_value double precision,
-    isotope integer,
     ref_iso character varying,
-    skeleton_id bigint NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    isotope integer,
+    baseline integer,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL,
+    bone_id bigint
 );
 
 
@@ -912,12 +944,12 @@ ALTER SEQUENCE public.tags_id_seq OWNED BY public.tags.id;
 
 CREATE TABLE public.taxonomies (
     id bigint NOT NULL,
-    created_at timestamp(6) without time zone NOT NULL,
-    culture_id bigint,
+    skeleton_id bigint,
     culture_note character varying,
     culture_reference character varying,
-    skeleton_id bigint,
-    updated_at timestamp(6) without time zone NOT NULL
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL,
+    culture_id bigint
 );
 
 
@@ -946,14 +978,14 @@ ALTER SEQUENCE public.taxonomies_id_seq OWNED BY public.taxonomies.id;
 
 CREATE TABLE public.text_items (
     id bigint NOT NULL,
-    created_at timestamp(6) without time zone NOT NULL,
     page_id bigint NOT NULL,
     text character varying,
-    updated_at timestamp(6) without time zone NOT NULL,
     x1 integer,
     x2 integer,
     y1 integer,
-    y2 integer
+    y2 integer,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
 );
 
 
@@ -982,11 +1014,11 @@ ALTER SEQUENCE public.text_items_id_seq OWNED BY public.text_items.id;
 
 CREATE TABLE public.users (
     id bigint NOT NULL,
-    code_hash character varying,
-    created_at timestamp(6) without time zone NOT NULL,
     email character varying,
+    code_hash character varying,
     name character varying,
     role integer,
+    created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL
 );
 
@@ -1016,8 +1048,8 @@ ALTER SEQUENCE public.users_id_seq OWNED BY public.users.id;
 
 CREATE TABLE public.y_haplogroups (
     id bigint NOT NULL,
-    created_at timestamp(6) without time zone NOT NULL,
     name character varying,
+    created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL
 );
 
@@ -1179,6 +1211,13 @@ ALTER TABLE ONLY public.periods ALTER COLUMN id SET DEFAULT nextval('public.peri
 --
 
 ALTER TABLE ONLY public.publications ALTER COLUMN id SET DEFAULT nextval('public.publications_id_seq'::regclass);
+
+
+--
+-- Name: share_publications id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.share_publications ALTER COLUMN id SET DEFAULT nextval('public.share_publications_id_seq'::regclass);
 
 
 --
@@ -1411,6 +1450,14 @@ ALTER TABLE ONLY public.publications
 
 ALTER TABLE ONLY public.schema_migrations
     ADD CONSTRAINT schema_migrations_pkey PRIMARY KEY (version);
+
+
+--
+-- Name: share_publications share_publications_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.share_publications
+    ADD CONSTRAINT share_publications_pkey PRIMARY KEY (id);
 
 
 --
@@ -1660,6 +1707,20 @@ CREATE INDEX index_publications_on_user_id ON public.publications USING btree (u
 
 
 --
+-- Name: index_share_publications_on_publication_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_share_publications_on_publication_id ON public.share_publications USING btree (publication_id);
+
+
+--
+-- Name: index_share_publications_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_share_publications_on_user_id ON public.share_publications USING btree (user_id);
+
+
+--
 -- Name: index_skeletons_on_figure_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -1740,6 +1801,14 @@ ALTER TABLE ONLY public.stable_isotopes
 
 
 --
+-- Name: share_publications fk_rails_6b690e58fb; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.share_publications
+    ADD CONSTRAINT fk_rails_6b690e58fb FOREIGN KEY (publication_id) REFERENCES public.publications(id);
+
+
+--
 -- Name: pages fk_rails_6e85f0c61d; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1753,6 +1822,14 @@ ALTER TABLE ONLY public.pages
 
 ALTER TABLE ONLY public.pages
     ADD CONSTRAINT fk_rails_7484eb7907 FOREIGN KEY (image_id) REFERENCES public.images(id) ON DELETE CASCADE;
+
+
+--
+-- Name: share_publications fk_rails_785bc17926; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.share_publications
+    ADD CONSTRAINT fk_rails_785bc17926 FOREIGN KEY (user_id) REFERENCES public.users(id);
 
 
 --
@@ -1826,6 +1903,7 @@ ALTER TABLE ONLY public.text_items
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260124094306'),
 ('20251217131441'),
 ('20251216092344'),
 ('20251216092343'),

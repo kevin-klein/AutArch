@@ -1,5 +1,5 @@
 class PublicationsController < AuthorizedController
-  before_action :set_publication, only: %i[export_lithics export radar update_tags assign_tags update_site assign_site progress summary show edit update destroy stats]
+  before_action :set_publication, only: %i[analysis export_lithics export radar update_tags assign_tags update_site assign_site progress summary show edit update destroy stats]
 
   # GET /publications or /publications.json
   def index
@@ -204,6 +204,49 @@ class PublicationsController < AuthorizedController
     end
   end
 
+  def analysis
+    @form = Forms::ArtefactAnalysisForm.new
+
+    @colors = [
+      [209, 41, 41],
+      [129, 239, 19],
+      [77, 209, 209],
+      [115, 10, 219]
+    ]
+    @hex_colors = @colors.map do |color|
+      "##{color[0].to_s(16)}#{color[1].to_s(16)}#{color[2].to_s(16)}"
+    end
+
+    if params[:forms_artefact_analysis_form].present?
+      @form = Forms::ArtefactAnalysisForm.new(analysis_form_params)
+
+      @artefact_type = {
+        'Lithic' => StoneTool,
+        'Ceramic' => Ceramic,
+      }[@form.artefact_type]
+
+      @figures = @publication.figures.includes(:scale).where(type: @artefact_type.name).order(:id)#.filter { _1.width_with_unit[:unit] != 'px' }
+      @figures = @figures.filter { _1.contour.present? }
+
+      contours = @figures.map(&:contour)
+      return if contours.empty?
+      frequencies = contours.map do |contour|
+        Efd.elliptic_fourier_descriptors(contour, normalize: true, order: 15).to_a.flatten
+      end
+
+      @pca = Stats.efd_pca(frequencies)
+
+      @pca_data = @pca.zip(@figures)
+      @pca_data = [{
+        name: @publication.short_description,
+        data: @pca_data.map do |pca, figure|
+          pca = Stats.convert_pca_item_to_polar(pca)
+          pca.merge({ id: figure.id, title: figure.id, link: "/size_figures/#{figure.id}/update_size_figure/set_data" })
+        end
+      }]
+    end
+  end
+
   private
 
   # Use callbacks to share common setup or constraints between actions.
@@ -223,6 +266,10 @@ class PublicationsController < AuthorizedController
 
   # Only allow a list of trusted parameters through.
   def publication_params
-    params.require(:publication).permit(:pdf, :public, :author, :title, :year)
+    params.require(:publication).permit(:pdf, :public, :author, :title, :year, shared_with_user_ids: [])
+  end
+
+  def analysis_form_params
+    params.require(:forms_artefact_analysis_form).permit(:artefact_type)
   end
 end
