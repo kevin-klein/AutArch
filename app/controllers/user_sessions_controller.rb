@@ -28,12 +28,17 @@ class UserSessionsController < ApplicationController
     if @user.nil?
       raise
     else
-      User.transaction do
-        @user.code_hash = SecureRandom.alphanumeric(6)
-        @user.save!
-      end
+      if Rails.env.development?
+        session[:user_id] = @user.id
+        redirect_to "/", notice: "Successfully logged in"
+      else
+        User.transaction do
+          @user.code_hash = SecureRandom.alphanumeric(6)
+          @user.save!
+        end
 
-      LoginMailer.with(user: @user).login_code.deliver_later
+        LoginMailer.with(user: @user).login_code.deliver_later
+      end
     end
   end
 end

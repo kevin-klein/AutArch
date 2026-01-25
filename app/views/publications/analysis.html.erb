@@ -1,0 +1,9 @@
+<%= simple_form_for(@form, url: analysis_publication_path(@publication), method: "GET") do |f| %>
+  <%= f.input :artefact_type, collection: ['Lithic', 'Ceramic'] %>
+  <%= f.submit('Search', class: 'btn btn-success') %>
+<% end %>
+
+<% if @pca_data.present? %>
+  <h5 class="card-title">PCA of EFD of outlines with 15 harmonics</h5>
+  <%= react_component('ScatterChart', props: { colors: @hex_colors, data: @pca_data }) %>
+<% end %>

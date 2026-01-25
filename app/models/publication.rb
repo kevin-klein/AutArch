@@ -16,6 +16,9 @@ class Publication < ApplicationRecord
   has_many :figures, through: :pages
   has_many :ceramics, through: :pages
 
+has_many :share_publications, dependent: :destroy
+  has_many :shared_with, through: :share_publications
+
   has_one_attached :pdf
 
   def short_description

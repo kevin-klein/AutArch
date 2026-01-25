@@ -1,12 +1,9 @@
 class Pca
   attr_reader :explained_variance_ratio
   def initialize(scale_data: false, components: 2, whiten: true)
-    @pca = Rumale::Decomposition::PCA.new(n_components: components)
+    @pca = Rumale::Decomposition::PCA.new(n_components: components, random_seed: 42)
     @scale_data = scale_data
-    # @scale_data = false
   end
-
-
 
   def fit(x)
     if @scale_data
@@ -15,9 +12,6 @@ class Pca
     end
 
     @pca.fit(x)
-    # raise
-
-
 
     # evaluator = Rumale::EvaluationMeasure::ExplainedVarianceScore.new
     # evaluator.score(@pca.trans)

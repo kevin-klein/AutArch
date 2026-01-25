@@ -132,7 +132,7 @@ function ScatterChart ({ data, colors }) {
         tooltip: {
           custom: function ({ series, seriesIndex, dataPointIndex, w }) {
             return '<div class="arrow_box" style="padding: 10;">' +
-          '<span>Grave ' + data[seriesIndex].data[dataPointIndex].title + '</span>' +
+          '<span>Object ' + data[seriesIndex].data[dataPointIndex].title + '</span>' +
           '</div>'
           }
         },
@@ -147,8 +147,12 @@ function ScatterChart ({ data, colors }) {
           events: {
             markerClick: function (event, chartContext, { seriesIndex, dataPointIndex, config }) {
               const item = data[seriesIndex].data[dataPointIndex]
-              const link = `/graves/${item.id}/update_grave/set_grave_data`
-              window.location.href = link
+              if (item.link !== undefined) {
+                window.location.href = item.link
+              } else {
+                const link = `/graves/${item.id}/update_grave/set_grave_data`
+                window.location.href = link
+              }
             }
           }
         },

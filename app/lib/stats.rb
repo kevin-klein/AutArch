@@ -113,7 +113,7 @@ module Stats
     frequencies = contours.zip(graves).map do |contour, grave|
       Efd.elliptic_fourier_descriptors(contour, normalize: true, order: 15).to_a.flatten
     end
-    max = (10.0 / frequencies.flatten.max)
+    max = frequencies.flatten.max
     frequencies = frequencies.map { |item| item.each_slice(2).map(&:last).map { _1 * max } }
 
     [frequencies, graves]
