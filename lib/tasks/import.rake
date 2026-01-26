@@ -4,8 +4,8 @@ namespace :import do
     file = ENV['PDF']
     user = User.find(user_id)
 
-      publication = Publication.create!(
-      title: file,
+    publication = Publication.create!(
+      title: File.basename(file),
       user: user
     )
     publication.pdf.attach(io: File.open(file), filename: File.basename(file), content_type: "application/pdf",)
