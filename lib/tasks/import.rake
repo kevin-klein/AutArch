@@ -1,4 +1,19 @@
 namespace :import do
+  task pdf_for_user: :environment do
+    user_id = ENV['USER']
+    file = ENV['PDF']
+    user = User.find(user_id)
+
+      publication = Publication.create!(
+      title: file,
+      user: user
+    )
+    publication.pdf.attach(io: File.open(file), filename: File.basename(file), content_type: "application/pdf",)
+    publication.save!
+
+    AnalyzePublication.new.run(publication)
+  end
+
   task pdfs: :environment do
     Publication.transaction do
       Dir["pdfs/*.pdf"].each do |file|
