@@ -88,15 +88,7 @@ class UpdateGraveController < ApplicationController
 
   def grave_params
     if params[:grave]
-      params.require(:grave).permit(
-        :percentage_scale,
-        :page_size,
-        :identifier,
-        :site_id,
-        :internment_type,
-        tag_ids: [],
-        skeleton_figures_attributes: %i[id deposition_type]
-      )
+      params.require(:grave).permit!
     else
       {}
     end
