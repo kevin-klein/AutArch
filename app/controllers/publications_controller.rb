@@ -166,7 +166,7 @@ class PublicationsController < AuthorizedController
     })
 
     respond_to do |format|
-      if @publication.save
+      if @publication.save!
         AnalyzePublicationJob.perform_later(@publication, site_id: publication_params[:site])
 
         format.html do
