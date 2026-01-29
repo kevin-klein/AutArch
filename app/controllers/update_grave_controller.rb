@@ -59,7 +59,7 @@ class UpdateGraveController < ApplicationController
 
       @grave.save!
     when :resize_boxes
-      Figure.update(params[:figures].keys, params[:figures].values).reject { |p| p.errors.empty? }
+      Figure.update(params[:figures].permit!.keys, params[:figures]permit!.values).reject { |p| p.errors.empty? }
 
       figures = Figure.where(id: params[:figures].keys)
       GraveSize.new.run(figures)
