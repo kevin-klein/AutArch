@@ -51,6 +51,6 @@ class SizeFiguresController < ApplicationController
   end
 
   def set_figure
-    @figure = @figure_cls.find(params[:id])
+    @figure = @figure_cls.find(params[:size_figure_id])
   end
 end
