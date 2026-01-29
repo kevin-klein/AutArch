@@ -266,7 +266,7 @@ class PublicationsController < AuthorizedController
 
   # Only allow a list of trusted parameters through.
   def publication_params
-    params.require(:publication).permit(:pdf, :public, :author, :title, :year, shared_with_user_ids: [])
+    params.require(:publication).permit(:pdf, :author, :title, :year)
   end
 
   def analysis_form_params
