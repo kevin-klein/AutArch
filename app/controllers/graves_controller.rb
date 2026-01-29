@@ -103,22 +103,24 @@ class GravesController < AuthorizedController
   def root
     @no_box = true
 
-    @skeleton_angles = Site.includes(
-      graves: [:spines, :arrow]
-    ).all.to_a.map do |site|
-      spines = site.graves.flat_map do |grave|
-        grave.spines
-      end
+    # @skeleton_angles = Site.includes(
+    #   graves: [:spines, :arrow]
+    # ).all.to_a.map do |site|
+    #   spines = site.graves.flat_map do |grave|
+    #     grave.spines
+    #   end
 
-      angles = Stats.spine_angles(spines)
+    #   angles = Stats.spine_angles(spines)
 
-      {
-        site: site,
-        angles:
-      }
-    end.filter do |grave_data|
-      grave_data[:angles].values.sum > 0
-    end
+    #   {
+    #     site: site,
+    #     angles:
+    #   }
+    # end.filter do |grave_data|
+    #   grave_data[:angles].values.sum > 0
+    # end
+
+    @skeleton_angles = []
   end
 
   def stats
