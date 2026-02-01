@@ -9,10 +9,8 @@ class ApplicationController < ActionController::Base
     if Rails.env.development?
       @current_user = User.find(1)
     end
-    # raise
 
-    if @current_user.disabled?
-      raise
+    if @current_user && !@current_user.disabled?
       @current_user = nil
     end
 
