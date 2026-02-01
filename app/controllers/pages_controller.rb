@@ -44,9 +44,7 @@ class PagesController < ApplicationController
   # PATCH/PUT /pages/1 or /pages/1.json
   def update
     respond_to do |format|
-      Figure.update(params[:figures].keys, params[:figures].values).reject { |p| p.errors.empty? }
-
-      if Figure.update(params[:figures].keys, params[:figures].values).reject { |p| p.errors.empty? }
+      if Figure.update(params[:figures].permit!.keys, params[:figures].permit!.values).reject { |p| p.errors.empty? }
         format.html { redirect_to publication_page_path(@publication, @page), notice: "Page was successfully updated." }
         format.json { render :show, status: :ok, location: @page }
       else
