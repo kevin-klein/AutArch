@@ -4,10 +4,15 @@ class Ability
   include CanCan::Ability
 
   def initialize(user)
-    can :manage, Publication, user_id: user.id
-    can :read, Publication, public: true
+    if user.admin?
+      can :manage, :all
+    else
+      can :manage, Publication, user_id: user.id
+      can :read, Publication, public: true
 
-    can :read, Publication, id: user.share_publications.select(:publication_id)
+      can :read, Publication, id: user.share_publications.select(:publication_id)
+    end
+
     # Define abilities for the user here. For example:
     #
     #   return unless user.present?

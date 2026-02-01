@@ -1019,7 +1019,8 @@ CREATE TABLE public.users (
     name character varying,
     role integer,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    disabled boolean DEFAULT false NOT NULL
 );
 
 
@@ -1903,6 +1904,7 @@ ALTER TABLE ONLY public.text_items
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260201095743'),
 ('20260124094306'),
 ('20251217131441'),
 ('20251216092344'),

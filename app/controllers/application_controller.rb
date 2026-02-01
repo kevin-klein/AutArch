@@ -6,5 +6,16 @@ class ApplicationController < ActionController::Base
 
   def current_user
     @current_user ||= User.find_by(id: session[:user_id])
+    if Rails.env.development?
+      @current_user = User.find(1)
+    end
+    # raise
+
+    if @current_user.disabled?
+      raise
+      @current_user = nil
+    end
+
+    @current_user
   end
 end

@@ -1,13 +1,10 @@
 class UsersController < AuthorizedController
-  before_action :set_user, only: %i[show edit update destroy]
+  # before_action :set_user, only: %i[show edit update destroy]
+  load_and_authorize_resource
 
   # GET /users or /users.json
   def index
-    @users = User.all
-  end
-
-  # GET /users/1 or /users/1.json
-  def show
+    @users = User.order(:id)
   end
 
   # GET /users/new
@@ -25,11 +22,9 @@ class UsersController < AuthorizedController
 
     respond_to do |format|
       if @user.save
-        format.html { redirect_to user_url(@user), notice: "User was successfully created." }
-        format.json { render :show, status: :created, location: @user }
+        format.html { redirect_to users_path, notice: "User was successfully created." }
       else
         format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @user.errors, status: :unprocessable_entity }
       end
     end
   end
@@ -38,7 +33,7 @@ class UsersController < AuthorizedController
   def update
     respond_to do |format|
       if @user.update(user_params)
-        format.html { redirect_to user_url(@user), notice: "User was successfully updated." }
+        format.html { redirect_to users_path, notice: "User was successfully updated." }
         format.json { render :show, status: :ok, location: @user }
       else
         format.html { render :edit, status: :unprocessable_entity }
@@ -66,6 +61,6 @@ class UsersController < AuthorizedController
 
   # Only allow a list of trusted parameters through.
   def user_params
-    params.require(:user).permit(:email, :role, :name)
+    params.require(:user).permit(:email, :role, :name, :disabled)
   end
 end
