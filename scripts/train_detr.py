@@ -313,23 +313,18 @@ def compute_metrics(evaluation_results, image_processor, threshold=0.0, id2label
     return metrics
 
 def train_rtdetr():
-    """Initializes and trains the RT-DETRv2 model."""
     global id2label
 
-    # 1. Initialize Dataset and Determine Number of Classes
     dataset = DfgDataset(root=DATA_ROOT)
     train_dataset, test_dataset = torch.utils.data.random_split(dataset, [0.8, 0.2])
     id2label = {v: k for k, v in dataset.labels.items()}
     label2id = dataset.labels
     num_labels = len(id2label)
 
-    print(num_labels)
-
     if num_labels == 0:
         print("Error: No labels found. Please ensure your DATA_ROOT contains valid XML files.")
         return
 
-    # 2. Initialize Processor and Model
     # The processor needs the label maps to correctly handle the classes
     global processor
     processor = AutoImageProcessor.from_pretrained(
@@ -385,63 +380,14 @@ def train_rtdetr():
 
     trainer.train()
 
-    # device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    # print(f"Using device: {device}")
-    # model.to(device)
-
-    # # 4. Optimizer and Training Setup
-    # optimizer = torch.optim.AdamW(model.parameters(), lr=LEARNING_RATE)
-
-    # print("Starting training...")
-
-    # # 5. Training Loop
-    # model.train()
-
-    # for epoch in range(NUM_EPOCHS):
-    #     total_loss = 0
-    #     pbar = tqdm(train_dataloader, desc=f"Epoch {epoch+1}/{NUM_EPOCHS}")
-
-    #     for batch_idx, batch in enumerate(pbar):
-    #         # Move inputs to device
-    #         pixel_values = batch["pixel_values"].to(device)
-    #         labels = [{k: v.to(device) for k, v in t.items()} for t in batch["labels"]]
-
-    #         # Zero gradients
-    #         optimizer.zero_grad()
-
-    #         # Forward pass
-    #         outputs = model(
-    #             pixel_values=pixel_values,
-    #             labels=labels
-    #         )
-
-    #         # The outputs dictionary contains the total loss and individual loss components
-    #         loss = outputs.loss
-
-    #         # Backward pass and optimization
-    #         loss.backward()
-    #         optimizer.step()
-
-    #         # Log progress
-    #         total_loss += loss.item()
-    #         avg_loss = total_loss / (batch_idx + 1)
-    #         pbar.set_postfix({"Loss": f"{avg_loss:.4f}"})
-
-    #     print(f"Epoch {epoch+1} finished. Average Loss: {avg_loss:.4f}")
-
-    # 6. Save Model and Processor
-    os.makedirs(os.path.dirname(MODEL_SAVE_PATH), exist_ok=True)
-
     # Save the model
+    os.makedirs(os.path.dirname(MODEL_SAVE_PATH), exist_ok=True)
     model.save_pretrained(MODEL_SAVE_PATH)
 
     # Save the processor (important for prediction/inference)
     processor.save_pretrained(MODEL_SAVE_PATH)
 
     print(f"\nTraining complete. Model and processor saved to: {MODEL_SAVE_PATH}")
-    print("To run inference, load them using:")
-    print("model = RtDetrForObjectDetection.from_pretrained(MODEL_SAVE_PATH)")
-    print("processor = RtDetrProcessor.from_pretrained(MODEL_SAVE_PATH)")
 
 if __name__ == "__main__":
     train_rtdetr()

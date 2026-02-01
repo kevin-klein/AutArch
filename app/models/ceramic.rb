@@ -61,7 +61,6 @@ class Ceramic < Figure
   belongs_to :good, foreign_key: "parent_id", optional: true, inverse_of: :ceramics
   belongs_to :grave, foreign_key: "parent_id", optional: true, inverse_of: :ceramics
 
-
   belongs_to :site, optional: true
 
   has_one :scale, dependent: :destroy, foreign_key: "parent_id", class_name: "Scale", inverse_of: :stone_tool
