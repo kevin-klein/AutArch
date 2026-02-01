@@ -10,7 +10,7 @@ class ApplicationController < ActionController::Base
       @current_user = User.find(1)
     end
 
-    if @current_user && !@current_user.disabled?
+    if @current_user && @current_user.disabled?
       @current_user = nil
     end
 
