@@ -44,8 +44,6 @@ def convert_bbox_yolo_to_pascal(boxes, image_size):
 
     return boxes
 
-# --- Configuration ---
-# NOTE: The data root has been updated to your specified path.
 DATA_ROOT = "training_data/object detection"
 MODEL_SAVE_PATH = "models/conditional-detr-resnet"
 PRETRAINED_MODEL_NAME = "microsoft/conditional-detr-resnet-50"
@@ -187,8 +185,7 @@ def collate_fn(batch):
     for t in targets_from_dataset:
         targets.append(t)
 
-    # Use the processor to transform the batch
-    # This does: image resizing/padding/normalization and target conversion (pixel to normalized cx,cy,w,h)
+    # image resizing/padding/normalization and target conversion (pixel to normalized cx,cy,w,h)
     encoded_inputs = processor(images=images, annotations=targets, return_tensors="pt")
 
     return encoded_inputs
@@ -228,33 +225,14 @@ def compute_metrics(evaluation_results, image_processor, threshold=0.0, id2label
 
     predictions, targets = evaluation_results.predictions, evaluation_results.label_ids
 
-    # For metric computation we need to provide:
-
-    #  - targets in a form of list of dictionaries with keys "boxes", "labels"
-
-    #  - predictions in a form of list of dictionaries with keys "boxes", "scores", "labels"
-
     image_sizes = []
-
     post_processed_targets = []
-
     post_processed_predictions = []
 
-    # Collect targets in the required format for metric computation
-
     for batch in targets:
-
-        # collect image sizes, we will need them for predictions post processing
-
         batch_image_sizes = torch.tensor(np.array([x["orig_size"] for x in batch]))
 
         image_sizes.append(batch_image_sizes)
-
-        # collect targets in the required format for metric computation
-
-        # boxes were converted to YOLO format needed for model training
-
-        # here we will convert them to Pascal VOC format (x_min, y_min, x_max, y_max)
 
         for image_target in batch:
 
@@ -265,10 +243,6 @@ def compute_metrics(evaluation_results, image_processor, threshold=0.0, id2label
             labels = torch.tensor(image_target["class_labels"])
 
             post_processed_targets.append({"boxes": boxes, "labels": labels})
-
-    # Collect predictions in the required format for metric computation,
-
-    # model produce boxes in YOLO format, then image_processor convert them to Pascal VOC format
 
     for batch, target_sizes in zip(predictions, image_sizes):
 
