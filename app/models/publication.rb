@@ -16,7 +16,7 @@ class Publication < ApplicationRecord
   has_many :figures, through: :pages
   has_many :ceramics, through: :pages
 
-  belongs_to :user
+  belongs_to :user, optional: true
 
   has_many :share_publications, dependent: :destroy
   has_many :shared_with, through: :share_publications
