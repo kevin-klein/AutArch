@@ -2,10 +2,12 @@
 
 <div class='row'>
   <div class='col-md-6'>
-    <div class="online_3d_viewer"
-      style="min-height: 600px;"
-      model="<%= rails_blob_path(@figure.three_d_model) %>">
-    </div>
+    <% if @figure.three_d_model.attached? %>
+      <div class="online_3d_viewer"
+        style="min-height: 600px;"
+        model="<%= rails_blob_path(@figure.three_d_model) %>">
+      </div>
+    <% end %>
   </div>
 
   <div class='col-md-6'>
