@@ -12,7 +12,7 @@ module UnitAccessor
           return {value: 0, unit: "px"} if send(name).nil?
           return {value: send(name), unit: "px"} if ratio.nil?
           {value: send(name) * ratio, unit: value_unit(square)}
-        elsif percentage_scale.present? || (self.class.method_defined?(:grave) && grave.percentage_scale.present?)
+        elsif percentage_scale.present? || (self.class.method_defined?(:grave) && grave.present? && grave.percentage_scale.present?)
           value = send(name)
           if self.class.method_defined?(:grave)
             cm_on_page = grave.page_size.to_f / grave.page.image.width
