@@ -78,6 +78,7 @@ module Stats
   def spine_angles(spines)
     spines.map { [_1, _1.grave&.arrow] }
       .filter { |_spine, arrow| arrow.present? }
+      .filter { |_spine, arrow| arrow.angle.present? }
       .map { |spine, arrow| spine.angle_with_arrow(arrow) }
       .map { round_to_nearest(_1, 30) }
       .tally
