@@ -92,13 +92,17 @@ class PublicationsController < AuthorizedController
 
     # @graves_pca_chart = Stats.pca_chart(@graves_pca)
 
-    @base_spines_by_site = @publication.figures.where(type: "Spine").group_by { |spine| spine.grave.site }
+    @base_spines_by_site = @publication.figures.where(type: "Spine")
+      .filter { |spine| spine.skeleton.present? }
+      .group_by { |spine| spine.grave.site }
 
     @spines_right = @publication.figures.where(type: "Spine")
+      .filter { |spine| spine.skeleton.present? }
       .filter { |spine| spine.skeleton.deposition_type == "right_side" }
     @spines_right = ArtefactsHeatmap.new.run(@spines_right)
 
     @spines_left = @publication.figures.where(type: "Spine")
+      .filter { |spine| spine.skeleton.present? }
       .filter { |spine| spine.skeleton.deposition_type == "left_side" }
     @spines_left = ArtefactsHeatmap.new.run(@spines_left)
 
