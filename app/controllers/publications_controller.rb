@@ -98,21 +98,21 @@ class PublicationsController < AuthorizedController
 
     @spines_right = @publication.figures.where(type: "Spine")
       .filter { |spine| spine.skeleton.present? }
-      .filter { |spine| spine.skeleton.deposition_type == "right_side" }
+      .filter { |spine| spine.skeleton.deposition_type == "flexed_on_the_right" }
     @spines_right = ArtefactsHeatmap.new.run(@spines_right)
 
     @spines_left = @publication.figures.where(type: "Spine")
       .filter { |spine| spine.skeleton.present? }
-      .filter { |spine| spine.skeleton.deposition_type == "left_side" }
+      .filter { |spine| spine.skeleton.deposition_type == "flexed_on_the_left" }
     @spines_left = ArtefactsHeatmap.new.run(@spines_left)
 
     @spines_by_site_right = @base_spines_by_site.map do |site, spines|
-      spines = spines.filter { _1.skeleton.deposition_type == "right_side" }
+      spines = spines.filter { _1.skeleton.deposition_type == "flexed_on_the_right" }
       [site, ArtefactsHeatmap.new.run(spines)]
     end.to_h.filter { |site, data| !data[:graves].empty? }
 
     @spines_by_site_left = @base_spines_by_site.map do |site, spines|
-      [site, ArtefactsHeatmap.new.run(spines.filter { _1.skeleton.deposition_type == "left_side" })]
+      [site, ArtefactsHeatmap.new.run(spines.filter { _1.skeleton.deposition_type == "flexed_on_the_left" })]
     end.to_h.filter { |site, data| !data[:graves].empty? }
 
     @outlines_data, _ = Stats.outlines_efd([@publication, *@other_publications].reverse, excluded: @excluded_graves)
