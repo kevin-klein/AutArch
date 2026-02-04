@@ -21,7 +21,9 @@ class UpdateSizeFigureController < ApplicationController
     when :set_tags
       @figure.update(figure_params)
     when :upload_3d_model
-      @figure.update(figure_params)
+      if params[:lithic].present? || params[:figure].present?
+        @figure.update(figure_params)
+      end
     when :set_scale
       if params[:scale].present?
         @scale.update(text: params[:scale][:text])
