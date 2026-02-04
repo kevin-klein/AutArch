@@ -20,3 +20,7 @@
     ) %>
   </div>
 </div>
+
+<%= simple_form_for(@figure, url: wizard_path) do |f| %>
+  <%= f.submit("Next", class: "btn btn-primary") %>
+<% end %>
