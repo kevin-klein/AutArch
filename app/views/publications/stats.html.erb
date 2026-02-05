@@ -9,7 +9,7 @@
             <div class='row'>
               <%= f.input :publication_id,
                       collection:
-                        Publication.accessible_by(current_ability).where.not(id: @publication.id).all.map { [_1.short_description, _1.id] },
+                        Publication.accessible_by(current_ability).where.not(id: @publication.id).order(:author).all.map { [_1.short_description, _1.id] },
                       as: :check_boxes,
                       checked: params.dig(:compare, :publication_id) %>
             </div>
