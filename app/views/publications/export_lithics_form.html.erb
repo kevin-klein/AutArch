@@ -1,0 +1,19 @@
+<h4>Export Lithics Settings</h4>
+
+<%= form_with url: export_lithics_publication_path(@publication), method: :post, local: true do |f| %>
+  <div class="mb-3">
+    <%= f.label :contour_points, "Number of contour points", class: "form-label" %>
+
+    <%= f.number_field :contour_points, min: 0, required: true, class: "form-control" %>
+  </div>
+
+  <div class="mb-3">
+    <%= f.label :format, "Export format", class: "form-label" %>
+
+    <%= f.select :format, options_for_select([["JSON", "json"], ["CSV", "csv"]]), {}, class: "form-select" %>
+  </div>
+
+  <div class="mb-3">
+    <%= f.submit "Export", class: "btn btn-primary" %>
+  </div>
+<% end %>

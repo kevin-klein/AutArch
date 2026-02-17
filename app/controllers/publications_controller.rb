@@ -1,5 +1,5 @@
 class PublicationsController < AuthorizedController
-  before_action :set_publication, only: %i[analysis export_lithics export radar update_tags assign_tags update_site assign_site progress summary show edit update destroy stats]
+  before_action :set_publication, only: %i[analysis export_lithics export_lithics_form export radar update_tags assign_tags update_site assign_site progress summary show edit update destroy stats]
 
   # GET /publications or /publications.json
   def index
@@ -137,10 +137,19 @@ class PublicationsController < AuthorizedController
   def edit
   end
 
+  def export_lithics_form
+  end
+
   def export_lithics
     @lithics = @publication.figures.where(type: "StoneTool").where("probability > ?", 0.6)
 
-    render json: ExportLithics.new.export(@lithics)
+    @data = ExportLithics.new.export(@lithics, format: params[:format], num_points: params[:contour_points].to_i)
+
+    if params[:format] == 'json'
+      render json: @data
+    else
+      send_data @data, filename: "#{@publication.short_description}_lithics.csv"
+    end
   end
 
   def export
