@@ -3,7 +3,7 @@
   <%= submit_tag("Search", class: 'btn btn-primary mt-1') %>
 <% end %>
 
-<%= react_component("EuropeMap", props: { orientations: @skeleton_angles }) %>
+<%= react_component("EuropeMap", orientations: @skeleton_angles) %>
 
 <ul>
   <% @publications.each do |publication| %>

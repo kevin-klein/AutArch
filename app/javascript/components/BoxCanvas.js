@@ -1,6 +1,7 @@
 import React from 'react'
 import { Group, Stage, Layer, Circle, Image, Rect, Line, Transformer, Arrow, Shape } from 'react-konva'
 import useImage from 'use-image'
+import ManualContour from './ManualContour'
 
 export function Box ({ onChangeFigure, onDraggingStart, active, figure, setActive }) {
   const { id, x1, y1, x2, y2, typeName } = figure

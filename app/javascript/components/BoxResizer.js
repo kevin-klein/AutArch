@@ -39,7 +39,7 @@ function NewFigureDialog ({ closeDialog, addFigure }) {
   )
 }
 
-function BoxResizer ({ next_url, grave, sites, image, page }) {
+export default function BoxResizer ({ next_url, grave, sites, image, page }) {
   const { figures, updateFigure, setFigures, addFigure, removeFigure } = useFigureStore()
 
   const [creatingNewFigure, setCreatingNewFigure] = React.useState(false)
@@ -418,8 +418,4 @@ function BoxResizer ({ next_url, grave, sites, image, page }) {
       </div>
     </>
   )
-}
-
-export default function (props, railsContext) {
-  return () => <BoxResizer {...props} />
 }
