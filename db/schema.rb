@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_12_17_131441) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_01_095743) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -268,6 +268,15 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_17_131441) do
     t.index ["user_id"], name: "index_publications_on_user_id"
   end
 
+  create_table "share_publications", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "publication_id", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["publication_id"], name: "index_share_publications_on_publication_id"
+    t.index ["user_id"], name: "index_share_publications_on_user_id"
+  end
+
   create_table "sites", force: :cascade do |t|
     t.integer "country_code"
     t.float "lat"
@@ -343,6 +352,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_17_131441) do
   create_table "users", force: :cascade do |t|
     t.string "code_hash"
     t.datetime "created_at", null: false
+    t.boolean "disabled", default: false, null: false
     t.string "email"
     t.string "name"
     t.integer "role"
@@ -365,6 +375,8 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_17_131441) do
   add_foreign_key "page_texts", "pages"
   add_foreign_key "pages", "images", on_delete: :cascade
   add_foreign_key "pages", "publications", on_delete: :cascade
+  add_foreign_key "share_publications", "publications"
+  add_foreign_key "share_publications", "users"
   add_foreign_key "skeletons", "figures"
   add_foreign_key "stable_isotopes", "skeletons"
   add_foreign_key "text_items", "pages"

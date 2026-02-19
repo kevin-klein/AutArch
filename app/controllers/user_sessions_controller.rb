@@ -26,19 +26,17 @@ class UserSessionsController < ApplicationController
     @user = User.find_by(email: email)
 
     if @user.nil?
-      raise
+      redirect_to login_path, notice: "Please enter a valid email address."
+    elsif Rails.env.development?
+      session[:user_id] = @user.id
+      redirect_to "/", notice: "Successfully logged in"
     else
-      if Rails.env.development?
-        session[:user_id] = @user.id
-        redirect_to "/", notice: "Successfully logged in"
-      else
-        User.transaction do
-          @user.code_hash = SecureRandom.alphanumeric(6)
-          @user.save!
-        end
-
-        LoginMailer.with(user: @user).login_code.deliver_later
+      User.transaction do
+        @user.code_hash = SecureRandom.alphanumeric(6)
+        @user.save!
       end
+
+      LoginMailer.with(user: @user).login_code.deliver_later
     end
   end
 end

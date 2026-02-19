@@ -1,5 +1,6 @@
-class UpdateGraveController < ApplicationController
+class UpdateGraveController < AuthorizedController
   include Wicked::Wizard
+
   steps :set_grave_data, :set_site, :set_tags, :resize_boxes, :show_contours, :set_scale, :set_north_arrow, :set_skeleton_data
 
   def skeleton_keypoints
