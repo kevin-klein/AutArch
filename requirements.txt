@@ -44,7 +44,7 @@ onnx-ir==0.1.12
 onnxscript==0.5.6
 opencv-python==4.13.0.90
 packaging==25.0
-pillow==12.0.0
+pillow==12.1.1
 protobuf==6.33.2
 pyefd==1.6.0
 pyparsing==3.2.5
