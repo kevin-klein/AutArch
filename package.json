@@ -11,7 +11,7 @@
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
     "@fontsource/roboto": "^4.5.8",
-    "@popperjs/core": "^2.11.6",
+    "@popperjs/core": "^2.11.8",
     "@rails/ujs": "^7.0.7-2",
     "@types/babel__core": "7",
     "@types/webpack": "5",
@@ -41,13 +41,11 @@
     "react-dom": "^18.2.0",
     "react-konva": "^18.2.10",
     "react-leaflet": "^4.2.0",
-    "react-on-rails": "^13.4.0",
     "react-select": "^5.7.0",
     "react-simple-maps": "^3.0.0",
     "react-use-wizard": "^2.2.1",
     "sass": "^1.57.1",
     "sass-loader": "^13.2.0",
-    "shakapacker": "7.2.2",
     "style-loader": "^3.3.1",
     "swr": "^2.3.3",
     "terser-webpack-plugin": "5",
@@ -60,22 +58,20 @@
     "zustand": "^4.3.9"
   },
   "version": "0.1.0",
-  "babel": {
-    "presets": [
-      "./node_modules/shakapacker/package/babel/preset.js",
-      "@babel/preset-react"
-    ]
-  },
   "browserslist": [
     "defaults"
   ],
   "packageManager": "yarn@1.22.21",
   "devDependencies": {
+    "esbuild": "^0.27.3",
     "eslint": "^8.32.0",
     "eslint-config-prettier": "^8.6.0",
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-react": "^7.32.1",
     "prettier": "^2.8.3",
     "standard": "^17.1.0"
+  },
+  "scripts": {
+    "build": "esbuild app/javascript/*.* --bundle --loader:.png=dataurl --loader:.js=jsx --sourcemap --format=esm --outdir=app/assets/builds --public-path=/assets --define:import.meta.env=\"{\\\"MODE\\\":\\\"development\\\"}\""
   }
 }

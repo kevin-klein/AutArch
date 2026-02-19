@@ -9,11 +9,9 @@
   <div class='col-md-6'>
     <%= react_component(
       "SamPointSelector",
-      props: {
-        figure: @figure.as_json(methods: [:type]),
-        image: @figure.page.image.as_json(methods: [:url]),
-        url: size_figure_sam_contour_path(@figure)
-      }
+      figure: @figure.as_json(methods: [:type]),
+      image: @figure.page.image.as_json(methods: [:url]),
+      url: size_figure_sam_contour_path(@figure)
     ) %>
   </div>
   <div class='col-md-6'>

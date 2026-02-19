@@ -65,6 +65,16 @@ skeleton_angles
 test
 training_data
 keypoint_skeletons
+app/assets/builds/*.js
+app/assets/builds/*.css
+
+autarch.sql
+ceramics/
+config/credentials*
+coverage
+
+masks_out/
+predictions_out/
 
 # Ignore key files for decrypting credentials and more.
 /config/credentials/*.key
@@ -73,3 +83,6 @@ keypoint_skeletons
 # Ignore key files for decrypting credentials and more.
 /config/*.key
 
+
+/app/assets/builds/*
+!/app/assets/builds/.keep
