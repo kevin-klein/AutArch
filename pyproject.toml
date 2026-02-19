@@ -29,7 +29,7 @@ segment-anything = {git = "https://github.com/facebookresearch/segment-anything.
 mobile-sam = {git = "https://github.com/ChaoningZhang/MobileSAM.git"}
 sentencepiece = "^0.2.1"
 bitsandbytes = "^0.48.1"
-protobuf = "^6.33.0"
+protobuf = "^6.33.5"
 
 [[tool.poetry.source]]
 name = "pytorch_cuda"
