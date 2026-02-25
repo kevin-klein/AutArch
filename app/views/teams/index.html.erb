@@ -1,0 +1,30 @@
+<h1>Teams</h1>
+
+<%= link_to 'New Team', new_team_path, class: 'btn btn-primary mb-3' %>
+
+<table class="table table-bordered">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Description</th>
+      <th>Members</th>
+      <th>Publications</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @teams.each do |team| %>
+      <tr>
+        <td><%= link_to team.name, team %></td>
+        <td><%= team.description %></td>
+        <td><%= team.users.count %></td>
+        <td><%= team.publications.count %></td>
+        <td><%= link_to 'Show', team, class: 'btn btn-sm btn-info' %></td>
+        <td><%= link_to 'Edit', edit_team_path(team), class: 'btn btn-sm btn-warning' %></td>
+        <td><%= link_to 'Delete', team, method: :delete,
+                      data: { confirm: 'Are you sure?' },
+                      class: 'btn btn-sm btn-danger' %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

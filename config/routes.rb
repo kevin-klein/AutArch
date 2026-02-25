@@ -22,6 +22,13 @@ Rails.application.routes.draw do # rubocop:disable Metrics/BlockLength
     get :sam_contour
   end
 
+  resources :teams do
+    # user assignments
+    resources :team_memberships, only: [:new, :create, :destroy], module: :teams
+    # publication assignments
+    resources :team_publications, only: [:new, :create, :destroy], module: :teams
+  end
+
 
   # resources :lithics do
   #   member do

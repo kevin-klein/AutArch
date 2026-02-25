@@ -1,4 +1,17 @@
+<div class="text-center mb-4">
+  <h1 class="h3 mb-3 font-weight-normal">Welcome to AutArch</h1>
+  <p class="mb-3">Please sign in to your account</p>
+</div>
+
 <%= simple_form_for(:login, html: { class: 'form-signin' }) do |f| %>
-  <%= f.input :email, label: false, placeholder: 'E-mail' %>
-  <%= f.submit('Login', class: 'btn btn-block btn-success mt-3') %>
+  <div class="form-group">
+    <%= f.input :email,
+                label: false,
+                placeholder: 'Email address',
+                input_html: { class: 'form-control', autofocus: true } %>
+  </div>
+
+  <%= f.submit 'Login',
+              class: 'btn btn-lg btn-primary btn-block mt-3',
+              data: { disable_with: "Signing in..." } %>
 <% end %>

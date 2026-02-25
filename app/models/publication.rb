@@ -18,8 +18,8 @@ class Publication < ApplicationRecord
 
   belongs_to :user, optional: true
 
-  has_many :share_publications, dependent: :destroy
-  has_many :shared_with, through: :share_publications
+  has_many :publication_teams, dependent: :destroy
+  has_many :teams, through: :publication_teams
 
   has_one_attached :pdf
 

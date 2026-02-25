@@ -1,0 +1,10 @@
+<h2>Add User to <%= @team.name %></h2>
+
+<%= form_with(model: @membership, url: team_team_memberships_path(@team), local: true) do |f| %>
+  <div class="form-group">
+    <%= f.label :user_id, 'Select User' %>
+    <%= f.collection_select :user_id, @users, :id, :email, { prompt: 'Choose a user' }, class: 'form-control' %>
+  </div>
+
+  <%= f.submit 'Add User', class: 'btn btn-primary' %>
+<% end %>

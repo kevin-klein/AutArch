@@ -13,7 +13,7 @@ feature "sign in" do
 
     user.reload
     fill_in "login[code]", with: user.code_hash
-    click_button "Send"
+    click_button "Verify Code"
     expect(page).to have_current_path("/")
 
     expect(page).to have_css("a.nav-link", text: user.name)
@@ -40,7 +40,7 @@ feature "sign in" do
 
     user.reload
     fill_in "login[code]", with: user.code_hash + "AAAA"
-    click_button "Send"
+    click_button "Verify Code"
     expect(page).to have_current_path(login_path)
 
     expect(page).to have_css("div.alert", text: "The code you entered was not correct.")
