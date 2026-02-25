@@ -15,8 +15,9 @@ class TeamsController < AuthorizedController
 
   def create
     @team = Team.new(team_params)
-    @team.user_teams.create!(user: current_user)
     if @team.save
+      @team.user_teams.create!(user: current_user)
+
       redirect_to @team, notice: "Team was successfully created."
     else
       render :new
