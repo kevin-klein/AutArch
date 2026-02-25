@@ -10,6 +10,13 @@
     <%= csp_meta_tag %>
     <%= stylesheet_link_tag "autarch" %>
     <%= javascript_include_tag "autarch" %>
+
+    <style>
+      @font-face {
+        font-family: Roboto;
+        src: url(/roboto-latin-400-normal.woff);
+      }
+    </style>
   </head>
 
   <body>
@@ -60,8 +67,13 @@
               <a class="nav-link" href="<%= new_publication_path %>">Upload Publication</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="<%= users_path %>">Users</a>
+              <a class="nav-link" href="<%= teams_path %>">Teams</a>
             </li>
+            <% if can?(:manage, User) %>
+              <li class="nav-item">
+                <a class="nav-link" href="<%= users_path %>">Users</a>
+              </li>
+            <% end %>
           </ul>
           <!-- Left links -->
 

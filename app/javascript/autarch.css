@@ -5,6 +5,7 @@
 @import '@fontsource/roboto/700.css'; */
 
 /* @import "~bootstrap/scss/bootstrap"; */
+
 @import 'mdb-ui-kit/css/mdb.min.css';
 @import 'leaflet/dist/leaflet.css';
 
@@ -251,4 +252,93 @@ rect.btn {
 
 .list-group-item {
   cursor: pointer;
+}
+
+
+/* app/javascript/autarch.css */
+:root {
+  /* General Backgrounds */
+  --color-bg-body:       #1a202c;   /* Deep cool gray/navy */
+  --color-bg-card:       #2d3748;   /* Steel blue-gray for depth */
+  --color-bg-alert:      #334155;   /* Slightly lighter than card for visibility */
+
+  /* Brand / Action Colors */
+  --color-primary:       #38bdf8;   /* Vibrant sky blue */
+  --color-primary-hover: #0ea5e9;   /* Deeper sky blue for interaction */
+
+  /* Typography */
+  --color-text-primary:  #f8fafc;   /* Off-white for reduced glare */
+  --color-text-muted:    #cbd5e0;   /* Light frost gray */
+  --color-link-hover:    #7dd3fc;   /* Pale cyan for link states */
+
+  /* MDB / Component specific */
+  --mdb-table-color:     #f8fafc;
+  --mdb-body-color:      #f8fafc;
+}
+
+/* ----------------- Body ----------------- */
+html, body {
+  background-color: var(--color-bg-body);
+  color: var(--color-text-primary);
+  font-weight: 400;
+  min-height: 100vh;
+}
+
+/* ----------------- Navbar ----------------- */
+.navbar {
+  background: linear-gradient(135deg, var(--color-bg-body) 0%, var(--color-bg-card) 100%);
+}
+.navbar .navbar-brand,
+.navbar .nav-link,
+.navbar .dropdown-item {
+  color: var(--color-text-muted);
+}
+.navbar .nav-link:hover,
+.navbar .dropdown-item:hover {
+  color: var(--color-text-primary);
+  text-decoration: underline;
+}
+
+/* ----------------- Cards ----------------- */
+.card {
+  background-color: var(--color-bg-card);
+  border: 0;
+  box-shadow: 0 2px 6px rgba(0,0,0,.3);
+}
+.card-body {
+  color: var(--color-text-primary);
+}
+
+/* ----------------- Buttons ----------------- */
+.btn-primary {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #fff;
+}
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: var(--color-primary-hover);
+  border-color: var(--color-primary-hover);
+}
+
+/* ----------------- Alerts ----------------- */
+.alert {
+  background-color: var(--color-bg-alert);
+  border-color: var(--color-alert-border);
+  color: var(--color-text-muted);
+}
+.alert a {
+  color: var(--color-primary);
+}
+.alert a:hover {
+  color: var(--color-primary-hover);
+}
+
+/* ----------------- Links & Typography ------------- */
+a {
+  color: var(--color-primary);
+}
+a:hover {
+  color: var(--color-primary-hover);
+  text-decoration: underline;
 }
