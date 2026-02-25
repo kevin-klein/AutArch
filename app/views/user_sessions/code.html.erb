@@ -1,5 +1,19 @@
+<div class="text-center mb-4">
+  <h1 class="h3 mb-3 font-weight-normal">Enter Login Code</h1>
+  <p class="mb-3">We've sent a login code to your email</p>
+</div>
+
 <%= simple_form_for(:login, url: login_code_path, html: { class: 'form-signin' }) do |f| %>
-  <%= f.input :code, label: false, placeholder: 'Login Code' %>
+  <div class="form-group">
+    <%= f.input :code,
+                label: false,
+                placeholder: 'Enter 6-digit code',
+                input_html: { class: 'form-control', autofocus: true } %>
+  </div>
+
   <%= f.input :user_id, as: :hidden, input_html: { value: @user.id } %>
-  <%= f.submit('Send', class: 'btn btn-block btn-success mt-3') %>
+
+  <%= f.submit 'Verify Code',
+              class: 'btn btn-lg btn-success btn-block mt-3',
+              data: { disable_with: "Verifying..." } %>
 <% end %>

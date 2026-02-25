@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_01_095743) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_25_094639) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -256,6 +256,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_01_095743) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "publication_teams", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "publication_id", null: false
+    t.bigint "team_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["publication_id"], name: "index_publication_teams_on_publication_id"
+    t.index ["team_id"], name: "index_publication_teams_on_team_id"
+  end
+
   create_table "publications", force: :cascade do |t|
     t.string "author"
     t.datetime "created_at", null: false
@@ -266,15 +275,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_01_095743) do
     t.bigint "user_id"
     t.string "year"
     t.index ["user_id"], name: "index_publications_on_user_id"
-  end
-
-  create_table "share_publications", force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.bigint "publication_id", null: false
-    t.datetime "updated_at", null: false
-    t.bigint "user_id", null: false
-    t.index ["publication_id"], name: "index_share_publications_on_publication_id"
-    t.index ["user_id"], name: "index_share_publications_on_user_id"
   end
 
   create_table "sites", force: :cascade do |t|
@@ -337,6 +337,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_01_095743) do
     t.index ["skeleton_id"], name: "index_taxonomies_on_skeleton_id"
   end
 
+  create_table "teams", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.string "name"
+    t.datetime "updated_at", null: false
+  end
+
   create_table "text_items", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.bigint "page_id", null: false
@@ -347,6 +354,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_01_095743) do
     t.integer "y1"
     t.integer "y2"
     t.index ["page_id"], name: "index_text_items_on_page_id"
+  end
+
+  create_table "user_teams", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "team_id", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["team_id"], name: "index_user_teams_on_team_id"
+    t.index ["user_id"], name: "index_user_teams_on_user_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -375,9 +391,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_01_095743) do
   add_foreign_key "page_texts", "pages"
   add_foreign_key "pages", "images", on_delete: :cascade
   add_foreign_key "pages", "publications", on_delete: :cascade
-  add_foreign_key "share_publications", "publications"
-  add_foreign_key "share_publications", "users"
+  add_foreign_key "publication_teams", "publications"
+  add_foreign_key "publication_teams", "teams"
   add_foreign_key "skeletons", "figures"
   add_foreign_key "stable_isotopes", "skeletons"
   add_foreign_key "text_items", "pages"
+  add_foreign_key "user_teams", "teams"
+  add_foreign_key "user_teams", "users"
 end
