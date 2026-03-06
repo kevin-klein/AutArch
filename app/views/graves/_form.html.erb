@@ -21,19 +21,17 @@
 </div>
 <%= react_component(
   "GraveEditor",
-  {
-    image:
-      @grave.page.image.as_json(methods: [:href], only: %i[id width height]),
-    grave:
-      @grave.as_json(
-        methods: [:type],
-        include: {
-          figures: {
-            methods: [:type]
-          }
+  image:
+    @grave.page.image.as_json(methods: [:href], only: %i[id width height]),
+  grave:
+    @grave.as_json(
+      methods: [:type],
+      include: {
+        figures: {
+          methods: [:type]
         }
-      ),
-    sites: Site.all,
-    page: @grave.page
-  }
+      }
+    ),
+  sites: Site.all,
+  page: @grave.page
 ) %>

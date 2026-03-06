@@ -1,0 +1,13 @@
+<h2>Add Publication to <%= @team.name %></h2>
+
+<%= form_with(model: @publication_assignment,
+               url: team_team_publications_path(@team),
+               local: true) do |f| %>
+  <div class="form-group">
+    <%= f.label :publication_id, 'Select Publication' %>
+    <%= f.collection_select :publication_id, @publications, :id, :title,
+                             { prompt: 'Choose a publication' }, class: 'form-control' %>
+  </div>
+
+  <%= f.submit 'Add Publication', class: 'btn btn-primary' %>
+<% end %>

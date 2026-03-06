@@ -16,12 +16,8 @@
 
 <%= react_component(
   "AddFigures",
-  {
-    props: {
-      image: @page.image.as_json.merge(href: @page.image.url),
-      pageFigures: @page.figures.select { (_1.probability || 1) > 0.6 }.as_json(methods: [:type]),
-      page: @page,
-      next_url: publication_page_path(@publication, @page)
-    }
-  }
+  image: @page.image.as_json.merge(href: @page.image.url),
+  pageFigures: @page.figures.select { (_1.probability || 1) > 0.6 }.as_json(methods: [:type]),
+  page: @page,
+  next_url: publication_page_path(@publication, @page)
 ) %>
