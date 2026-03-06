@@ -3,11 +3,18 @@ class GravesController < AuthorizedController
 
   # GET /graves or /graves.json
   def index
-    graves = Grave.where(publication: Publication.accessible_by(current_ability))
+    publications = Publication.accessible_by(current_ability)
+    graves = Grave.where(publication: publications)
     if params.dig(:search, :publication_id).present?
-      graves = Grave
+      filter_id = params.dig(:search, :publication_id)
+
+      if publications.pluck(:id).include?(filter_id)
+        graves = Grave
         .joins(page: :publication)
-        .where({publication: {id: params.dig(:search, :publication_id)}})
+        .where({publication: {id: filter_id}})
+      else
+        raise CanCan::AccessDenied
+      end
     end
 
     @graves = graves

@@ -1,0 +1,16 @@
+[Unit]
+Description=AutArch ML Services
+After=network.target
+
+[Service]
+User=rails
+Group=rails
+WorkingDirectory=/home/rails/AutArch
+Environment="PATH=/home/rails/.local/share/mise/shims:/home/rails/AutArch/venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+Environment="RAILS_ENV=production"
+ExecStart=/home/rails/AutArch/env/bin/python scripts/torch_service.py
+Restart=always
+RestartSec=10s
+
+[Install]
+WantedBy=multi-user.target

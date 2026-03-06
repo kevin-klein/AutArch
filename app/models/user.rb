@@ -13,8 +13,8 @@
 class User < ApplicationRecord
   has_many :publications
 
-  has_many :share_publications, dependent: :destroy
-  has_many :shared_with, through: :share_publications, source: :user
+  has_many :user_teams, dependent: :destroy
+  has_many :teams, through: :user_teams
 
   enum :role, {
     user: 1,

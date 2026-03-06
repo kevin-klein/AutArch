@@ -1,0 +1,23 @@
+[Unit]
+Description=AutArch
+After=network.target
+
+[Service]
+Type=simple
+User=rails
+WorkingDirectory=/home/rails/AutArch
+Environment=PG_PASS=PG_PASS
+Environment=PG_USER=PG_USER
+Environment=RAILS_ENV=production
+Environment=MISE_DIR=/home/deploy/.local/share/mise
+Environment=PATH=/home/deploy/.local/share/mise/shims:/home/deploy/.local/share/mise/bin:/usr/local/bin:/usr/bin:/bin
+ExecStart=/bin/bash -lc 'mise exec ruby -- bin/rails server -p 3000'
+Restart=always
+RestartSec=5
+TimeoutSec=30
+
+StandardOutput=/home/rails/AutArch/log/output.log
+StandardError=/home/rails/AutArch/log/error.log
+
+[Install]
+WantedBy=multi-user.target

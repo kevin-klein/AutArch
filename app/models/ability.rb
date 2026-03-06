@@ -8,9 +8,16 @@ class Ability
       can :manage, :all
     else
       can :manage, Publication, user_id: user.id
-      can :read, Publication, public: true
 
-      can :read, Publication, id: user.share_publications.select(:publication_id)
+      can [:create, :index], Team
+
+      team_ids = user.teams.pluck(:id)
+      if team_ids.any?
+        can :manage, Team, id: team_ids
+        can :read, Publication, id: PublicationTeam.where(team_id: team_ids).select(:publication_id)
+      end
+
+      can :read, Publication, public: true
     end
 
     # Define abilities for the user here. For example:

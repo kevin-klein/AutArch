@@ -1,0 +1,36 @@
+<h1><%= @team.name %></h1>
+<p><%= @team.description %></p>
+
+<hr>
+
+<h3>Members</h3>
+<ul class="list-group mb-3">
+  <% @team.user_teams.each do |user_team| %>
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+      <%= user_team.user.email %>
+      <%= link_to 'Remove', team_team_membership_path(@team, user_team),
+                  method: :delete,
+                  data: { confirm: 'Remove this user?' },
+                  class: 'btn btn-sm btn-danger' %>
+    </li>
+  <% end %>
+</ul>
+
+<%= link_to 'Add User', new_team_team_membership_path(@team), class: 'btn btn-success mb-3' %>
+
+<hr>
+
+<h3>Publications</h3>
+<ul class="list-group mb-3">
+  <% @team.publication_teams.each do |publication_team| %>
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+      <%= link_to publication_team.publication.title, publication_team.publication %>
+      <%= link_to 'Remove', team_team_publication_path(@team, publication_team),
+                  method: :delete,
+                  data: { confirm: 'Remove this publication?' },
+                  class: 'btn btn-sm btn-danger' %>
+    </li>
+  <% end %>
+</ul>
+
+<%= link_to 'Add Publication', new_team_team_publication_path(@team), class: 'btn btn-success mb-3' %>

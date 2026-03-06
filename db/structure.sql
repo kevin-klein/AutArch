@@ -718,6 +718,38 @@ ALTER SEQUENCE public.periods_id_seq OWNED BY public.periods.id;
 
 
 --
+-- Name: publication_teams; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.publication_teams (
+    id bigint NOT NULL,
+    publication_id bigint NOT NULL,
+    team_id bigint NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: publication_teams_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.publication_teams_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: publication_teams_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.publication_teams_id_seq OWNED BY public.publication_teams.id;
+
+
+--
 -- Name: publications; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -760,38 +792,6 @@ ALTER SEQUENCE public.publications_id_seq OWNED BY public.publications.id;
 CREATE TABLE public.schema_migrations (
     version character varying NOT NULL
 );
-
-
---
--- Name: share_publications; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.share_publications (
-    id bigint NOT NULL,
-    publication_id bigint NOT NULL,
-    user_id bigint NOT NULL,
-    created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
-);
-
-
---
--- Name: share_publications_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.share_publications_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: share_publications_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.share_publications_id_seq OWNED BY public.share_publications.id;
 
 
 --
@@ -973,6 +973,38 @@ ALTER SEQUENCE public.taxonomies_id_seq OWNED BY public.taxonomies.id;
 
 
 --
+-- Name: teams; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.teams (
+    id bigint NOT NULL,
+    name character varying,
+    description text,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: teams_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.teams_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: teams_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.teams_id_seq OWNED BY public.teams.id;
+
+
+--
 -- Name: text_items; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1006,6 +1038,38 @@ CREATE SEQUENCE public.text_items_id_seq
 --
 
 ALTER SEQUENCE public.text_items_id_seq OWNED BY public.text_items.id;
+
+
+--
+-- Name: user_teams; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.user_teams (
+    id bigint NOT NULL,
+    user_id bigint NOT NULL,
+    team_id bigint NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: user_teams_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.user_teams_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: user_teams_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.user_teams_id_seq OWNED BY public.user_teams.id;
 
 
 --
@@ -1208,17 +1272,17 @@ ALTER TABLE ONLY public.periods ALTER COLUMN id SET DEFAULT nextval('public.peri
 
 
 --
+-- Name: publication_teams id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.publication_teams ALTER COLUMN id SET DEFAULT nextval('public.publication_teams_id_seq'::regclass);
+
+
+--
 -- Name: publications id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.publications ALTER COLUMN id SET DEFAULT nextval('public.publications_id_seq'::regclass);
-
-
---
--- Name: share_publications id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.share_publications ALTER COLUMN id SET DEFAULT nextval('public.share_publications_id_seq'::regclass);
 
 
 --
@@ -1257,10 +1321,24 @@ ALTER TABLE ONLY public.taxonomies ALTER COLUMN id SET DEFAULT nextval('public.t
 
 
 --
+-- Name: teams id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.teams ALTER COLUMN id SET DEFAULT nextval('public.teams_id_seq'::regclass);
+
+
+--
 -- Name: text_items id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.text_items ALTER COLUMN id SET DEFAULT nextval('public.text_items_id_seq'::regclass);
+
+
+--
+-- Name: user_teams id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.user_teams ALTER COLUMN id SET DEFAULT nextval('public.user_teams_id_seq'::regclass);
 
 
 --
@@ -1438,6 +1516,14 @@ ALTER TABLE ONLY public.periods
 
 
 --
+-- Name: publication_teams publication_teams_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.publication_teams
+    ADD CONSTRAINT publication_teams_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: publications publications_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1451,14 +1537,6 @@ ALTER TABLE ONLY public.publications
 
 ALTER TABLE ONLY public.schema_migrations
     ADD CONSTRAINT schema_migrations_pkey PRIMARY KEY (version);
-
-
---
--- Name: share_publications share_publications_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.share_publications
-    ADD CONSTRAINT share_publications_pkey PRIMARY KEY (id);
 
 
 --
@@ -1502,11 +1580,27 @@ ALTER TABLE ONLY public.taxonomies
 
 
 --
+-- Name: teams teams_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.teams
+    ADD CONSTRAINT teams_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: text_items text_items_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.text_items
     ADD CONSTRAINT text_items_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: user_teams user_teams_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.user_teams
+    ADD CONSTRAINT user_teams_pkey PRIMARY KEY (id);
 
 
 --
@@ -1701,24 +1795,24 @@ CREATE INDEX index_pages_on_publication_id ON public.pages USING btree (publicat
 
 
 --
+-- Name: index_publication_teams_on_publication_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_publication_teams_on_publication_id ON public.publication_teams USING btree (publication_id);
+
+
+--
+-- Name: index_publication_teams_on_team_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_publication_teams_on_team_id ON public.publication_teams USING btree (team_id);
+
+
+--
 -- Name: index_publications_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_publications_on_user_id ON public.publications USING btree (user_id);
-
-
---
--- Name: index_share_publications_on_publication_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_share_publications_on_publication_id ON public.share_publications USING btree (publication_id);
-
-
---
--- Name: index_share_publications_on_user_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_share_publications_on_user_id ON public.share_publications USING btree (user_id);
 
 
 --
@@ -1778,6 +1872,20 @@ CREATE INDEX index_text_items_on_page_id ON public.text_items USING btree (page_
 
 
 --
+-- Name: index_user_teams_on_team_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_user_teams_on_team_id ON public.user_teams USING btree (team_id);
+
+
+--
+-- Name: index_user_teams_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_user_teams_on_user_id ON public.user_teams USING btree (user_id);
+
+
+--
 -- Name: page_texts fk_rails_30e2bd5652; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1794,6 +1902,14 @@ ALTER TABLE ONLY public.skeletons
 
 
 --
+-- Name: publication_teams fk_rails_387b88576e; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.publication_teams
+    ADD CONSTRAINT fk_rails_387b88576e FOREIGN KEY (team_id) REFERENCES public.teams(id);
+
+
+--
 -- Name: stable_isotopes fk_rails_44a721f0e7; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1802,11 +1918,11 @@ ALTER TABLE ONLY public.stable_isotopes
 
 
 --
--- Name: share_publications fk_rails_6b690e58fb; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: user_teams fk_rails_64c25f3fe6; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.share_publications
-    ADD CONSTRAINT fk_rails_6b690e58fb FOREIGN KEY (publication_id) REFERENCES public.publications(id);
+ALTER TABLE ONLY public.user_teams
+    ADD CONSTRAINT fk_rails_64c25f3fe6 FOREIGN KEY (team_id) REFERENCES public.teams(id);
 
 
 --
@@ -1826,11 +1942,11 @@ ALTER TABLE ONLY public.pages
 
 
 --
--- Name: share_publications fk_rails_785bc17926; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: publication_teams fk_rails_7ce45ba258; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.share_publications
-    ADD CONSTRAINT fk_rails_785bc17926 FOREIGN KEY (user_id) REFERENCES public.users(id);
+ALTER TABLE ONLY public.publication_teams
+    ADD CONSTRAINT fk_rails_7ce45ba258 FOREIGN KEY (publication_id) REFERENCES public.publications(id);
 
 
 --
@@ -1847,6 +1963,14 @@ ALTER TABLE ONLY public.object_similarities
 
 ALTER TABLE ONLY public.figures
     ADD CONSTRAINT fk_rails_86f3fd6261 FOREIGN KEY (page_id) REFERENCES public.pages(id) ON DELETE CASCADE;
+
+
+--
+-- Name: user_teams fk_rails_978858c8ea; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.user_teams
+    ADD CONSTRAINT fk_rails_978858c8ea FOREIGN KEY (user_id) REFERENCES public.users(id);
 
 
 --
@@ -1904,6 +2028,10 @@ ALTER TABLE ONLY public.text_items
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260225094639'),
+('20260225094636'),
+('20260225094439'),
+('20260225094340'),
 ('20260201095743'),
 ('20260124094306'),
 ('20251217131441'),
