@@ -7,20 +7,18 @@
 
 <%= react_component(
   "BoxResizer",
-  props: {
-    image:
-      @grave.page.image.as_json.merge(href: @grave.page.image.url),
-    grave:
-      @grave.as_json(
-        methods: [:type],
-        include: {
-          figures: {
-            methods: [:type]
-          }
+  image:
+    @grave.page.image.as_json.merge(href: @grave.page.image.url),
+  grave:
+    @grave.as_json(
+      methods: [:type],
+      include: {
+        figures: {
+          methods: [:type]
         }
-      ),
-    sites: Site.all,
-    page: @grave.page,
-    next_url: wizard_path
-  }
+      }
+    ),
+  sites: Site.all,
+  page: @grave.page,
+  next_url: wizard_path
 ) %>

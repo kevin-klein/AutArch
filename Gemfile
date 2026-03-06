@@ -14,10 +14,12 @@ gem "pg"
 gem "cancancan"
 gem "mina"
 gem "rmagick"
-gem "sprockets-rails"
+gem "propshaft"
+
 gem "mittens"
 gem "engtagger"
-gem 'rumale'
+gem "rumale"
+gem "simplecov", require: false, group: :test
 
 gem "graphql"
 gem "message_bus"
@@ -58,8 +60,6 @@ gem "jbuilder"
 # Use Redis adapter to run Action Cable in production
 gem "redis", "~> 4.0"
 
-gem "react_on_rails"
-
 # Use Kredis to get higher-level data types in Redis [https://github.com/rails/kredis]
 # gem 'kredis'
 
@@ -70,9 +70,6 @@ gem "bcrypt", "~> 3.1.7"
 gem "bootsnap", require: false
 gem "simple_form"
 gem "rubyzip", require: "zip"
-
-# Use Sass to process CSS
-# gem 'sassc-rails'
 
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
 # gem 'image_processing', '~> 1.2'
@@ -88,8 +85,8 @@ group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[mri mingw x64_mingw]
 
-  gem 'rspec-rails', '~> 8.0.0'
-  gem 'factory_bot_rails'
+  gem "rspec-rails", "~> 8.0.0"
+  gem "factory_bot_rails"
 end
 
 group :development do
@@ -119,8 +116,6 @@ gem "dotenv-rails", "~> 2.8"
 gem "pkg-config"
 gem "minopencv", github: "kevin-klein/ruby-minopencv"
 
-gem "shakapacker"
-
 gem "rwordnet", "~> 2.0"
 
 gem "stemmify", "~> 0.0.2"
@@ -133,3 +128,5 @@ gem "ruby-progressbar", "~> 1.13"
 
 gem "erb-formatter", "~> 0.4.2"
 gem "graphiql-rails", group: :development
+
+gem "jsbundling-rails", "~> 1.3"
