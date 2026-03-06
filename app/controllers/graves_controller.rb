@@ -8,7 +8,7 @@ class GravesController < AuthorizedController
     if params.dig(:search, :publication_id).present?
       filter_id = params.dig(:search, :publication_id)
 
-      if publications.pluck(:id).include?(filter_id)
+      if publications.pluck(:id).include?(filter_id.to_i)
         graves = Grave
         .joins(page: :publication)
         .where({publication: {id: filter_id}})
