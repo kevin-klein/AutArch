@@ -9,6 +9,7 @@ import { createRoot } from 'react-dom/client';
 
 import './autarch.css'
 
+import ArrowHeads from './components/ArrowHeads'
 import SamPointSelector from './components/SamPointSelector'
 import BoxResizer from './components/BoxResizer'
 import AddFigures from './components/AddFigures'
@@ -214,7 +215,8 @@ const COMPONENT_REGISTRY = {
   SamPointSelector,
   Relations,
   SiteMap,
-  EuropeMap
+  EuropeMap,
+  ArrowHeads
 }
 
 function mountReactComponents () {

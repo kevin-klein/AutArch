@@ -3,7 +3,7 @@ import { Group, Stage, Layer, Circle, Image, Rect, Line, Transformer, Arrow, Sha
 import useImage from 'use-image'
 import ManualContour from './ManualContour'
 
-export function Box ({ onChangeFigure, onDraggingStart, active, figure, setActive }) {
+export function Box ({ onChangeFigure, onDraggingStart, active, figure, setActive, fillEnabled = false, fill = null }) {
   const { id, x1, y1, x2, y2, typeName } = figure
 
   let color = 'purple'
@@ -69,10 +69,10 @@ export function Box ({ onChangeFigure, onDraggingStart, active, figure, setActiv
         </>}
 
       {typeName !== 'Spine' && <Rect
-        fill={null}
+        fill={fill}
         ref={shapeRef}
         stroke={color}
-        fillEnabled={false}
+        fillEnabled={fillEnabled}
         strokeWidth={3}
         x={x1}
         y={y1}

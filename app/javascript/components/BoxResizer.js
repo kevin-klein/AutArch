@@ -39,9 +39,113 @@ function NewFigureDialog ({ closeDialog, addFigure }) {
   )
 }
 
-export default function BoxResizer ({ next_url, grave, sites, image, page }) {
+export default function BoxResizerApiWrapper ({ next_url, grave, sites, image, page }) {
+  const token =
+      document.querySelector('[name=csrf-token]').content
   const { figures, updateFigure, setFigures, addFigure, removeFigure } = useFigureStore()
 
+  async function removeEditBox (id) {
+    const response = await fetch(`/figures/${id}.json`, {
+      method: 'DELETE',
+      headers: {
+        'X-CSRF-Token': token,
+        'Content-Type': 'application/json'
+      }
+    })
+    if (response.ok) {
+      removeFigure(figures[id])
+    } else {
+      return Promise.reject(response)
+    }
+  }
+
+  function onChangeFigure (id, figure) {
+    setFigures(Object.values(figures).map((currentFigure) => {
+      if (currentFigure.id === figure.id) {
+        return figure
+      } else {
+        return currentFigure
+      }
+    }))
+  }
+
+  async function createFigure (type, coords = null) {
+    let x1, y1, x2, y2
+
+    if (coords) {
+      // Use coords from drawing
+      x1 = coords.x1
+      y1 = coords.y1
+      x2 = coords.x2
+      y2 = coords.y2
+    } else if (grave !== undefined) {
+      // Fallback to original logic (for dialog)
+      if (type === 'Spine') {
+        const graveWidth = grave.x2 - grave.x1
+        const graveHeight = grave.y2 - grave.y1
+        x1 = grave.x1 + graveWidth * 0.5
+        x2 = grave.x1 + graveWidth * 0.5
+
+        y1 = grave.y1 + graveHeight * 0.6
+        y2 = grave.y1 + graveHeight * 0.4
+      } else {
+        const graveWidth = grave.x2 - grave.x1
+        const graveHeight = grave.y2 - grave.y1
+        x1 = grave.x1 + graveWidth * 0.3
+        x2 = grave.x1 + graveWidth * 0.6
+
+        y1 = grave.y1 + graveHeight * 0.4
+        y2 = grave.y1 + graveHeight * 0.6
+      }
+    } else {
+      // Default fallback
+      x1 = 0; y1 = 0; x2 = 100; y2 = 100
+    }
+
+    const response = await fetch('/figures.json', {
+      method: 'POST',
+      body: JSON.stringify({
+        grave_id: grave.id,
+        figure: {
+          x1, // Use derived x1
+          x2, // Use derived x2
+          y1, // Use derived y1
+          y2, // Use derived y2
+          page_id: page.id,
+          type,
+          parent_id: grave.id
+        }
+      }),
+      headers: {
+        'X-CSRF-Token': token,
+        'Content-Type': 'application/json'
+      }
+    })
+    if (response.ok) {
+      const newFigure = await response.json()
+      addFigure({ ...newFigure, typeName: type })
+      // setCurrentEditBox(newFigure.id)
+    } else {
+      return Promise.reject(response)
+    }
+  }
+
+  return (
+    <BoxResizer
+      next_url={next_url}
+      grave={grave}
+      sites={sites}
+      image={image}
+      page={page}
+      setFigures={setFigures}
+      figures={figures}
+      removeFigure={removeFigure}
+      addFigure={addFigure}
+    />
+  )
+}
+
+export function BoxResizer ({ next_url, grave, sites, image, page, setFigures, figures, removeFigure, addFigure }) {
   const [creatingNewFigure, setCreatingNewFigure] = React.useState(false)
   const [currentEditBox, setCurrentEditBox] = React.useState(grave.figures.filter((f) => f.type === 'Lithic')[0]?.id)
 
@@ -274,6 +378,7 @@ export default function BoxResizer ({ next_url, grave, sites, image, page }) {
         )
       }
     }
+    return null
   })
 
   return (
@@ -399,7 +504,7 @@ export default function BoxResizer ({ next_url, grave, sites, image, page }) {
                         <input type='hidden' name={`figures[${id}][anchor_point_4_y]`} value={figure.anchor_point_4_y} />
 
                         <input type='hidden' name={`figures[${id}][manual_bounding_box]`} value={figure.manual_bounding_box} />
-                      </>}
+                                                     </>}
                     </React.Fragment>
                   )
                 })}
