@@ -13,6 +13,8 @@ Rails.application.routes.draw do # rubocop:disable Metrics/BlockLength
     resources :c14_dates
   end
 
+  resources :arrow_heads
+
   get '/figures/:figure_type', to: 'size_figures#index'
   delete '/figures/:figure_type/:id', to: 'size_figures#destroy'
 
@@ -20,6 +22,10 @@ Rails.application.routes.draw do # rubocop:disable Metrics/BlockLength
     resources :update_size_figure
 
     get :sam_contour
+
+    collection do
+      post :boxes
+    end
   end
 
   resources :teams do
