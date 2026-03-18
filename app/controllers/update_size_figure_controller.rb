@@ -1,5 +1,6 @@
 class UpdateSizeFigureController < ApplicationController
   include Wicked::Wizard
+
   steps :set_data, :set_site, :set_tags, :resize_boxes, :show_contours, :set_scale, :upload_3d_model, :view_3d_model
 
   def show
@@ -21,7 +22,7 @@ class UpdateSizeFigureController < ApplicationController
     when :set_tags
       @figure.update(figure_params)
     when :upload_3d_model
-      if params[:lithic].present? || params[:figure].present?
+      if params[:lithic].present? || params[:figure].present? || params[:ceramic].present?
         @figure.update(figure_params)
       end
     when :set_scale
