@@ -25,6 +25,8 @@ Rails.application.routes.draw do # rubocop:disable Metrics/BlockLength
 
     collection do
       post :boxes
+      post :update_contour
+      post :new_box
     end
   end
 

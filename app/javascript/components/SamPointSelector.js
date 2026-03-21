@@ -40,7 +40,6 @@ export default function SamPointSelector ({ figure, image, url }) {
   let polylines = []
 
   if (stateFigure.contour.length > 0 && stateFigure.contour[0][0].constructor === Array) {
-    console.log('array constructor')
     polylines = stateFigure.contour.map((contour, index) => {
       const points = ([...contour, contour[0]]
         .map(point => `${point[0] + figure.x1},${point[1] + figure.y1}`)
