@@ -257,23 +257,23 @@ rect.btn {
 
 /* app/javascript/autarch.css */
 :root {
-  /* General Backgrounds */
-  --color-bg-body:       #1a202c;   /* Deep cool gray/navy */
-  --color-bg-card:       #2d3748;   /* Steel blue-gray for depth */
-  --color-bg-alert:      #334155;   /* Slightly lighter than card for visibility */
+  /* General Backgrounds - Softer, less harsh darks */
+  --color-bg-body:       #0f172a;   /* Slate 900 - Deep, rich dark blue-gray */
+  --color-bg-card:       #1e293b;   /* Slate 800 - Distinct but harmonious depth */
+  --color-bg-alert:      #334155;   /* Slate 700 - Clear separation */
 
-  /* Brand / Action Colors */
-  --color-primary:       #38bdf8;   /* Vibrant sky blue */
-  --color-primary-hover: #0ea5e9;   /* Deeper sky blue for interaction */
+  /* Brand / Action Colors - Sophisticated Teal */
+  --color-primary:       #2dd4bf;   /* Teal 400 - Vibrant but not neon */
+  --color-primary-hover: #14b8a6;   /* Teal 500 - Deepens on interaction */
 
-  /* Typography */
-  --color-text-primary:  #f8fafc;   /* Off-white for reduced glare */
-  --color-text-muted:    #cbd5e0;   /* Light frost gray */
-  --color-link-hover:    #7dd3fc;   /* Pale cyan for link states */
+  /* Typography - High contrast but warm */
+  --color-text-primary:  #f1f5f9;   /* Slate 50 - Crisp white */
+  --color-text-muted:    #94a3b8;   /* Slate 400 - Readable gray */
+  --color-link-hover:    #7dd3fc;   /* Sky 300 - Soft cyan for links */
 
   /* MDB / Component specific */
-  --mdb-table-color:     #f8fafc;
-  --mdb-body-color:      #f8fafc;
+  --mdb-table-color:     #f1f5f9;
+  --mdb-body-color:      #f1f5f9;
 }
 
 /* ----------------- Body ----------------- */
@@ -343,20 +343,125 @@ a:hover {
   text-decoration: underline;
 }
 
-.upload-step .next-button {
-  margin-top: 15px;
-  padding: 8px 16px;
+/* ----------------- Upload Step Styles ----------------- */
+.upload-step {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.upload-step .form-label {
+  font-weight: 500;
+  color: var(--color-text-primary);
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+
+.upload-step .form-select {
+  padding: 10px 15px;
   font-size: 1rem;
-  background: #4caf50;
+  background-color: var(--color-bg-card);
+  border: 1px solid #4a5568;
+  color: var(--color-text-primary);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.upload-step .form-select:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
+  outline: none;
+}
+
+.dropzone {
+  min-height: 300px;
+  border: 2px dashed #4a5568;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(45, 55, 72, 0.3);
+  transition: all 0.3s ease;
+  margin: 20px 0;
+  padding: 30px;
+  text-align: center;
+}
+
+.dropzone:hover {
+  border-color: var(--color-primary);
+  background-color: rgba(45, 55, 72, 0.5);
+  transform: translateY(-2px);
+}
+
+.dropzone.active {
+  border-color: var(--color-primary);
+  background-color: rgba(56, 189, 248, 0.1);
+  border-style: solid;
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.2);
+}
+
+.dropzone label {
+  font-size: 1.25rem;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.dropzone label:hover {
+  color: var(--color-primary);
+}
+
+.dropzone input[type="file"] {
+  display: none;
+}
+
+.file-list {
+  list-style: none;
+  padding: 0;
+  margin: 15px 0;
+}
+
+.file-list li {
+  padding: 10px 15px;
+  background-color: var(--color-bg-card);
+  border: 1px solid #4a5568;
+  border-radius: 8px;
+  color: var(--color-text-primary);
+  font-size: 0.95rem;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.next-button {
+  width: 100%;
+  margin-top: 15px;
+  padding: 12px 24px;
+  font-size: 1rem;
+  font-weight: 500;
+  background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 8px;
   cursor: pointer;
-  opacity: 1;
-  transition: opacity 0.3s;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
 }
-.upload-step .next-button:disabled {
-  background: #9e9e9e;
+
+.next-button:hover:not(:disabled) {
+  background: linear-gradient(135deg, #45a049 0%, #3d8b40 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.next-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.next-button:disabled {
+  background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
   cursor: not-allowed;
   opacity: 0.6;
 }
