@@ -41,37 +41,73 @@ class SizeFiguresController < ApplicationController
     }
   end
 
+  def update_contour
+    uploaded_file = params[:image]
+
+    vips_image = Vips::Image.new_from_buffer(uploaded_file.read, "")
+    image_data = vips_image.write_to_buffer(".jpg")
+    points = JSON.parse(params[:points])
+
+    render json: {
+      contour: AnalyzeContourSam.new.segment(image_data, points)["contour"]
+    }
+  end
+
   def boxes
-    # Retrieve the uploaded file from the params (note the typo “imaeg” as requested)
     uploaded_file = params[:image]
 
     if uploaded_file.present?
       begin
-        # Convert the uploaded file into a VIPS image
         vips_image = Vips::Image.new_from_buffer(uploaded_file.read, "")
 
         image_data = vips_image.write_to_buffer(".jpg")
 
         predictions = AnalyzePublication.new.predict_boxes(image_data)
 
+        predictions = predictions
+          .filter do |pred|
+            pred["label"] == params[:object_type]
+          end
+          .map do |prediction|
+            x1, y1, x2, y2 = prediction["box"]
+            center = [(x1 + x2) / 2, (y1 + y2) / 2].map(&:to_i)
+            prediction.merge({
+              id: SecureRandom.hex,
+              contour: AnalyzeContourSam.new.segment(image_data, [center])["contour"][0]
+            })
+          end
+
         # Simple JSON response – adjust as needed for your front‑end
-        render json: { status: "success", boxes: predictions }
-      rescue StandardError => e
+        render json: {status: "success", boxes: predictions}
+      rescue => e
         # Handle any conversion errors
-        render json: { error: e.message }, status: :unprocessable_entity
+        render json: {error: e.message}, status: :unprocessable_entity
       end
     else
       # No file was provided
-      render json: { error: "No image uploaded" }, status: :bad_request
+      render json: {error: "No image uploaded"}, status: :bad_request
     end
+  end
+
+  def new_box
+    uploaded_file = params[:image]
+
+    vips_image = Vips::Image.new_from_buffer(uploaded_file.read, "")
+    image_data = vips_image.write_to_buffer(".jpg")
+    points = JSON.parse(params[:points])
+
+    render json: {
+      id: SecureRandom.hex,
+      contour: AnalyzeContourSam.new.segment(image_data, points)["contour"][0]
+    }
   end
 
   private
 
   def set_figure_class
     @figure_cls = {
-      'lithics' => StoneTool,
-      'ceramics' => Ceramic
+      "lithics" => StoneTool,
+      "ceramics" => Ceramic
     }[params[:figure_type]]
     @figure_cls ||= Figure
   end
