@@ -1,0 +1,218 @@
+/* Select Ceramic Styles */
+
+.figure-type-badge {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  display: inline-block;
+  font-weight: 500;
+}
+
+.figure-type-grave {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.figure-type-arrow {
+  background-color: #d1e7dd;
+  color: #0f5132;
+}
+
+.figure-type-ceramic {
+  background-color: #cff4fc;
+  color: #055160;
+}
+
+.figure-type-stonetool {
+  background-color: #fff3cd;
+  color: #664d03;
+}
+
+.figure-type-skeleton {
+  background-color: #e2e3e5;
+  color: #41464b;
+}
+
+.figure-type-kurgan {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.figure-type-oxcal {
+  background-color: #e2e3e5;
+  color: #41464b;
+}
+
+.figure-type-bone {
+  background-color: #d1e7dd;
+  color: #0f5132;
+}
+
+.figure-type-default {
+  background-color: #e2e3e5;
+  color: #41464b;
+}
+
+/* Custom scrollbar for figures list */
+.list-group-flush .list-group-item {
+  padding: 0.75rem 1rem;
+  transition: background-color 0.2s;
+}
+
+.list-group-flush .list-group-item:hover {
+  background-color: #f8f9fa;
+}
+
+/* Stage container */
+.card-body.p-0 {
+  padding: 0 !important;
+}
+
+/* Loading spinner */
+.spinner-border {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  border-top-color: #0d6efd;
+  animation: spinner 0.75s linear infinite;
+}
+
+@keyframes spinner {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Alert improvements */
+.alert {
+  border-left: 4px solid;
+}
+
+.alert-info {
+  background-color: #e7f1ff;
+  border-color: #b6d4fe;
+  color: #0c5460;
+}
+
+.alert-info .alert-link {
+  color: #0a58ca;
+}
+
+.alert-warning {
+  background-color: #fff8db;
+  border-color: #ffe8a1;
+  color: #664d03;
+}
+
+.alert-warning .alert-link {
+  color: #b07800;
+}
+
+.alert-success {
+  background-color: #d3f9d8;
+  border-color: #b2f2bb;
+  color: #1e7e34;
+}
+
+.alert-success .alert-link {
+  color: #0b5e7e;
+}
+
+/* Button improvements */
+.btn {
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+/* List group improvements */
+.list-group-item {
+  border-left: none;
+  border-right: none;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.list-group-item:first-child {
+  border-top: none;
+}
+
+.list-group-item:last-child {
+  border-bottom: none;
+}
+
+/* Card improvements */
+.card {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.2s;
+}
+
+.card:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Stage improvements */
+.Stage {
+  touch-action: none;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+  .col-lg-8,
+  .col-lg-4 {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .figure-type-badge {
+    font-size: 0.65rem;
+    padding: 0.15rem 0.35rem;
+  }
+}
+
+/* Accessibility improvements */
+.btn:focus,
+.list-group-item:focus {
+  outline: 2px solid #0d6efd;
+  outline-offset: 2px;
+}
+
+/* Focus styles for better accessibility */
+*:focus-visible {
+  outline: 2px solid #0d6efd;
+  outline-offset: 2px;
+}
+
+/* Selection highlight */
+.list-group-item.active {
+  background-color: #0d6efd;
+  color: white;
+}

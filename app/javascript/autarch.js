@@ -10,6 +10,7 @@ import { createRoot } from 'react-dom/client';
 import './autarch.css'
 
 import ArrowHeads from './components/ArrowHeads'
+import CeramicWizard from './components/CeramicWizard'
 import SamPointSelector from './components/SamPointSelector'
 import BoxResizer from './components/BoxResizer'
 import AddFigures from './components/AddFigures'
@@ -17,6 +18,8 @@ import NorthArrow from './components/NorthArrow'
 import EuropeMap from './components/EuropeMap'
 import ImportProgress from './components/ImportProgress'
 import SiteMap from './components/SiteMap'
+import KioskConfig from './components/KioskConfig'
+import SelectCeramic from './components/SelectCeramic'
 import Chart from 'react-apexcharts'
 
 import simpleheat from './components/simpleheat'
@@ -216,7 +219,10 @@ const COMPONENT_REGISTRY = {
   Relations,
   SiteMap,
   EuropeMap,
-  ArrowHeads
+  ArrowHeads,
+  CeramicWizard,
+  KioskConfig,
+  SelectCeramic
 }
 
 function mountReactComponents () {

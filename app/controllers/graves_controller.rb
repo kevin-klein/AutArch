@@ -108,7 +108,7 @@ class GravesController < AuthorizedController
   end
 
   def root
-    @no_box = true
+    # @no_box = true
 
     # @skeleton_angles = Site.includes(
     #   graves: [:spines, :arrow]
@@ -140,7 +140,7 @@ class GravesController < AuthorizedController
 
   # GET /graves/1/edit
   def edit
-    @no_box = true
+    # @no_box = true
   end
 
   # POST /graves or /graves.json

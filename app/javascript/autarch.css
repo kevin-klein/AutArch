@@ -465,3 +465,125 @@ a:hover {
   cursor: not-allowed;
   opacity: 0.6;
 }
+
+/* Ceramic Wizard Styles */
+.ceramic-wizard {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.ceramic-wizard h2 {
+  text-align: center;
+  color: var(--color-text-primary);
+  margin-bottom: 20px;
+  font-size: 1.5rem;
+}
+
+.loading-wizard {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 400px;
+  font-size: 1.2rem;
+  color: var(--color-text-muted);
+}
+
+.similarity-card {
+  background-color: var(--color-bg-card);
+  border: 1px solid #4a5568;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 10px;
+  transition: all 0.3s ease;
+}
+
+.similarity-card:hover {
+  border-color: var(--color-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(56, 189, 248, 0.2);
+}
+
+.similarity-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.similarity-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.similarity-badge {
+  background-color: rgba(56, 189, 248, 0.2);
+  color: #38bdf8;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.feature-column {
+  text-align: center;
+  padding: 15px;
+  background-color: var(--color-bg-card);
+  border-radius: 8px;
+  border: 1px solid #4a5568;
+}
+
+.feature-column strong {
+  display: block;
+  font-size: 1.5rem;
+  color: var(--color-primary);
+  margin-bottom: 5px;
+}
+
+.feature-column span {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+
+.feature-list {
+  margin-top: 20px;
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid #4a5568;
+}
+
+.feature-icon {
+  font-size: 1.2rem;
+}
+
+.feature-text {
+  color: var(--color-text-primary);
+  font-size: 0.95rem;
+}
+
+.analysis-summary {
+  margin-top: 20px;
+}
+
+.analysis-summary h6 {
+  color: var(--color-text-primary);
+  margin-bottom: 15px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 15px;
+}

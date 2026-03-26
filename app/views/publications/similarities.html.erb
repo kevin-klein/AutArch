@@ -1,0 +1,59 @@
+<h1>Similarities for <%= @publication.title %></h1>
+
+<% if @ceramics.empty? %>
+  <p>No ceramics found with probability > 0.6.</p>
+<% else %>
+  <h2>Ceramics (<%= @ceramics.count %>)</h2>
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Preview</th>
+        <th>ID</th>
+        <th>Identifier</th>
+        <th>Prob.</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @ceramics.each do |ceramic| %>
+        <tr>
+          <td><%= image_tag(preview_figure_path(ceramic), class: 'img-fluid', style: 'max-height: 60px; max-width: 60px') %></td>
+          <td><%= ceramic.id %></td>
+          <td><%= ceramic.identifier || "N/A" %></td>
+          <td><%= ceramic.probability %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+
+  <h2>Similarity Matrix</h2>
+
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>Preview</th>
+        <% @ceramics.each do |ceramic| %>
+          <td><%= image_tag(preview_figure_path(ceramic), class: 'img-fluid', style: 'max-height: 60px; max-width: 60px') %></td>
+        <% end %>
+      </tr>
+
+    </thead>
+    <tbody>
+      <% @ceramics.each_with_index do |ceramic, first_index| %>
+        <tr>
+          <td><%= image_tag(preview_figure_path(ceramic), class: 'img-fluid', style: 'max-height: 60px; max-width: 60px') %></td>
+          <% @ceramics.each_with_index do |other_ceramic, second_index| %>
+            <% if first_index == second_index %>
+              <td>-</td>
+            <% else %>
+              <% similarity = @similarities[first_index].find { |s| s.second_id == other_ceramic.id } %>
+              <td><%= similarity&.similarity.round(2) * 100 || "-" %>%</td>
+            <% end %>
+          <% end %>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>
+
+<%= link_to "Back to #{@publication.title}", publication_path(@publication) %>
