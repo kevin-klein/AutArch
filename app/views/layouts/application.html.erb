@@ -20,8 +20,9 @@
   </head>
 
   <body>
+    <% if !@no_box %>
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark <%= 'kiosk-mode' if @no_box %>">
       <!-- Container wrapper -->
       <div class="container-fluid">
         <!-- Toggle button -->
@@ -69,6 +70,9 @@
             <li class="nav-item">
               <a class="nav-link" href="<%= teams_path %>">Teams</a>
             </li>
+            <li class="nav-item">
+              <a class="nav-link" href="<%= kiosk_config_frontend_path %>"><i class="bi bi-display"></i> Kiosk Config</a>
+            </li>
             <% if can?(:manage, User) %>
               <li class="nav-item">
                 <a class="nav-link" href="<%= users_path %>">Users</a>
@@ -93,6 +97,8 @@
       </div>
       <!-- Container wrapper -->
     </nav>
+
+    <% end %>
 
     <% flash.each do |type, msg| %>
       <div class="alert alert-primary" role="alert">

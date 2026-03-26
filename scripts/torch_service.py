@@ -1,3 +1,5 @@
+from sklearn.cluster import MiniBatchKMeans
+from sklearn.metrics.pairwise import cosine_similarity
 from bottle import Bottle, request, response
 from train_detr import MODEL_SAVE_PATH
 from transforms import PILToTensor, Compose
@@ -14,6 +16,7 @@ import matplotlib.pyplot as plt
 from transformers import AutoModelForObjectDetection, AutoImageProcessor
 import json
 from train_arrow_angle_network import model as arrow_model
+from train_object_detection import get_model
 
 def show_mask(mask, ax, random_color=False, borders = True):
     if random_color:
@@ -24,7 +27,6 @@ def show_mask(mask, ax, random_color=False, borders = True):
     mask = mask.astype(np.uint8)
     mask_image =  mask.reshape(h, w, 1) * color.reshape(1, 1, -1)
     if borders:
-        import cv2
         contours, _ = cv2.findContours(mask,cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
         # Try to smooth contours
         contours = [cv2.approxPolyDP(contour, epsilon=0.01, closed=True) for contour in contours]
@@ -58,7 +60,7 @@ def show_masks(image, masks, scores, point_coords=None, box_coords=None, input_l
         plt.axis('off')
         plt.show()
 
-labels = torch.load('models/retinanet_v2_labels.model')
+labels = torch.load('models/faster_rcnn_v2.model')
 labels = {v: k for k, v in labels.items()}
 
 if torch.cuda.is_available():
@@ -69,29 +71,40 @@ else:
 sam_checkpoint = "models/mobile_sam.pt"
 model_type = 'vit_t'
 
+# Load BOVW vocabulary if available
+BOVW_VOCABULARY_PATH = "models/bovw_vocabulary.pkl"
+bovw_vocabulary = None
+try:
+    if os.path.exists(BOVW_VOCABULARY_PATH):
+        with open(BOVW_VOCABULARY_PATH, 'rb') as f:
+            bovw_vocabulary = pickle.load(f)
+        print(f"Loaded BOVW vocabulary from {BOVW_VOCABULARY_PATH}")
+except Exception as e:
+    print(f"Failed to load BOVW vocabulary: {e}")
+
 sam = sam_model_registry[model_type](checkpoint=sam_checkpoint)
 sam.to(device=device)
 sam.eval()
 
-# loaded_model = get_model(num_classes = len(labels.keys()), device=device)
-# loaded_model.load_state_dict(torch.load('models/retinanet_v2_dfg.model', map_location=device))
+loaded_model = get_model(num_classes = len(labels.keys()), device=device)
+loaded_model.load_state_dict(torch.load('models/fcos_resnext.model', map_location=device))
 
 id2label = {v: k for k, v in labels.items()}
 label2id = labels
 
-processor = AutoImageProcessor.from_pretrained(
-    MODEL_SAVE_PATH,
-    do_resize=True,
-    do_pad=True,
-)
+# processor = AutoImageProcessor.from_pretrained(
+#     MODEL_SAVE_PATH,
+#     do_resize=True,
+#     do_pad=True,
+# )
 
-loaded_model = AutoModelForObjectDetection.from_pretrained(
-    MODEL_SAVE_PATH,
-    id2label=id2label,
-    label2id=label2id,
-    num_labels=len(labels),
-    ignore_mismatched_sizes=True
-)
+# loaded_model = AutoModelForObjectDetection.from_pretrained(
+#     MODEL_SAVE_PATH,
+#     id2label=id2label,
+#     label2id=label2id,
+#     num_labels=len(labels),
+#     ignore_mismatched_sizes=True
+# )
 
 loaded_model.eval()
 
@@ -130,34 +143,139 @@ predictor = SamPredictor(sam)
 #     quantization_config=quantization_config
 # )
 
-def object_features(file):
+def extract_local_features(image_array, feature_type='sift'):
+    """
+    Extract local features from an image.
+    Supports SIFT and ORB features.
+    """
+    if feature_type == 'sift':
+        # Initialize SIFT detector
+        sift = cv2.SIFT_create()
+        keypoints, descriptors = sift.detectAndCompute(image_array, None)
+
+        if descriptors is not None:
+            return descriptors
+        else:
+            return None
+    elif feature_type == 'orb':
+        # Initialize ORB detector
+        orb = cv2.ORB_create(nfeatures=1000)
+        keypoints, descriptors = orb.detectAndCompute(image_array, None)
+
+        if descriptors is not None:
+            return descriptors
+        else:
+            return None
+    else:
+        raise ValueError(f"Unknown feature type: {feature_type}")
+
+def train_visual_vocabulary(image_paths, n_clusters=32, feature_type='sift'):
+    """
+    Train a Bag of Visual Words vocabulary using K-Means clustering.
+    """
+    print("Extracting features for vocabulary training...")
+
+    # Extract features from all images
+    all_features = []
+    for img_path in image_paths:
+        img = cv2.imread(img_path)
+        if img is None:
+            continue
+
+        # Convert to grayscale
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+        # Extract features
+        descriptors = extract_local_features(gray, feature_type)
+
+        if descriptors is not None:
+            all_features.append(descriptors)
+
+    # Concatenate all features
+    if len(all_features) == 0:
+        raise ValueError("No features extracted from images")
+
+    all_features = np.vstack(all_features)
+
+    print(f"Training K-Means with {n_clusters} clusters on {all_features.shape[0]} features...")
+
+    # Train K-Means
+    kmeans = MiniBatchKMeans(n_clusters=n_clusters, random_state=42, n_init=10)
+    kmeans.fit(all_features)
+
+    print(f"Visual vocabulary trained! Vocabulary shape: {kmeans.cluster_centers_.shape}")
+
+    return kmeans
+
+def compute_bovw_features(image_array, vocabulary, feature_type='sift'):
+    """
+    Compute Bag of Visual Words features for an image.
+    """
+    # Extract local features
+    descriptors = extract_local_features(image_array, feature_type)
+
+    if descriptors is None:
+        # Return zero vector if no features found
+        return np.zeros(vocabulary.n_clusters)
+
+    # Assign each feature to the nearest visual word
+    distances = vocabulary.transform(descriptors)
+    labels = distances.argmax(axis=1)
+
+    # Create histogram of visual word occurrences
+    hist, _ = np.histogram(labels, bins=vocabulary.n_clusters, range=(0, vocabulary.n_clusters))
+
+    # L2 normalize the histogram
+    norm = np.linalg.norm(hist)
+    if norm > 0:
+        hist = hist / norm
+
+    return hist.tolist()
+
+def object_features(file, vocabulary=None):
+    """
+    Extract BOVW features from an image.
+    If vocabulary is provided, uses BOVW. Otherwise uses backbone features as fallback.
+    """
     request_object_content = file.read()
     img = Image.open(io.BytesIO(request_object_content)).resize((200, 200), Image.Resampling.BILINEAR)
 
-    img, _ = PILToTensor()(img)
-    img = torch.stack([img]).to(device)
+    # Convert PIL image to numpy array
+    img_array = np.array(img)
+
+    # Try BOVW if vocabulary is provided
+    if vocabulary is not None:
+        try:
+            bovw_features = compute_bovw_features(img_array, vocabulary, feature_type='sift')
+            return bovw_features
+        except Exception as e:
+            print(f"BOVW extraction failed: {e}, falling back to backbone features")
+
+    # Fallback to backbone features
+    img_pil = Image.open(io.BytesIO(request_object_content)).resize((200, 200), Image.Resampling.BILINEAR)
+    img_tensor, _ = PILToTensor()(img_pil)
+    img_tensor = torch.stack([img_tensor]).to(device)
 
     with torch.no_grad():
         loaded_model.backbone.eval()
-        return loaded_model.backbone(img)
+        return loaded_model.backbone(img_tensor)
 
 def analyze_file(file):
     request_object_content = file.read()
-    img = Image.open(io.BytesIO(request_object_content))
+    pil_image = Image.open(io.BytesIO(request_object_content))
+
+    img, _ = PILToTensor()(pil_image)
 
     with torch.no_grad():
-        inputs = processor(images=[img], return_tensors="pt")
-        outputs = loaded_model(**inputs.to(device))
-        results = processor.post_process_object_detection(outputs, target_sizes=torch.tensor([(img.height, img.width)]), threshold=0.5)
-        prediction = results[0]
+        prediction = loaded_model([img.to(device)])
 
     result = []
-    for element in range(len(prediction["boxes"])):
-            boxes = prediction["boxes"][element].cpu().numpy().tolist()
-            score = np.round(prediction["scores"][element].cpu().numpy(),
+    for element in range(len(prediction[0]["boxes"])):
+            boxes = prediction[0]["boxes"][element].cpu().numpy().tolist()
+            score = np.round(prediction[0]["scores"][element].cpu().numpy(),
                     decimals= 4)
 
-            label = labels[prediction['labels'][element].cpu().item()]
+            label = labels[prediction[0]['labels'][element].cpu().item()]
 
             if score > 0.1:
                 result.append({
@@ -301,16 +419,10 @@ def upload_arrow():
 
     return { 'predictions': result.tolist()[0] }
 
-# @app.post('/features')
-# def upload_features():
-#     upload_file = request.POST['image']
-#     result = object_features(upload_file.file)
-
-#     return { 'features': result['p7'].tolist()[0] }
-
 @app.post('/skeleton')
 def upload_skeleton():
     upload_file = request.POST['image']
+
     result = analyze_skeleton(upload_file.file)
 
     return { 'predictions': result }
@@ -330,6 +442,66 @@ def efd():
     return {
         'efds': coeffs.tolist()
     }
+
+@app.post('/train_bovw')
+def train_bovw():
+    """
+    Train a new Bag of Visual Words vocabulary and create a similarity matrix of all images.
+    Expects a list of image paths in the request body.
+    """
+    images = request.json['images']
+    n_clusters = request.json.get('n_clusters', 128)
+    feature_type = request.json.get('feature_type', 'sift')
+
+    try:
+        # Train vocabulary
+        vocabulary = train_visual_vocabulary(images, n_clusters, feature_type)
+
+        # Extract BOVW features for all images
+        print("Extracting BOVW features for all images...")
+        all_features = []
+        for img_path in images:
+            img = cv2.imread(img_path)
+            if img is None:
+                continue
+
+            gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+            descriptors = extract_local_features(gray, feature_type)
+
+            if descriptors is not None:
+                # Assign each feature to nearest visual word
+                distances = vocabulary.transform(descriptors)
+                labels = distances.argmax(axis=1)
+
+                # Create histogram
+                hist, _ = np.histogram(labels, bins=vocabulary.n_clusters, range=(0, vocabulary.n_clusters))
+
+                # L2 normalize
+                norm = np.linalg.norm(hist)
+                if norm > 0:
+                    hist = hist / norm
+
+                all_features.append(hist)
+
+        all_features = np.array(all_features)
+
+        # Compute similarity matrix (cosine similarity)
+        print("Computing similarity matrix...")
+        similarity_matrix = cosine_similarity(all_features)
+
+        return {
+            'success': True,
+            'n_clusters': n_clusters,
+            'feature_type': feature_type,
+            'n_images': len(all_features),
+            'similarity_matrix': similarity_matrix.tolist()
+        }
+
+    except Exception as e:
+        return {
+            'success': False,
+            'error': str(e)
+        }
 
 if __name__ == '__main__':
     # Check if we're in production mode

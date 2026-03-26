@@ -63,16 +63,27 @@ def bezier_point(anchor1:, anchor2:, control:, t:)
 end
 
 class Figure < ApplicationRecord
-  belongs_to :page #, dependent: :destroy
-  belongs_to :publication #, dependent: :destroy
+  belongs_to :page # , dependent: :destroy
+  belongs_to :publication # , dependent: :destroy
   include UnitAccessor
+
   serialize :contour, coder: JSON
   validates :publication, presence: true
   has_many :key_points
 
   has_one_attached :three_d_model
 
-  belongs_to :object_similarity, optional: true #, class_name: ''
+  has_many :similarities_as_first,
+    class_name: "ObjectSimilarity",
+    foreign_key: "first_id",
+    dependent: :destroy
+
+  has_many :similarities_as_second,
+    class_name: "ObjectSimilarity",
+    foreign_key: "second_id",
+    dependent: :destroy
+
+  has_many :related_ceramics, through: :similarities_as_first, source: :second_ceramic
 
   has_and_belongs_to_many :tags
 
@@ -81,7 +92,6 @@ class Figure < ApplicationRecord
   end
 
   def similar
-
   end
 
   def manual_contour

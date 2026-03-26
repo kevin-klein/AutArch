@@ -1,5 +1,6 @@
 class CeramicsController < ApplicationController
   def index
+    @no_box = true
     @ceramics = Ceramic.where("figures.probability > 0.6").order(:id)
 
     if params.dig(:search, :publication_id).present?
@@ -19,5 +20,11 @@ class CeramicsController < ApplicationController
 
   def show
     @ceramic = Ceramic.find(params[:id])
+  end
+
+  def wizard
+    @page = Page.find(params[:page_id]) if params[:page_id]
+    @no_box = true  # Hide navbar for kiosk mode
+    render template: 'ceramics/wizard'
   end
 end

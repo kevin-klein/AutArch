@@ -1,0 +1,105 @@
+<%= simple_form_for @kiosk_config, url: kiosk_config_path, method: :post do |f| %>
+  <%= f.error_notification %>
+  <%= f.error_notification message: f.object.errors[:base].to_sentence if f.object.errors[:base].present? %>
+
+  <div class="form-inputs">
+    <div class="mb-3">
+      <%= f.label :page, 'Select Publication and Page', class: 'form-label' %>
+      <select name="kiosk_config[page_id]" id="kiosk_config_page_id" class="form-select" required>
+        <option value="">-- Select a page --</option>
+        <% pages = Page.joins(:publication).where(publications: { public: true }).includes(:publication, :image).order(publications: :title, pages: :number) %>
+        <% pages.each do |page| %>
+          <option value="<%= page.id %>" <%= 'selected' if @kiosk_config.page_id == page.id %>>
+            <%= page.publication.title %> - Page <%= page.number %>
+          </option>
+        <% end %>
+      </select>
+      <div class="invalid-feedback">
+        Please select a page.
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <%= f.label :figure, 'Select Figure', class: 'form-label' %>
+      <select name="kiosk_config[figure_id]" id="kiosk_config_figure_id" class="form-select" disabled required>
+        <option value="">-- Select a page first --</option>
+      </select>
+      <div class="invalid-feedback">
+        Please select a figure.
+      </div>
+    </div>
+
+    <div class="form-text">
+      The kiosk configuration is stored as a single global record. Select a page and then choose a figure to set as the default kiosk display.
+    </div>
+  </div>
+
+  <div class="form-actions">
+    <%= f.button :submit, 'Save Kiosk Configuration', class: 'btn btn-primary' %>
+  </div>
+<% end %>
+
+<script>
+  // Page selection handler
+  document.addEventListener('DOMContentLoaded', function() {
+    const pageSelect = document.getElementById('kiosk_config_page_id');
+    const figureSelect = document.getElementById('kiosk_config_figure_id');
+
+    if (pageSelect && figureSelect) {
+      pageSelect.addEventListener('change', async function() {
+        const pageId = this.value;
+
+        if (pageId) {
+          // Disable the figure select while loading
+          figureSelect.disabled = true;
+          figureSelect.innerHTML = '<option value="">Loading figures...</option>';
+
+          try {
+            // Fetch figures for the selected page
+            const response = await fetch(`/kiosk_configs/pages/${pageId}/figures`);
+            const data = await response.json();
+
+            if (data.length > 0) {
+              figureSelect.innerHTML = '<option value="">-- Select a figure --</option>';
+
+              data.forEach(figure => {
+                const option = document.createElement('option');
+                option.value = figure.id;
+                const typeLabel = figure.type;
+                const identifier = figure.identifier || figure.text || 'ID: ' + figure.id;
+
+                // Add color indicator based on figure type
+                let typeClass = 'text-secondary';
+                if (typeLabel === 'Grave') typeClass = 'text-danger';
+                else if (typeLabel === 'Arrow') typeClass = 'text-success';
+                else if (typeLabel === 'Ceramic') typeClass = 'text-primary';
+                else if (typeLabel === 'StoneTool') typeClass = 'text-warning';
+
+                option.textContent = `${identifier} (${typeLabel})`;
+                option.dataset.type = typeLabel;
+
+                if (@kiosk_config.figure_id == figure.id) {
+                  option.selected = true;
+                }
+
+                figureSelect.appendChild(option);
+              });
+            } else {
+              figureSelect.innerHTML = '<option value="">No figures found</option>';
+            }
+
+            figureSelect.disabled = false;
+          } catch (error) {
+            console.error('Error loading figures:', error);
+            figureSelect.innerHTML = '<option value="">Error loading figures</option>';
+            figureSelect.disabled = false;
+          }
+        } else {
+          // Reset figure select when no page is selected
+          figureSelect.innerHTML = '<option value="">-- Select a page first --</option>';
+          figureSelect.disabled = true;
+        }
+      });
+    }
+  });
+</script>

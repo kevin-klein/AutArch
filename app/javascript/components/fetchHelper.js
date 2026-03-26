@@ -62,3 +62,9 @@ function getMetaContent (name) {
   const header = document.querySelector(`meta[name="${name}"]`);
   return header && header.content;
 }
+
+export {
+  getAuthenticityToken,
+  authenticityHeader,
+  getMetaContent
+}

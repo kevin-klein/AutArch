@@ -41,6 +41,46 @@ class PagesController < ApplicationController
     end
   end
 
+  def update_boxes
+    page = Page.find(params[:id])
+    publication = page.publication
+
+    image_data = page.image.data
+
+    predictions = AnalyzePublication.new.predict_boxes(image_data)
+
+    figures = []
+
+    Page.transaction do
+      page.figures.delete_all
+
+      predictions.each do |prediction|
+        x1, y1, x2, y2 = prediction["box"]
+        type_name = prediction["label"]
+        type_name = "skeleton_figure" if type_name == "skeleton"
+        probability = prediction["score"]
+        if x1.to_i == x2.to_i || y1.to_i == y2.to_i || type_name.camelize.singularize == "St"
+          next
+        end
+
+        figure = page.figures.create!(x1: x1, y1: y1, x2: x2, y2: y2, probability: probability, type: type_name.camelize.singularize, publication: publication)
+        figures << figure
+      end
+
+      # BuildText.new.run(publication)
+      CreateGraves.new.run([page])
+      CreateLithics.new.run([page])
+      GraveAngles.new.run(figures.select { _1.is_a?(Arrow) })
+      GraveSize.new.run(figures)
+      figures.each do |figure|
+        AnalyzeContour.new.run(figure)
+      end
+      AnalyzeScales.new.run(figures)
+    end
+
+    redirect_to publication_page_path(page.publication, page)
+  end
+
   # PATCH/PUT /pages/1 or /pages/1.json
   def update
     respond_to do |format|
