@@ -1,5 +1,5 @@
 class PublicationsController < AuthorizedController
-  before_action :set_publication, only: %i[analysis export_lithics export_lithics_form export radar update_tags assign_tags update_site assign_site progress summary show edit update destroy stats]
+  before_action :set_publication, only: %i[similarities create_bovw_data analysis export_lithics export_lithics_form export radar update_tags assign_tags update_site assign_site progress summary show edit update destroy stats]
 
   # GET /publications or /publications.json
   def index
@@ -145,7 +145,7 @@ class PublicationsController < AuthorizedController
 
     @data = ExportLithics.new.export(@lithics, format: params[:format], num_points: params[:contour_points].to_i)
 
-    if params[:format] == 'json'
+    if params[:format] == "json"
       render json: @data
     else
       send_data @data, filename: "#{@publication.short_description}_lithics.csv"
@@ -195,6 +195,62 @@ class PublicationsController < AuthorizedController
   def progress
   end
 
+  def create_bovw_data
+    ceramics = @publication.figures.includes(page: :image).where(type: "Ceramic").where("figures.probability > 0.6")
+
+    paths = []
+    ceramics = ceramics.to_a
+    ceramics.each do |ceramic|
+      image = MinOpenCV.extractFigure(ceramic, ceramic.page.image.data)
+      path = Rails.root.join("figures", "#{ceramic.id}.jpg").to_s
+      paths << path
+
+      unless File.exist?(path)
+        MinOpenCV.imwrite(path, image)
+      end
+    end
+
+    response = HTTP.post("#{ENV["ML_SERVICE_URL"]}/train_bovw", json: {
+      images: paths,
+      publication_id: @publication.id,
+      n_clusters: 32
+    })
+
+    response = JSON.parse(response.body.to_s)
+    matrix = response["similarity_matrix"]
+
+    Ceramic.transaction do
+      ceramics.zip(matrix).each_with_index do |data, first_index|
+        similarities = data[1]
+        ceramic = data[0]
+        ceramic.similarities_as_first.delete_all
+
+        similarities.each_with_index do |similarity, second_index|
+          next if first_index == second_index
+
+          ObjectSimilarity.create!(
+            first: ceramic,
+            second: ceramics[second_index],
+            similarity: similarity
+          )
+        end
+      end
+    end
+
+    redirect_to publications_path, notice: "BOVW training data was successfully created."
+  end
+
+  def similarities
+    @ceramics = @publication.figures
+      .where(type: "Ceramic")
+      .where("figures.probability > 0.6")
+      .order(:id)
+
+    @similarities = @ceramics.map do |ceramic|
+      ceramic.similarities_as_first.to_a
+    end
+  end
+
   # PATCH/PUT /publications/1 or /publications/1.json
   def update
     respond_to do |format|
@@ -235,11 +291,11 @@ class PublicationsController < AuthorizedController
       @form = Forms::ArtefactAnalysisForm.new(analysis_form_params)
 
       @artefact_type = {
-        'Lithic' => StoneTool,
-        'Ceramic' => Ceramic,
+        "Lithic" => StoneTool,
+        "Ceramic" => Ceramic
       }[@form.artefact_type]
 
-      @figures = @publication.figures.includes(:scale).where(type: @artefact_type.name).order(:id)#.filter { _1.width_with_unit[:unit] != 'px' }
+      @figures = @publication.figures.includes(:scale).where(type: @artefact_type.name).order(:id) # .filter { _1.width_with_unit[:unit] != 'px' }
       @figures = @figures.filter { _1.contour.present? }
 
       contours = @figures.map(&:contour)
@@ -255,7 +311,7 @@ class PublicationsController < AuthorizedController
         name: @publication.short_description,
         data: @pca_data.map do |pca, figure|
           pca = Stats.convert_pca_item_to_polar(pca)
-          pca.merge({ id: figure.id, title: figure.id, link: "/size_figures/#{figure.id}/update_size_figure/set_data" })
+          pca.merge({id: figure.id, title: figure.id, link: "/size_figures/#{figure.id}/update_size_figure/set_data"})
         end
       }]
     end

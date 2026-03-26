@@ -33,8 +33,13 @@ class AnalyzePublication
           next
         end
 
-        figure = page.figures.create!(x1: x1, y1: y1, x2: x2, y2: y2, probability: probability, type: type_name.camelize.singularize, publication: publication)
-        figures << figure
+        cls_name = type_name.camelize.singularize
+        begin Module.const_get(cls_name)
+              figure = page.figures.create!(x1: x1, y1: y1, x2: x2, y2: y2, probability: probability, type: type_name.camelize.singularize, publication: publication)
+              figures << figure
+        rescue NameError
+          Rails.logger.warn("Class #{cls_name} not found, discarding object")
+        end
       end
     end
 

@@ -19,34 +19,25 @@ export default function () {
     formData.append('object_type', objectType)
 
     try {
-    // Send the request
       const response = await fetch('/size_figures/boxes', {
         method: 'POST',
         body: formData
-      // Optional: add headers if your API expects them
-      // headers: { 'Accept': 'application/json' },
       })
 
-      // Check for HTTP errors
       if (!response.ok) {
         const errorText = await response.text()
         throw new Error(`Upload failed: ${errorText}`)
       }
 
-      // Parse JSON (or whatever your endpoint returns)
       const result = await response.json()
-      return result // e.g., { url: 'https://...', id: 123 }
-    } catch (err) {
-      console.error('Error uploading image:', err)
-      throw err // Re‑throw so callers can handle it
+      return result
     } finally {
       setUploading(false)
     }
   }
 
-  /* ---------- step navigation ---------- */
-  const goNext = async (boxes) => {
-    setFinalBoxes(boxes)
+  const goNext = async (updatedBoxes) => {
+    setFinalBoxes(updatedBoxes)
     setCurrentStep((s) => s + 1)
   }
 
@@ -61,13 +52,10 @@ export default function () {
       setUploading(true)
       try {
         const res = await uploadImage(file, objectType)
-        setBoxes(res.boxes || []) // store the boxes for the next step
+        setBoxes(res.boxes || [])
       } catch (e) {
         console.error(e)
-        // You could add an error state here and show a message to the user
       }
-      setCurrentStep((s) => s + 1)
-    } else {
       setCurrentStep((s) => s + 1)
     }
   }
@@ -85,14 +73,16 @@ export default function () {
       image={image}
       imageFile={imageFile}
       label={label}
-      onNext={goNext}
+      onNext={(boxes) => goNext(boxes)}
       onBack={goBack}
     />,
-    <TableExport
-      key='export'
-      boxes={finalBoxes}
-      onBack={goBack}
-    />
+    TableExport ? (
+      <TableExport
+        key='export'
+        boxes={finalBoxes}
+        onBack={goBack}
+      />
+    ) : null
   ]
 
   return (
@@ -102,7 +92,7 @@ export default function () {
       {uploading && (
         <div className='progress-container' style={{ marginBottom: '1rem' }}>
           <progress style={{ width: '100%' }} />
-          <span>Processing Image ....</span>
+          <span>Processing Image....</span>
         </div>
       )}
 

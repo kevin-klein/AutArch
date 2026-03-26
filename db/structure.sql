@@ -113,6 +113,40 @@ ALTER SEQUENCE public.active_storage_variant_records_id_seq OWNED BY public.acti
 
 
 --
+-- Name: analysis_wizards; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.analysis_wizards (
+    id bigint NOT NULL,
+    step integer DEFAULT 0,
+    page_id bigint,
+    contours jsonb[] DEFAULT '{}'::jsonb[],
+    state text,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: analysis_wizards_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.analysis_wizards_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: analysis_wizards_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.analysis_wizards_id_seq OWNED BY public.analysis_wizards.id;
+
+
+--
 -- Name: anthropologies; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -366,7 +400,8 @@ CREATE TABLE public.figures (
     efds double precision[] DEFAULT '{}'::double precision[] NOT NULL,
     internment_type integer,
     dummy boolean DEFAULT false NOT NULL,
-    actual_height_mm integer
+    actual_height_mm integer,
+    wizard_id bigint
 );
 
 
@@ -523,6 +558,38 @@ ALTER SEQUENCE public.key_points_id_seq OWNED BY public.key_points.id;
 
 
 --
+-- Name: kiosk_configs; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.kiosk_configs (
+    id bigint NOT NULL,
+    page_id bigint NOT NULL,
+    figure_id bigint NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: kiosk_configs_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.kiosk_configs_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: kiosk_configs_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.kiosk_configs_id_seq OWNED BY public.kiosk_configs.id;
+
+
+--
 -- Name: kurgans; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -598,7 +665,8 @@ CREATE TABLE public.object_similarities (
     first_id bigint NOT NULL,
     second_id bigint NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    bovw_features jsonb[] DEFAULT '{}'::jsonb[] NOT NULL
 );
 
 
@@ -1160,6 +1228,13 @@ ALTER TABLE ONLY public.active_storage_variant_records ALTER COLUMN id SET DEFAU
 
 
 --
+-- Name: analysis_wizards id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.analysis_wizards ALTER COLUMN id SET DEFAULT nextval('public.analysis_wizards_id_seq'::regclass);
+
+
+--
 -- Name: anthropologies id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -1227,6 +1302,13 @@ ALTER TABLE ONLY public.images ALTER COLUMN id SET DEFAULT nextval('public.image
 --
 
 ALTER TABLE ONLY public.key_points ALTER COLUMN id SET DEFAULT nextval('public.key_points_id_seq'::regclass);
+
+
+--
+-- Name: kiosk_configs id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.kiosk_configs ALTER COLUMN id SET DEFAULT nextval('public.kiosk_configs_id_seq'::regclass);
 
 
 --
@@ -1380,6 +1462,14 @@ ALTER TABLE ONLY public.active_storage_variant_records
 
 
 --
+-- Name: analysis_wizards analysis_wizards_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.analysis_wizards
+    ADD CONSTRAINT analysis_wizards_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: anthropologies anthropologies_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1465,6 +1555,14 @@ ALTER TABLE ONLY public.images
 
 ALTER TABLE ONLY public.key_points
     ADD CONSTRAINT key_points_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: kiosk_configs kiosk_configs_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.kiosk_configs
+    ADD CONSTRAINT kiosk_configs_pkey PRIMARY KEY (id);
 
 
 --
@@ -1648,6 +1746,13 @@ CREATE UNIQUE INDEX index_active_storage_variant_records_uniqueness ON public.ac
 
 
 --
+-- Name: index_analysis_wizards_on_page_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_analysis_wizards_on_page_id ON public.analysis_wizards USING btree (page_id);
+
+
+--
 -- Name: index_anthropologies_on_skeleton_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -1704,6 +1809,13 @@ CREATE INDEX index_figures_on_site_id ON public.figures USING btree (site_id);
 
 
 --
+-- Name: index_figures_on_wizard_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_figures_on_wizard_id ON public.figures USING btree (wizard_id);
+
+
+--
 -- Name: index_figures_tags_on_figure_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -1750,6 +1862,20 @@ CREATE INDEX index_genetics_on_y_haplogroup_id ON public.genetics USING btree (y
 --
 
 CREATE INDEX index_key_points_on_figure_id ON public.key_points USING btree (figure_id);
+
+
+--
+-- Name: index_kiosk_configs_on_figure_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_kiosk_configs_on_figure_id ON public.kiosk_configs USING btree (figure_id);
+
+
+--
+-- Name: index_kiosk_configs_on_page_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_kiosk_configs_on_page_id ON public.kiosk_configs USING btree (page_id);
 
 
 --
@@ -1894,6 +2020,14 @@ ALTER TABLE ONLY public.page_texts
 
 
 --
+-- Name: kiosk_configs fk_rails_32757c98ab; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.kiosk_configs
+    ADD CONSTRAINT fk_rails_32757c98ab FOREIGN KEY (figure_id) REFERENCES public.figures(id);
+
+
+--
 -- Name: skeletons fk_rails_3530f65d41; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1907,6 +2041,14 @@ ALTER TABLE ONLY public.skeletons
 
 ALTER TABLE ONLY public.publication_teams
     ADD CONSTRAINT fk_rails_387b88576e FOREIGN KEY (team_id) REFERENCES public.teams(id);
+
+
+--
+-- Name: analysis_wizards fk_rails_4271bb81fb; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.analysis_wizards
+    ADD CONSTRAINT fk_rails_4271bb81fb FOREIGN KEY (page_id) REFERENCES public.pages(id);
 
 
 --
@@ -1931,6 +2073,14 @@ ALTER TABLE ONLY public.user_teams
 
 ALTER TABLE ONLY public.pages
     ADD CONSTRAINT fk_rails_6e85f0c61d FOREIGN KEY (publication_id) REFERENCES public.publications(id) ON DELETE CASCADE;
+
+
+--
+-- Name: kiosk_configs fk_rails_7348b0c37b; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.kiosk_configs
+    ADD CONSTRAINT fk_rails_7348b0c37b FOREIGN KEY (page_id) REFERENCES public.pages(id);
 
 
 --
@@ -2014,6 +2164,14 @@ ALTER TABLE ONLY public.genetics
 
 
 --
+-- Name: figures fk_rails_e0de94bf71; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.figures
+    ADD CONSTRAINT fk_rails_e0de94bf71 FOREIGN KEY (wizard_id) REFERENCES public.analysis_wizards(id);
+
+
+--
 -- Name: text_items fk_rails_f8547942a2; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2028,6 +2186,7 @@ ALTER TABLE ONLY public.text_items
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260325102857'),
 ('20260225094639'),
 ('20260225094636'),
 ('20260225094439'),
@@ -2042,6 +2201,9 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20250715180104'),
 ('20250617101517'),
 ('20250604075837'),
+('20250325120002'),
+('20250325120001'),
+('20250325120000'),
 ('20250320155546'),
 ('20250320150924'),
 ('20250320132340'),

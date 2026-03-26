@@ -1,0 +1,11 @@
+<div id="kiosk-config-root"
+  data-react-component="KioskConfig"
+  data-props='{
+    "kioskConfig": <%= @kiosk_config.to_json %>,
+    "options": {
+      "idleTimeout": <%= (ENV.fetch('KIOSK_IDLE_TIMEOUT', 60000) / 1000).to_i %>
+    }
+  }'>
+</div>
+
+<%#= stylesheet_link_tag "kiosk_config" %>

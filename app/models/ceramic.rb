@@ -60,6 +60,7 @@
 class Ceramic < Figure
   belongs_to :good, foreign_key: "parent_id", optional: true, inverse_of: :ceramics
   belongs_to :grave, foreign_key: "parent_id", optional: true, inverse_of: :ceramics
+  belongs_to :analysis_wizard, foreign_key: "wizard_id", optional: true
 
   belongs_to :site, optional: true
 

@@ -1,0 +1,55 @@
+<div class="container mt-5">
+  <div class="row">
+    <div class="col-md-8 offset-md-2">
+      <div class="card">
+        <div class="card-header bg-primary text-white">
+          <h4 class="mb-0">Kiosk Configuration</h4>
+        </div>
+        <div class="card-body">
+          <p class="text-muted mb-4">
+            Set up the kiosk display by selecting a publication page and a figure to display.
+            This configuration is stored globally and will be used by the kiosk system.
+          </p>
+
+          <%= render 'kiosk_configs/kiosk_config_form/kiosk_config_form' %>
+        </div>
+        <div class="card-footer bg-light">
+          <small class="text-muted">
+            <i class="fas fa-info-circle"></i>
+            Only public publications are shown in the dropdown.
+          </small>
+        </div>
+      </div>
+
+      <% if @kiosk_config.persisted? %>
+        <div class="card mt-4">
+          <div class="card-header bg-success text-white">
+            <h5 class="mb-0">Current Configuration</h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6">
+                <strong>Publication:</strong>
+                <%= @kiosk_config.page&.publication&.title || 'None' %>
+              </div>
+              <div class="col-md-6">
+                <strong>Page:</strong>
+                <%= @kiosk_config.page&.number || 'None' %>
+              </div>
+            </div>
+            <div class="row mt-2">
+              <div class="col-md-6">
+                <strong>Figure Type:</strong>
+                <%= @kiosk_config.figure&.type || 'None' %>
+              </div>
+              <div class="col-md-6">
+                <strong>Identifier:</strong>
+                <%= @kiosk_config.figure&.identifier || @kiosk_config.figure&.text || 'None' %>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

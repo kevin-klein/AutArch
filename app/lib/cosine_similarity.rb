@@ -1,13 +1,21 @@
 module CosineSimilarity
-  module_function
+  # Calculate cosine similarity between two vectors
+  # Both vectors should be arrays of numbers
+  def self.similarity(vec1, vec2)
+    return 0.0 if vec1.nil? || vec2.nil? || vec1.empty? || vec2.empty?
 
-  def similarity(first, second)
-    dot_product = 0
-    first.zip(second).each do |v1i, v2i|
-      dot_product += v1i * v2i
+    dot_product = 0.0
+    norm1 = 0.0
+    norm2 = 0.0
+
+    vec1.each_with_index do |val, i|
+      dot_product += val * vec2[i] if vec2[i]
+      norm1 += val * val
+      norm2 += vec2[i] * vec2[i] if vec2[i]
     end
-    a = first.map { |n| n**2 }.reduce(:+)
-    b = second.map { |n| n**2 }.reduce(:+)
-    dot_product / (Math.sqrt(a) * Math.sqrt(b))
+
+    return 0.0 if norm1 == 0.0 || norm2 == 0.0
+
+    dot_product / (Math.sqrt(norm1) * Math.sqrt(norm2))
   end
 end

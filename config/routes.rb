@@ -44,6 +44,24 @@ Rails.application.routes.draw do # rubocop:disable Metrics/BlockLength
   #   end
   #   # resources :update_lithic
   # end
+  scope :kiosk_configs do
+    # Global kiosk config (single record)
+    get '/kiosk_config.json', to: 'kiosk_configs#show', as: :kiosk_config_json
+    get '/kiosk_config', to: 'kiosk_configs#kiosk_config', as: :kiosk_config
+    post '/kiosk_config.json', to: 'kiosk_configs#create', as: :kiosk_config_json_create
+    get '/kiosk_config/frontend', to: 'kiosk_configs#kiosk_config_frontend', as: :kiosk_config_frontend
+    # Select ceramic view
+    get '/select_ceramic', to: 'kiosk_configs#select_ceramic', as: :select_ceramic
+
+    # JSON API for page selection
+    get '/pages.json', to: 'kiosk_configs#pages', as: :kiosk_pages
+
+    # JSON API for publications
+    get '/publications.json', to: 'kiosk_configs#publications', as: :kiosk_publications
+
+    # JSON API for figures on a page
+    get '/kiosk_config/pages/:id/figures.json', to: 'kiosk_configs#page_figures', as: :kiosk_page_figures
+  end
   resources :kurgans
   resources :sites
   resources :maps
@@ -72,9 +90,26 @@ Rails.application.routes.draw do # rubocop:disable Metrics/BlockLength
     resources :stable_isotopes
   end
   resources :page_images
-  resources :ceramics
+  resources :ceramics do
+    get :wizard, on: :collection
+  end
+
+  get '/ceramics/wizard', to: 'ceramics#wizard', as: :ceramic_wizard
+  resources :analysis_wizards do
+    member do
+      put :advance_step
+      post :step_1
+      post :step_2
+      post :step_3
+      post :save_ceramic
+      post :similar_ceramics
+    end
+  end
   resources :publications do
     resources :pages do
+      member do
+        post :update_boxes
+      end
       collection do
         get :by_page_number
       end
@@ -93,6 +128,8 @@ Rails.application.routes.draw do # rubocop:disable Metrics/BlockLength
       get :radar
       get :analyze
       get :summary
+      get :create_bovw_data
+      get :similarities
     end
     # get :delete, on: :member
   end

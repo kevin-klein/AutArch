@@ -68,7 +68,7 @@ class FiguresController < AuthorizedController
 
   # DELETE /figures/1 or /figures/1.json
   def destroy
-    @figure.delete
+    @figure.destroy
 
     respond_to do |format|
       format.html { redirect_to root_path, notice: "Figure was successfully destroyed." }

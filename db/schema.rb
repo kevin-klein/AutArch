@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_25_094639) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_25_102857) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -40,6 +40,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_25_094639) do
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "analysis_wizards", force: :cascade do |t|
+    t.jsonb "contours", default: [], array: true
+    t.datetime "created_at", null: false
+    t.bigint "page_id"
+    t.text "state"
+    t.integer "step", default: 0
+    t.datetime "updated_at", null: false
+    t.index ["page_id"], name: "index_analysis_wizards_on_page_id"
   end
 
   create_table "anthropologies", force: :cascade do |t|
@@ -157,12 +167,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_25_094639) do
     t.boolean "validated", default: false, null: false
     t.boolean "verified", default: false, null: false
     t.float "width"
+    t.bigint "wizard_id"
     t.integer "x1", null: false
     t.integer "x2", null: false
     t.integer "y1", null: false
     t.integer "y2", null: false
     t.index ["page_id"], name: "index_figures_on_page_id"
     t.index ["site_id"], name: "index_figures_on_site_id"
+    t.index ["wizard_id"], name: "index_figures_on_wizard_id"
   end
 
   create_table "figures_tags", force: :cascade do |t|
@@ -205,6 +217,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_25_094639) do
     t.index ["figure_id"], name: "index_key_points_on_figure_id"
   end
 
+  create_table "kiosk_configs", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "figure_id", null: false
+    t.bigint "page_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["figure_id"], name: "index_kiosk_configs_on_figure_id"
+    t.index ["page_id"], name: "index_kiosk_configs_on_page_id"
+  end
+
   create_table "kurgans", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.integer "height"
@@ -222,6 +243,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_25_094639) do
   end
 
   create_table "object_similarities", force: :cascade do |t|
+    t.jsonb "bovw_features", default: [], null: false, array: true
     t.datetime "created_at", null: false
     t.bigint "first_id", null: false
     t.bigint "second_id", null: false
@@ -383,9 +405,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_25_094639) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "analysis_wizards", "pages"
+  add_foreign_key "figures", "analysis_wizards", column: "wizard_id"
   add_foreign_key "figures", "pages", on_delete: :cascade
   add_foreign_key "genetics", "skeletons"
   add_foreign_key "key_points", "figures"
+  add_foreign_key "kiosk_configs", "figures"
+  add_foreign_key "kiosk_configs", "pages"
   add_foreign_key "object_similarities", "figures", column: "first_id"
   add_foreign_key "object_similarities", "figures", column: "second_id"
   add_foreign_key "page_texts", "pages"

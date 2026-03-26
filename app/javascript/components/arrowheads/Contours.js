@@ -17,14 +17,14 @@ function normalizeBox (boxData, index) {
   }
 }
 
-export default function Contours ({ boxes: initialBoxes, image, onNext, onBack, imageFile, label }) {
+export default function Contours ({ boxes: initialBoxes, image, onNext, onBack, imageFile, label, isWizard = false, setBoxes = null }) {
   const defaultCenters = initialBoxes.reduce((acc, item) => {
     const [x1, y1, x2, y2] = item.box
     acc[item.id] = [[Math.round((x1 + x2) / 2), Math.round((y1 + y2) / 2)]]
     return acc
   }, {})
 
-  const [boxes, setBoxes] = useState(() => initialBoxes.map((b, i) => normalizeBox(b, i)))
+  const [normalizedBoxes, setNormalizedBoxes] = useState(() => initialBoxes.map((b, i) => normalizeBox(b, i)))
   const [selectedBoxId, setSelectedBoxId] = useState(null)
   const [samPoints, setSamPoints] = useState(defaultCenters)
   const [loading, setLoading] = useState(false)
@@ -46,7 +46,7 @@ export default function Contours ({ boxes: initialBoxes, image, onNext, onBack, 
     }
   }, [image])
 
-  const selectedBox = boxes.find(b => b.id === selectedBoxId)
+  const selectedBox = normalizedBoxes.find(b => b.id === selectedBoxId)
 
   // Handle stage click for adding SAM points or new box points
   const handleStageClick = (e) => {
@@ -80,28 +80,19 @@ export default function Contours ({ boxes: initialBoxes, image, onNext, onBack, 
 
     try {
       setLoading(true)
-
       const formData = new FormData()
       formData.append('image', imageFile)
       formData.append('points', JSON.stringify(samPoints[selectedBoxId]))
-
       const response = await fetch('/size_figures/update_contour', {
         method: 'POST',
         body: formData,
         headers: { Accept: 'application/json' }
       })
-
       if (!response.ok) throw new Error('Failed to update contour')
-
       const result = await response.json()
-
-      // Update the box with new contour
-      setBoxes(prev => prev.map(box =>
-        box.id === selectedBoxId
-          ? { ...box, contour: result.contour }
-          : box
+      setNormalizedBoxes(prev => prev.map(box =>
+        box.id === selectedBoxId ? { ...box, contour: result.contour } : box
       ))
-      // Don't clear samPoints - keep them for review
     } catch (err) {
       console.error('Error updating contour:', err)
       alert('Failed to update contour')
@@ -113,25 +104,20 @@ export default function Contours ({ boxes: initialBoxes, image, onNext, onBack, 
   // Create a new box from control points
   const createNewBox = async () => {
     if (newBoxPoints.length === 0) return
-
     try {
       setLoading(true)
-
       const formData = new FormData()
       formData.append('image', imageFile)
       formData.append('points', JSON.stringify(newBoxPoints))
-
       const response = await fetch('/size_figures/new_box', {
         method: 'POST',
         headers: { Accept: 'application/json' },
         body: formData
       })
-
       if (!response.ok) throw new Error('Failed to create new box')
-
       const result = await response.json()
-      setBoxes(prev => [...prev, { ...result, type: label }])
-      setSamPoints({ ...samPoints, [response.id]: newBoxPoints })
+      setNormalizedBoxes(prev => [...prev, { ...result, type: label }])
+      setSamPoints({ ...samPoints, [result.id]: newBoxPoints })
       setNewBoxPoints([])
       setIsCreatingNewBox(false)
     } catch (err) {
@@ -177,32 +163,6 @@ export default function Contours ({ boxes: initialBoxes, image, onNext, onBack, 
     })
   }
 
-  // Render box rectangle
-  const renderBox = (box) => {
-    const isSelected = box.id === selectedBoxId
-    const strokeColor = isSelected ? '#F44336' : 'purple'
-    const fillColor = isSelected ? 'rgba(244, 143, 54, 0.44)' : 'rgba(128, 0, 128, 0.11)'
-
-    return (
-      <Rect
-        key={`box-${box.id}`}
-        x={box.x1}
-        y={box.y1}
-        width={box.x2 - box.x1}
-        height={box.y2 - box.y1}
-        fill={fillColor}
-        stroke={strokeColor}
-        strokeWidth={2}
-        onClick={() => {
-          setSelectedBoxId(box.id)
-        }}
-        onTap={() => {
-          setSelectedBoxId(box.id)
-        }}
-      />
-    )
-  }
-
   return (
     <div className='row'>
       {loading && <LoadingDialog />}
@@ -214,14 +174,14 @@ export default function Contours ({ boxes: initialBoxes, image, onNext, onBack, 
             <h3>Select Box & Set Control Points</h3>
             <div>
               <button className='btn btn-info me-2' onClick={onBack}>Back</button>
-              <button className='btn btn-info' onClick={() => onNext(boxes)}>Next</button>
+              <button className='btn btn-info' onClick={() => onNext(normalizedBoxes)}>Next</button>
             </div>
           </div>
 
           {/* --- NEW: User Instructions Section --- */}
-          <div className='alert alert-info mb-2' role="alert">
-            <h5 className="alert-heading">How to use this interface:</h5>
-            <ul className="mb-0">
+          <div className='alert alert-info mb-2' role='alert'>
+            <h5 className='alert-heading'>How to use this interface:</h5>
+            <ul className='mb-0'>
               <li><strong>1. Select a Box:</strong> Click on any detected box (purple outline) in the image list or directly on the image to select it.</li>
               <li><strong>2. Add Control Points:</strong> Once a box is selected, click in the image to add control points (red dots). Add as many points as needed to define the object's shape.</li>
               <li><strong>3. Update Contour:</strong> After adding points, click the <strong>"Update Contour"</strong> button. The system will use these points to generate a precise contour around the object.</li>
@@ -277,11 +237,8 @@ export default function Contours ({ boxes: initialBoxes, image, onNext, onBack, 
                 y={0}
               />
 
-              {/* Render all boxes */}
-              {/* {boxes.map(box => renderBox(box))} */}
-
               {/* Render contours for all boxes */}
-              {boxes.map(box => renderContour(box))}
+              {normalizedBoxes.map(box => renderContour(box))}
 
               {/* Render SAM points for selected box */}
               {selectedBoxId !== null && samPoints[selectedBoxId].map((point, idx) => (
@@ -338,7 +295,7 @@ export default function Contours ({ boxes: initialBoxes, image, onNext, onBack, 
           </div>
 
           <div className='list-group' style={{ maxHeight: '600px', overflowY: 'auto' }}>
-            {boxes.map((box) => (
+            {normalizedBoxes.map((box) => (
               <React.Fragment key={box.id}>
                 <div
                   className='d-flex align-items-center list-group-item list-group-item-action'
@@ -363,7 +320,7 @@ export default function Contours ({ boxes: initialBoxes, image, onNext, onBack, 
                     className='btn btn-outline-danger btn-sm ms-2' onClick={(e) => {
                       e.stopPropagation()
 
-                      setBoxes(boxes.filter(filterBox => filterBox.id !== box.id))
+                      setNormalizedBoxes(normalizedBoxes.filter(filterBox => filterBox.id !== box.id))
                     }}
                   >
                     Remove
@@ -373,7 +330,7 @@ export default function Contours ({ boxes: initialBoxes, image, onNext, onBack, 
             ))}
           </div>
 
-          {boxes.length === 0 && (
+          {normalizedBoxes.length === 0 && (
             <div className='text-center text-muted py-4'>
               <p>No boxes detected.</p>
               <button

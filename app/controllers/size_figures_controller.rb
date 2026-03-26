@@ -24,7 +24,7 @@ class SizeFiguresController < ApplicationController
   end
 
   def destroy
-    @figure.delete
+    @figure.destroy
 
     respond_to do |format|
       format.html { redirect_to size_figure_update_size_figure_path(@figure.class.order(:id).where("id > ?", @figure.id).first || @figure.class.last, :set_data), notice: "Figure was successfully removed." }
