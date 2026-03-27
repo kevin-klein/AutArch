@@ -63,15 +63,6 @@ function LocationMapDialog ({
     ]
   }
 
-  // Get zoom level based on location count
-  const getZoomLevel = () => {
-    if (locations.length === 0) return 4
-    if (locations.length === 1) return 10
-    if (locations.length <= 5) return 8
-    if (locations.length <= 20) return 6
-    return 5
-  }
-
   const markers = locations.map((location, index) => {
     const isSelected = highlightLocation &&
                       highlightLocation.id === location.id ||
@@ -137,7 +128,7 @@ function LocationMapDialog ({
             <div style={{ flex: 1, position: 'relative', minHeight: '400px' }}>
               <MapContainer
                 center={getMapCenter()}
-                zoom={initialZoom || getZoomLevel()}
+                zoom={initialZoom}
                 style={{ height: '100%', width: '100%' }}
                 scrollWheelZoom
                 doubleClickZoom={false}
@@ -252,7 +243,7 @@ export default function LocationMap ({
   locations = [],
   highlightLocation = null,
   height = 600,
-  initialZoom = 6,
+  initialZoom = 8,
   showPopup = true,
   className = '',
   isOpen = true,
