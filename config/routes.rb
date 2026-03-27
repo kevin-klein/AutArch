@@ -92,6 +92,9 @@ Rails.application.routes.draw do # rubocop:disable Metrics/BlockLength
   resources :page_images
   resources :ceramics do
     get :wizard, on: :collection
+    member do
+      get :similarities
+    end
   end
 
   get '/ceramics/wizard', to: 'ceramics#wizard', as: :ceramic_wizard

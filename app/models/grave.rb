@@ -58,7 +58,6 @@
 #  features             :float            default([]), not null, is an Array
 #
 class Grave < Figure
-  belongs_to :site, optional: true
   has_one :scale, dependent: :destroy, foreign_key: "parent_id", class_name: "Scale", inverse_of: :grave
   has_one :arrow, dependent: :destroy, foreign_key: "parent_id", class_name: "Arrow", inverse_of: :grave
   has_one :grave_cross_section, dependent: :destroy, foreign_key: "parent_id", class_name: "GraveCrossSection",

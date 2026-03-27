@@ -113,40 +113,6 @@ ALTER SEQUENCE public.active_storage_variant_records_id_seq OWNED BY public.acti
 
 
 --
--- Name: analysis_wizards; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.analysis_wizards (
-    id bigint NOT NULL,
-    step integer DEFAULT 0,
-    page_id bigint,
-    contours jsonb[] DEFAULT '{}'::jsonb[],
-    state text,
-    created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
-);
-
-
---
--- Name: analysis_wizards_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.analysis_wizards_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: analysis_wizards_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.analysis_wizards_id_seq OWNED BY public.analysis_wizards.id;
-
-
---
 -- Name: anthropologies; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -400,8 +366,7 @@ CREATE TABLE public.figures (
     efds double precision[] DEFAULT '{}'::double precision[] NOT NULL,
     internment_type integer,
     dummy boolean DEFAULT false NOT NULL,
-    actual_height_mm integer,
-    wizard_id bigint
+    actual_height_mm integer
 );
 
 
@@ -1228,13 +1193,6 @@ ALTER TABLE ONLY public.active_storage_variant_records ALTER COLUMN id SET DEFAU
 
 
 --
--- Name: analysis_wizards id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.analysis_wizards ALTER COLUMN id SET DEFAULT nextval('public.analysis_wizards_id_seq'::regclass);
-
-
---
 -- Name: anthropologies id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -1459,14 +1417,6 @@ ALTER TABLE ONLY public.active_storage_blobs
 
 ALTER TABLE ONLY public.active_storage_variant_records
     ADD CONSTRAINT active_storage_variant_records_pkey PRIMARY KEY (id);
-
-
---
--- Name: analysis_wizards analysis_wizards_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.analysis_wizards
-    ADD CONSTRAINT analysis_wizards_pkey PRIMARY KEY (id);
 
 
 --
@@ -1746,13 +1696,6 @@ CREATE UNIQUE INDEX index_active_storage_variant_records_uniqueness ON public.ac
 
 
 --
--- Name: index_analysis_wizards_on_page_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_analysis_wizards_on_page_id ON public.analysis_wizards USING btree (page_id);
-
-
---
 -- Name: index_anthropologies_on_skeleton_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -1806,13 +1749,6 @@ CREATE INDEX index_figures_on_page_id ON public.figures USING btree (page_id);
 --
 
 CREATE INDEX index_figures_on_site_id ON public.figures USING btree (site_id);
-
-
---
--- Name: index_figures_on_wizard_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_figures_on_wizard_id ON public.figures USING btree (wizard_id);
 
 
 --
@@ -2044,14 +1980,6 @@ ALTER TABLE ONLY public.publication_teams
 
 
 --
--- Name: analysis_wizards fk_rails_4271bb81fb; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.analysis_wizards
-    ADD CONSTRAINT fk_rails_4271bb81fb FOREIGN KEY (page_id) REFERENCES public.pages(id);
-
-
---
 -- Name: stable_isotopes fk_rails_44a721f0e7; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2164,14 +2092,6 @@ ALTER TABLE ONLY public.genetics
 
 
 --
--- Name: figures fk_rails_e0de94bf71; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.figures
-    ADD CONSTRAINT fk_rails_e0de94bf71 FOREIGN KEY (wizard_id) REFERENCES public.analysis_wizards(id);
-
-
---
 -- Name: text_items fk_rails_f8547942a2; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2186,6 +2106,7 @@ ALTER TABLE ONLY public.text_items
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260327093411'),
 ('20260325102857'),
 ('20260225094639'),
 ('20260225094636'),

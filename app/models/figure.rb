@@ -70,6 +70,7 @@ class Figure < ApplicationRecord
   serialize :contour, coder: JSON
   validates :publication, presence: true
   has_many :key_points
+  belongs_to :site, optional: true
 
   has_one_attached :three_d_model
 
