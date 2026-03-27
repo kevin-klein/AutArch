@@ -70,7 +70,7 @@ app/assets/builds/*.js
 app/assets/builds/*.css
 
 autarch.sql
-ceramics/
+/ceramics/
 config/credentials*
 coverage
 

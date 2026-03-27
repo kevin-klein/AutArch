@@ -1,0 +1,9 @@
+<%=
+  react_component(
+    "CeramicWizard",
+    kioskConfig: @kiosk_config,
+    options: {
+      idleTimeout: (ENV.fetch('CERAMIC_WIZARD_IDLE_TIMEOUT', 60000)).to_i
+    }
+  )
+%>
