@@ -4,6 +4,9 @@ import useImage from 'use-image'
 import { createRoot } from 'react-dom/client'
 import PropTypes from 'prop-types'
 import useSWR from 'swr'
+import LocationMap from './LocationMap'
+import SharedButton from './SharedButton'
+import { t } from '../utils/i18n'
 
 const fetcher = (...args) => fetch(...args).then(res => {
   if (!res.ok) {
@@ -25,8 +28,7 @@ const figureTypeColors = {
   default: 'figure-type-default'
 }
 
-export default function SelectCeramic (params = {}) {
-  const [imageError, setImageError] = useState(null)
+export default function SelectCeramic ({ figuresData, onNext, onBack, boxes = [], image: propImage, imageFile, label = 'Ceramic', isWizard = false, setBoxes }) {
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 })
   const [stageScale, setStageScale] = useState(1)
   const [container, setContainer] = useState(null)
@@ -36,20 +38,43 @@ export default function SelectCeramic (params = {}) {
   const [selectedContours, setSelectedContours] = useState([])
   const [hoveredFigureId, setHoveredFigureId] = useState(null)
 
+  // map state
+  const [showMap, setShowMap] = useState(false)
+  const [highlightSite, setHighlightSite] = useState(null)
+
   // Loading state
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
 
-  // Fetch figures from kiosk config API
-  const { data: figuresData, error: figuresError, isLoading: figuresLoading } = useSWR(
-    '/kiosk_configs/kiosk_config.json',
-    fetcher
+  const [image, status] = useImage(
+    figuresData?.image
   )
 
-  // Load a demo image or use the first page's image
-  const [image, status] = useImage(
-    '/demo.jpg' // Default demo image
-  )
+  const selectedFigure = figuresData?.figures?.find(f => f.id === selectedFigureId)
+
+  // Get recommended figure from kiosk config
+  const recommendedFigure = figuresData?.figure
+  const recommendedFigureId = recommendedFigure?.id
+
+  // Handle Next button click
+  const handleNext = () => {
+    if (!selectedFigureId) {
+      alert(t('pleaseSelectFigure'))
+      return
+    }
+
+    // Format the selected figure as a box with contour
+    const figure = figuresData?.figures?.find(f => f.id === selectedFigureId)
+    if (!figure) {
+      alert(t('figureNotFound'))
+      return
+    }
+
+    // Call onNext with the updated boxes array
+    if (onNext) {
+      onNext(figure)
+    }
+  }
 
   // Calculate display dimensions
   useEffect(() => {
@@ -73,24 +98,6 @@ export default function SelectCeramic (params = {}) {
   const handleFigureSelect = (figureId) => {
     setSelectedFigureId(figureId)
     setSelectedContours([]) // Clear previous selections
-  }
-
-  // Handle contour click
-  const handleContourClick = (figureId, contour) => {
-    if (selectedFigureId !== figureId) {
-      // First click on a new figure
-      setSelectedFigureId(figureId)
-      setSelectedContours([contour])
-    } else {
-      // Toggle contour selection
-      setSelectedContours(prev => {
-        if (prev.includes(contour)) {
-          return prev.filter(c => c !== contour)
-        } else {
-          return [...prev, contour]
-        }
-      })
-    }
   }
 
   // Handle mouse enter for hover effect
@@ -125,41 +132,25 @@ export default function SelectCeramic (params = {}) {
 
   return (
     <div className='container-fluid'>
-      {/* Header */}
+      <LocationMap
+        highlightLocation={highlightSite}
+        locations={figuresData?.sites}
+        isOpen={showMap}
+        onClose={() => setShowMap(false)}
+      />
       <div className='row mb-4'>
         <div className='col-12'>
           <div className='card'>
             <div className='card-header bg-primary text-white'>
               <h5 className='mb-0'>
                 <i className='bi bi-cube me-2' />
-                Select Ceramic Contours
+                {t('selectCeramicContours')}
               </h5>
             </div>
             <div className='card-body'>
-              <p className='text-muted'>
-                Click on a contour to select it. Selected contours will be highlighted in blue.
-                You can select multiple contours from the same figure.
+              <p className='text-white'>
+                {t('clickContour')}
               </p>
-              <div className='alert alert-info'>
-                <strong>Usage Hints:</strong>
-                <ul className='mb-0 mt-2'>
-                  <li>
-                    <strong>Single Select:</strong> Click a contour to select it (it becomes blue)
-                  </li>
-                  <li>
-                    <strong>Multi-Select:</strong> Click multiple contours from the same figure
-                  </li>
-                  <li>
-                    <strong>Change Figure:</strong> Click a different figure to switch selection
-                  </li>
-                  <li>
-                    <strong>Clear Selection:</strong> Click the "Clear Selection" button
-                  </li>
-                  <li>
-                    <strong>Figure Info:</strong> Hover over a figure to see its details
-                  </li>
-                </ul>
-              </div>
             </div>
           </div>
         </div>
@@ -173,33 +164,24 @@ export default function SelectCeramic (params = {}) {
             <div className='card-header d-flex justify-content-between align-items-center'>
               <span>
                 <i className='bi bi-image me-2' />
-                {loading ? 'Loading...' : 'Contour Viewer'}
+                {loading ? t('loading') : t('contourViewer')}
               </span>
-              {selectedFigureId && (
-                <span className='badge bg-secondary'>
-                  Figure: {selectedFigureId}
-                </span>
-              )}
+              <div>
+                {recommendedFigureId && (
+                  <span className='badge bg-warning text-dark me-2'>
+                    <i className='bi bi-star me-1' />
+                    {t('recommended')}: {recommendedFigure?.identifier || recommendedFigureId}
+                  </span>
+                )}
+                {selectedFigureId && (
+                  <span className='badge bg-secondary'>
+                    {t('selectedFigure')}: {selectedFigureId}
+                  </span>
+                )}
+              </div>
             </div>
             <div className='card-body p-0'>
-              {figuresLoading ? (
-                <div className='text-center p-5'>
-                  <div className='spinner-border text-primary' role='status'>
-                    <span className='visually-hidden'>Loading figures...</span>
-                  </div>
-                  <p className='mt-2'>Loading figures from API...</p>
-                </div>
-              ) : figuresError ? (
-                <div className='alert alert-danger m-3'>
-                  <strong>Error:</strong> {figuresError.message}
-                  <button
-                    className='btn btn-sm btn-link mt-2'
-                    onClick={() => window.location.reload()}
-                  >
-                    Retry
-                  </button>
-                </div>
-              ) : (
+              {(
                 figures.length > 0 && image && (
                   <Stage
                     width={dimensions.width}
@@ -224,20 +206,47 @@ export default function SelectCeramic (params = {}) {
                       {figures.map((figure) => {
                         const isSelected = selectedFigureId === figure.id
                         const isHovered = hoveredFigureId === figure.id
+                        const isRecommended = recommendedFigureId === figure.id
                         const selectedContourIndices = getSelectedContours(figure)
                         const contourPoints = getContourPoints(figure)
+
+                        // Determine stroke color based on state
+                        let strokeColor = '#000000'
+                        let strokeWidth = 1
+
+                        if (isSelected) {
+                          strokeColor = selectedContourIndices.length > 0 ? '#2563eb' : '#4f46e5'
+                          strokeWidth = selectedContourIndices.length > 0 ? 3 : 2
+                        } else if (isRecommended) {
+                          strokeColor = '#f59e0b' // Amber color for recommended
+                          strokeWidth = 3
+                        } else if (isHovered) {
+                          strokeColor = '#4f46e5'
+                          strokeWidth = 2
+                        }
+
+                        // Determine fill color
+                        let fillColor = 'rgba(0, 0, 0, 0.2)'
+                        if (isSelected) {
+                          fillColor = 'rgba(79, 70, 229, 0.5)'
+                        } else if (isRecommended) {
+                          fillColor = 'rgba(245, 158, 11, 0.15)' // Light amber
+                        }
 
                         return (
                           <React.Fragment key={figure.id}>
                             <Line
                               points={contourPoints.flat()}
                               closed
-                              onTap={() => console.log(`clicked ${figure.id}`)}
-                              onClick={() => console.log(`clicked ${figure.id}`)}
-                              stroke={isSelected ? (selectedContourIndices.length > 0 ? '#2563eb' : '#4f46e5') : (isHovered ? '#4f46e5' : '#000000')}
-                              strokeWidth={isSelected ? (selectedContourIndices.length > 0 ? 3 : 2) : 1}
-                              fill={isSelected ? 'rgba(79, 70, 229, 0.5)' : 'rgba(0, 0, 0, 0.2)'}
+                              onTap={() => setSelectedFigureId(figure.id)}
+                              onClick={() => setSelectedFigureId(figure.id)}
+                              stroke={strokeColor}
+                              strokeWidth={strokeWidth}
+                              fill={fillColor}
                               perfectDrawEnabled={false}
+                              shadowColor={isRecommended ? '#f59e0b' : ''}
+                              shadowBlur={isRecommended ? 10 : 0}
+                              shadowOpacity={isRecommended ? 0.5 : 0}
                             />
                           </React.Fragment>
                         )
@@ -257,61 +266,38 @@ export default function SelectCeramic (params = {}) {
             <div className='card mb-4'>
               <div className='card-header bg-info text-white'>
                 <i className='bi bi-info-circle me-2' />
-                Selected Figure
+                {t('selectedFigure')}
               </div>
               <div className='card-body'>
                 {figures.find(f => f.id === selectedFigureId) && (
                   <div>
-                    <h6 className='mb-3'>Figure Details</h6>
+                    <h6 className='mb-3'>{t('figureDetails')}</h6>
                     <div className='mb-2'>
-                      <strong>Type:</strong>
-                      <span className={`ms-2 figure-type-badge figure-type-${selectedFigureId.type?.toLowerCase()}`}>
-                        {selectedFigureId.type || 'Unknown'}
+                      <strong>{t('type')}:</strong>
+                      <span className={`ms-2 figure-type-badge figure-type-${selectedFigure.type}`}>
+                        {t('ceramics')}
                       </span>
                     </div>
                     <div className='mb-2'>
-                      <strong>Identifier:</strong>
-                      <span className='ms-2 text-muted'>{selectedFigureId.identifier || selectedFigureId.text || 'N/A'}</span>
+                      <strong>{t('identifier')}:</strong>
+                      <span className='ms-2 text-muted'>Vessel-{selectedFigure.identifier}</span>
                     </div>
                     <div className='mb-2'>
-                      <strong>Probability:</strong>
+                      <strong>{t('site')}:</strong>
                       <span className='ms-2 text-muted'>
-                        {(selectedFigureId.probability * 100).toFixed(1)}%
-                      </span>
-                    </div>
-                    <div className='mb-2'>
-                      <strong>Coordinates:</strong>
-                      <div className='ms-2 small text-muted'>
-                        X1: {selectedFigureId.x1}, Y1: {selectedFigureId.y1}<br />
-                        X2: {selectedFigureId.x2}, Y2: {selectedFigureId.y2}
-                      </div>
-                    </div>
-                    <div className='mb-2'>
-                      <strong>Contour Points:</strong>
-                      <span className='ms-2 text-muted'>{selectedFigureId.contour?.length || 0} points</span>
-                    </div>
-                    <div className='mb-2'>
-                      <strong>Selected Contours:</strong>
-                      <span className='ms-2 text-muted'>
-                        {getSelectedContours(figures.find(f => f.id === selectedFigureId)).length} / {selectedFigureId.contour?.length || 0}
+                        <button
+                          onClick={() => {
+                            setHighlightSite(selectedFigure.site)
+                            setShowMap(true)
+                          }}
+                          className='btn btn-info'
+                        >
+                          {selectedFigure.site.name}
+                        </button>
                       </span>
                     </div>
                   </div>
                 )}
-
-                {/* Action Buttons */}
-                <div className='mt-4'>
-                  <button
-                    className='btn btn-danger w-100 mb-2'
-                    onClick={() => {
-                      setSelectedFigureId(null)
-                      setSelectedContours([])
-                    }}
-                  >
-                    <i className='bi bi-x-circle me-2' />
-                    Clear Selection
-                  </button>
-                </div>
               </div>
             </div>
           )}
@@ -321,7 +307,7 @@ export default function SelectCeramic (params = {}) {
             <div className='card-header d-flex justify-content-between align-items-center'>
               <span>
                 <i className='bi bi-list me-2' />
-                Figures ({figures.length})
+                {t('figures')} ({figures.length})
               </span>
             </div>
             <div className='card-body p-0'>
@@ -329,31 +315,42 @@ export default function SelectCeramic (params = {}) {
                 {figures.length === 0
                   ? (
                     <div className='text-center p-3 text-muted'>
-                      No figures available
+                      {t('noFigures')}
                     </div>
                     )
                   : (
                       figures.map((figure) => {
                         const isSelected = selectedFigureId === figure.id
+                        const isRecommended = recommendedFigureId === figure.id
+
                         return (
                           <button
                             key={figure.id}
-                            className={`list-group-item list-group-item-action ${isSelected ? 'active' : ''}`}
+                            className={`list-group-item list-group-item-action ${isSelected ? 'active' : ''} ${isRecommended ? 'recommended-figure' : ''}`}
                             onClick={() => handleFigureSelect(figure.id)}
                             onMouseEnter={() => handleMouseEnter(figure.id)}
                             onMouseLeave={() => handleMouseLeave(figure.id)}
                           >
                             <div className='d-flex justify-content-between align-items-center'>
                               <div>
-                                <strong className={isSelected ? 'text-white' : ''}>
-                                  {figure.identifier || figure.text || `Figure ${figure.id}`}
-                                </strong>
-                                <span className={`figure-type-badge figure-type-${figure.type?.toLowerCase()} ms-2`}>
-                                  {figure.type || 'Unknown'}
+                                <span className={`figure-type-badge figure-type-${figure.type?.toLowerCase()}`}>
+                                  {t('ceramics')}
                                 </span>
+                                <strong className={isSelected ? 'text-white ms-2' : 'ms-2'}>
+                                  {figure.identifier || figure.text || `${t('figure')} ${figure.id}`}
+                                </strong>
+                                {isRecommended && (
+                                  <span className='badge bg-warning text-dark ms-2'>
+                                    <i className='bi bi-star me-1' />
+                                    {t('recommended')}
+                                  </span>
+                                )}
                               </div>
                               {isSelected && (
                                 <i className='bi bi-check-circle-fill text-primary' />
+                              )}
+                              {isRecommended && !isSelected && (
+                                <i className='bi bi-star-fill text-warning' />
                               )}
                             </div>
                             <div className='small text-muted'>
@@ -367,38 +364,32 @@ export default function SelectCeramic (params = {}) {
             </div>
           </div>
 
-          {/* Help Section */}
-          <div className='card mt-4'>
-            <div className='card-header bg-warning text-dark'>
-              <i className='bi bi-question-circle me-2' />
-              How to Use
+          {/* Action Buttons */}
+          {isWizard && (
+            <div className='card mt-4'>
+              <div className='card-body'>
+                <div className='d-flex justify-content-between gap-2'>
+                  {onBack && (
+                    <SharedButton
+                      onClick={onBack}
+                      disabled={!selectedFigureId}
+                      variant='secondary'
+                    >
+                      <i className='bi bi-arrow-left me-2' />
+                      {t('back')}
+                    </SharedButton>
+                  )}
+                  <SharedButton
+                    onClick={handleNext}
+                    disabled={!selectedFigureId || loading}
+                    style={{ flex: 1 }}
+                  >
+                    {t('next')}
+                  </SharedButton>
+                </div>
+              </div>
             </div>
-            <div className='card-body'>
-              <ol className='mb-0'>
-                <li>Scroll through the figures list to see all available ceramics</li>
-                <li>Click on any figure to select it</li>
-                <li>Click on contours in the image to select specific ones</li>
-                <li>Selected contours appear in blue with vertex circles</li>
-                <li>View figure details in the sidebar</li>
-                <li>Click "Clear Selection" to start over</li>
-              </ol>
-            </div>
-          </div>
-
-          {/* Tips */}
-          <div className='card mt-4'>
-            <div className='card-header bg-success text-white'>
-              <i className='bi bi-lightbulb me-2' />
-              Tips
-            </div>
-            <div className='card-body'>
-              <ul className='mb-0 small'>
-                <li>Multi-click to select multiple contours from the same figure</li>
-                <li>Use the scrollbar to browse through many figures</li>
-                <li>Hover over contours to see figure boundaries</li>
-              </ul>
-            </div>
-          </div>
+          )}
         </div>
       </div>
     </div>

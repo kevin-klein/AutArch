@@ -4,8 +4,7 @@
 import React from 'react'
 import 'chartkick/chart.js'
 import * as Popper from '@popperjs/core'
-// import 'bootstrap'
-import { createRoot } from 'react-dom/client';
+import { createRoot } from 'react-dom/client'
 
 import './autarch.css'
 
@@ -20,6 +19,7 @@ import ImportProgress from './components/ImportProgress'
 import SiteMap from './components/SiteMap'
 import KioskConfig from './components/KioskConfig'
 import SelectCeramic from './components/SelectCeramic'
+import LocationMap from './components/LocationMap'
 import Chart from 'react-apexcharts'
 
 import simpleheat from './components/simpleheat'
@@ -222,7 +222,8 @@ const COMPONENT_REGISTRY = {
   ArrowHeads,
   CeramicWizard,
   KioskConfig,
-  SelectCeramic
+  SelectCeramic,
+  LocationMap
 }
 
 function mountReactComponents () {

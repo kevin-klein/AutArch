@@ -1,5 +1,12 @@
-<div id="select-ceramic-root" data-params='{
-  "title": "Select Ceramic Contours"
+<div id="select-ceramic-root" data-props='{
+  "boxes": <%= boxes.to_json %>,
+  "image": <%= image.to_json rescue 'null' %>,
+  "imageFile": <%= imageFile.to_json rescue 'null' %>,
+  "label": "<%= label %>",
+  "onNext": <%= onNext.to_json %>,
+  "onBack": <%= onBack.to_json %>,
+  "isWizard": <%= isWizard %>,
+  "setBoxes": <%= setBoxes.to_json %>
 }'></div>
 
 <%= stylesheet_link_tag "select_ceramic" %>

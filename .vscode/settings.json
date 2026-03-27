@@ -10,5 +10,6 @@
     "regex": "cpp",
     "utility": "cpp"
   },
-  "git.ignoreLimitWarning": true
+  "git.ignoreLimitWarning": true,
+  "python-envs.defaultEnvManager": "ms-python.python:system"
 }
