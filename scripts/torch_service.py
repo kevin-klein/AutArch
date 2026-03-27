@@ -87,7 +87,7 @@ sam.to(device=device)
 sam.eval()
 
 loaded_model = get_model(num_classes = len(labels.keys()), device=device)
-loaded_model.load_state_dict(torch.load('models/fcos_resnext.model', map_location=device))
+loaded_model.load_state_dict(torch.load('models/rcnn_fpn.model', map_location=device))
 
 id2label = {v: k for k, v in labels.items()}
 label2id = labels
