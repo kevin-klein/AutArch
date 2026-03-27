@@ -36,7 +36,6 @@ export default function SelectCeramic ({ figuresData, onNext, onBack, boxes = []
   // Selection state
   const [selectedFigureId, setSelectedFigureId] = useState(null)
   const [selectedContours, setSelectedContours] = useState([])
-  const [hoveredFigureId, setHoveredFigureId] = useState(null)
 
   // map state
   const [showMap, setShowMap] = useState(false)
@@ -98,20 +97,6 @@ export default function SelectCeramic ({ figuresData, onNext, onBack, boxes = []
   const handleFigureSelect = (figureId) => {
     setSelectedFigureId(figureId)
     setSelectedContours([]) // Clear previous selections
-  }
-
-  // Handle mouse enter for hover effect
-  const handleMouseEnter = (figureId) => {
-    setHoveredFigureId(figureId)
-  }
-
-  // Handle mouse leave for hover effect
-  const handleMouseLeave = (figureId) => {
-    if (selectedFigureId === figureId) {
-      setHoveredFigureId(figureId)
-    } else {
-      setHoveredFigureId(null)
-    }
   }
 
   // Get contour points with offset
@@ -205,32 +190,28 @@ export default function SelectCeramic ({ figuresData, onNext, onBack, boxes = []
                       {/* Draw contours */}
                       {figures.map((figure) => {
                         const isSelected = selectedFigureId === figure.id
-                        const isHovered = hoveredFigureId === figure.id
                         const isRecommended = recommendedFigureId === figure.id
                         const selectedContourIndices = getSelectedContours(figure)
                         const contourPoints = getContourPoints(figure)
 
                         // Determine stroke color based on state
-                        let strokeColor = '#000000'
-                        let strokeWidth = 1
+                        let strokeColor = '#ffffff'
+                        let strokeWidth = 4
 
                         if (isSelected) {
-                          strokeColor = selectedContourIndices.length > 0 ? '#2563eb' : '#4f46e5'
-                          strokeWidth = selectedContourIndices.length > 0 ? 3 : 2
+                          strokeColor = '#1E88E5'
+                          strokeWidth = 6
                         } else if (isRecommended) {
-                          strokeColor = '#f59e0b' // Amber color for recommended
-                          strokeWidth = 3
-                        } else if (isHovered) {
-                          strokeColor = '#4f46e5'
-                          strokeWidth = 2
+                          strokeColor = '#ff6600' // Bright orange for recommended
+                          strokeWidth = 5
                         }
 
                         // Determine fill color
-                        let fillColor = 'rgba(0, 0, 0, 0.2)'
+                        let fillColor = '#FFEE5866'
                         if (isSelected) {
-                          fillColor = 'rgba(79, 70, 229, 0.5)'
+                          fillColor = '#1E88E599'
                         } else if (isRecommended) {
-                          fillColor = 'rgba(245, 158, 11, 0.15)' // Light amber
+                          fillColor = 'rgba(255, 102, 0, 0.3)' // Light orange
                         }
 
                         return (
@@ -245,8 +226,8 @@ export default function SelectCeramic ({ figuresData, onNext, onBack, boxes = []
                               fill={fillColor}
                               perfectDrawEnabled={false}
                               shadowColor={isRecommended ? '#f59e0b' : ''}
-                              shadowBlur={isRecommended ? 10 : 0}
-                              shadowOpacity={isRecommended ? 0.5 : 0}
+                              shadowBlur={isRecommended ? 8 : 0}
+                              shadowOpacity={isRecommended ? 0.6 : 0}
                             />
                           </React.Fragment>
                         )
@@ -328,8 +309,6 @@ export default function SelectCeramic ({ figuresData, onNext, onBack, boxes = []
                             key={figure.id}
                             className={`list-group-item list-group-item-action ${isSelected ? 'active' : ''} ${isRecommended ? 'recommended-figure' : ''}`}
                             onClick={() => handleFigureSelect(figure.id)}
-                            onMouseEnter={() => handleMouseEnter(figure.id)}
-                            onMouseLeave={() => handleMouseLeave(figure.id)}
                           >
                             <div className='d-flex justify-content-between align-items-center'>
                               <div>
@@ -352,9 +331,6 @@ export default function SelectCeramic ({ figuresData, onNext, onBack, boxes = []
                               {isRecommended && !isSelected && (
                                 <i className='bi bi-star-fill text-warning' />
                               )}
-                            </div>
-                            <div className='small text-muted'>
-                              Prob: {(figure.probability * 100).toFixed(1)}% • {figure.contour?.length || 0} pts
                             </div>
                           </button>
                         )
