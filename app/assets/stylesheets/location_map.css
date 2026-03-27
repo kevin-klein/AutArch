@@ -1,0 +1,520 @@
+/* Location Map Styles - Dark Theme */
+
+.location-map-container {
+  font-family: "Roboto", sans-serif;
+}
+
+/* ============================================================================
+   MDB UI KIT OVERRIDES - DARK THEME
+   ============================================================================ */
+
+/* Modal background override */
+.modal,
+.modal.show,
+.modal.fade.show,
+.modal-dialog,
+.modal-dialog .modal-content,
+.modal-content,
+.mdb-modal .modal-content {
+  background-color: var(--color-bg-card) !important;
+}
+
+/* Modal header and footer */
+.modal-header,
+.modal-footer,
+.modal-body {
+  background-color: var(--color-bg-card) !important;
+}
+
+/* MDB modal border colors */
+.modal-header,
+.modal-footer {
+  border-color: #4a5568 !important;
+}
+
+/* MDB modal title */
+.modal-title {
+  color: var(--color-text-primary) !important;
+}
+
+/* MDB modal body text */
+.modal-body {
+  color: var(--color-text-primary) !important;
+}
+
+/* MDB close button */
+.modal .btn-close,
+.btn-close {
+  background-color: transparent !important;
+  color: var(--color-text-primary) !important;
+  opacity: 0.7;
+}
+
+.modal .btn-close:hover,
+.btn-close:hover {
+  opacity: 0.9;
+}
+
+/* MDB buttons in modal */
+.modal .btn-secondary,
+.modal-footer .btn-secondary {
+  background-color: #4a5568 !important;
+  border-color: #4a5568 !important;
+  color: var(--color-text-primary) !important;
+}
+
+.modal .btn-secondary:hover,
+.modal-footer .btn-secondary:hover {
+  background-color: #334155 !important;
+  border-color: #334155 !important;
+}
+
+/* MDB modal backdrop */
+.modal-backdrop,
+.modal-backdrop.show {
+  background-color: rgba(0, 0, 0, 0.5) !important;
+}
+
+/* ============================================================================
+   END MDB OVERRIDES
+   ============================================================================ */
+
+/* Modal styles - Dark theme (override MDB UI Kit) */
+.modal {
+  display: none !important;
+  position: fixed;
+  z-index: 2000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal.show {
+  display: block !important;
+}
+
+.modal-dialog {
+  margin: 0;
+  max-width: 100%;
+  height: 100%;
+}
+
+.modal-dialog.modal-fullscreen {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  height: 100%;
+}
+
+.modal-content {
+  background-color: var(--color-bg-card) !important;
+  border: 0 !important;
+  box-shadow: 0 2px 6px rgba(0,0,0,.3);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Override MDB modal background - multiple selectors for MDB */
+.modal .modal-content,
+.modal-content,
+.mdb-modal .modal-content,
+.modal.fade.show .modal-content,
+.modal.show .modal-content,
+.modal-dialog .modal-content {
+  background: var(--color-bg-card) !important;
+}
+
+.modal-dialog-centered .modal-content,
+.modal-fullscreen .modal-content {
+  background: var(--color-bg-card) !important;
+}
+
+/* MDB specific overrides - comprehensive */
+.modal-backdrop,
+.modal-backdrop.show,
+.modal-backdrop.fade {
+  background-color: rgba(0, 0, 0, 0.5) !important;
+}
+
+/* MDB Modal Header & Footer */
+.modal-header,
+.modal-header *,
+.modal-footer,
+.modal-footer *,
+.modal-body,
+.modal-body {
+  background-color: var(--color-bg-card) !important;
+  color: var(--color-text-primary) !important;
+}
+
+.modal-header {
+  border-bottom-color: #4a5568 !important;
+}
+
+.modal-footer {
+  border-top-color: #4a5568 !important;
+}
+
+/* MDB modal title */
+.modal-title {
+  color: var(--color-text-primary) !important;
+}
+
+/* MDB buttons */
+.modal .btn-secondary,
+.modal-footer .btn-secondary {
+  background-color: #4a5568 !important;
+  border-color: #4a5568 !important;
+  color: var(--color-text-primary) !important;
+}
+
+.modal .btn-secondary:hover,
+.modal-footer .btn-secondary:hover {
+  background-color: #334155 !important;
+  border-color: #334155 !important;
+}
+
+/* MDB close button */
+.modal .btn-close,
+.btn-close {
+  background-color: transparent !important;
+  opacity: 0.7;
+}
+
+.modal .btn-close:hover,
+.btn-close:hover {
+  opacity: 0.9;
+}
+
+/* MDB modal dialog */
+.modal-dialog {
+  background-color: var(--color-bg-card) !important;
+}
+
+/* MDB modal variants */
+.modal.modal-dialog-centered .modal-content,
+.modal.modal-fullscreen .modal-content {
+  background-color: var(--color-bg-card) !important;
+}
+
+/* MDB modal fade animation */
+.modal.fade .modal-content {
+  background-color: var(--color-bg-card) !important;
+}
+
+.modal-header {
+  padding: 1rem;
+  border-bottom: 1px solid #4a5568;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.modal-title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.btn-close {
+  padding: 0.5rem;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: var(--color-text-primary);
+  text-shadow: none;
+  opacity: 0.7;
+  background-color: transparent;
+  border: 0;
+}
+
+.btn-close:hover {
+  opacity: 0.9;
+}
+
+.modal-body {
+  padding: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.modal-footer {
+  padding: 1rem;
+  border-top: 1px solid #4a5568 !important;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  flex-shrink: 0;
+  background-color: var(--color-bg-card) !important;
+}
+
+/* Override MDB modal footer */
+.modal-footer .btn-secondary {
+  background-color: #4a5568 !important;
+  border-color: #4a5568 !important;
+}
+
+.modal-footer .btn-secondary:hover {
+  background-color: #334155 !important;
+  border-color: #334155 !important;
+}
+
+/* Map legend styles - Dark theme */
+.map-legend {
+  font-size: 12px;
+}
+
+.map-legend .legend-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.map-legend .legend-icon {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid white;
+  margin-right: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Animation for pulse effect */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.7);
+  }
+  70% {
+    transform: scale(1.2);
+    box-shadow: 0 0 0 10px rgba(56, 189, 248, 0);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(56, 189, 248, 0);
+  }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .modal-dialog.modal-fullscreen {
+    width: 100%;
+    height: 100%;
+  }
+
+  .modal-content {
+    height: 100%;
+    border-radius: 0;
+  }
+
+  .modal-header {
+    padding: 0.5rem;
+  }
+
+  .modal-footer {
+    padding: 0.5rem;
+  }
+
+  .map-legend {
+    font-size: 11px;
+  }
+}
+
+/* Accessibility improvements */
+.modal:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.modal-content:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Leaflet map container */
+.leaflet-container {
+  font-family: "Roboto", sans-serif;
+}
+
+.leaflet-popup-content-wrapper {
+  background-color: var(--color-bg-card);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.leaflet-popup-content {
+  margin: 10px;
+  font-size: 14px;
+  color: var(--color-text-primary);
+}
+
+.leaflet-popup-tip {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Marker animation */
+.leaflet-marker-icon {
+  transition: transform 0.3s ease;
+  background: transparent !important;
+}
+
+.leaflet-marker-icon.pulse {
+  animation: pulse 1.5s infinite;
+}
+
+/* Location info overlay */
+.location-info-overlay {
+  position: absolute;
+  bottom: 60px;
+  right: 10px;
+  background-color: var(--color-bg-card);
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  max-width: 300px;
+  border: 1px solid #4a5568;
+}
+
+.location-info-overlay strong {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 1rem;
+  color: var(--color-text-primary);
+}
+
+.location-info-overlay .text-muted {
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+}
+
+/* Button styles */
+.btn-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  line-height: 1;
+}
+
+.btn-close:hover {
+  opacity: 0.75;
+}
+
+/* Modal backdrop */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1999;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Map location list overlay */
+.location-list-overlay {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background-color: var(--color-bg-card);
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  max-height: 300px;
+  overflow-y: auto;
+  max-width: 250px;
+  border: 1px solid #4a5568;
+}
+
+.location-list-overlay strong {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 0.875rem;
+  color: var(--color-text-primary);
+}
+
+.location-list-overlay .btn-link {
+  padding: 2px 0;
+  font-size: 0.875rem;
+  color: var(--color-primary);
+}
+
+.location-list-overlay .btn-link:hover {
+  color: var(--color-primary-hover);
+  text-decoration: underline;
+}
+
+/* Map legend overlay */
+.map-legend-overlay {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background-color: var(--color-bg-card);
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  font-size: 12px;
+  border: 1px solid #4a5568;
+}
+
+.map-legend-overlay .legend-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.map-legend-overlay .legend-icon {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid white;
+  margin-right: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Loading state */
+.map-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  min-height: 400px;
+}
+
+.map-loading .spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  border-top-color: var(--color-primary);
+  animation: spinner 0.75s linear infinite;
+}
+
+@keyframes spinner {
+  to {
+    transform: rotate(360deg);
+  }
+}

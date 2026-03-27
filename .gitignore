@@ -17,6 +17,7 @@
 image_processing/Makefile
 image_processing/*.bundle
 image_processing/*.log
+figures/*.jpg
 
 # Ignore all logfiles and tempfiles.
 /log/*

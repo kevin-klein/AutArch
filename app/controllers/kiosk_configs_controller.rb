@@ -6,15 +6,29 @@ class KioskConfigsController < ApplicationController
   def show
     respond_to do |format|
       format.json do
+        # Get the recommended figure's 3D model URL if available
+        three_d_model_url = nil
+        preview_image_url = nil
+        
+        if @kiosk_config.figure.present?
+          figure = Figure.find(@kiosk_config.figure)
+          three_d_model_url = figure.three_d_model.attached? ? rails_blob_url(figure.three_d_model) : nil
+          preview_image_url = figure.preview_url if figure.respond_to?(:preview_url)
+        end
+
         render json: {
           id: @kiosk_config.id,
           page_id: @kiosk_config.page_id,
           figure_id: @kiosk_config.figure_id,
           page: @kiosk_config.page,
+          image: @kiosk_config.page.image.url,
           figure: @kiosk_config.figure,
           publication_id: @kiosk_config.page&.publication_id,
           figure: @kiosk_config.figure,
-          figures: @kiosk_config.page.figures.where(type: 'Ceramic')
+          figures: @kiosk_config.page.figures.where(type: 'Ceramic').as_json(include: :site),
+          sites: Site.all,
+          three_d_model: three_d_model_url,
+          preview_image: preview_image_url
         }
       end
     end

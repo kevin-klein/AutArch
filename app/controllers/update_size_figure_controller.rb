@@ -78,7 +78,7 @@ class UpdateSizeFigureController < ApplicationController
 
   def figure_params
     if params[:ceramic]
-      params.require(:ceramic).permit(:name, :description, :site_id, :three_d_model, :percentage_scale, :page_size)
+      params.require(:ceramic).permit(:identifier, :name, :description, :site_id, :three_d_model, :percentage_scale, :page_size)
     else
       params.require(:lithic).permit(:name, :description, :site_id)
     end

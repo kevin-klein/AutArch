@@ -24,16 +24,9 @@ const figureTypeColors = {
 }
 
 function KioskConfig ({ kioskConfig = null, options = {} }) {
-  // const [publications, setPublications] = useState([])
-  // const [pages, setPages] = useState([])
   const [selectedPublicationId, setSelectedPublicationId] = useState(null)
   const [selectedPageId, setSelectedPageId] = useState(null)
   const [selectedFigureId, setSelectedFigureId] = useState(null)
-  // const [loading, setLoading] = useState({
-  //   publications: false,
-  //   figures: false,
-  //   save: false
-  // })
   const [error, setError] = useState(null)
 
   const saveLoading = false

@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react'
+import SharedButton from '../SharedButton'
+import { t } from '../../utils/i18n'
 
 // Convert Uint8Array to base64
 const uint8ArrayToBase64 = (uint8Array) => {
@@ -102,25 +104,25 @@ export default function UploadStep ({ onNext, autoSelect = false, fixedImage = n
   return (
     <div className='upload-step'>
       <div className='alert alert-info mb-3' role='alert'>
-        <h5 className='alert-heading'>How to use this:</h5>
+        <h5 className='alert-heading'>{t('howToUse')}</h5>
         {demoImage !== null
           ? <ul className='mb-0'>
-            <li><strong>1. Upload Image:</strong> {autoSelect ? 'Drag demo.jpg from the source box to the upload box, or click the source box.' : 'Drag & drop an image file (JPG, PNG, GIF, WebP) or click to browse your files. Maximum size is 10MB recommended.'}</li>
-            <li><strong>2. Select Vessel:</strong> The interface will auto-detect vessels for you.</li>
-            <li><strong>3. Continue:</strong> View similar objects and a 3D model of the vessel.</li>
+            <li><strong>1. {t('uploadImage')}:</strong> {autoSelect ? t('dragImage') : t('uploadInstructions')}</li>
+            <li><strong>2. {t('selectVessel')}:</strong> {t('selectVesselInstructions')}</li>
+            <li><strong>3. {t('similarity')}</strong> {t('similarityInstructions')}</li>
           </ul>
           : <ul className='mb-0'>
-            <li><strong>1. Object Type:</strong> {autoSelect ? 'Ceramic analysis - automatically set to Ceramics' : 'Choose the type of artifact (Lithics, Graves, Arrowheads, or Ceramics) you are adding.'}</li>
-            <li><strong>2. Upload Image:</strong> {autoSelect ? 'Drag demo.jpg from the source box to the upload box, or click the source box.' : 'Drag & drop an image file (JPG, PNG, GIF, WebP) or click to browse your files. Maximum size is 10MB recommended.'}</li>
-            <li><strong>3. Review Features:</strong> The interface will auto-detect object types for you, but you will have the chance to adjust this later in the workflow.</li>
-            <li><strong>4. Continue:</strong> Once your file is selected and ready, click the "Continue" button to proceed to the next step.</li>
+            <li><strong>1. {t('objectTypeInfo')}:</strong> {autoSelect ? t('ceramics') : t('objectTypeInfo')}</li>
+            <li><strong>2. {t('upload')} {t('image')}:</strong> {autoSelect ? t('dragImage') : t('uploadInstructions')}</li>
+            <li><strong>3. {t('reviewFeatures')}:</strong> {t('reviewFeaturesInstructions')}</li>
+            <li><strong>4. {t('continueInstructions')}</strong></li>
             </ul>}
       </div>
 
       <div className='mb-3'>
         {!autoSelect &&
           <>
-            <label htmlFor='objectType' className='form-label'>Object Type</label>
+            <label htmlFor='objectType' className='form-label'>{t('objectType')}</label>
             <div className='form-select-wrapper'>
               <select
                 id='objectType'
@@ -129,10 +131,10 @@ export default function UploadStep ({ onNext, autoSelect = false, fixedImage = n
                 onChange={(e) => setObjectType(e.target.value)}
                 disabled={autoSelect}
               >
-                <option value='lithics'>Lithics - Stone tools</option>
-                <option value='grave'>Graves - Burial pits</option>
-                <option value='arrowheads'>ArrowHeads - Lithic Arrowheads</option>
-                <option value='ceramics'>Ceramics - Pottery and ceramic artifacts</option>
+                <option value='lithics'>{t('lithics')}</option>
+                <option value='grave'>{t('graves')}</option>
+                <option value='arrowheads'>{t('arrowheads')}</option>
+                <option value='ceramics'>{t('ceramics')}</option>
               </select>
             </div>
           </>}
@@ -151,20 +153,17 @@ export default function UploadStep ({ onNext, autoSelect = false, fixedImage = n
             {demoImage
               ? (
                 <img
-                  src={`data:image/jpeg;base64,${uint8ArrayToBase64(demoImage)}`}
-                  alt='demo.jpg'
+                  src={demoImage}
+                  alt={t('demoFile')}
                   className='source-image img-fluid'
                 />
                 )
               : (
                 <div className='source-placeholder'>
                   <span className='source-icon'>🖼️</span>
-                  <span className='source-text'>demo.jpg</span>
+                  <span className='source-text'>{t('demoFile')}</span>
                 </div>
                 )}
-            <div className='source-caption'>
-              {autoSelect ? 'Drag to upload' : 'Source: demo.jpg'}
-            </div>
           </div>
         </div>
 
@@ -184,17 +183,16 @@ export default function UploadStep ({ onNext, autoSelect = false, fixedImage = n
               disabled={false}
             />
             <label htmlFor='fileInput' className='dropzone-btn'>
-              <span className='dropzone-icon'>📤</span>
               <span className='dropzone-text'>
-                {isDragOver ? 'Drop the file here...' : autoSelect ? 'Drag demo.jpg from the source box' : 'Drag & drop an image file here'}
+                {isDragOver ? 'Drop the file here...' : autoSelect ? t('dragImage') : t('dragDrop')}
               </span>
-              <span className='dropzone-hint'> or click to browse</span>
+              <span className='dropzone-hint'> {t('orClick')}</span>
             </label>
           </div>
           {demoImage === null &&
             <div className='dropzone-help'>
-              <span className='help-item'>🖼️ Supports: JPG, PNG, GIF, WebP</span>
-              <span className='help-item'>⏱️ Max: 10MB recommended</span>
+              <span className='help-item'>🖼️ {t('supports')} JPG, PNG, GIF, WebP</span>
+              <span className='help-item'>⏱️ {t('max')} 10MB</span>
             </div>}
         </div>
       </div>
@@ -206,16 +204,14 @@ export default function UploadStep ({ onNext, autoSelect = false, fixedImage = n
       )}
 
       <div className='next-button-area'>
-        <button
+        <SharedButton
           type='button'
           disabled={!isFileSet}
           onClick={handleNext}
-          className='next-button'
         >
-          <span className='button-icon'>🚀</span>
-          <span className='button-text'>Continue</span>
-          <span className='button-hint'>{isFileSet ? '(ready)' : '(select a file)'}</span>
-        </button>
+          <span>{t('continue')}</span>
+          <span style={{ display: isFileSet ? 'none' : 'inline' }}>{`(${t('selectFile')})`}</span>
+        </SharedButton>
         {file && (
           <div className='file-info'>
             <span className='file-icon'>📎</span>
