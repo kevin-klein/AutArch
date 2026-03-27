@@ -154,7 +154,7 @@ export default function AddFigure ({ image, pageFigures, page, next_url }) {
           <button type='button' style={{ backgroundColor: '#26C6DA', color: 'white' }} className='btn btn-secondary' onClick={() => startDrawing('GraveCrossSection')}>GraveCrossSection</button>
           <button type='button' style={{ backgroundColor: '#4CAF50', color: 'white' }} className='btn btn-secondary' onClick={() => startDrawing('Good')}>Artefact</button>
           <button type='button' style={{ backgroundColor: '#9575CD', color: 'white' }} className='btn btn-secondary' onClick={() => startDrawing('Scale')}>Scale</button>
-          <button type='button' style={{ backgroundColor: '#FF9800', color: 'white' }} className='btn btn-secondary' onClick={() => startDrawing('Ceramics')}>Ceramics</button>
+          <button type='button' style={{ backgroundColor: '#FF9800', color: 'white' }} className='btn btn-secondary' onClick={() => startDrawing('Ceramic')}>Ceramics</button>
           <button type='button' style={{ backgroundColor: 'grey', color: 'white' }} className='btn btn-secondary' onClick={() => startDrawing('StoneTool')}>Lithic</button>
         </div>
       </div>
