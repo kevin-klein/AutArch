@@ -7,3 +7,4 @@
 # Rails.application.config.assets.paths << Emoji.images_path
 
 Rails.application.config.assets.paths << Rails.root.join("app/assets/builds")
+Rails.application.config.assets.paths << Rails.root.join("app/assets/stylesheets")
