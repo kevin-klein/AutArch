@@ -86,6 +86,8 @@ class Figure < ApplicationRecord
 
   has_many :related_ceramics, through: :similarities_as_first, source: :second_ceramic
 
+  has_many :pattern_parts, dependent: :destroy
+
   has_and_belongs_to_many :tags
 
   before_save do

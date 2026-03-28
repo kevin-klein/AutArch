@@ -720,6 +720,45 @@ ALTER SEQUENCE public.pages_id_seq OWNED BY public.pages.id;
 
 
 --
+-- Name: pattern_parts; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.pattern_parts (
+    id bigint NOT NULL,
+    figure_id bigint NOT NULL,
+    x1 integer NOT NULL,
+    y1 integer NOT NULL,
+    x2 integer NOT NULL,
+    y2 integer NOT NULL,
+    description text,
+    confidence double precision DEFAULT 1.0,
+    feature_type integer DEFAULT 0,
+    features jsonb DEFAULT '{}'::jsonb,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: pattern_parts_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.pattern_parts_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: pattern_parts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.pattern_parts_id_seq OWNED BY public.pattern_parts.id;
+
+
+--
 -- Name: periods; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1305,6 +1344,13 @@ ALTER TABLE ONLY public.pages ALTER COLUMN id SET DEFAULT nextval('public.pages_
 
 
 --
+-- Name: pattern_parts id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.pattern_parts ALTER COLUMN id SET DEFAULT nextval('public.pattern_parts_id_seq'::regclass);
+
+
+--
 -- Name: periods id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -1553,6 +1599,14 @@ ALTER TABLE ONLY public.page_texts
 
 ALTER TABLE ONLY public.pages
     ADD CONSTRAINT pages_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: pattern_parts pattern_parts_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.pattern_parts
+    ADD CONSTRAINT pattern_parts_pkey PRIMARY KEY (id);
 
 
 --
@@ -1857,6 +1911,20 @@ CREATE INDEX index_pages_on_publication_id ON public.pages USING btree (publicat
 
 
 --
+-- Name: index_pattern_parts_on_figure_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_pattern_parts_on_figure_id ON public.pattern_parts USING btree (figure_id);
+
+
+--
+-- Name: index_pattern_parts_on_x1_and_y1_and_x2_and_y2; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_pattern_parts_on_x1_and_y1_and_x2_and_y2 ON public.pattern_parts USING btree (x1, y1, x2, y2);
+
+
+--
 -- Name: index_publication_teams_on_publication_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -1945,6 +2013,14 @@ CREATE INDEX index_user_teams_on_team_id ON public.user_teams USING btree (team_
 --
 
 CREATE INDEX index_user_teams_on_user_id ON public.user_teams USING btree (user_id);
+
+
+--
+-- Name: pattern_parts fk_rails_0f2abc2884; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.pattern_parts
+    ADD CONSTRAINT fk_rails_0f2abc2884 FOREIGN KEY (figure_id) REFERENCES public.figures(id);
 
 
 --
@@ -2106,6 +2182,7 @@ ALTER TABLE ONLY public.text_items
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260328120000'),
 ('20260327093411'),
 ('20260325102857'),
 ('20260225094639'),

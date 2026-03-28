@@ -28,6 +28,10 @@ Rails.application.routes.draw do # rubocop:disable Metrics/BlockLength
       post :update_contour
       post :new_box
     end
+
+    member do
+      get :pattern_matches
+    end
   end
 
   resources :teams do
@@ -131,7 +135,8 @@ Rails.application.routes.draw do # rubocop:disable Metrics/BlockLength
       get :radar
       get :analyze
       get :summary
-      get :create_bovw_data
+      post :create_bovw_data
+      get :bovw_setting
       get :similarities
     end
     # get :delete, on: :member

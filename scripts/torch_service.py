@@ -17,6 +17,7 @@ from transformers import AutoModelForObjectDetection, AutoImageProcessor
 import json
 from train_arrow_angle_network import model as arrow_model
 from train_object_detection import get_model
+import pickle
 
 def show_mask(mask, ax, random_color=False, borders = True):
     if random_color:
@@ -63,24 +64,14 @@ def show_masks(image, masks, scores, point_coords=None, box_coords=None, input_l
 labels = torch.load('models/faster_rcnn_v2.model')
 labels = {v: k for k, v in labels.items()}
 
-if torch.cuda.is_available():
-    device = torch.device('cuda')
-else:
-    device = torch.device('cpu')
+# if torch.cuda.is_available():
+#     device = torch.device('cuda')
+# else:
+#     device = torch.device('cpu')
+device = torch.device('cpu')
 
 sam_checkpoint = "models/mobile_sam.pt"
 model_type = 'vit_t'
-
-# Load BOVW vocabulary if available
-BOVW_VOCABULARY_PATH = "models/bovw_vocabulary.pkl"
-bovw_vocabulary = None
-try:
-    if os.path.exists(BOVW_VOCABULARY_PATH):
-        with open(BOVW_VOCABULARY_PATH, 'rb') as f:
-            bovw_vocabulary = pickle.load(f)
-        print(f"Loaded BOVW vocabulary from {BOVW_VOCABULARY_PATH}")
-except Exception as e:
-    print(f"Failed to load BOVW vocabulary: {e}")
 
 sam = sam_model_registry[model_type](checkpoint=sam_checkpoint)
 sam.to(device=device)
@@ -145,62 +136,103 @@ predictor = SamPredictor(sam)
 
 def extract_local_features(image_array, feature_type='sift'):
     """
-    Extract local features from an image.
+    Extract local features from an image with quality filtering.
     Supports SIFT and ORB features.
     """
     if feature_type == 'sift':
-        # Initialize SIFT detector
-        sift = cv2.SIFT_create()
+        # Initialize SIFT detector with better parameters
+        sift = cv2.SIFT_create(
+            nfeatures=0,  # No limit
+            nOctaveLayers=3,
+            contrastThreshold=0.02,  # Lower = more features
+            edgeThreshold=10,
+            sigma=1.6
+        )
         keypoints, descriptors = sift.detectAndCompute(image_array, None)
 
-        if descriptors is not None:
-            return descriptors
-        else:
-            return None
+        if descriptors is not None and len(keypoints) > 0:
+            # Filter low-quality descriptors based on response
+            responses = np.array([kp.response for kp in keypoints])
+            threshold = np.percentile(responses, 25)  # Keep top 75%
+            quality_mask = responses > threshold
+            if np.any(quality_mask):
+                descriptors = descriptors[quality_mask]
+            return descriptors, keypoints
+        return None, None
     elif feature_type == 'orb':
         # Initialize ORB detector
-        orb = cv2.ORB_create(nfeatures=1000)
+        orb = cv2.ORB_create(nfeatures=1000, scoreType=cv2.ORB_FAST_SCORE)
         keypoints, descriptors = orb.detectAndCompute(image_array, None)
 
-        if descriptors is not None:
-            return descriptors
-        else:
-            return None
+        if descriptors is not None and len(keypoints) > 0:
+            return descriptors, keypoints
+        return None, None
     else:
         raise ValueError(f"Unknown feature type: {feature_type}")
 
 def train_visual_vocabulary(image_paths, n_clusters=32, feature_type='sift'):
     """
-    Train a Bag of Visual Words vocabulary using K-Means clustering.
+    Train a Bag of Visual Words vocabulary optimized for small datasets of circular objects.
+    Focuses on surface decoration patterns rather than spatial position.
     """
     print("Extracting features for vocabulary training...")
+    n_images = len(image_paths)
+
+    # For small datasets, use fewer clusters to avoid overfitting
+    # Rule of thumb: at least 2-3 images per cluster
+    max_clusters = max(16, min(n_clusters, n_images * 3))
+    if max_clusters != n_clusters:
+        print(f"Adjusted clusters from {n_clusters} to {max_clusters} for small dataset")
 
     # Extract features from all images
     all_features = []
+    feature_counts = []
+
     for img_path in image_paths:
         img = cv2.imread(img_path)
         if img is None:
+            print(f"Warning: Could not read {img_path}")
             continue
 
-        # Convert to grayscale
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        # Convert to LAB color space - better for texture/color analysis
+        lab = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
 
-        # Extract features
-        descriptors = extract_local_features(gray, feature_type)
+        # Use L channel (lightness) for texture detection
+        l_channel = lab[:,:,0]
 
-        if descriptors is not None:
-            all_features.append(descriptors)
+        # Apply CLAHE for better contrast in surface decorations
+        clahe = cv2.createCLAHE(clipLimit=3.0, tileGridSize=(8,8))
+        enhanced = clahe.apply(l_channel)
 
-    # Concatenate all features
+        # Extract features with quality filtering
+        descriptors, keypoints = extract_local_features(enhanced, feature_type)
+
+        if descriptors is not None and len(descriptors) > 0:
+            # For small datasets, keep more features per image
+            if len(descriptors) >= 5:
+                all_features.append(descriptors)
+                feature_counts.append(len(descriptors))
+
+    # Check if we have enough features
     if len(all_features) == 0:
         raise ValueError("No features extracted from images")
 
+    # Concatenate all features
     all_features = np.vstack(all_features)
+    print(f"Total features extracted: {all_features.shape[0]}")
+    print(f"Average features per image: {np.mean(feature_counts):.1f}")
 
-    print(f"Training K-Means with {n_clusters} clusters on {all_features.shape[0]} features...")
+    # For small datasets, avoid PCA which can lose information
+    # Use standard K-Means with more iterations for stability
+    n_init = max(20, min(100, n_images * 10))
 
-    # Train K-Means
-    kmeans = MiniBatchKMeans(n_clusters=n_clusters, random_state=42, n_init=10)
+    print(f"Training K-Means with {max_clusters} clusters on {all_features.shape[0]} features...")
+    kmeans = MiniBatchKMeans(
+        n_clusters=max_clusters,
+        random_state=42,
+        n_init=n_init,
+        batch_size=min(32, all_features.shape[0])
+    )
     kmeans.fit(all_features)
 
     print(f"Visual vocabulary trained! Vocabulary shape: {kmeans.cluster_centers_.shape}")
@@ -209,36 +241,45 @@ def train_visual_vocabulary(image_paths, n_clusters=32, feature_type='sift'):
 
 def compute_bovw_features(image_array, vocabulary, feature_type='sift'):
     """
-    Compute Bag of Visual Words features for an image.
+    Compute Bag of Visual Words features for an image with TF-IDF weighting.
+    Optimized for small datasets of surface decorations.
     """
     # Extract local features
-    descriptors = extract_local_features(image_array, feature_type)
+    descriptors, keypoints = extract_local_features(image_array, feature_type)
 
-    if descriptors is None:
+    if descriptors is None or len(descriptors) == 0:
         # Return zero vector if no features found
-        return np.zeros(vocabulary.n_clusters)
+        return np.zeros(vocabulary.n_clusters), None
 
     # Assign each feature to the nearest visual word
     distances = vocabulary.transform(descriptors)
-    labels = distances.argmax(axis=1)
+    word_labels = distances.argmax(axis=1)
 
     # Create histogram of visual word occurrences
-    hist, _ = np.histogram(labels, bins=vocabulary.n_clusters, range=(0, vocabulary.n_clusters))
+    hist, _ = np.histogram(word_labels, bins=vocabulary.n_clusters, range=(0, vocabulary.n_clusters))
 
-    # L2 normalize the histogram
-    norm = np.linalg.norm(hist)
+    # TF-IDF weighting optimized for small datasets
+    # Use smoother IDF to avoid extreme weights with few documents
+    # Formula: log((N + 1) / (df + 1)) + 1 where N = total images, df = document frequency
+    idf = np.log((vocabulary.n_clusters + 1) / (hist + 1)) + 1
+
+    # Apply TF-IDF weighting
+    tfidf_hist = hist * idf
+
+    # L2 normalize the weighted histogram
+    norm = np.linalg.norm(tfidf_hist)
     if norm > 0:
-        hist = hist / norm
+        tfidf_hist = tfidf_hist / norm
 
-    return hist.tolist()
+    return tfidf_hist.tolist(), word_labels
 
 def object_features(file, vocabulary=None):
     """
     Extract BOVW features from an image.
-    If vocabulary is provided, uses BOVW. Otherwise uses backbone features as fallback.
+    If vocabulary is provided, uses BOVW with TF-IDF. Otherwise uses backbone features as fallback.
     """
     request_object_content = file.read()
-    img = Image.open(io.BytesIO(request_object_content)).resize((200, 200), Image.Resampling.BILINEAR)
+    img = Image.open(io.BytesIO(request_object_content))
 
     # Convert PIL image to numpy array
     img_array = np.array(img)
@@ -246,14 +287,23 @@ def object_features(file, vocabulary=None):
     # Try BOVW if vocabulary is provided
     if vocabulary is not None:
         try:
-            bovw_features = compute_bovw_features(img_array, vocabulary, feature_type='sift')
+            # Use same preprocessing as training
+            if len(img_array.shape) == 3:
+                lab = cv2.cvtColor(img_array, cv2.COLOR_BGR2LAB)
+                l_channel = lab[:,:,0]
+                clahe = cv2.createCLAHE(clipLimit=3.0, tileGridSize=(8,8))
+                enhanced = clahe.apply(l_channel)
+            else:
+                enhanced = img_array
+
+            bovw_features, _ = compute_bovw_features(enhanced, vocabulary, feature_type='sift')
             return bovw_features
         except Exception as e:
             print(f"BOVW extraction failed: {e}, falling back to backbone features")
 
     # Fallback to backbone features
-    img_pil = Image.open(io.BytesIO(request_object_content)).resize((200, 200), Image.Resampling.BILINEAR)
-    img_tensor, _ = PILToTensor()(img_pil)
+    pil_image = Image.open(io.BytesIO(request_object_content))
+    img_tensor, _ = PILToTensor()(pil_image)
     img_tensor = torch.stack([img_tensor]).to(device)
 
     with torch.no_grad():
@@ -443,64 +493,309 @@ def efd():
         'efds': coeffs.tolist()
     }
 
+@app.post('/color_bovw')
+def color_bovw():
+    """
+    Compute BOVW using color histograms instead of SIFT.
+    Better for small datasets where color patterns are important.
+    """
+    images = request.json['images']
+    n_bins = request.json.get('n_bins', 64)
+
+    try:
+        all_features = []
+        valid_images = []
+
+        for img_path in images:
+            img = cv2.imread(img_path)
+            if img is None:
+                continue
+
+            # Compute color histogram in LAB color space
+            lab = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
+
+            # Histogram for each channel
+            hist_l = cv2.calcHist([lab], [0], None, [n_bins], [0, 256])
+            hist_a = cv2.calcHist([lab], [1], None, [n_bins], [-128, 128])
+            hist_b = cv2.calcHist([lab], [2], None, [n_bins], [-128, 128])
+
+            # Concatenate channels
+            color_hist = np.concatenate([hist_l, hist_a, hist_b])
+
+            # L2 normalize
+            norm = np.linalg.norm(color_hist)
+            if norm > 0:
+                color_hist = color_hist / norm
+
+            all_features.append(color_hist)
+            valid_images.append(img_path)
+
+        if len(all_features) == 0:
+            raise ValueError("No valid images")
+
+        all_features = np.array(all_features)
+
+        # Compute similarity
+        similarity_matrix = cosine_similarity(all_features)
+
+        return {
+            'success': True,
+            'n_bins': n_bins,
+            'n_images': len(all_features),
+            'similarity_matrix': similarity_matrix.tolist(),
+            'valid_images': valid_images
+        }
+
+    except Exception as e:
+        import traceback
+        return {
+            'success': False,
+            'error': str(e),
+            'traceback': traceback.format_exc()
+        }
+
+@app.post('/pattern_match')
+def pattern_match():
+    """
+    Match pattern parts from a query image against a database of pattern parts.
+    Expects:
+    - query_image: image path or base64
+    - pattern_boxes: list of [x1, y1, x2, y2] rectangles
+    - target_images: list of image paths to search in
+    - feature_type: 'texture', 'color', or 'edge'
+
+    Returns matches with similarity scores.
+    """
+    query_image_path = request.json.get('query_image')
+    pattern_boxes = request.json.get('pattern_boxes', [])
+    target_images = request.json.get('target_images', [])
+    feature_type = request.json.get('feature_type', 'texture')
+
+    try:
+        if not pattern_boxes:
+            raise ValueError("No pattern boxes provided")
+
+        # Load query image
+        query_img = cv2.imread(query_image_path)
+        if query_img is None:
+            raise ValueError(f"Could not load query image: {query_image_path}")
+
+        # Extract features from query pattern boxes
+        query_features = []
+        for i, box in enumerate(pattern_boxes):
+            x1, y1, x2, y2 = box
+            # Extract ROI
+            roi = query_img[y1:y2, x1:x2]
+            if roi.size == 0:
+                continue
+
+            feature = extract_pattern_feature(roi, feature_type)
+            if feature is not None:
+                query_features.append({
+                    'box': box,
+                    'feature': feature,
+                    'index': i
+                })
+
+        if not query_features:
+            raise ValueError("Could not extract features from pattern boxes")
+
+        # Match against target images
+        matches = []
+        for target_path in target_images:
+            target_img = cv2.imread(target_path)
+            if target_img is None:
+                continue
+
+            # Extract features from all possible regions in target
+            target_matches = []
+            for qf in query_features:
+                # Slide window approach or direct comparison
+                # For small patterns, use template matching
+                query_roi = query_img[qf['box'][1]:qf['box'][3], qf['box'][0]:qf['box'][2]]
+
+                # Use template matching for texture/edge features
+                if feature_type in ['texture', 'edge']:
+                    matches_loc = cv2.matchTemplate(target_img, query_roi, cv2.TM_CCOEFF_NORMED)
+                    min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(matches_loc)
+
+                    if max_val > 0.6:  # Threshold for match
+                        h, w = query_roi.shape[:2]
+                        target_matches.append({
+                            'query_box': qf['box'],
+                            'target_box': [max_loc[0], max_loc[1], max_loc[0] + w, max_loc[1] + h],
+                            'similarity': max_val,
+                            'target_image': target_path
+                        })
+
+                # For color features, compare histograms
+                elif feature_type == 'color':
+                    target_hist = extract_pattern_feature(target_img, 'color')
+                    if target_hist is not None:
+                        # Compare histograms
+                        similarity = cv2.compareHist(qf['feature'], target_hist, cv2.HISTCMP_CORREL)
+                        if similarity > 0.7:
+                            # Find approximate location (center of image for now)
+                            h, w = target_img.shape[:2]
+                            target_matches.append({
+                                'query_box': qf['box'],
+                                'target_box': [w//4, h//4, 3*w//4, 3*h//4],
+                                'similarity': similarity,
+                                'target_image': target_path
+                            })
+
+            matches.extend(target_matches)
+
+        # Sort by similarity
+        matches.sort(key=lambda x: x['similarity'], reverse=True)
+
+        return {
+            'success': True,
+            'n_query_patterns': len(query_features),
+            'n_matches': len(matches),
+            'matches': matches
+        }
+
+    except Exception as e:
+        import traceback
+        return {
+            'success': False,
+            'error': str(e),
+            'traceback': traceback.format_exc()
+        }
+
+def extract_pattern_feature(image_array, feature_type='texture'):
+    """
+    Extract features from a pattern region.
+    """
+    if feature_type == 'texture':
+        # Use SIFT descriptors
+        sift = cv2.SIFT_create()
+        keypoints, descriptors = sift.detectAndCompute(image_array, None)
+
+        if descriptors is not None and len(descriptors) > 0:
+            # Create histogram of SIFT descriptors
+            # For simplicity, use mean descriptor
+            return descriptors.mean(axis=0).tolist()
+        return None
+
+    elif feature_type == 'color':
+        # Compute LAB color histogram
+        lab = cv2.cvtColor(image_array, cv2.COLOR_BGR2LAB)
+        hist_l = cv2.calcHist([lab], [0], None, [32], [0, 256])
+        hist_a = cv2.calcHist([lab], [1], None, [32], [-128, 128])
+        hist_b = cv2.calcHist([lab], [2], None, [32], [-128, 128])
+        hist = np.concatenate([hist_l, hist_a, hist_b])
+        return hist.flatten()
+
+    elif feature_type == 'edge':
+        # Use Canny edge detection + histogram of gradients
+        gray = cv2.cvtColor(image_array, cv2.COLOR_BGR2GRAY)
+        edges = cv2.Canny(gray, 50, 150)
+
+        # Compute HOG-like feature
+        # Simplified: count edge pixels and orientations
+        orientations = np.arctan2(*np.gradient(edges)[::-1])
+        hist, _ = np.histogram(orientations, bins=18, range=(-np.pi, np.pi))
+        return hist.tolist()
+
+    return None
+
 @app.post('/train_bovw')
 def train_bovw():
     """
-    Train a new Bag of Visual Words vocabulary and create a similarity matrix of all images.
-    Expects a list of image paths in the request body.
+    Train a new Bag of Visual Words vocabulary and create a similarity matrix.
+    Optimized for small datasets of circular objects with surface decorations.
     """
     images = request.json['images']
-    n_clusters = request.json.get('n_clusters', 128)
+    n_clusters = request.json.get('n_clusters', 32)
     feature_type = request.json.get('feature_type', 'sift')
 
     try:
         # Train vocabulary
         vocabulary = train_visual_vocabulary(images, n_clusters, feature_type)
 
-        # Extract BOVW features for all images
+        # Extract BOVW features for all images with TF-IDF
         print("Extracting BOVW features for all images...")
         all_features = []
+        valid_images = []
+
         for img_path in images:
             img = cv2.imread(img_path)
             if img is None:
+                print(f"Warning: Could not read {img_path}")
                 continue
 
-            gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-            descriptors = extract_local_features(gray, feature_type)
+            # Use same preprocessing as training
+            lab = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
+            l_channel = lab[:,:,0]
+            clahe = cv2.createCLAHE(clipLimit=3.0, tileGridSize=(8,8))
+            enhanced = clahe.apply(l_channel)
 
-            if descriptors is not None:
-                # Assign each feature to nearest visual word
+            descriptors, _ = extract_local_features(enhanced, feature_type)
+
+            if descriptors is not None and len(descriptors) > 0:
+                # Compute BOVW histogram
                 distances = vocabulary.transform(descriptors)
-                labels = distances.argmax(axis=1)
+                word_labels = distances.argmax(axis=1)
 
                 # Create histogram
-                hist, _ = np.histogram(labels, bins=vocabulary.n_clusters, range=(0, vocabulary.n_clusters))
+                hist, _ = np.histogram(word_labels, bins=vocabulary.n_clusters, range=(0, vocabulary.n_clusters))
+
+                # TF-IDF weighting (same as training)
+                idf = np.log((vocabulary.n_clusters + 1) / (hist + 1)) + 1
+                tfidf_hist = hist * idf
 
                 # L2 normalize
-                norm = np.linalg.norm(hist)
+                norm = np.linalg.norm(tfidf_hist)
                 if norm > 0:
-                    hist = hist / norm
+                    tfidf_hist = tfidf_hist / norm
 
-                all_features.append(hist)
+                all_features.append(tfidf_hist)
+                valid_images.append(img_path)
+
+        if len(all_features) == 0:
+            raise ValueError("No valid features extracted from images")
 
         all_features = np.array(all_features)
+        print(f"Extracted features from {len(valid_images)} images")
 
-        # Compute similarity matrix (cosine similarity)
+        # Compute similarity matrix using cosine similarity
+        # For small datasets, also compute correlation-based similarity
         print("Computing similarity matrix...")
-        similarity_matrix = cosine_similarity(all_features)
+        cosine_sim = cosine_similarity(all_features)
+
+        # Alternative: Pearson correlation (better for small datasets)
+        # This measures pattern similarity rather than magnitude
+        correlation_sim = np.corrcoef(all_features)
+        # Handle NaN values from constant vectors
+        correlation_sim = np.nan_to_num(correlation_sim, nan=0.0)
+
+        correlation_sim = (-correlation_sim - (-1)) / 2
+        cosine_sim = (-cosine_sim - (-1)) / 2
+
+        # Blend both similarities (cosine focuses on direction, correlation on pattern)
+        blended_sim = 0.8 * cosine_sim + 0.2 * correlation_sim
 
         return {
             'success': True,
-            'n_clusters': n_clusters,
+            'n_clusters': vocabulary.n_clusters,
             'feature_type': feature_type,
             'n_images': len(all_features),
-            'similarity_matrix': similarity_matrix.tolist()
+            'similarity_matrix': blended_sim.tolist(),
+            'valid_images': valid_images,
+            'metrics': {
+                'cosine_only': cosine_sim.tolist(),
+                'correlation_only': correlation_sim.tolist()
+            }
         }
 
     except Exception as e:
+        import traceback
         return {
             'success': False,
-            'error': str(e)
+            'error': str(e),
+            'traceback': traceback.format_exc()
         }
 
 if __name__ == '__main__':
