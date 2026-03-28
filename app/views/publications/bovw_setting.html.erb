@@ -1,0 +1,641 @@
+<div class="bovw-dashboard">
+  <style>
+    .bovw-dashboard {
+      padding: 24px;
+      max-width: 1200px;
+      margin: 0 auto;
+      background: #f1f5f9;
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    }
+
+    /* Dashboard Header */
+    .dashboard-header {
+      background: white;
+      border-radius: 12px;
+      padding: 24px 32px;
+      margin-bottom: 24px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .dashboard-title {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .dashboard-icon {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
+
+    .dashboard-title h1 {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 700;
+      color: #1e293b;
+    }
+
+    .dashboard-title p {
+      margin: 4px 0 0 0;
+      font-size: 14px;
+      color: #64748b;
+    }
+
+    .publication-badge {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    /* Dashboard Grid */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    /* Cards */
+    .dashboard-card {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 2px solid #f1f5f9;
+    }
+
+    .card-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+
+    .card-icon.blue { background: #dbeafe; }
+    .card-icon.green { background: #d1fae5; }
+    .card-icon.purple { background: #ede9fe; }
+    .card-icon.orange { background: #fed7aa; }
+
+    .card-title {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 700;
+      color: #1e293b;
+    }
+
+    /* Metric Cards */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .metric-card {
+      background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .metric-value {
+      font-size: 32px;
+      font-weight: 800;
+      color: #1e293b;
+      margin-bottom: 4px;
+    }
+
+    .metric-value.highlight {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .metric-label {
+      font-size: 13px;
+      color: #64748b;
+      font-weight: 500;
+    }
+
+    /* Form Section */
+    .form-section {
+      margin-bottom: 24px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 8px;
+    }
+
+    .form-hint {
+      font-size: 13px;
+      color: #6b7280;
+      margin-bottom: 12px;
+    }
+
+    .range-slider {
+      width: 100%;
+      margin-bottom: 12px;
+    }
+
+    .range-slider input[type="range"] {
+      width: 100%;
+      height: 6px;
+      border-radius: 3px;
+      background: #e2e8f0;
+      outline: none;
+      -webkit-appearance: none;
+    }
+
+    .range-slider input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(102, 126, 234, 0.4);
+      transition: transform 0.2s;
+    }
+
+    .range-slider input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.1);
+    }
+
+    .input-group {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .input-wrapper {
+      flex: 1;
+      position: relative;
+    }
+
+    .tech-input {
+      width: 100%;
+      padding: 14px 16px;
+      font-size: 16px;
+      font-weight: 600;
+      color: #1e293b;
+      background: white;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      transition: all 0.2s;
+      text-align: center;
+    }
+
+    .tech-input:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    }
+
+    .input-unit {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #94a3b8;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .range-values {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: #64748b;
+      margin-top: 8px;
+    }
+
+    /* Action Button */
+    .action-section {
+      text-align: center;
+      padding-top: 24px;
+      border-top: 2px solid #f1f5f9;
+    }
+
+    .primary-btn {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 16px 48px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .primary-btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .primary-btn:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    .primary-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .spinner {
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Info Panel */
+    .info-panel {
+      background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+      border-left: 4px solid #3b82f6;
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin-bottom: 24px;
+    }
+
+    .info-panel h3 {
+      font-size: 14px;
+      font-weight: 700;
+      color: #1e40af;
+      margin: 0 0 8px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .info-panel ul {
+      margin: 0;
+      padding-left: 20px;
+      color: #475569;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .info-panel li {
+      margin-bottom: 4px;
+    }
+
+    /* Sidebar Stats */
+    .sidebar-stats {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .stat-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+    }
+
+    .stat-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+
+    .stat-icon.purple { background: #ede9fe; }
+    .stat-icon.green { background: #d1fae5; }
+    .stat-icon.orange { background: #fed7aa; }
+
+    .stat-content {
+      flex: 1;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: #64748b;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .stat-value {
+      font-size: 20px;
+      font-weight: 700;
+      color: #1e293b;
+    }
+
+    /* Back Link */
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: #64748b;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 10px 16px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      transition: all 0.2s;
+      margin-top: 16px;
+    }
+
+    .back-link:hover {
+      border-color: #667eea;
+      color: #667eea;
+      background: #f8fafc;
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .metrics-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 640px) {
+      .dashboard-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+      }
+
+      .metrics-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .input-group {
+        flex-direction: column;
+        align-items: stretch;
+      }
+    }
+  </style>
+
+  <!-- Dashboard Header -->
+  <div class="dashboard-header">
+    <div class="dashboard-title">
+      <div class="dashboard-icon">🎨</div>
+      <div>
+        <h1>BOVW Training Dashboard</h1>
+        <p>Bag of Visual Words - Ceramic Similarity Analysis</p>
+      </div>
+    </div>
+    <div class="publication-badge">
+      Pub #<%= @publication.id %>
+    </div>
+  </div>
+
+  <!-- Dashboard Grid -->
+  <div class="dashboard-grid">
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Info Panel -->
+      <div class="info-panel">
+        <h3>
+          <span>ℹ️</span>
+          What is BOVW Training?
+        </h3>
+        <ul>
+          <li>BOVW (Bag of Visual Words) creates a visual vocabulary from ceramic images</li>
+          <li>Computes similarity matrix between vessels using SIFT features + K-Means clustering</li>
+          <li>Output: Similarity scores stored in ObjectSimilarity table for ceramic comparison</li>
+        </ul>
+      </div>
+
+      <!-- Metrics -->
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <div class="metric-value highlight"><%= @publication.figures.where(type: "Ceramic").where("figures.probability > 0.6").count %></div>
+          <div class="metric-label">Ceramic Figures</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value">32</div>
+          <div class="metric-label">Default Clusters</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value">SIFT</div>
+          <div class="metric-label">Feature Type</div>
+        </div>
+      </div>
+
+      <!-- Configuration Form -->
+      <div class="dashboard-card">
+        <div class="card-header">
+          <div class="card-icon blue">⚙️</div>
+          <h2 class="card-title">Training Configuration</h2>
+        </div>
+
+        <div class="form-section">
+          <label class="form-label">Number of Clusters (Visual Words)</label>
+          <div class="form-hint">
+            Determines vocabulary size. More clusters = more detailed analysis but slower processing.
+          </div>
+
+          <div class="range-slider">
+            <input
+              type="range"
+              id="clusters-slider"
+              name="clusters"
+              value="32"
+              min="16"
+              max="256"
+              step="1"
+              class="form-control"
+            />
+          </div>
+
+          <div class="input-group">
+            <div class="input-wrapper">
+              <input
+                type="number"
+                id="clusters"
+                name="clusters"
+                value="32"
+                min="16"
+                max="256"
+                step="1"
+                class="tech-input"
+              />
+              <span class="input-unit">clusters</span>
+            </div>
+          </div>
+
+          <div class="range-values">
+            <span>16 (Fast)</span>
+            <span>32 (Recommended)</span>
+            <span>256 (Detailed)</span>
+          </div>
+        </div>
+
+        <!-- Action Section -->
+        <div class="action-section">
+          <button type="button" id="bovw-submit" class="primary-btn">
+            <span id="button-text">🚀 Start BOVW Training</span>
+            <span id="loading-spinner" class="spinner" style="display: none;"></span>
+          </button>
+
+          <%= link_to publications_path do %>
+            <span class="back-link">
+              <span>←</span>
+              <span>Cancel</span>
+            </span>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="dashboard-card">
+        <div class="card-header">
+          <div class="card-icon purple">📊</div>
+          <h2 class="card-title">Processing Info</h2>
+        </div>
+
+        <div class="sidebar-stats">
+          <div class="stat-item">
+            <div class="stat-icon purple">🏺</div>
+            <div class="stat-content">
+              <div class="stat-label">Figure Type</div>
+              <div class="stat-value">Ceramic</div>
+            </div>
+          </div>
+
+          <div class="stat-item">
+            <div class="stat-icon green">✓</div>
+            <div class="stat-content">
+              <div class="stat-label">Probability Threshold</div>
+              <div class="stat-value">> 0.6</div>
+            </div>
+          </div>
+
+          <div class="stat-item">
+            <div class="stat-icon orange">🔍</div>
+            <div class="stat-content">
+              <div class="stat-label">Algorithm</div>
+              <div class="stat-value">K-Means</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const submitButton = document.getElementById('bovw-submit');
+    const buttonText = document.getElementById('button-text');
+    const loadingSpinner = document.getElementById('loading-spinner');
+    const clustersInput = document.getElementById('clusters');
+    const clustersSlider = document.getElementById('clusters-slider');
+
+    // Sync slider and input
+    function syncValues() {
+      const value = parseInt(clustersInput.value);
+      clustersSlider.value = value;
+    }
+
+    clustersInput.addEventListener('input', syncValues);
+    clustersSlider.addEventListener('input', function() {
+      clustersInput.value = this.value;
+    });
+
+    // Submit handler
+    submitButton.addEventListener('click', function() {
+      const clusters = parseInt(clustersInput.value);
+
+      // Validate input FIRST
+      if (isNaN(clusters) || clusters < 16) {
+        alert('Number of clusters must be at least 16');
+        return;
+      }
+
+      if (clusters > 256) {
+        alert('Number of clusters should not exceed 256');
+        return;
+      }
+
+      // Show loading state
+      submitButton.disabled = true;
+      buttonText.style.display = 'none';
+      loadingSpinner.style.display = 'block';
+
+      // Create and submit form
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = '/publications/<%= @publication.id %>/create_bovw_data';
+
+      // Add CSRF token
+      const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+      if (csrfMeta) {
+        const csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = 'authenticity_token';
+        csrfInput.value = csrfMeta.content;
+        form.appendChild(csrfInput);
+      }
+
+      // Add clusters parameter
+      const clustersHidden = document.createElement('input');
+      clustersHidden.type = 'hidden';
+      clustersHidden.name = 'clusters';
+      clustersHidden.value = clusters;
+      form.appendChild(clustersHidden);
+
+      clustersInput.disabled = true;
+      clustersSlider.disabled = true;
+
+      document.body.appendChild(form);
+      form.submit();
+    });
+  });
+</script>

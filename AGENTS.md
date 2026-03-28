@@ -820,3 +820,115 @@ The Ceramic Analysis Wizard is a multi-step React-based workflow for analyzing c
 7. **Export**:
    - Lithics export via `/publications/:id/export_lithics`
    - Full publication export via `/publications/:id/export`
+
+---
+
+## Pattern Matching
+
+Pattern matching allows users to identify and match unique small pattern parts across vessel figures.
+
+### Model: PatternPart
+
+**Schema:**
+```ruby
+create_table :pattern_parts do |t|
+  t.references :figure, null: false, foreign_key: true
+  t.integer :x1, null: false
+  t.integer :y1, null: false
+  t.integer :x2, null: false
+  t.integer :y2, null: false
+  t.text :description
+  t.float :confidence, default: 1.0
+  t.integer :feature_type, default: 0 # 0: texture, 1: color, 2: edge
+  t.jsonb :features, default: {}
+end
+```
+
+**Attributes:**
+- `figure_id`: Parent figure
+- `x1, y1, x2, y2`: Bounding box coordinates
+- `description`: Optional description (e.g., "Rim decoration")
+- `feature_type`: Texture, color, or edge matching
+
+### Workflow
+
+1. **Select Pattern Parts**:
+   - Navigate to wizard step: `/publications/:id/ceramics/:figure_id/update_size_figure/select_pattern_parts`
+   - Click and drag to draw pattern region boxes
+   - Add descriptions and select feature type
+   - Save and proceed
+
+2. **View Pattern Matches**:
+   - Navigate to: `/size_figures/:id/pattern_matches`
+   - Displays query figure with pattern parts
+   - Shows matched figures with similarity scores
+
+3. **Python Service**:
+   - Endpoint: `POST /pattern_match`
+   - Feature types: texture (SIFT), color (LAB histogram), edge (Canny + HOG)
+   - Returns matches with similarity scores
+
+### Components
+
+#### PatternPartSelector.js
+- React component for pattern part selection
+- Konva-based canvas for drawing pattern boxes
+- Interactive UI for managing pattern parts
+- Form submission with validation
+
+#### Pattern Matches View
+- `app/views/size_figures/pattern_matches.html.erb`
+- Displays query figure and pattern part details
+- Shows matched figures sorted by similarity
+
+### Python Service Endpoints
+
+#### POST `/pattern_match`
+**Purpose**: Match pattern parts from query image against target images
+**Request**:
+```json
+{
+  "query_image": "/path/to/query.jpg",
+  "pattern_boxes": [[x1, y1, x2, y2], ...],
+  "target_images": ["/path/to/target1.jpg", ...],
+  "feature_type": "texture"
+}
+```
+**Response**:
+```json
+{
+  "success": true,
+  "n_query_patterns": 3,
+  "n_matches": 12,
+  "matches": [
+    {
+      "query_box": [50, 30, 150, 130],
+      "target_box": [120, 45, 220, 145],
+      "similarity": 0.85,
+      "target_image": "/path/to/target1.jpg"
+    }
+  ]
+}
+```
+
+**Feature Types:**
+- **Texture**: SIFT descriptors + template matching (threshold: 0.6)
+- **Color**: LAB histogram correlation (threshold: 0.7)
+- **Edge**: Canny edge detection + HOG-like features (threshold: 0.6)
+
+### Configuration
+
+**Matching Thresholds** (in `torch_service.py`):
+```python
+# Template matching (texture/edge)
+if max_val > 0.6:  # Increase for stricter matching
+
+# Histogram correlation (color)
+if similarity > 0.7:  # Increase for stricter matching
+```
+
+**Best Practices:**
+- Pattern box size: < 200x200 pixels
+- Pattern parts per figure: 3-5 recommended
+- Use color feature type for faster matching
+- Select distinctive, unique patterns

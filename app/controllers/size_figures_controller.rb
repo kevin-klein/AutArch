@@ -1,6 +1,6 @@
 class SizeFiguresController < ApplicationController
   before_action :set_figure_class
-  before_action :set_figure, only: %i[destroy sam_contour]
+  before_action :set_figure, only: %i[destroy sam_contour pattern_matches]
   skip_forgery_protection only: [:boxes]
 
   def index
@@ -39,6 +39,81 @@ class SizeFiguresController < ApplicationController
     render json: {
       contour: @figure.contour
     }
+  end
+
+  def pattern_matches
+    # Get pattern parts from this figure
+    pattern_parts = @figure.pattern_parts.includes(:figure)
+    
+    if pattern_parts.empty?
+      render json: { matches: [], message: "No pattern parts defined for this figure" }
+      return
+    end
+
+    # Get all other figures of the same type in the same publication
+    other_figures = @figure.class
+      .joins(:page)
+      .where(pages: { publication_id: @figure.publication_id })
+      .where.not(id: @figure.id)
+      .where("probability > ?", 0.6)
+
+    # Prepare query for pattern matching service
+    query_image_path = Rails.root.join("public", @figure.page.image.data.path).to_s
+    target_image_paths = other_figures.map do |f|
+      Rails.root.join("public", f.page.image.data.path).to_s
+    end
+
+    pattern_boxes = pattern_parts.map do |pp|
+      [pp.x1, pp.y1, pp.x2, pp.y2]
+    end
+
+    # Call Python service
+    begin
+      require 'net/http'
+      require 'json'
+
+      uri = URI('http://localhost:9000/pattern_match')
+      response = Net::HTTP.post(
+        uri,
+        {
+          query_image: query_image_path,
+          pattern_boxes: pattern_boxes,
+          target_images: target_image_paths,
+          feature_type: pattern_parts.first.feature_type
+        }.to_json,
+        {
+          'Content-Type' => 'application/json'
+        }
+      )
+
+      result = JSON.parse(response.body)
+
+      if result['success']
+        matches = result['matches'].map do |match|
+          # Find which figure this target image belongs to
+          target_figure = other_figures.find do |f|
+            Rails.root.join("public", f.page.image.data.path).to_s == match['target_image']
+          end
+
+          {
+            figure_id: target_figure&.id,
+            figure_identifier: target_figure&.identifier,
+            similarity: match['similarity'],
+            query_box: match['query_box'],
+            target_box: match['target_box']
+          }
+        end.compact
+
+        render json: {
+          matches: matches.sort_by { |m| -m[:similarity] }.take(10),
+          n_matches: matches.length
+        }
+      else
+        render json: { matches: [], error: result['error'] }
+      end
+    rescue => e
+      render json: { matches: [], error: e.message }
+    end
   end
 
   def update_contour

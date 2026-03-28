@@ -1,5 +1,5 @@
 class PublicationsController < AuthorizedController
-  before_action :set_publication, only: %i[similarities create_bovw_data analysis export_lithics export_lithics_form export radar update_tags assign_tags update_site assign_site progress summary show edit update destroy stats]
+  before_action :set_publication, only: %i[similarities bovw_setting create_bovw_data analysis export_lithics export_lithics_form export radar update_tags assign_tags update_site assign_site progress summary show edit update destroy stats]
 
   # GET /publications or /publications.json
   def index
@@ -195,6 +195,10 @@ class PublicationsController < AuthorizedController
   def progress
   end
 
+  def bovw_setting
+
+  end
+
   def create_bovw_data
     ceramics = @publication.figures.includes(page: :image).where(type: "Ceramic").where("figures.probability > 0.6")
 
@@ -213,11 +217,12 @@ class PublicationsController < AuthorizedController
     response = HTTP.post("#{ENV["ML_SERVICE_URL"]}/train_bovw", json: {
       images: paths,
       publication_id: @publication.id,
-      n_clusters: 32
+      n_clusters: params[:clusters].to_i
     })
 
     response = JSON.parse(response.body.to_s)
     matrix = response["similarity_matrix"]
+
 
     Ceramic.transaction do
       ceramics.zip(matrix).each_with_index do |data, first_index|

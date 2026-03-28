@@ -1,0 +1,26 @@
+<%= render("stepper") %>
+
+<h2>Select Pattern Parts</h2>
+<p class='text-muted'>
+  Select regions with unique small patterns on this figure. These patterns will be used for matching with other vessels of the same type.
+</p>
+
+<div id='pattern-part-selector'
+     data-figure-id='<%= @figure.id %>'
+     data-figure-class='<%= @figure.class.name %>'
+     data-image-id='<%= @figure.page.image.id %>'
+     data-next-url='<%#= update_size_figure_path(@figure, step: :set_scale) %>'>
+</div>
+
+<%= react_component(
+  "PatternPartSelector",
+  image: @figure.page.image.as_json.merge(href: @figure.page.image.url),
+  nextUrl: wizard_path,
+  figure: @figure
+) %>
+
+<style>
+  .pattern-part-selector {
+    min-height: 500px;
+  }
+</style>
