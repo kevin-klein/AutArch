@@ -1,7 +1,7 @@
 class UpdateSizeFigureController < ApplicationController
   include Wicked::Wizard
 
-  steps :set_data, :set_site, :set_tags, :resize_boxes, :show_contours, :set_scale, :upload_3d_model, :view_3d_model
+  steps :set_data, :set_site, :set_tags, :resize_boxes, :show_contours, :select_pattern_parts, :set_scale, :upload_3d_model, :view_3d_model
 
   def show
     @figure = Figure.find(params[:size_figure_id])
@@ -53,6 +53,24 @@ class UpdateSizeFigureController < ApplicationController
       figures = Figure.where(id: params[:figures].keys)
       GraveSize.new.run(figures)
       AnalyzeScales.new.run(figures)
+    when :select_pattern_parts
+      # Handle pattern parts creation/update
+      if params[:pattern_parts].present?
+        # Destroy existing pattern parts for this figure
+        @figure.pattern_parts.destroy_all
+
+        # Create new pattern parts
+        params[:pattern_parts].each do |pp_params|
+          @figure.pattern_parts.create!(
+            x1: pp_params[:x1],
+            y1: pp_params[:y1],
+            x2: pp_params[:x2],
+            y2: pp_params[:y2],
+            description: pp_params[:description],
+            feature_type: pp_params[:feature_type] || 'texture'
+          )
+        end
+      end
     end
 
     render_wizard @figure

@@ -20,6 +20,8 @@ import SiteMap from './components/SiteMap'
 import KioskConfig from './components/KioskConfig'
 import SelectCeramic from './components/SelectCeramic'
 import LocationMap from './components/LocationMap'
+import PatternPartSelector from './components/PatternPartSelector'
+
 import Chart from 'react-apexcharts'
 
 import simpleheat from './components/simpleheat'
@@ -223,7 +225,8 @@ const COMPONENT_REGISTRY = {
   CeramicWizard,
   KioskConfig,
   SelectCeramic,
-  LocationMap
+  LocationMap,
+  PatternPartSelector
 }
 
 function mountReactComponents () {
