@@ -22,7 +22,7 @@ class PatternPart < ApplicationRecord
   validates :x1, :y1, :x2, :y2, presence: true
   validate :bounding_box_valid
 
-  enum feature_type: {
+  enum :feature_type, {
     texture: 0,
     color: 1,
     edge: 2
