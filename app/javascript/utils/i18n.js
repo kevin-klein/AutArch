@@ -112,7 +112,16 @@ const translations = {
     languageInstructions: 'Please choose your preferred language',
     english: 'English',
     german: 'Deutsch',
-    germanEnglish: 'German / English'
+    germanEnglish: 'German / English',
+
+    // PLY Viewer
+    threeDControls: '3D Controls',
+    resetView: 'Reset View',
+    pauseAutoRotate: 'Pause Auto-Rotate',
+    autoRotate: 'Auto-Rotate',
+    mouseRotate: 'Left-click: Rotate',
+    mousePan: 'Right-click: Pan',
+    mouseZoom: 'Scroll: Zoom'
   },
   de: {
     // Common
@@ -213,7 +222,16 @@ const translations = {
     languageInstructions: 'Bitte wählen Sie Ihre bevorzugte Sprache',
     english: 'English',
     german: 'Deutsch',
-    germanEnglish: 'Deutsch / Englisch'
+    germanEnglish: 'Deutsch / Englisch',
+
+    // PLY Viewer
+    threeDControls: '3D-Steuerung',
+    resetView: 'Ansicht zurücksetzen',
+    pauseAutoRotate: 'Auto-Rotation pausieren',
+    autoRotate: 'Auto-Rotation',
+    mouseRotate: 'Linksklick: Drehen',
+    mousePan: 'Rechtsklick: Verschieben',
+    mouseZoom: 'Scrollen: Zoom'
   }
 }
 
