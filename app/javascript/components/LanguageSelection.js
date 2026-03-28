@@ -1,5 +1,5 @@
 import React from 'react'
-import { setLanguage, getLanguage, getLanguages, t } from '../utils/i18n'
+import { setLanguage, getLanguages, t } from '../utils/i18n'
 
 export default function LanguageSelection ({ onLanguageSelect }) {
   const languages = getLanguages()
@@ -10,16 +10,18 @@ export default function LanguageSelection ({ onLanguageSelect }) {
   }
 
   return (
-    <div className='language-selection-screen' style={{
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
-      minHeight: '100vh',
-      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-      padding: '20px',
-      color: 'white'
-    }}>
+    <div
+      className='language-selection-screen' style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        padding: '20px',
+        color: 'white'
+      }}
+    >
       <style>{`
         .language-selection-screen {
           animation: fadeIn 0.5s ease;
@@ -85,7 +87,8 @@ export default function LanguageSelection ({ onLanguageSelect }) {
           font-weight: 700;
           color: #1f2937;
         }
-      `}</style>
+      `}
+      </style>
 
       <div className='language-title'>{t('selectLanguage')}</div>
       <div className='language-subtitle'>{t('languageInstructions')}</div>

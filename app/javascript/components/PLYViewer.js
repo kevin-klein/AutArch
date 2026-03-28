@@ -1,9 +1,10 @@
-import React, { useRef, useState, useMemo } from 'react'
-import { Canvas, useLoader, useThree } from '@react-three/fiber'
+import React, { useRef, useState, useMemo, useEffect } from 'react'
+import { Canvas, useLoader, useThree, useFrame } from '@react-three/fiber'
 import { PLYLoader } from 'three/addons/loaders/PLYLoader.js'
 import { STLLoader } from 'three/addons/loaders/STLLoader.js'
-import { OrbitControls, Bounds } from '@react-three/drei'
+import { OrbitControls, Bounds, Html } from '@react-three/drei'
 import * as THREE from 'three'
+import { t } from '../utils/i18n'
 
 function Model ({ url }) {
   const geometry = useLoader(
@@ -37,12 +38,33 @@ function Model ({ url }) {
   )
 }
 
+function AutoRotateControl ({ autoRotate }) {
+  const ref = useRef()
+  useFrame(() => {
+    if (autoRotate && ref.current) {
+      ref.current.rotation.y += 0.005
+    }
+  })
+  return <primitive ref={ref} object={new THREE.Object3D()} />
+}
+
 export default function PLYViewer ({ modelUrl, width = 400, height = 400, label }) {
+  const [autoRotate, setAutoRotate] = useState(false)
+  const cameraRef = useRef()
+
   const extensions = useMemo(() => ['.ply', '.stl'], [])
   const isSupportedFormat = useMemo(() => {
     if (!modelUrl) return false
     return extensions.some(ext => modelUrl.toLowerCase().endsWith(ext))
   }, [modelUrl, extensions])
+
+  const handleReset = () => {
+    console.log('Reset')
+    if (cameraRef.current) {
+      cameraRef.current.reset()
+    }
+    setAutoRotate(false)
+  }
 
   if (!modelUrl) {
     return (
@@ -99,44 +121,22 @@ export default function PLYViewer ({ modelUrl, width = 400, height = 400, label 
   }
 
   return (
-    <div
-      style={{
-        width: `${width}px`,
-        height: `${height}px`,
-        borderRadius: '12px',
-        overflow: 'hidden',
-        position: 'relative'
-      }}
-    >
-      {/* Label */}
-      {label && (
-        <div
-          style={{
-            position: 'absolute',
-            top: '10px',
-            left: '10px',
-            backgroundColor: 'rgba(0, 0, 0, 0.6)',
-            color: 'white',
-            padding: '8px 12px',
-            borderRadius: '6px',
-            fontSize: '14px',
-            fontWeight: 'bold',
-            zIndex: 10
-          }}
-        >
-          {label}
-        </div>
-      )}
-
+    <div style={{ width: `${width}px`, height: `${height}px` }}>
       {/* 3D Canvas */}
       <Canvas
+        style={{
+          width: `${width}px`,
+          height: `${height}px`,
+          borderRadius: '12px',
+          overflow: 'hidden'
+        }}
         onCreated={({ gl }) => {
           gl.setClearColor('#f5f5f5')
           gl.shadowMap.enabled = true
           gl.shadowMap.type = 'PCSoftShadowMap'
           gl.shadowMap.autoUpdate = true
         }}
-        camera={{ position: [0, 0, 300], fov: 50 }}
+        camera={{ position: [0, 0, 500], fov: 50, near: 1, far: 10000 }}
       >
         <ambientLight intensity={0.5} />
         <directionalLight
@@ -160,16 +160,24 @@ export default function PLYViewer ({ modelUrl, width = 400, height = 400, label 
           <Model url={modelUrl} />
         </Bounds>
 
-        <OrbitControls />
-      </Canvas>
+        <AutoRotateControl autoRotate={autoRotate} />
 
-      <style>{`
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-      `}
-      </style>
+        <OrbitControls
+          enablePan
+          enableZoom
+          enableRotate
+          rotateSpeed={0.5}
+          zoomSpeed={0.8}
+          panSpeed={0.7}
+          autoRotate={autoRotate}
+          autoRotateSpeed={2.0}
+          minDistance={50}
+          maxDistance={800}
+          enableDamping
+          dampingFactor={0.05}
+          ref={cameraRef}
+        />
+      </Canvas>
     </div>
   )
 }
