@@ -94,12 +94,16 @@ Rails.application.routes.draw do # rubocop:disable Metrics/BlockLength
     resources :stable_isotopes
   end
   resources :page_images
+
   resources :ceramics do
     get :wizard, on: :collection
     member do
       get :similarities
     end
   end
+
+  get '/ipai_showcase', to: 'ceramics#index'
+  get '/light', to: 'arrow_heads#index'
 
   get '/ceramics/wizard', to: 'ceramics#wizard', as: :ceramic_wizard
   resources :analysis_wizards do

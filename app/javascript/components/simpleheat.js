@@ -1,3 +1,5 @@
+// https://github.com/mourner/simpleheat
+
 'use strict'
 
 if (typeof module !== 'undefined') module.exports = simpleheat
