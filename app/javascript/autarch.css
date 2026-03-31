@@ -17,6 +17,10 @@
   display: flex;
 }
 
+.col-form-label {
+  color: white; 
+}
+
 html {
   height: 100%;
 }
