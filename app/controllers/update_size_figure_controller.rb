@@ -76,6 +76,77 @@ class UpdateSizeFigureController < ApplicationController
     render_wizard @figure
   end
 
+  # POST /update_size_figure/1/extract_identifier
+  def extract_identifier
+    @figure = Figure.find(params[:size_figure_id])
+    
+    # Get the image for this figure
+    image_path = get_figure_image_path(@figure)
+    
+    if image_path && File.exist?(image_path)
+      # Get bounding box coordinates
+      bounding_box = [@figure.x1, @figure.y1, @figure.x2, @figure.y2]
+      
+      # Extract identifier using multimodal LLM
+      extractor = MultimodalIdentifierExtractor.new
+      identifier = extractor.extract_identifier(image_path, @figure.type, bounding_box)
+      
+      # Update the figure with the extracted identifier
+      if identifier.present?
+        @figure.update(identifier: identifier)
+        flash[:notice] = "Identifier '#{identifier}' extracted successfully."
+      else
+        flash[:alert] = "Failed to extract identifier."
+      end
+    else
+      flash[:alert] = "Could not find image for this figure."
+    end
+    
+    redirect_back(fallback_location: @figure)
+  end
+
+  # GET /update_size_figure/1/show_summary_sources
+  def show_summary_sources
+    @figure = Figure.find(params[:size_figure_id])
+    
+    # Extract the summary with sources
+    extractor = TextSummaryExtractor.new
+    summary = extractor.extract_summary(@figure, @figure.publication_id)
+    
+    if summary.present?
+      # Extract sources from the summary
+      sources = extract_sources_from_summary(summary)
+      
+      # Render the sources
+      render json: { sources: sources, summary: summary }
+    else
+      render json: { error: "No summary available" }, status: :not_found
+    end
+  end
+
+  private
+
+  def extract_sources_from_summary(summary)
+    # Extract sources from the summary
+    sources = []
+    
+    # Look for the sources section
+    if summary.include?("Sources:")
+      sources_section = summary.split("Sources:").last
+      
+      # Extract each source line
+      sources_section.split("\n").each do |line|
+        if line.match(/^\s*\d+\.\s*Page\s+\d+/)
+          # Extract page number
+          page_number = line.match(/Page\s+(\d+)/)&.captures&.first&.to_i
+          sources << { page_number: page_number } if page_number
+        end
+      end
+    end
+    
+    sources
+  end
+
   def details
     @figure.update(figure_params)
 
@@ -99,6 +170,17 @@ class UpdateSizeFigureController < ApplicationController
       params.require(:ceramic).permit(:identifier, :name, :description, :site_id, :three_d_model, :percentage_scale, :page_size)
     else
       params.require(:lithic).permit(:name, :description, :site_id)
+    end
+  end
+
+  def get_figure_image_path(figure)
+    # Get the image path for the figure
+    if figure.page && figure.page.image && figure.page.image.data.attached?
+      # Get the path to the image file
+      figure.page.image.data.service_url
+    else
+      # Try to get the image from the figure's bounding box
+      nil
     end
   end
 end

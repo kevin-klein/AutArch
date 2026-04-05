@@ -22,6 +22,7 @@ import SelectCeramic from './components/SelectCeramic'
 import LocationMap from './components/LocationMap'
 import PatternPartSelector from './components/PatternPartSelector'
 import Heatmap from './components/Heatmap'
+import SummarySourcesModal from './components/SummarySourcesModal'
 
 import Chart from 'react-apexcharts'
 
@@ -112,7 +113,8 @@ const COMPONENT_REGISTRY = {
   KioskConfig,
   SelectCeramic,
   LocationMap,
-  PatternPartSelector
+  PatternPartSelector,
+  SummarySourcesModal
 }
 
 function mountReactComponents () {
@@ -124,8 +126,23 @@ function mountReactComponents () {
 
     if (Component) {
       const props = JSON.parse(el.getAttribute('data-props') || '{}')
-      const root = createRoot(el)
-      root.render(<Component {...props} />)
+      
+      // For SummarySourcesModal, we need to handle it differently
+      if (name === 'SummarySourcesModal') {
+        // Create a container for the modal
+        const container = document.createElement('div');
+        container.id = `summarySourcesModalContainer-${props.figureId}`;
+        
+        // Insert the container after the button
+        el.parentNode.insertBefore(container, el.nextSibling);
+        
+        // Create and render the component
+        const root = createRoot(container);
+        root.render(<Component {...props} />);
+      } else {
+        const root = createRoot(el)
+        root.render(<Component {...props} />)
+      }
     } else {
       console.warn(`React Component "${name}" not found in registry.`)
     }

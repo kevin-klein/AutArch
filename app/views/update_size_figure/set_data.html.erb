@@ -19,5 +19,11 @@
       <%= f.submit("Next", class: "btn btn-primary") %>
     <% end %>
     <%= link_to("Delete", size_figure_path(@figure), method: :delete, class: 'btn btn-danger mt-2', 'data-confirm': 'Are you sure?') %>
+    
+    <!-- React component for showing summary sources -->
+    <div data-react-component="SummarySourcesModal" data-props='{"figureId": <%= @figure.id %>, "figureType": "<%= @figure.type %>"}'></div>
+    
+    <!-- React component will be mounted here -->
+    <div id="summarySourcesModalContainer"></div>
   </div>
 </div>

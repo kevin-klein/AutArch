@@ -31,6 +31,8 @@ Rails.application.routes.draw do # rubocop:disable Metrics/BlockLength
 
     member do
       get :pattern_matches
+      post :extract_identifier
+      get :show_summary_sources
     end
   end
 
@@ -73,6 +75,10 @@ Rails.application.routes.draw do # rubocop:disable Metrics/BlockLength
     resources :update_grave do
       collection do
         get :skeleton_keypoints
+      end
+      member do
+        post :extract_identifier
+        get :show_summary_sources
       end
     end
     collection do
@@ -142,6 +148,7 @@ Rails.application.routes.draw do # rubocop:disable Metrics/BlockLength
       post :create_bovw_data
       get :bovw_setting
       get :similarities
+      post :extract_text_summaries
     end
     # get :delete, on: :member
   end

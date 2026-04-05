@@ -187,4 +187,63 @@ namespace :analyze do
       end
     end
   end
+
+  task export_spines: :environment do
+    # Get all spines that are associated with graves having skeleton figures
+    # with position 'flexed_on_the_left' or 'flexed_on_the_right'
+    spines = Spine.joins(grave: :skeleton_figures).where(skeleton_figures: { deposition_type: [0, 1] })
+    
+    # Create CSV file
+    CSV.open("viewing_angles.csv", "wb") do |csv|
+      # Write header
+      csv << [
+        "id",
+        "grave_id",
+        "skeleton_position",
+        "x1", "y1", "x2", "y2",
+        "angle", "adjusted_angle", "angle_with_arrow",
+        "created_at", "updated_at"
+      ]
+      
+      # Write data for each spine
+      spines.each do |spine|
+        # Get the skeleton position (0 = flexed_on_the_left, 1 = flexed_on_the_right)
+        skeleton = spine.grave.skeleton_figures.first
+        skeleton_position = skeleton.deposition_type == 0 ? "flexed_on_the_left" : "flexed_on_the_right"
+        
+        # Calculate adjusted angle based on skeleton position
+        # +90 degrees on the left, -90 degrees on the right
+        adjusted_angle = spine.angle
+        if skeleton.deposition_type == 0 # flexed_on_the_left
+          adjusted_angle += 90
+        elsif skeleton.deposition_type == 1 # flexed_on_the_right
+          adjusted_angle -= 90
+        end
+        
+        # Normalize angle to be between 0 and 360
+        adjusted_angle = adjusted_angle % 360
+        
+        # Get angle with arrow if available
+        angle_with_arrow = nil
+        if spine.grave && spine.grave.arrows.any?
+          # Use first arrow for angle calculation
+          angle_with_arrow = spine.angle_with_arrow(spine.grave.arrows.first)
+        end
+        
+        csv << [
+          spine.id,
+          spine.grave_id,
+          skeleton_position,
+          spine.x1, spine.y1, spine.x2, spine.y2,
+          spine.angle,
+          adjusted_angle,
+          angle_with_arrow,
+          spine.created_at,
+          spine.updated_at
+        ]
+      end
+    end
+    
+    puts "Exported #{spines.count} spines to viewing_angles.csv"
+  end
 end
