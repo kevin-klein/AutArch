@@ -248,6 +248,47 @@ class PublicationsController < AuthorizedController
     redirect_to publications_path, notice: "BOVW training data was successfully created."
   end
 
+  # POST /publications/:id/extract_text_summaries
+  def extract_text_summaries
+    @publication = Publication.find(params[:id])
+    
+    # Get all figures for this publication
+    figures = @publication.figures
+    
+    # Process each figure to extract text summary
+    figures.find_each do |figure|
+      # Extract text summary using multimodal LLM
+      extractor = TextSummaryExtractor.new
+      summary = extractor.extract_summary(figure, figure.publication_id)
+      
+      # Update the figure with the extracted summary
+      if summary.present?
+        figure.update(text_summary: summary)
+        Rails.logger.info("Extracted text summary for figure #{figure.id} (#{figure.type})")
+      else
+        Rails.logger.warn("Failed to extract text summary for figure #{figure.id} (#{figure.type})")
+      end
+    end
+    
+    respond_to do |format|
+      format.html { redirect_to @publication, notice: 'Text summaries extracted successfully.' }
+      format.json { render json: { success: true, message: 'Text summaries extracted successfully.', figure_count: figures.count } }
+    end
+  end
+
+  private
+
+  def get_figure_image_path(figure)
+    # Get the image path for the figure
+    if figure.page && figure.page.image && figure.page.image.data.attached?
+      # Get the path to the image file
+      figure.page.image.data.service_url
+    else
+      # Try to get the image from the figure's bounding box
+      nil
+    end
+  end
+
   def similarities
     @ceramics = @publication.figures
       .where(type: "Ceramic")

@@ -1,0 +1,73 @@
+<% if @summary || @extracted_info %>
+  <div class="card mt-4">
+    <div class="card-header">
+      <h4>AI Analysis</h4>
+    </div>
+    <div class="card-body">
+      <% if @summary %>
+        <h5>Summary</h5>
+        <p><%= @summary %></p>
+      <% end %>
+      
+      <% if @extracted_info && !@extracted_info.empty? %>
+        <h5>Extracted Information</h5>
+        <div class="row">
+          <% if @extracted_info['locations'] && @extracted_info['locations'].any? %>
+            <div class="col-md-6">
+              <h6>Locations</h6>
+              <ul>
+                <% @extracted_info['locations'].each do |location| %>
+                  <li><%= location %></li>
+                <% end %>
+              </ul>
+            </div>
+          <% end %>
+          
+          <% if @extracted_info['dates'] && @extracted_info['dates'].any? %>
+            <div class="col-md-6">
+              <h6>Dates</h6>
+              <ul>
+                <% @extracted_info['dates'].each do |date| %>
+                  <li><%= date %></li>
+                <% end %>
+              </ul>
+            </div>
+          <% end %>
+          
+          <% if @extracted_info['artifacts'] && @extracted_info['artifacts'].any? %>
+            <div class="col-md-6">
+              <h6>Artifacts</h6>
+              <ul>
+                <% @extracted_info['artifacts'].each do |artifact| %>
+                  <li><%= artifact %></li>
+                <% end %>
+              </ul>
+            </div>
+          <% end %>
+          
+          <% if @extracted_info['people'] && @extracted_info['people'].any? %>
+            <div class="col-md-6">
+              <h6>People</h6>
+              <ul>
+                <% @extracted_info['people'].each do |person| %>
+                  <li><%= person %></li>
+                <% end %>
+              </ul>
+            </div>
+          <% end %>
+          
+          <% if @extracted_info['keywords'] && @extracted_info['keywords'].any? %>
+            <div class="col-md-12">
+              <h6>Key Findings</h6>
+              <ul>
+                <% @extracted_info['keywords'].each do |keyword| %>
+                  <li><%= keyword %></li>
+                <% end %>
+              </ul>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+<% end>

@@ -39,7 +39,7 @@ def show(imgs):
     plt.show()
 
 if __name__ == '__main__':
-  model = torchvision.models.resnext50_32x4d(weights=torchvision.models.ResNet152_Weights.IMAGENET1K_V2)
+  model = torchvision.models.resnet50(weights=torchvision.models.ResNet50_Weights.IMAGENET1K_V2)
   model.fc = torch.nn.Linear(in_features=2048, out_features=6, bias=True)
 
   dataset = torchvision.datasets.ImageFolder('skeleton_angles', transforms.Compose([

@@ -83,7 +83,7 @@ if __name__ == '__main__':
   data_loader = torch.utils.data.DataLoader(
                 dataset, pin_memory=True, batch_size=4, shuffle=True, num_workers=8,)
 
-  model = torchvision.models.convnext_tiny(weights=torchvision.models.ConvNeXt_Tiny_Weights.IMAGENET1K_V1)
+  model = torchvision.models.resnet50(weights=torchvision.models.ResNet50_Weights.IMAGENET1K_V2)
   model.classifier = nn.Sequential(
     model.classifier[0], model.classifier[1], nn.Linear(model.classifier[2].in_features, len(dataset.classes))
   )

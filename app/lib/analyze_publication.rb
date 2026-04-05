@@ -37,6 +37,9 @@ class AnalyzePublication
         begin Module.const_get(cls_name)
               figure = page.figures.create!(x1: x1, y1: y1, x2: x2, y2: y2, probability: probability, type: type_name.camelize.singularize, publication: publication)
               figures << figure
+              
+              # Extract text summary for this figure
+              extract_text_summary(figure)
         rescue NameError
           Rails.logger.warn("Class #{cls_name} not found, discarding object")
         end
@@ -89,5 +92,57 @@ class AnalyzePublication
 
   def page_count(path)
     PDF::Reader.open(path, &:page_count)
+  end
+
+  private
+
+  def extract_text_summary(figure)
+    # Extract text summary using multimodal LLM
+    extractor = TextSummaryExtractor.new
+    summary = extractor.extract_summary(figure, figure.publication_id)
+    
+    # Update the figure with the extracted summary
+    if summary.present?
+      figure.update(text_summary: summary)
+      Rails.logger.info("Extracted text summary for figure #{figure.id} (#{figure.type})")
+    else
+      # Try one more time if self-validation failed
+      Rails.logger.warn("Failed to extract text summary for figure #{figure.id} (#{figure.type}) - trying again")
+      
+      # Try again with a different approach
+      summary = extractor.extract_summary_with_retry(figure, figure.publication_id)
+      
+      if summary.present?
+        figure.update(text_summary: summary)
+        Rails.logger.info("Successfully extracted text summary for figure #{figure.id} (#{figure.type}) after retry")
+      else
+        Rails.logger.warn("Failed to extract text summary for figure #{figure.id} (#{figure.type}) after retry")
+      end
+    end
+  end
+
+  def extract_text_summary_with_retry(figure)
+    # Extract text summary using multimodal LLM with retry logic
+    extractor = TextSummaryExtractor.new
+    summary = extractor.extract_summary_with_retry(figure, figure.publication_id)
+    
+    # Update the figure with the extracted summary
+    if summary.present?
+      figure.update(text_summary: summary)
+      Rails.logger.info("Extracted text summary for figure #{figure.id} (#{figure.type}) with retry")
+    else
+      Rails.logger.warn("Failed to extract text summary for figure #{figure.id} (#{figure.type}) with retry")
+    end
+  end
+
+  def get_figure_image_path(figure)
+    # Get the image path for the figure
+    if figure.page && figure.page.image && figure.page.image.data.attached?
+      # Get the path to the image file
+      figure.page.image.data.service_url
+    else
+      # Try to get the image from the figure's bounding box
+      nil
+    end
   end
 end
