@@ -305,6 +305,43 @@ ALTER SEQUENCE public.cultures_id_seq OWNED BY public.cultures.id;
 
 
 --
+-- Name: figure_texts; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.figure_texts (
+    id bigint NOT NULL,
+    figure_id bigint NOT NULL,
+    ocr_text character varying,
+    extracted_dimensions json,
+    extracted_description character varying,
+    extracted_summary character varying,
+    key_phrases json,
+    raw_text character varying,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: figure_texts_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.figure_texts_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: figure_texts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.figure_texts_id_seq OWNED BY public.figure_texts.id;
+
+
+--
 -- Name: figures; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -366,7 +403,8 @@ CREATE TABLE public.figures (
     efds double precision[] DEFAULT '{}'::double precision[] NOT NULL,
     internment_type integer,
     dummy boolean DEFAULT false NOT NULL,
-    actual_height_mm integer
+    actual_height_mm integer,
+    text_summary text
 );
 
 
@@ -834,7 +872,8 @@ CREATE TABLE public.publications (
     year character varying,
     user_id bigint,
     public boolean DEFAULT false NOT NULL,
-    summary text
+    summary text,
+    text text
 );
 
 
@@ -1267,6 +1306,13 @@ ALTER TABLE ONLY public.cultures ALTER COLUMN id SET DEFAULT nextval('public.cul
 
 
 --
+-- Name: figure_texts id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.figure_texts ALTER COLUMN id SET DEFAULT nextval('public.figure_texts_id_seq'::regclass);
+
+
+--
 -- Name: figures id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -1511,6 +1557,14 @@ ALTER TABLE ONLY public.chronologies
 
 ALTER TABLE ONLY public.cultures
     ADD CONSTRAINT cultures_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: figure_texts figure_texts_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.figure_texts
+    ADD CONSTRAINT figure_texts_pkey PRIMARY KEY (id);
 
 
 --
@@ -1792,6 +1846,13 @@ CREATE INDEX index_chronologies_on_skeleton_id ON public.chronologies USING btre
 
 
 --
+-- Name: index_figure_texts_on_figure_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_figure_texts_on_figure_id ON public.figure_texts USING btree (figure_id);
+
+
+--
 -- Name: index_figures_on_page_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2024,6 +2085,14 @@ ALTER TABLE ONLY public.pattern_parts
 
 
 --
+-- Name: figure_texts fk_rails_1dfd1a9f06; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.figure_texts
+    ADD CONSTRAINT fk_rails_1dfd1a9f06 FOREIGN KEY (figure_id) REFERENCES public.figures(id);
+
+
+--
 -- Name: page_texts fk_rails_30e2bd5652; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2182,6 +2251,9 @@ ALTER TABLE ONLY public.text_items
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260407162549'),
+('20260402120000'),
+('20260401000001'),
 ('20260328120000'),
 ('20260327093411'),
 ('20260325102857'),

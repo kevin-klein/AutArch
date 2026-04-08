@@ -39,6 +39,7 @@
       <th>
         Tag
       </th>
+      <th>Text</th>
       <th>Orientation [Grave]</th>
       <th></th>
     </tr>
@@ -67,6 +68,7 @@
           <% end %>
         </td>
         <td><%= grave.tags.map { _1.name }.join(' ') %></td>
+        <td><%= grave.text %></td>
         <td>
           <% unless grave&.arrow&.angle.nil? %>
             <%= ((grave.angle.abs.round + grave.arrow.angle) % 180).round %>

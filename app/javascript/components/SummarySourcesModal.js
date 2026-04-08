@@ -1,65 +1,65 @@
-import React, { useState, useEffect } from 'react';
-import { Modal, Button } from 'react-bootstrap';
+import React, { useState, useEffect } from 'react'
+// import { Modal, Button } from 'react-bootstrap';
 
 const SummarySourcesModal = ({ figureId, figureType }) => {
-  const [show, setShow] = useState(false);
-  const [summary, setSummary] = useState('');
-  const [sources, setSources] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [show, setShow] = useState(false)
+  const [summary, setSummary] = useState('')
+  const [sources, setSources] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
   const fetchSummarySources = async () => {
     try {
-      setLoading(true);
-      setError(null);
-      
-      let url;
+      setLoading(true)
+      setError(null)
+
+      let url
       if (figureType === 'Grave') {
-        url = `/graves/${figureId}/update_grave/show_summary_sources`;
+        url = `/graves/${figureId}/update_grave/show_summary_sources`
       } else {
-        url = `/size_figures/${figureId}/update_size_figure/show_summary_sources`;
+        url = `/size_figures/${figureId}/update_size_figure/show_summary_sources`
       }
-      
+
       const response = await fetch(url, {
         headers: {
-          'Accept': 'application/json',
+          Accept: 'application/json',
           'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content
         }
-      });
-      
+      })
+
       if (!response.ok) {
-        throw new Error('Failed to fetch summary sources');
+        throw new Error('Failed to fetch summary sources')
       }
-      
-      const data = await response.json();
-      
+
+      const data = await response.json()
+
       if (data.error) {
-        throw new Error(data.error);
+        throw new Error(data.error)
       }
-      
-      setSummary(data.summary);
-      setSources(data.sources || []);
+
+      setSummary(data.summary)
+      setSources(data.sources || [])
     } catch (err) {
-      setError(err.message);
+      setError(err.message)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const renderContent = () => {
     if (loading) {
-      return <p>Loading...</p>;
+      return <p>Loading...</p>
     }
-    
+
     if (error) {
-      return <p className="text-danger">{error}</p>;
+      return <p className='text-danger'>{error}</p>
     }
-    
+
     return (
       <div>
         <h6>Summary:</h6>
         <p>{summary}</p>
-        
+
         {sources.length > 0 && (
           <div>
             <h6>Sources:</h6>
@@ -71,25 +71,25 @@ const SummarySourcesModal = ({ figureId, figureType }) => {
           </div>
         )}
       </div>
-    );
+    )
   };
 
   const handleShow = () => {
-    setShow(true);
-    fetchSummarySources();
+    setShow(true)
+    fetchSummarySources()
   };
 
   const handleClose = () => {
-    setShow(false);
+    setShow(false)
   };
 
   return (
     <>
-      <button className="btn btn-info mt-2" onClick={handleShow}>
+      <button className='btn btn-info mt-2' onClick={handleShow}>
         Show Summary Sources
       </button>
-      
-      <Modal show={show} onHide={handleClose} size="lg">
+
+      <Modal show={show} onHide={handleClose} size='lg'>
         <Modal.Header closeButton>
           <Modal.Title>Summary Sources</Modal.Title>
         </Modal.Header>
@@ -97,13 +97,13 @@ const SummarySourcesModal = ({ figureId, figureType }) => {
           {renderContent()}
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
+          <Button variant='secondary' onClick={handleClose}>
             Close
           </Button>
         </Modal.Footer>
       </Modal>
     </>
-  );
+  )
 };
 
-export default SummarySourcesModal;
+export default SummarySourcesModal

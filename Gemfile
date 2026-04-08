@@ -108,6 +108,7 @@ group :test do
   gem "capybara"
   gem "selenium-webdriver"
   gem "webdrivers"
+  gem "httparty"
 end
 gem "rubocop-rails", require: false
 gem "sidekiq", "~> 6.5"

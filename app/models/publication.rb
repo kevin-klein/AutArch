@@ -28,6 +28,6 @@ class Publication < ApplicationRecord
   end
 
   def graves
-    figures.filter { _1.is_a?(Grave) }
+    figures.filter { _1.is_a?(Grave) && _1.probability > 0.6 }
   end
 end

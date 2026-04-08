@@ -3,6 +3,8 @@ FactoryBot.define do
     association :page
     x1 { rand(100..1000) }
     y1 { rand(100..1000) }
+    x2 { x1 + rand(50..200) }
+    y2 { y1 + rand(50..200) }
     width { rand(50..200) }
     height { rand(50..200) }
     angle { rand(0..360) }
