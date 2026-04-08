@@ -8,10 +8,8 @@ class AddFigureText < ActiveRecord::Migration[7.0]
       t.string :extracted_summary
       t.json :key_phrases
       t.string :raw_text
-      
+
       t.timestamps
     end
-    
-    add_index :figure_texts, :figure_id
   end
 end

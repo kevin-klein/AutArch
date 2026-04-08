@@ -1,5 +1,5 @@
 class PublicationsController < AuthorizedController
-  before_action :set_publication, only: %i[similarities bovw_setting create_bovw_data analysis export_lithics export_lithics_form export radar update_tags assign_tags update_site assign_site progress summary show edit update destroy stats]
+  before_action :set_publication, only: %i[similarities bovw_setting create_bovw_data analysis export_lithics export_lithics_form export radar update_tags assign_tags update_site assign_site progress summary show edit stats]
 
   # GET /publications or /publications.json
   def index
@@ -199,7 +199,6 @@ class PublicationsController < AuthorizedController
   end
 
   def bovw_setting
-
   end
 
   def create_bovw_data
@@ -226,7 +225,6 @@ class PublicationsController < AuthorizedController
     response = JSON.parse(response.body.to_s)
     matrix = response["similarity_matrix"]
 
-
     Ceramic.transaction do
       ceramics.zip(matrix).each_with_index do |data, first_index|
         similarities = data[1]
@@ -251,28 +249,16 @@ class PublicationsController < AuthorizedController
   # POST /publications/:id/extract_text_summaries
   def extract_text_summaries
     @publication = Publication.find(params[:id])
-    
-    # Get all figures for this publication
-    figures = @publication.figures
-    
-    # Process each figure to extract text summary
-    figures.find_each do |figure|
-      # Extract text summary using multimodal LLM
-      extractor = TextSummaryExtractor.new
-      summary = extractor.extract_summary(figure, figure.publication_id)
-      
-      # Update the figure with the extracted summary
-      if summary.present?
-        figure.update(text_summary: summary)
-        Rails.logger.info("Extracted text summary for figure #{figure.id} (#{figure.type})")
-      else
-        Rails.logger.warn("Failed to extract text summary for figure #{figure.id} (#{figure.type})")
-      end
-    end
-    
+
+    # Get identifiers from figures (or use params)
+    identifiers = params[:identifiers] || @publication.figures.distinct.pluck(:identifier).compact
+
+    # Enqueue the background job
+    ExtractTextSummariesJob.perform_later(@publication, identifiers)
+
     respond_to do |format|
-      format.html { redirect_to @publication, notice: 'Text summaries extracted successfully.' }
-      format.json { render json: { success: true, message: 'Text summaries extracted successfully.', figure_count: figures.count } }
+      format.html { redirect_to @publication, notice: "Text summary extraction started. This may take a few minutes." }
+      format.json { render json: {success: true, message: "Text summary extraction started."} }
     end
   end
 

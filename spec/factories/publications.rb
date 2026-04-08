@@ -10,6 +10,15 @@ FactoryBot.define do
 
       after(:create) do |publication, evaluator|
         create_list(:page, evaluator.pages_count, publication: publication)
+        # Attach a mock PDF file
+        file = Rails.root.join('spec', 'fixtures', 'files', 'test.pdf')
+        if File.exist?(file)
+          publication.pdf.attach(
+            io: File.open(file),
+            filename: 'test.pdf',
+            content_type: 'application/pdf'
+          )
+        end
       end
     end
   end

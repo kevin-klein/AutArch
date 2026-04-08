@@ -173,6 +173,10 @@ GEM
     http-cookie (1.1.0)
       domain_name (~> 0.5)
     http-form_data (2.3.0)
+    httparty (0.24.2)
+      csv
+      mini_mime (>= 1.0.0)
+      multi_xml (>= 0.5.2)
     i18n (1.14.8)
       concurrent-ruby (~> 1.0)
     image_processing (1.14.0)
@@ -230,6 +234,8 @@ GEM
     mize (0.6.1)
     mmh3 (1.2.0)
     msgpack (1.8.0)
+    multi_xml (0.8.1)
+      bigdecimal (>= 3.1, < 5)
     net-imap (0.6.3)
       date
       net-protocol
@@ -618,6 +624,7 @@ DEPENDENCIES
   graphql
   http
   http-form_data
+  httparty
   image_processing (~> 1.2)
   importmap-rails
   jbuilder

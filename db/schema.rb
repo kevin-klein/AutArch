@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_25_102857) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_07_162549) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -40,16 +40,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_25_102857) do
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
-  end
-
-  create_table "analysis_wizards", force: :cascade do |t|
-    t.jsonb "contours", default: [], array: true
-    t.datetime "created_at", null: false
-    t.bigint "page_id"
-    t.text "state"
-    t.integer "step", default: 0
-    t.datetime "updated_at", null: false
-    t.index ["page_id"], name: "index_analysis_wizards_on_page_id"
   end
 
   create_table "anthropologies", force: :cascade do |t|
@@ -113,6 +103,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_25_102857) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "figure_texts", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "extracted_description"
+    t.json "extracted_dimensions"
+    t.string "extracted_summary"
+    t.bigint "figure_id", null: false
+    t.json "key_phrases"
+    t.string "ocr_text"
+    t.string "raw_text"
+    t.datetime "updated_at", null: false
+    t.index ["figure_id"], name: "index_figure_texts_on_figure_id"
+  end
+
   create_table "figures", force: :cascade do |t|
     t.integer "actual_height_mm"
     t.integer "anchor_point_1_x"
@@ -162,19 +165,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_25_102857) do
     t.float "real_world_width"
     t.bigint "site_id"
     t.string "text"
+    t.text "text_summary"
     t.string "type", null: false
     t.datetime "updated_at", null: false
     t.boolean "validated", default: false, null: false
     t.boolean "verified", default: false, null: false
     t.float "width"
-    t.bigint "wizard_id"
     t.integer "x1", null: false
     t.integer "x2", null: false
     t.integer "y1", null: false
     t.integer "y2", null: false
     t.index ["page_id"], name: "index_figures_on_page_id"
     t.index ["site_id"], name: "index_figures_on_site_id"
-    t.index ["wizard_id"], name: "index_figures_on_wizard_id"
   end
 
   create_table "figures_tags", force: :cascade do |t|
@@ -272,6 +274,22 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_25_102857) do
     t.index ["publication_id"], name: "index_pages_on_publication_id"
   end
 
+  create_table "pattern_parts", force: :cascade do |t|
+    t.float "confidence", default: 1.0
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.integer "feature_type", default: 0
+    t.jsonb "features", default: {}
+    t.bigint "figure_id", null: false
+    t.datetime "updated_at", null: false
+    t.integer "x1", null: false
+    t.integer "x2", null: false
+    t.integer "y1", null: false
+    t.integer "y2", null: false
+    t.index ["figure_id"], name: "index_pattern_parts_on_figure_id"
+    t.index ["x1", "y1", "x2", "y2"], name: "index_pattern_parts_on_x1_and_y1_and_x2_and_y2"
+  end
+
   create_table "periods", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "name"
@@ -292,6 +310,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_25_102857) do
     t.datetime "created_at", null: false
     t.boolean "public", default: false, null: false
     t.text "summary"
+    t.text "text"
     t.string "title"
     t.datetime "updated_at", null: false
     t.bigint "user_id"
@@ -405,8 +424,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_25_102857) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
-  add_foreign_key "analysis_wizards", "pages"
-  add_foreign_key "figures", "analysis_wizards", column: "wizard_id"
+  add_foreign_key "figure_texts", "figures"
   add_foreign_key "figures", "pages", on_delete: :cascade
   add_foreign_key "genetics", "skeletons"
   add_foreign_key "key_points", "figures"
@@ -417,6 +435,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_25_102857) do
   add_foreign_key "page_texts", "pages"
   add_foreign_key "pages", "images", on_delete: :cascade
   add_foreign_key "pages", "publications", on_delete: :cascade
+  add_foreign_key "pattern_parts", "figures"
   add_foreign_key "publication_teams", "publications"
   add_foreign_key "publication_teams", "teams"
   add_foreign_key "skeletons", "figures"

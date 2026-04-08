@@ -41,7 +41,7 @@
             <%= link_to "Tags", assign_tags_publication_path(publication) %>
             <div class="vr mx-1"></div>
           <% end %>
-          <%= link_to "Summary", summary_publication_path(publication) %>
+          <%= link_to "Extract Summaries", extract_text_summaries_publication_path(publication), method: :post, 'data-confirm': 'Start text summary extraction? This may take a few minutes.' %>
           <div class="vr mx-1"></div>
           <% if can?(:delete, publication) %>
             <%= link_to "Delete", publication_path(publication), method: :delete, 'data-confirm': 'Are you sure?' %>

@@ -81,18 +81,18 @@ class UpdateGraveController < AuthorizedController
   # POST /update_grave/1/extract_identifier
   def extract_identifier
     @grave = Grave.find(params[:grave_id])
-    
+
     # Get the image for this grave
     image_path = get_grave_image_path(@grave)
-    
+
     if image_path && File.exist?(image_path)
       # Get bounding box coordinates
       bounding_box = [@grave.x1, @grave.y1, @grave.x2, @grave.y2]
-      
+
       # Extract identifier using multimodal LLM
       extractor = MultimodalIdentifierExtractor.new
-      identifier = extractor.extract_identifier(image_path, 'Grave', bounding_box)
-      
+      identifier = extractor.extract_identifier(image_path, "Grave", bounding_box)
+
       # Update the grave with the extracted identifier
       if identifier.present?
         @grave.update(identifier: identifier)
@@ -103,26 +103,26 @@ class UpdateGraveController < AuthorizedController
     else
       flash[:alert] = "Could not find image for this grave."
     end
-    
+
     redirect_back(fallback_location: @grave)
   end
 
   # GET /update_grave/1/show_summary_sources
   def show_summary_sources
     @grave = Grave.find(params[:grave_id])
-    
+
     # Extract the summary with sources
     extractor = TextSummaryExtractor.new
     summary = extractor.extract_summary(@grave, @grave.publication_id)
-    
+
     if summary.present?
       # Extract sources from the summary
       sources = extract_sources_from_summary(summary)
-      
+
       # Render the sources
-      render json: { sources: sources, summary: summary }
+      render json: {sources: sources, summary: summary}
     else
-      render json: { error: "No summary available" }, status: :not_found
+      render json: {error: "No summary available"}, status: :not_found
     end
   end
 
@@ -131,21 +131,21 @@ class UpdateGraveController < AuthorizedController
   def extract_sources_from_summary(summary)
     # Extract sources from the summary
     sources = []
-    
+
     # Look for the sources section
     if summary.include?("Sources:")
       sources_section = summary.split("Sources:").last
-      
+
       # Extract each source line
       sources_section.split("\n").each do |line|
-        if line.match(/^\s*\d+\.\s*Page\s+\d+/)
+        if /^\s*\d+\.\s*Page\s+\d+/.match?(line)
           # Extract page number
           page_number = line.match(/Page\s+(\d+)/)&.captures&.first&.to_i
-          sources << { page_number: page_number } if page_number
+          sources << {page_number: page_number} if page_number
         end
       end
     end
-    
+
     sources
   end
 
@@ -169,13 +169,6 @@ class UpdateGraveController < AuthorizedController
   private
 
   def get_grave_image_path(grave)
-    # Get the image path for the grave
-    if grave.page && grave.page.image && grave.page.image.data.attached?
-      # Get the path to the image file
-      grave.page.image.data.service_url
-    else
-      # Try to get the image from the grave's bounding box
-      nil
-    end
+    grave.page.image.file_path
   end
 end
