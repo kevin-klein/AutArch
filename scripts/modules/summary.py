@@ -15,11 +15,19 @@ import threading
 import requests
 from docling.document_converter import DocumentConverter
 from docling.chunking import HybridChunker
+from docling_core.types.doc.document import DoclingDocument
 from collections import defaultdict
 from datetime import datetime, timedelta
+import os
+
+if __name__ == '__main__':
+    import dotenv
+    dotenv.load_dotenv('/home/kevin/AutArch/.env')
 
 # Configuration
-API_URL = "http://localhost:8001/v1/chat/completions"
+# API_URL = "http://localhost:8001/v1/chat/completions"
+API_URL = f"{os.environ['LLM_BASE_URI']}/api/chat/completions"
+API_TOKEN = os.environ['LLM_API_KEY']
 
 # Rate limiting configuration
 RATE_LIMIT = {
@@ -50,56 +58,8 @@ You have no prior knowledge about:
 
 You do not know what "Grave", "Kurgan", "Arrow", "Skeleton", "Ceramic", "StoneTool", or any other object types mean.
 
-YOUR EXACT ROLE (READ THIS CAREFULLY):
-1. You are a机械的文字处理器 (mechanical text processor)
-2. You are a字面翻译器 (literal translator)
-3. You are a factual记录器 (factual recorder)
-4. You are a数据提取器 (data extraction tool)
-5. You are a reproduction机器 (reproduction machine)
-
-YOUR MANDATORY INSTRUCTIONS:
-1. You do NOT interpret what you read
-2. You do NOT infer meaning
-3. You do NOT assume context
-4. You do NOT apply external knowledge
-5. You do NOT make educated guesses
-6. You do NOT explain concepts
-7. You do NOT add commentary
-8. You do NOT use technical terms not in the source text
-9. You do NOT generalize or abstract
-10. You do NOT summarize - you reproduce
-
-WHAT TO DO INSTEAD:
-1. Read each sentence exactly as written
-2. Copy the words as they appear in the text
-3. Translate word-for-word if the text is in another language
-4. Report only what is explicitly stated
-5. If a detail is not mentioned, state "not mentioned" or "no information provided"
-6. If information is incomplete, state that explicitly
-
-TRANSLATION RULES:
-- If text is in English, output in English - but copy phrasing exactly
-- If text is in another language, translate LITERALLY
-- Do NOT adapt idioms or cultural references
-- Do NOT explain what something "means"
-- Keep the original structure when possible
-
-VERIFICATION REQUIREMENT (BEFORE ANY OUTPUT):
-Ask yourself for EACH piece of information:
-1. Is this EXPLICITLY written in the text? (YES/NO)
-2. If NO: Remove it, do not include
-3. If YES: Keep it exactly as written
-
-OUTPUT FORMAT REQUIREMENT:
-- You MUST output ONLY valid JSON
-- You MUST NOT add explanations before or after JSON
-- You MUST NOT use markdown code blocks
-- You MUST NOT add any text other than JSON
-- You MUST follow the exact JSON schema provided
-
-FINAL REMINDER:
 You are NOT an archaeologist. You are NOT a scholar. You are NOT explaining anything.
-You are a机械翻译和提取工具 (mechanical translation and extraction tool).
+You are a mechanical translation and extraction tool.
 Your job is to REPRODUCE what is written, not to INTERPRET it.
 """
 
@@ -222,6 +182,8 @@ def call_local_llm(prompt, response_format="json_object"):
 
     # Make the request
     payload = {
+        "model": "GPT OSS 120B",
+        "reasoning_effort": "medium",
         "messages": [
             {"role": "system", "content": LLM_SYSTEM_PROMPT},
             {"role": "user", "content": prompt}
@@ -230,7 +192,12 @@ def call_local_llm(prompt, response_format="json_object"):
         "response_format": {"type": response_format}
     }
 
-    response = requests.post(API_URL, json=payload)
+    headers = {
+        "Authorization": f"Bearer {API_TOKEN}",
+        "Content-Type": "application/json"
+    }
+
+    response = requests.post(API_URL, json=payload, headers=headers)
     response_data = response.json()
     result_text = response_data['choices'][0]['message']['content']
 
@@ -254,48 +221,22 @@ CONTEXT: {text_content}
 
 TARGET IDENTIFIERS: {identifiers}
 
-YOUR TASK - FOLLOW THESE STEPS EXACTLY:
+Step 1: Extract mentions of the identifiers and a brief summary in English.
+Step 2: Distinguish between 'Site Context' (shared info) and 'Specific Findings' (unique to this ID).
+Step 3: Generate verification questions for each summary (e.g., "Is this fact explicitly in the text?").
+Step 4: Answer those questions using ONLY the provided text.
+Step 5: Translate the summaries into English.
+Step 6: If there is either no shared_context, write NO_CONTENT.
+Step 7: If there is either no unique_details, write NO_CONTENT.
+Step 8: Provide the final verified English summaries in JSON format.
 
-STEP 1 - IDENTIFICATION:
-- Find ALL occurrences of the target identifiers in the text
-- List each occurrence with its surrounding context
-- Do NOT assume what these identifiers represent
-
-STEP 2 - EXTRACTION:
-- For each identifier found, extract ONLY what is explicitly stated about it
-- Extract: location, date, findings, measurements, descriptions
-- If a field has no explicit information, use the literal phrase "not mentioned"
-- Do NOT infer or assume anything
-
-STEP 3 - VERIFICATION:
-- For each extracted detail, ask: "Is this explicitly stated in the text?"
-- If the answer is no, remove it
-- If the answer is yes, keep it
-
-STEP 4 - OUTPUT:
-Provide ONLY the following JSON structure:
-
-{
+{{
   "verified_extractions": [
-    { "id": "identifier_name", "unique_details": "literal_text_exactly_as_written", "shared_context": "literal_text_exactly_as_written", "confidence": "high" }
+    {{ "id": "identifier_name", "unique_details": "...", "shared_context": "...", "confidence": "low|medium|high" }}
   ]
-}
+}}
 
-RULES FOR THIS OUTPUT:
-1. "id" must exactly match one of the target identifiers
-2. "unique_details" should contain ONLY what is explicitly stated about this specific identifier
-3. "shared_context" should contain ONLY what is explicitly stated about the context (shared information)
-4. If a field has no information, use the literal text "not mentioned"
-5. "confidence" must be exactly one of: "high", "medium", "low"
-6. Use the EXACT PHRASING from the text when possible
-7. Do NOT interpret or explain the meaning of anything
-8. Do NOT use technical terms unless they appear in the text
-9. Do NOT add any information not present in the text
-10. Output ONLY valid JSON, nothing else
-
-IMPORTANT: You are reproducing text, not interpreting it. Your output should be a factual record of what is written.
-
-IMPORTANT: Output ONLY the JSON structure, nothing else. Do not add explanations or comments."""
+Output ONLY the JSON structure, nothing else. Do not add explanations or comments."""
 
 
 def _build_refine_prompt(verified_extractions):
@@ -322,15 +263,15 @@ RULES FOR CONSOLIDATION:
 8. Keep the literal phrasing from the original text
 
 OUTPUT FORMAT:
-{
+{{
   "summaries": [
-    {
+    {{
       "id": "identifier_name",
       "summary": "Single consolidated summary of what was found",
       "confidence": "high|medium|low"
-    }
+    }}
   ]
-}
+}}
 
 RULES FOR OUTPUT:
 1. "id" must exactly match the identifier from input
@@ -376,31 +317,38 @@ def _refine_summaries(all_extractions, identifiers):
     return result.get('summaries', [])
 
 
-def process_document(file_path, identifiers):
+def process_document(file_path, identifiers, publication_id):
     """Process document and return refined summaries for all identifiers."""
-    converter = DocumentConverter()
-    result = converter.convert(file_path)
+    cache_path = os.path.join('tmp/documents', f"{publication_id}.json")
+    if os.path.exists(cache_path):
+        doc = DoclingDocument.load_from_json(cache_path)
+    else:
+        converter = DocumentConverter()
+        result = converter.convert(file_path)
+        doc = result.document
+        doc.save_as_json(cache_path)
 
     chunker = HybridChunker()
-    chunks = chunker.chunk(result.document)
+    chunks = chunker.chunk(doc)
 
     all_extractions = []
 
-    for chunk in chunks:
+    for chunk in list(chunks)[:50]:
         text = chunk.text
-        matches = [id for id in identifiers if re.search(rf"\b{re.escape(id)}\b", text, re.IGNORECASE)]
+        matches = [id for id in identifiers if re.search(rf"\b{re.escape(id)}\b", text, re.IGNORECASE) or re.search(rf"\b{re.escape(re.sub(r'\D', '', id))}\b", text, re.IGNORECASE)]
         if matches:
             extractions = _extract_from_chunk(text, matches)
+            print(extractions)
             all_extractions.extend(extractions)
 
     return _refine_summaries(all_extractions, identifiers)
 
 
-def extract_pdf(pdf_path, identifiers):
+def extract_pdf(pdf_path, identifiers, publication_id):
     """Extract and summarize objects from PDF."""
-    return process_document(pdf_path, identifiers)
+    return process_document(pdf_path, identifiers, publication_id)
 
 
 if __name__ == '__main__':
-    result = extract_pdf('test.pdf', ['H166', 'H121'])
+    result = extract_pdf('/home/kevin/AutArch/test.pdf', ['H166', 'H121'], 'test')
     print(json.dumps(result, indent=2))

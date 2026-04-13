@@ -132,19 +132,22 @@ def handle_extract_summaries():
     data = request.json
     pdf_url = data.get('pdf_url')
     identifiers = data.get('identifiers', [])
+    publication_id = data.get('publication_id')
 
     try:
         if not pdf_url:
             raise ValueError("Missing pdf_url parameter")
         if not identifiers or not isinstance(identifiers, list):
             raise ValueError("Missing or invalid identifiers parameter")
+        if not publication_id:
+            raise ValueError("Missing publication_id parameter")
 
         # Download PDF to temp file
         tmp_path = download_pdf_to_temp(pdf_url)
 
         try:
             # Process the PDF
-            summaries = extract_pdf(tmp_path, identifiers)
+            summaries = extract_pdf(tmp_path, identifiers, publication_id)
             return {'summaries': summaries}
         finally:
             os.unlink(tmp_path)

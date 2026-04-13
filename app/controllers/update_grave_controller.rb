@@ -42,6 +42,7 @@ class UpdateGraveController < AuthorizedController
     when :set_scale
       if params[:scale].present?
         @scale.update(text: params[:scale][:text])
+        GraveSize.new.run([@scale])
       else
         values = grave_params
         values[:percentage_scale] = values[:percentage_scale].split(":")[1]

@@ -6,10 +6,11 @@ Main entry point for the torch service.
 import os
 from concurrent.futures import ThreadPoolExecutor
 from bottle import Bottle
+import os
 
-from dotenv import load_dotenv
+from dotenv import load_dotenv, dotenv_values
 
-load_dotenv('../.env')
+load_dotenv()
 
 from modules.models import registry
 from modules.routes import (
@@ -49,13 +50,14 @@ _executor = ThreadPoolExecutor(max_workers=4)
 
 def wrap_async(handler):
     """Wrap a handler to run in a thread pool, preventing request blocking."""
-    def wrapped():
-        future = _executor.submit(handler)
-        # Return immediately with a job ID (would need job tracking for real async)
-        # For now, we run synchronously but in a separate thread
-        # This prevents the main request thread from blocking
-        return future.result(timeout=3600)  # 1 hour timeout
-    return wrapped
+    # def wrapped():
+    #     future = _executor.submit(handler)
+    #     # Return immediately with a job ID (would need job tracking for real async)
+    #     # For now, we run synchronously but in a separate thread
+    #     # This prevents the main request thread from blocking
+    #     return future.result(timeout=3600)  # 1 hour timeout
+    # return wrapped
+    return handler
 
 def main():
     """Main entry point."""
