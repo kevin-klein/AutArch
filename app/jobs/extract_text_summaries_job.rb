@@ -7,19 +7,22 @@ class ExtractTextSummariesJob < ApplicationJob
 
   def perform(publication, identifiers)
     # Build the request to the Python microservice
-    pdf_url = rails_blob_url(publication.pdf)
+    pdf_url = rails_blob_url(publication.pdf, host: 'http://localhost:3001')
 
     response = HTTParty.post(
       'http://localhost:9000/extract_summaries',
       body: {
         pdf_url: pdf_url,
-        identifiers: identifiers
+        identifiers: identifiers,
+        publication_id: publication.id
       }.to_json,
       headers: {
         'Content-Type': 'application/json'
       },
       timeout: 3000
     )
+
+    ap response
 
     if response.success?
       summaries = response.parsed_response['summaries']

@@ -68,7 +68,7 @@
           <% end %>
         </td>
         <td><%= grave.tags.map { _1.name }.join(' ') %></td>
-        <td><%= grave.text %></td>
+      <td><%= grave.text_summary %></td>
         <td>
           <% unless grave&.arrow&.angle.nil? %>
             <%= ((grave.angle.abs.round + grave.arrow.angle) % 180).round %>

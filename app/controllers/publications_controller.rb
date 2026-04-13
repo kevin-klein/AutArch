@@ -257,7 +257,7 @@ class PublicationsController < AuthorizedController
     ExtractTextSummariesJob.perform_later(@publication, identifiers)
 
     respond_to do |format|
-      format.html { redirect_to @publication, notice: "Text summary extraction started. This may take a few minutes." }
+      format.html { redirect_to publications_path, notice: "Text summary extraction started. This may take a few minutes." }
       format.json { render json: {success: true, message: "Text summary extraction started."} }
     end
   end
