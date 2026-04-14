@@ -107,7 +107,7 @@ export default function UploadStep ({ onNext, autoSelect = false, fixedImage = n
         <h5 className='alert-heading'>{t('howToUse')}</h5>
         {demoImage !== null
           ? <ul className='mb-0'>
-            <li><strong>1. {t('uploadImage')}:</strong> {autoSelect ? t('dragImage') : t('uploadInstructions')}</li>
+            <li><strong>1. {t('uploadImage')}:</strong> {autoSelect ? t('dragImageBelow') : t('uploadInstructions')}</li>
             <li><strong>2. {t('selectVessel')}:</strong> {t('selectVesselInstructions')}</li>
             <li><strong>3. {t('similarity')}</strong> {t('similarityInstructions')}</li>
           </ul>
