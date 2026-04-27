@@ -1,4 +1,5 @@
 class CeramicsController < ApplicationController
+  
   def index
     @no_box = true
     @ceramics = Ceramic.where("figures.probability > 0.6").order(:id)
