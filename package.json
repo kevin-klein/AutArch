@@ -67,7 +67,7 @@
     "standard": "^17.1.0"
   },
   "scripts": {
-    "build": "esbuild app/javascript/*.* --bundle --loader:.woff=file --loader:.woff2=file --loader:.svg=dataurl --loader:.png=dataurl --loader:.js=jsx --sourcemap --format=esm --outdir=app/assets/builds --public-path=/assets",
+    "build": "esbuild app/javascript/*.* --bundle --sourcemap --format=esm --loader:.woff=file --loader:.woff2=file --loader:.svg=dataurl --loader:.png=dataurl --loader:.js=jsx --outdir=app/assets/builds --public-path=/assets --minify",
     "test": "jest",
     "test:watch": "jest --watch"
   },
