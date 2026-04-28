@@ -49,6 +49,7 @@ const translations = {
     sourceImage: 'Source Image',
     demoFile: 'demo.jpg',
     dragImage: 'Drag the image above here to continue',
+    dragImageBelow: 'Drag the image below here to continue',
     dragDrop: 'Drag & drop an image file here',
     orClick: 'or click to browse',
 

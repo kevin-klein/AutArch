@@ -1,4 +1,5 @@
 class FiguresController < AuthorizedController
+  skip_before_action :verify_user, only: [:preview]
   before_action :set_figure, only: %i[show edit preview update destroy]
 
   # GET /figures or /figures.json
