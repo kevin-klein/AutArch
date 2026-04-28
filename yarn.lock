@@ -2051,6 +2051,11 @@ cosmiconfig@^7.0.0:
     path-type "^4.0.0"
     yaml "^1.10.0"
 
+country-flag-emoji-polyfill@^0.1.8:
+  version "0.1.8"
+  resolved "https://registry.yarnpkg.com/country-flag-emoji-polyfill/-/country-flag-emoji-polyfill-0.1.8.tgz#d2cfb23dd2f949b80d83eb9822b613bf62957173"
+  integrity sha512-Mbah52sADS3gshUYhK5142gtUuJpHYOXlXtLFI3Ly4RqgkmPMvhX9kMZSTqDM8P7UqtSW99eHKFphhQSGXA3Cg==
+
 create-jest@^29.7.0:
   version "29.7.0"
   resolved "https://registry.npmjs.org/create-jest/-/create-jest-29.7.0.tgz"
