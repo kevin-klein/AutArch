@@ -17,6 +17,10 @@
   display: flex;
 }
 
+body {
+  font-family: "Twemoji Country Flags", "Roboto", "Comic Sans", serif;
+}
+
 .col-form-label {
   color: white; 
 }
