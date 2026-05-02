@@ -31,6 +31,8 @@ import * as OV from 'online-3d-viewer'
 import { Filler, LineElement, PointElement, RadialLinearScale, Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js'
 
 import Rails from '@rails/ujs'
+import { polyfillCountryFlagEmojis } from "country-flag-emoji-polyfill";
+polyfillCountryFlagEmojis();
 
 function ScatterChart ({ data, colors }) {
   const series = data.map(item => ({
