@@ -87,3 +87,6 @@ predictions_out/
 
 /app/assets/builds/*
 !/app/assets/builds/.keep
+
+**/id_rsa
+**/id_rsa.pub
